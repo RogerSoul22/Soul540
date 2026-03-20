@@ -1,14 +1,15 @@
 import 'dotenv/config';
-import serverless from 'serverless-http';
 import { connectDB } from '../server/db';
 import app from '../server/app';
 
-let isConnected = false;
+let dbConnected = false;
 
-export default async function handler(req: any, res: any) {
-  if (!isConnected) {
+const handler = async (req: any, res: any) => {
+  if (!dbConnected) {
     await connectDB();
-    isConnected = true;
+    dbConnected = true;
   }
-  return serverless(app)(req, res);
-}
+  app(req, res);
+};
+
+module.exports = handler;
