@@ -5,6 +5,7 @@ import app from './app';
 const PORT = process.env.PORT || 3001;
 
 console.log('MONGO_URI defined:', !!process.env.MONGO_URI);
+console.log('Env keys:', Object.keys(process.env).join(', '));
 
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 
