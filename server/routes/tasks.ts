@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import mongoose, { Schema } from 'mongoose';
+import { getTenantFilter, getTenantUnit } from '../middleware/tenant';
 
 const TaskSchema = new Schema({
   title: String,
@@ -10,19 +11,20 @@ const TaskSchema = new Schema({
   dueDate: String,
   eventId: String,
   createdAt: { type: String, default: () => new Date().toISOString() },
+  unit: { type: String, default: 'main' },
 }, { toJSON: { virtuals: true, versionKey: false } });
 
 const Task = mongoose.models.Task || mongoose.model('Task', TaskSchema);
 
 const router = Router();
 
-router.get('/', async (_req, res) => {
-  const tasks = await Task.find();
+router.get('/', async (req, res) => {
+  const tasks = await Task.find(getTenantFilter(req));
   res.json(tasks);
 });
 
 router.post('/', async (req, res) => {
-  const task = await Task.create(req.body);
+  const task = await Task.create({ ...req.body, unit: getTenantUnit(req) });
   res.status(201).json(task);
 });
 

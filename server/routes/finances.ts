@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import mongoose from 'mongoose';
+import { getTenantFilter, getTenantUnit } from '../middleware/tenant';
 
 const FinanceSchema = new mongoose.Schema(
   {
@@ -11,6 +12,7 @@ const FinanceSchema = new mongoose.Schema(
     date: { type: String, required: true },
     status: { type: String, enum: ['pending', 'paid', 'received'], default: 'pending' },
     autoEventBudget: { type: Boolean, default: false },
+    unit: { type: String, default: 'main' },
   },
   { toJSON: { virtuals: true, versionKey: false }, id: true },
 );
@@ -18,13 +20,13 @@ const FinanceSchema = new mongoose.Schema(
 export const Finance = mongoose.models.Finance || mongoose.model('Finance', FinanceSchema);
 const router = Router();
 
-router.get('/', async (_req, res) => {
-  const finances = await Finance.find().sort({ date: -1 });
+router.get('/', async (req, res) => {
+  const finances = await Finance.find(getTenantFilter(req)).sort({ date: -1 });
   res.json(finances);
 });
 
 router.post('/', async (req, res) => {
-  const finance = await Finance.create(req.body);
+  const finance = await Finance.create({ ...req.body, unit: getTenantUnit(req) });
   res.status(201).json(finance);
 });
 

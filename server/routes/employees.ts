@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import mongoose, { Schema } from 'mongoose';
+import { getTenantFilter, getTenantUnit } from '../middleware/tenant';
 
 const EmployeeSchema = new Schema({
   name: String,
@@ -18,19 +19,20 @@ const EmployeeSchema = new Schema({
   pixKey: String,
   availableDays: [String],
   createdAt: { type: String, default: () => new Date().toISOString() },
+  unit: { type: String, default: 'main' },
 }, { toJSON: { virtuals: true, versionKey: false } });
 
 const Employee = mongoose.models.Employee || mongoose.model('Employee', EmployeeSchema);
 
 const router = Router();
 
-router.get('/', async (_req, res) => {
-  const employees = await Employee.find().sort({ name: 1 });
+router.get('/', async (req, res) => {
+  const employees = await Employee.find(getTenantFilter(req)).sort({ name: 1 });
   res.json(employees);
 });
 
 router.post('/', async (req, res) => {
-  const employee = await Employee.create(req.body);
+  const employee = await Employee.create({ ...req.body, unit: getTenantUnit(req) });
   res.status(201).json(employee);
 });
 

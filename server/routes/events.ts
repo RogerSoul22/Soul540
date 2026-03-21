@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import mongoose, { Schema } from 'mongoose';
 import { Finance } from './finances';
+import { getTenantFilter, getTenantUnit } from '../middleware/tenant';
 
 const EventSchema = new Schema({
   name: String,
@@ -23,19 +24,20 @@ const EventSchema = new Schema({
   contractPdfName: String,
   createdBy: String,
   createdAt: { type: String, default: () => new Date().toISOString() },
+  unit: { type: String, default: 'main' },
 }, { toJSON: { virtuals: true, versionKey: false } });
 
 const Event = mongoose.models.Event || mongoose.model('Event', EventSchema);
 
 const router = Router();
 
-router.get('/', async (_req, res) => {
-  const events = await Event.find().sort({ date: 1 });
+router.get('/', async (req, res) => {
+  const events = await Event.find(getTenantFilter(req)).sort({ date: 1 });
   res.json(events);
 });
 
 router.post('/', async (req, res) => {
-  const event = await Event.create(req.body);
+  const event = await Event.create({ ...req.body, unit: getTenantUnit(req) });
   if (event.budget && event.budget > 0) {
     await Finance.create({
       eventId: event.id,
@@ -46,6 +48,7 @@ router.post('/', async (req, res) => {
       date: event.date,
       status: 'pending',
       autoEventBudget: true,
+      unit: getTenantUnit(req),
     });
   }
   res.status(201).json(event);
@@ -72,6 +75,7 @@ router.put('/:id', async (req, res) => {
         date: event.date,
         status: 'pending',
         autoEventBudget: true,
+        unit: getTenantUnit(req),
       });
     }
   } else if (existing) {
