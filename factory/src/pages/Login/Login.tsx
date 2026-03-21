@@ -16,7 +16,7 @@ export default function Login() {
     setError('');
     try {
       await login(email, password);
-      navigate(ROUTES.DASHBOARD);
+      navigate(ROUTES.EVENTOS);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao fazer login');
     }

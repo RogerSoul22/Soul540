@@ -18,7 +18,7 @@ import { optionalAuth } from './middleware/auth';
 
 const app = express();
 
-app.use(cors());
+app.use(cors({ allowedHeaders: ['Content-Type', 'Authorization'] }));
 app.use(express.json());
 app.use(optionalAuth);
 

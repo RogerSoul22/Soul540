@@ -4,7 +4,6 @@ import { AppProvider } from '@/contexts/AppContext';
 import { ROUTES } from '@/routes';
 import Login from '@/pages/Login/Login';
 import Layout from '@/components/Layout/Layout';
-import Dashboard from '@/pages/Dashboard/Dashboard/Dashboard';
 import Funcionarios from '@/pages/Funcionarios/Funcionarios/Funcionarios';
 import Contratantes from '@/pages/Contratantes/Contratantes/Contratantes';
 import Eventos from '@/pages/Eventos/Eventos/Eventos';
@@ -22,7 +21,7 @@ function PrivateRoute() {
 function PublicRoute() {
   const { authenticated, loading } = useAuth();
   if (loading) return null;
-  return authenticated ? <Navigate to={ROUTES.DASHBOARD} replace /> : <Outlet />;
+  return authenticated ? <Navigate to={ROUTES.EVENTOS} replace /> : <Outlet />;
 }
 
 export default function App() {
@@ -36,7 +35,6 @@ export default function App() {
           </Route>
           <Route element={<PrivateRoute />}>
             <Route element={<Layout />}>
-              <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
               <Route path={ROUTES.FUNCIONARIOS} element={<Funcionarios />} />
               <Route path={ROUTES.CONTRATANTES} element={<Contratantes />} />
               <Route path={ROUTES.EVENTOS} element={<Eventos />} />
