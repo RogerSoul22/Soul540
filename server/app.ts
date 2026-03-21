@@ -14,11 +14,13 @@ import utensilCategoriesRouter from './routes/utensil-categories';
 import supplyCategoriesRouter from './routes/supply-categories';
 import authRouter from './routes/auth';
 import usersRouter from './routes/users';
+import { optionalAuth } from './middleware/auth';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(optionalAuth);
 
 app.use('/api/events', eventsRouter);
 app.use('/api/tasks', tasksRouter);
