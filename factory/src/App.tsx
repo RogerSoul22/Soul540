@@ -4,14 +4,14 @@ import { AppProvider } from '@/contexts/AppContext';
 import { ROUTES } from '@/routes';
 import Login from '@/pages/Login/Login';
 import Layout from '@/components/Layout/Layout';
-import Dashboard from '@/pages/Dashboard/Dashboard';
-import Funcionarios from '@/pages/Funcionarios/Funcionarios';
-import Contratantes from '@/pages/Contratantes/Contratantes';
-import Eventos from '@/pages/Eventos/Eventos';
-import EstoqueInsumos from '@/pages/EstoqueInsumos/EstoqueInsumos';
-import EstoqueUtensilios from '@/pages/EstoqueUtensilios/EstoqueUtensilios';
-import Permissoes from '@/pages/Permissoes/Permissoes';
-import Financeiro from '@/pages/Financeiro/Financeiro';
+import Dashboard from '@/pages/Dashboard/Dashboard/Dashboard';
+import Funcionarios from '@/pages/Funcionarios/Funcionarios/Funcionarios';
+import Contratantes from '@/pages/Contratantes/Contratantes/Contratantes';
+import Eventos from '@/pages/Eventos/Eventos/Eventos';
+import EstoqueInsumos from '@/pages/EstoqueInsumos/EstoqueInsumos/EstoqueInsumos';
+import EstoqueUtensilios from '@/pages/EstoqueUtensilios/EstoqueUtensilios/EstoqueUtensilios';
+import Permissoes from '@/pages/Permissoes/Permissoes/Permissoes';
+import Financeiro from '@/pages/Financeiro/Financeiro/Financeiro';
 
 function PrivateRoute() {
   const { authenticated, loading } = useAuth();

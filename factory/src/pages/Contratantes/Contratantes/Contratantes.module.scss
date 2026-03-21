@@ -1,5 +1,5 @@
-@use '../../styles/variables' as *;
-@use '../../styles/mixins' as *;
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
 
 .page { padding: $spacing-2xl $spacing-xl; animation: fadeIn 0.4s ease; @include mobile { padding: $spacing-md; } }
 .header { @include flex-between; margin-bottom: $spacing-2xl; flex-wrap: wrap; gap: $spacing-md; }
