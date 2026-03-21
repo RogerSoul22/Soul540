@@ -11,6 +11,7 @@ import EstoqueInsumos from '@/pages/EstoqueInsumos/EstoqueInsumos/EstoqueInsumos
 import EstoqueUtensilios from '@/pages/EstoqueUtensilios/EstoqueUtensilios/EstoqueUtensilios';
 import Permissoes from '@/pages/Permissoes/Permissoes/Permissoes';
 import Financeiro from '@/pages/Financeiro/Financeiro/Financeiro';
+import MinhaConta from '@/pages/MinhaConta/MinhaConta';
 
 function PrivateRoute() {
   const { authenticated, loading } = useAuth();
@@ -42,6 +43,7 @@ export default function App() {
               <Route path={ROUTES.ESTOQUE_UTENSILIOS} element={<EstoqueUtensilios />} />
               <Route path={ROUTES.PERMISSOES} element={<Permissoes />} />
               <Route path={ROUTES.FINANCEIRO} element={<Financeiro />} />
+              <Route path={ROUTES.USUARIO} element={<MinhaConta />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to={ROUTES.LOGIN} replace />} />

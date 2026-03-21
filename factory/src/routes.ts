@@ -8,4 +8,5 @@ export const ROUTES = {
   ESTOQUE_UTENSILIOS: '/estoque-utensilios',
   PERMISSOES: '/permissoes',
   FINANCEIRO: '/financeiro',
+  USUARIO: '/minha-conta',
 } as const;
