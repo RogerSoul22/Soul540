@@ -37,7 +37,7 @@ function buildWhatsAppUrl(ev: PizzaEvent): string {
     `📅 Data: ${dateStr}${ev.time ? ` às ${ev.time}` : ''}`,
     `📍 Local: ${ev.location}${ev.outOfCity ? ' (fora da cidade)' : ''}`,
     `👥 Convidados: ${ev.guestCount}`,
-    `💰 Valor: R$ ${ev.budget.toLocaleString('pt-BR')}`,
+    `💰 Valor: R$ ${(ev.budget ?? 0).toLocaleString('pt-BR')}`,
     ...(ev.notes ? [`📝 Obs: ${ev.notes}`] : []),
   ];
   return `https://wa.me/55${digits}?text=${encodeURIComponent(lines.join('\n'))}`;
@@ -176,7 +176,7 @@ function EventModal({ event, onClose, onUpdate, onDelete }: {
                 <div className={styles.detailGrid}>
                   <div className={styles.detailItem}>
                     <span className={styles.detailLabel}>Valor</span>
-                    <span className={styles.detailValue}>R$ {event.budget.toLocaleString('pt-BR')}</span>
+                    <span className={styles.detailValue}>R$ {(event.budget ?? 0).toLocaleString('pt-BR')}</span>
                   </div>
                   <div className={styles.detailItem}>
                     <span className={styles.detailLabel}>Convidados</span>
@@ -199,11 +199,11 @@ function EventModal({ event, onClose, onUpdate, onDelete }: {
               )}
 
               {/* Cardápio */}
-              {event.menu.length > 0 && (
+              {(event.menu ?? []).length > 0 && (
                 <div className={styles.detailSection}>
                   <p className={styles.detailSectionTitle}>Cardápio</p>
                   <div className={styles.menuList}>
-                    {event.menu.map((item) => (
+                    {(event.menu ?? []).map((item) => (
                       <span key={item} className={styles.menuTag}>{item}</span>
                     ))}
                   </div>
@@ -243,7 +243,7 @@ function EventModal({ event, onClose, onUpdate, onDelete }: {
               <div className={styles.detailSection}>
                 <p className={styles.detailSectionTitle}>Criado por</p>
                 <span className={styles.detailValue}>
-                  {event.createdBy || format(parseISO(event.createdAt), 'dd/MM/yyyy')}
+                  {event.createdBy || (event.createdAt ? format(parseISO(event.createdAt), 'dd/MM/yyyy') : '')}
                 </span>
               </div>
 
@@ -530,7 +530,7 @@ export default function CalendarView({ events }: Props) {
                   <div className={styles.allDayEventContent}>
                     <p className={styles.allDayEventName}>{ev.name}</p>
                     <p className={styles.allDayEventMeta}>
-                      {ev.location} · {ev.guestCount} convidados · R$ {ev.budget.toLocaleString('pt-BR')}
+                      {ev.location} · {ev.guestCount} convidados · R$ {(ev.budget ?? 0).toLocaleString('pt-BR')}
                     </p>
                   </div>
                 </div>

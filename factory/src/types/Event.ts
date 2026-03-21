@@ -7,19 +7,20 @@ export interface PizzaEvent {
   endDate?: string;
   time?: string;
   duration?: string;
-  location: string;
+  location?: string;
   outOfCity?: boolean;
   phone?: string;
-  guestCount: number;
-  status: EventStatus;
-  budget: number;
-  menu: string[];
-  notes: string;
+  guestCount?: number;
+  status?: EventStatus | string;
+  budget?: number;
+  menu?: string[];
+  notes?: string;
   responsibleEmployeeId?: string;
   staffCount?: number;
   selectedEmployeeIds?: string[];
   paymentProofName?: string;
   contractPdfName?: string;
   createdBy?: string;
-  createdAt: string;
+  createdAt?: string;
+  [key: string]: any;
 }

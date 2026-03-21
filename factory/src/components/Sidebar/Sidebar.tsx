@@ -79,7 +79,7 @@ export default function Sidebar() {
           <div className={styles.avatar}>{user?.name?.charAt(0) || 'F'}</div>
           <div className={styles.userDetails}>
             <p className={styles.userName}>{user?.name}</p>
-            <p className={styles.userRole}>{user?.role}</p>
+            <p className={styles.userRole}>{user?.isAdmin ? 'Admin' : 'Colaborador'}</p>
           </div>
           <button className={styles.logoutBtn} onClick={handleLogout} title="Sair">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
