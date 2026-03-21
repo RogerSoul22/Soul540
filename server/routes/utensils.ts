@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import mongoose, { Schema } from 'mongoose';
+import { getTenantFilter, getTenantUnit } from '../middleware/tenant';
 
 const UtensilSchema = new Schema({
   name: { type: String, required: true },
@@ -8,6 +9,7 @@ const UtensilSchema = new Schema({
   unitValue: Number,
   location: { type: String, default: '' },
   status: { type: String, default: 'disponivel' },
+  unit: { type: String, default: 'main' },
   createdAt: { type: String, default: () => new Date().toISOString() },
 }, { toJSON: { virtuals: true, versionKey: false } });
 
@@ -15,13 +17,13 @@ const Utensil = mongoose.models.Utensil || mongoose.model('Utensil', UtensilSche
 
 const router = Router();
 
-router.get('/', async (_req, res) => {
-  const utensils = await Utensil.find().sort({ name: 1 });
+router.get('/', async (req, res) => {
+  const utensils = await Utensil.find(getTenantFilter(req)).sort({ name: 1 });
   res.json(utensils);
 });
 
 router.post('/', async (req, res) => {
-  const utensil = await Utensil.create(req.body);
+  const utensil = await Utensil.create({ ...req.body, unit: getTenantUnit(req) });
   res.status(201).json(utensil);
 });
 

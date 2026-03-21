@@ -1,16 +1,18 @@
 import { Router } from 'express';
 import mongoose, { Schema } from 'mongoose';
+import { getTenantFilter, getTenantUnit } from '../middleware/tenant';
 
 const SupplySchema = new Schema({
   name: { type: String, required: true },
   category: { type: String, default: '' },
-  unit: { type: String, default: 'kg' },
+  measureUnit: { type: String, default: 'kg' },
   quantity: { type: Number, default: 0 },
   minStock: { type: Number, default: 0 },
   costPerUnit: { type: Number, default: 0 },
   supplier: { type: String, default: '' },
   expirationDate: String,
   status: { type: String, default: 'em_estoque' },
+  unit: { type: String, default: 'main' },
   createdAt: { type: String, default: () => new Date().toISOString() },
 }, { toJSON: { virtuals: true, versionKey: false } });
 
@@ -18,13 +20,13 @@ const Supply = mongoose.models.Supply || mongoose.model('Supply', SupplySchema);
 
 const router = Router();
 
-router.get('/', async (_req, res) => {
-  const supplies = await Supply.find().sort({ name: 1 });
+router.get('/', async (req, res) => {
+  const supplies = await Supply.find(getTenantFilter(req)).sort({ name: 1 });
   res.json(supplies);
 });
 
 router.post('/', async (req, res) => {
-  const supply = await Supply.create(req.body);
+  const supply = await Supply.create({ ...req.body, unit: getTenantUnit(req) });
   res.status(201).json(supply);
 });
 

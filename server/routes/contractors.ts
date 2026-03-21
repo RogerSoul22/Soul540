@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import mongoose, { Schema } from 'mongoose';
+import { getTenantFilter, getTenantUnit } from '../middleware/tenant';
 
 const ContractorSchema = new Schema({
   name: String,
@@ -14,6 +15,7 @@ const ContractorSchema = new Schema({
   category: String,
   status: { type: String, default: 'ativo' },
   totalRevenue: { type: Number, default: 0 },
+  unit: { type: String, default: 'main' },
   createdAt: { type: String, default: () => new Date().toISOString() },
 }, { toJSON: { virtuals: true, versionKey: false } });
 
@@ -21,13 +23,13 @@ const Contractor = mongoose.models.Contractor || mongoose.model('Contractor', Co
 
 const router = Router();
 
-router.get('/', async (_req, res) => {
-  const contractors = await Contractor.find().sort({ name: 1 });
+router.get('/', async (req, res) => {
+  const contractors = await Contractor.find(getTenantFilter(req)).sort({ name: 1 });
   res.json(contractors);
 });
 
 router.post('/', async (req, res) => {
-  const contractor = await Contractor.create(req.body);
+  const contractor = await Contractor.create({ ...req.body, unit: getTenantUnit(req) });
   res.status(201).json(contractor);
 });
 
