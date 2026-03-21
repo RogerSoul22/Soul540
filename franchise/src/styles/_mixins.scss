@@ -44,6 +44,42 @@
   text-overflow: ellipsis;
 }
 
+// === Card ===
+@mixin card {
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  transition: all $transition-smooth;
+}
+
+@mixin card-hover {
+  &:hover {
+    border-color: $border-accent;
+    box-shadow: $shadow-card, $shadow-glow;
+    transform: translateY(-2px);
+  }
+}
+
+@mixin glass {
+  background: rgba($raw-bg-secondary, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+@mixin focus-ring {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba($accent, 0.5);
+}
+
+@mixin section-title {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
 // === Visually hidden (accessibility) ===
 @mixin sr-only {
   position: absolute;
