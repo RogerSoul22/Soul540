@@ -26,8 +26,16 @@ router.post('/login', async (req, res) => {
   const match = await bcrypt.compare(password, user.passwordHash);
   if (!match) return res.status(401).json({ error: 'Email ou senha incorretos' });
 
+  const userUnit = (user as any).unit || 'main';
+  const xSystem = (req.headers['x-system'] as string) || 'main';
+
+  // Admins can log in to any system; other users only to their own system
+  if (!user.isAdmin && userUnit !== xSystem) {
+    return res.status(403).json({ error: 'Acesso não permitido neste sistema' });
+  }
+
   const token = 'token-' + user._id + '-' + Date.now();
-  res.json({ token, user: { id: user.id, name: user.name, email: user.email, isAdmin: user.isAdmin, permissions: user.permissions, unit: (user as any).unit || 'main' } });
+  res.json({ token, user: { id: user.id, name: user.name, email: user.email, isAdmin: user.isAdmin, permissions: user.permissions, unit: userUnit } });
 });
 
 export default router;
