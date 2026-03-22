@@ -26,8 +26,8 @@ export default function Dashboard() {
   const urgentTasks = useMemo(() => tasks.filter((t) => t.priority === 'urgent' && t.status !== 'done'), [tasks]);
 
   const filteredEvents = useMemo(() => {
-    if (unitFilter === 'main') return events.filter((e) => !e.unit || e.unit === 'main');
-    if (unitFilter === 'franchise') return events.filter((e) => e.unit === 'franchise');
+    if (unitFilter === 'main') return events.filter((e) => !e.source || e.source === 'main');
+    if (unitFilter === 'franchise') return events.filter((e) => e.source === 'franchise');
     return events;
   }, [events, unitFilter]);
 

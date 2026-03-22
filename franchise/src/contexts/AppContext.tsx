@@ -57,9 +57,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const addEvent = useCallback(async (data: Omit<PizzaEvent, 'id' | 'createdAt'>) => {
-    const res = await apiFetch('/api/events', { method: 'POST', body: JSON.stringify({ ...data, unit: 'franchise' }) });
+    const res = await apiFetch('/api/events', { method: 'POST', body: JSON.stringify(data) });
     const created: PizzaEvent = await res.json();
-    setEvents((prev) => [...prev, { ...created, unit: 'franchise' }]);
+    setEvents((prev) => [...prev, created]);
     refreshFinances();
     return created;
   }, [refreshFinances]);

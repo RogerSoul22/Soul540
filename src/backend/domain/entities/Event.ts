@@ -23,4 +23,5 @@ export interface PizzaEvent {
   createdBy?: string;
   createdAt: string;
   unit?: string;
+  source?: string;
 }
