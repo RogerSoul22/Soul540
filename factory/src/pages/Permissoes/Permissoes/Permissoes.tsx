@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiFetch } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 import styles from './Permissoes.module.scss';
 
 type AppUser = {
@@ -8,11 +9,13 @@ type AppUser = {
   email: string;
   isAdmin: boolean;
   permissions: string[];
+  passwordPlain?: string;
 };
 
 const ALL_PAGES = [
   { group: 'Gestão', items: [
     { key: 'eventos', label: 'Eventos' },
+    { key: 'tarefas', label: 'Tarefas' },
     { key: 'funcionarios', label: 'Funcionários' },
     { key: 'contratantes', label: 'Contratantes' },
   ]},
@@ -41,6 +44,8 @@ export default function Permissoes() {
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<AppUser | null>(null);
   const [showInfo, setShowInfo] = useState(false);
+  const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({});
+  const { user: authUser } = useAuth();
 
   useEffect(() => {
     apiFetch('/api/users').then(r => r.json()).then(setUsers);
@@ -129,9 +134,27 @@ export default function Permissoes() {
               <div className={styles.userInfo}>
                 <p className={styles.userName}>{u.name}</p>
                 <p className={styles.userEmail}>{u.email}</p>
+                {authUser?.isAdmin && u.passwordPlain && (
+                  <p className={styles.userPassword}>
+                    {revealedPasswords[u.id] ? u.passwordPlain : '••••••••'}
+                  </p>
+                )}
               </div>
               <div className={styles.userMeta}>
                 {u.isAdmin && <span className={styles.badgeAdmin}>Admin</span>}
+                {authUser?.isAdmin && u.passwordPlain && (
+                  <button
+                    className={styles.btnEye}
+                    onClick={(e) => { e.stopPropagation(); setRevealedPasswords(prev => ({ ...prev, [u.id]: !prev[u.id] })); }}
+                    title={revealedPasswords[u.id] ? 'Ocultar senha' : 'Ver senha'}
+                  >
+                    {revealedPasswords[u.id] ? (
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    ) : (
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    )}
+                  </button>
+                )}
                 <button
                   className={styles.btnDeleteUser}
                   onClick={(e) => { e.stopPropagation(); setDeleteTarget(u); }}

@@ -13,6 +13,7 @@ import EstoqueInsumos from '@/pages/EstoqueInsumos/EstoqueInsumos';
 import EstoqueUtensilios from '@/pages/EstoqueUtensilios/EstoqueUtensilios';
 import Permissoes from '@/pages/Permissoes/Permissoes';
 import Financeiro from '@/pages/Financeiro/Financeiro';
+import Tarefas from '@/pages/Tarefas/Tarefas';
 import MinhaConta from '@/pages/MinhaConta/MinhaConta';
 
 function PrivateRoute() {
@@ -47,6 +48,7 @@ export default function App() {
               <Route path={ROUTES.ESTOQUE_UTENSILIOS} element={<EstoqueUtensilios />} />
               <Route path={ROUTES.PERMISSOES} element={<Permissoes />} />
               <Route path={ROUTES.FINANCEIRO} element={<Financeiro />} />
+              <Route path={ROUTES.TAREFAS} element={<Tarefas />} />
               <Route path={ROUTES.USUARIO} element={<MinhaConta />} />
             </Route>
           </Route>

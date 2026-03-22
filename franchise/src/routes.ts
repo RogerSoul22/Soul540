@@ -9,5 +9,6 @@ export const ROUTES = {
   CARDAPIOS: '/cardapios',
   PERMISSOES: '/permissoes',
   FINANCEIRO: '/financeiro',
+  TAREFAS: '/tarefas',
   USUARIO: '/minha-conta',
 } as const;

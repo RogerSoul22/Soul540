@@ -268,6 +268,54 @@
   justify-content: flex-end;
 }
 
+.passwordRow {
+  display: flex;
+  align-items: flex-end;
+  gap: $spacing-md;
+}
+
+.passwordInputWrap {
+  position: relative;
+
+  .formInput { padding-right: 42px; width: 100%; box-sizing: border-box; }
+}
+
+.eyeBtn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  transition: color $transition-fast;
+
+  &:hover { color: $accent; }
+}
+
+.btnChangePassword {
+  padding: 10px $spacing-lg;
+  background: none;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all $transition-fast;
+  flex-shrink: 0;
+  height: 40px;
+  align-self: flex-end;
+
+  &:hover:not(:disabled) { border-color: $accent; color: $accent; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
 // Settings
 .settingRow {
   display: flex;
