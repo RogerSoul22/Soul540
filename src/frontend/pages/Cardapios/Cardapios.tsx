@@ -83,7 +83,7 @@ async function generateMenuPdf(menu: StaticMenu) {
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true, logging: false },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    }).from(container.querySelector('#menu-pdf')).save();
+    }).from(container.querySelector('#menu-pdf') as HTMLElement).save();
   } finally {
     document.body.removeChild(container);
   }
@@ -329,7 +329,7 @@ export default function Cardapios() {
                 <div className={styles.standardBadge}>Soul540</div>
                 <div className={styles.standardStatsRow}>
                   {menu.categories.map((cat) => (
-                    <span key={cat.id} className={styles.standardStat}>
+                    <span key={cat.name} className={styles.standardStat}>
                       <strong>{cat.items.length}</strong> {cat.name.toLowerCase().includes('entrada') ? 'entradas' : cat.name.toLowerCase().includes('doce') ? 'doces' : 'sabores'}
                     </span>
                   ))}
