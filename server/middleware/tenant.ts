@@ -1,8 +1,8 @@
 function resolveUnit(req: any): string {
-  const userUnit = req.user?.unit;
-  if (userUnit && userUnit !== 'main') return userUnit;
   const xSystem = req.headers?.['x-system'];
   if (xSystem === 'franchise' || xSystem === 'factory') return xSystem;
+  const userUnit = req.user?.unit;
+  if (userUnit && userUnit !== 'main') return userUnit;
   return 'main';
 }
 
