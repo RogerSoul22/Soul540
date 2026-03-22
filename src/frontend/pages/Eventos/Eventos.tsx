@@ -155,6 +155,7 @@ export default function Eventos() {
     fetch('/api/employees').then(r => r.json()).then(setEmployees).catch(() => {});
   }, []);
   const [search, setSearch] = useState('');
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'main' | 'franchise'>('all');
 const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
@@ -170,13 +171,14 @@ const [showModal, setShowModal] = useState(false);
 
   const filtered = useMemo(() => {
     const all = events
+      .filter((e) => sourceFilter === 'all' || (sourceFilter === 'main' ? (!e.source || e.source === 'main') : e.source === 'franchise'))
       .filter((e) => !search || e.name.toLowerCase().includes(search.toLowerCase()))
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     return {
       fechados: all.filter((e) => e.status !== 'planning'),
       orcamentos: all.filter((e) => e.status === 'planning'),
     };
-  }, [events, search]);
+  }, [events, search, sourceFilter]);
 
   const openCreate = () => {
     setForm(emptyForm);
@@ -301,6 +303,11 @@ return (
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+        </div>
+        <div className={styles.unitFilter}>
+          <button className={`${styles.unitFilterBtn} ${sourceFilter === 'all' ? styles.unitFilterBtnActive : ''}`} onClick={() => setSourceFilter('all')}>Todos</button>
+          <button className={`${styles.unitFilterBtn} ${sourceFilter === 'main' ? styles.unitFilterBtnActive : ''}`} onClick={() => setSourceFilter('main')}>Principal</button>
+          <button className={`${styles.unitFilterBtn} ${sourceFilter === 'franchise' ? styles.unitFilterBtnActive : ''}`} onClick={() => setSourceFilter('franchise')}>Franquia</button>
         </div>
       </div>
 

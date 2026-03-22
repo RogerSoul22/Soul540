@@ -83,6 +83,7 @@
 .controls {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: $spacing-md;
   margin-bottom: $spacing-xl;
   flex-wrap: wrap;
@@ -92,6 +93,38 @@
   position: relative;
   flex: 1;
   max-width: 400px;
+}
+
+.unitFilter {
+  display: flex;
+  align-items: center;
+  background: var(--surface-alt, rgba(0,0,0,0.04));
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 3px;
+  gap: 2px;
+}
+
+.unitFilterBtn {
+  padding: 5px 14px;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-muted;
+  background: none;
+  border: none;
+  border-radius: calc(#{$radius-sm} - 2px);
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover { color: $text-primary; }
+}
+
+.unitFilterBtnActive {
+  background: $accent;
+  color: #fff;
+  font-weight: $font-weight-semibold;
+
+  &:hover { background: $accent-hover; color: #fff; }
 }
 
 .searchIcon {
