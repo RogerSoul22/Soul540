@@ -83,7 +83,7 @@ async function generateMenuPdf(menu: StaticMenu) {
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true, logging: false },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    }).from(container.querySelector('#menu-pdf') as HTMLElement).save();
+    }).from(container.querySelector<HTMLElement>('#menu-pdf')!).save();
   } finally {
     document.body.removeChild(container);
   }
