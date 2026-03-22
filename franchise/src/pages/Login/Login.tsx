@@ -32,7 +32,7 @@ export default function Login() {
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.field}>
               <label>Email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="franquia@soul540.com" required />
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="seu@email.com" required />
             </div>
             <div className={styles.field}>
               <label>Senha</label>
@@ -43,7 +43,6 @@ export default function Login() {
               {loading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
-          <p className={styles.hint}>Email: franquia@soul540.com · Senha: franquia123</p>
         </div>
       </div>
     </div>
