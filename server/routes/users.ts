@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { UserModel } from './auth';
+import { getTenantUnit } from '../middleware/tenant';
 
 const router = Router();
 
@@ -17,7 +18,7 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'name, email e password obrigatorios' });
   }
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = await UserModel.create({ name: name.trim(), email: email.toLowerCase().trim(), passwordHash, isAdmin: !!isAdmin, permissions: permissions || [] });
+  const user = await UserModel.create({ name: name.trim(), email: email.toLowerCase().trim(), passwordHash, isAdmin: !!isAdmin, permissions: permissions || [], unit: getTenantUnit(req) });
   const { passwordHash: _, ...safe } = user.toJSON();
   res.status(201).json(safe);
 });

@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { apiFetch } from '@/lib/api';
 import { useApp } from '@/contexts/AppContext';
 import type { PizzaEvent } from '@/types/Event';
 import { format, parseISO } from 'date-fns';
@@ -13,6 +14,7 @@ type Employee = {
   phone: string;
   status: string;
   createdAt: string;
+  unit?: string;
 };
 
 
@@ -160,7 +162,7 @@ export default function Eventos() {
   const [employees, setEmployees] = useState<Employee[]>([]);
 
   useEffect(() => {
-    fetch('/api/employees').then(r => r.json()).then(setEmployees).catch(() => {});
+    apiFetch('/api/employees').then(r => r.json()).then(setEmployees).catch(() => {});
   }, []);
   const [search, setSearch] = useState('');
 const [showModal, setShowModal] = useState(false);

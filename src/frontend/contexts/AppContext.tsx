@@ -4,7 +4,6 @@ import type { PizzaEvent } from '@backend/domain/entities/Event';
 import type { FinanceEntry } from '@backend/domain/entities/Finance';
 import type { Invoice } from '@backend/domain/entities/Invoice';
 import type { Task } from '@backend/domain/entities/Task';
-import { mockInvoices } from '@backend/infra/data/mockData';
 
 interface AppContextData {
   events: PizzaEvent[];
@@ -30,13 +29,14 @@ const AppContext = createContext<AppContextData>({} as AppContextData);
 export function AppProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<PizzaEvent[]>([]);
   const [finances, setFinances] = useState<FinanceEntry[]>([]);
-  const [invoices, setInvoices] = useState<Invoice[]>(mockInvoices);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
 
   useEffect(() => {
     fetch('/api/events').then(r => r.json()).then(setEvents).catch(() => {});
     fetch('/api/tasks').then(r => r.json()).then(setTasks).catch(() => {});
     fetch('/api/finances').then(r => r.json()).then(setFinances).catch(() => {});
+    fetch('/api/invoices').then(r => r.json()).then(setInvoices).catch(() => {});
   }, []);
 
   // Finance (API)
@@ -64,14 +64,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setFinances((prev) => prev.filter((f) => f.id !== id));
   }, []);
 
-  // Invoice (still mock)
-  const addInvoice = useCallback((invoice: Invoice) => {
-    setInvoices((prev) => [...prev, invoice]);
+  // Invoice (API)
+  const addInvoice = useCallback(async (invoice: Invoice) => {
+    const { id: _id, ...data } = invoice;
+    const res = await fetch('/api/invoices', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const created: Invoice = await res.json();
+    setInvoices((prev) => [created, ...prev]);
   }, []);
-  const updateInvoice = useCallback((id: string, data: Partial<Invoice>) => {
-    setInvoices((prev) => prev.map((inv) => (inv.id === id ? { ...inv, ...data } : inv)));
+  const updateInvoice = useCallback(async (id: string, data: Partial<Invoice>) => {
+    const res = await fetch(`/api/invoices/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const updated: Invoice = await res.json();
+    setInvoices((prev) => prev.map((inv) => (inv.id === id ? updated : inv)));
   }, []);
-  const deleteInvoice = useCallback((id: string) => {
+  const deleteInvoice = useCallback(async (id: string) => {
+    await fetch(`/api/invoices/${id}`, { method: 'DELETE' });
     setInvoices((prev) => prev.filter((inv) => inv.id !== id));
   }, []);
 

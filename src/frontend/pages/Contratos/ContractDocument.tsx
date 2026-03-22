@@ -1,8 +1,24 @@
 import { useState, useRef, useCallback } from 'react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import type { Contract } from '@backend/infra/data/mockData';
 import type { PizzaEvent } from '@backend/domain/entities/Event';
+
+type Contract = {
+  id: string;
+  clientName: string;
+  clientDocument?: string;
+  clientEmail?: string;
+  clientPhone?: string;
+  eventId?: string;
+  value: number;
+  startDate: string;
+  endDate?: string;
+  description: string;
+  paymentConditions?: string;
+  terms?: string;
+  status: string;
+  createdAt: string;
+};
 import styles from './ContractDocument.module.scss';
 
 interface Props {

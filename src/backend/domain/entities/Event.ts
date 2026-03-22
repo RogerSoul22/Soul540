@@ -22,4 +22,5 @@ export interface PizzaEvent {
   contractPdfName?: string;
   createdBy?: string;
   createdAt: string;
+  unit?: string;
 }

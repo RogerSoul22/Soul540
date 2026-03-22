@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
+import { apiFetch } from '@/lib/api';
 
 type Contractor = {
   id: string;
@@ -118,11 +119,11 @@ export default function Contratantes() {
   const [showInfo, setShowInfo] = useState(false);
 
   useEffect(() => {
-    fetch('/api/contractors')
+    apiFetch('/api/contractors')
       .then(r => r.json())
       .then(setContractors)
       .finally(() => setLoading(false));
-    fetch('/api/contractor-categories')
+    apiFetch('/api/contractor-categories')
       .then(r => r.json())
       .then(setCategories)
       .catch(() => {});
@@ -161,7 +162,7 @@ export default function Contratantes() {
   const addCategory = async () => {
     const trimmed = newCategory.trim();
     if (trimmed && !categories.map(c => c.toLowerCase()).includes(trimmed.toLowerCase())) {
-      await fetch('/api/contractor-categories', {
+      await apiFetch('/api/contractor-categories', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: trimmed }),
@@ -205,13 +206,13 @@ export default function Contratantes() {
       totalRevenue: existing?.totalRevenue ?? 0,
     };
     if (editingId) {
-      const res = await fetch(`/api/contractors/${editingId}`, {
+      const res = await apiFetch(`/api/contractors/${editingId}`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
       });
       const updated = await res.json();
       setContractors((prev) => prev.map((c) => c.id === editingId ? updated : c));
     } else {
-      const res = await fetch('/api/contractors', {
+      const res = await apiFetch('/api/contractors', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
       });
       const created = await res.json();
@@ -223,7 +224,7 @@ export default function Contratantes() {
   const handleDelete = (id: string) => setDeleteTargetId(id);
   const confirmDelete = async () => {
     if (deleteTargetId) {
-      await fetch(`/api/contractors/${deleteTargetId}`, { method: 'DELETE' });
+      await apiFetch(`/api/contractors/${deleteTargetId}`, { method: 'DELETE' });
       setContractors((prev) => prev.filter((c) => c.id !== deleteTargetId));
     }
     setDeleteTargetId(null);
@@ -614,7 +615,7 @@ export default function Contratantes() {
           confirmLabel="Remover"
           variant="danger"
           onConfirm={async () => {
-            await fetch('/api/contractor-categories', {
+            await apiFetch('/api/contractor-categories', {
               method: 'DELETE',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ name: deleteCatTarget }),

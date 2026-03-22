@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { apiFetch } from '@/lib/api';
 
 type Employee = {
   id: string;
@@ -86,7 +87,7 @@ export default function Funcionarios() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/employees')
+    apiFetch('/api/employees')
       .then(r => r.json())
       .then(setEmployees)
       .finally(() => setLoading(false));
@@ -168,13 +169,13 @@ export default function Funcionarios() {
       availableDays: form.availableDays.length > 0 ? form.availableDays : undefined,
     };
     if (editingId) {
-      const res = await fetch(`/api/employees/${editingId}`, {
+      const res = await apiFetch(`/api/employees/${editingId}`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
       });
       const updated = await res.json();
       setEmployees((prev) => prev.map((e) => e.id === editingId ? updated : e));
     } else {
-      const res = await fetch('/api/employees', {
+      const res = await apiFetch('/api/employees', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
       });
       const created = await res.json();
@@ -185,7 +186,7 @@ export default function Funcionarios() {
 
   const confirmDelete = async () => {
     if (deleteTargetId) {
-      await fetch(`/api/employees/${deleteTargetId}`, { method: 'DELETE' });
+      await apiFetch(`/api/employees/${deleteTargetId}`, { method: 'DELETE' });
       setEmployees((prev) => prev.filter((e) => e.id !== deleteTargetId));
     }
     setDeleteTargetId(null);

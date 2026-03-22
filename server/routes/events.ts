@@ -29,15 +29,26 @@ const EventSchema = new Schema({
 
 const Event = mongoose.models.Event || mongoose.model('Event', EventSchema);
 
+function getEventReadFilter(req: any) {
+  const unit = getTenantUnit(req);
+  if (unit === 'franchise') return { unit: 'franchise' };
+  // main and factory both see main + franchise events (null catches legacy docs with no unit field)
+  return { unit: { $in: ['main', 'franchise', null] } };
+}
+
 const router = Router();
 
 router.get('/', async (req, res) => {
-  const events = await Event.find(getTenantFilter(req)).sort({ date: 1 });
+  const events = await Event.find(getEventReadFilter(req)).sort({ date: 1 });
   res.json(events);
 });
 
 router.post('/', async (req, res) => {
-  const event = await Event.create({ ...req.body, unit: getTenantUnit(req) });
+  if (req.user?.unit === 'factory') return res.status(403).json({ error: 'Forbidden' });
+  const resolvedUnit = getTenantUnit(req);
+  const bodyUnit = req.body.unit;
+  const unit = (bodyUnit === 'franchise' || bodyUnit === 'factory') ? bodyUnit : resolvedUnit;
+  const event = await Event.create({ ...req.body, unit });
   if (event.budget && event.budget > 0) {
     await Finance.create({
       eventId: event.id,
@@ -48,13 +59,14 @@ router.post('/', async (req, res) => {
       date: event.date,
       status: 'pending',
       autoEventBudget: true,
-      unit: getTenantUnit(req),
+      unit,
     });
   }
   res.status(201).json(event);
 });
 
 router.put('/:id', async (req, res) => {
+  if (req.user?.unit === 'factory') return res.status(403).json({ error: 'Forbidden' });
   const event = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
   if (!event) return res.status(404).json({ error: 'Not found' });
   const existing = await Finance.findOne({ eventId: event.id, autoEventBudget: true });
@@ -85,6 +97,7 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
+  if (req.user?.unit === 'factory') return res.status(403).json({ error: 'Forbidden' });
   await Event.findByIdAndDelete(req.params.id);
   await Finance.deleteMany({ eventId: req.params.id, autoEventBudget: true });
   res.status(204).end();

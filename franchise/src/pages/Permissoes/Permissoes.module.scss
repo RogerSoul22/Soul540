@@ -58,3 +58,20 @@
 .input { padding: 10px $spacing-md; background: $bg-card; border: 1px solid $border; border-radius: $radius-sm; color: $text-primary; font-size: $font-size-sm; transition: all $transition-base; &::placeholder { color: $text-muted; } &:focus { outline: none; border-color: $accent; box-shadow: 0 0 0 3px rgba($accent, 0.1); } }
 .checkboxLabel { display: flex; align-items: center; gap: $spacing-sm; font-size: $font-size-sm; color: $text-secondary; cursor: pointer; input { width: 16px; height: 16px; accent-color: $accent; cursor: pointer; } }
 .deleteMsg { font-size: $font-size-sm; color: $text-secondary; line-height: 1.6; strong { color: $text-primary; } }
+
+.titleRow { display: flex; align-items: center; gap: $spacing-sm; }
+
+.btnInfo {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  background: none; border: none;
+  color: $text-muted; cursor: pointer;
+  border-radius: $radius-xs;
+  transition: all $transition-fast;
+  &:hover { color: $accent; background: rgba($accent, 0.08); }
+}
+
+.infoSection { display: flex; flex-direction: column; gap: 6px; }
+.infoSectionTitle { font-size: $font-size-sm; font-weight: $font-weight-semibold; color: $accent; text-transform: uppercase; letter-spacing: 0.4px; }
+.infoText { font-size: $font-size-sm; color: $text-secondary; line-height: 1.6; }
+.infoList { margin: 0; padding-left: $spacing-lg; display: flex; flex-direction: column; gap: 4px; li { font-size: $font-size-sm; color: $text-secondary; line-height: 1.6; } }

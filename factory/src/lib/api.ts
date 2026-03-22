@@ -8,6 +8,7 @@ export async function apiFetch(path: string, options: RequestInit = {}): Promise
     ...options,
     headers: {
       'Content-Type': 'application/json',
+      'X-System': 'factory',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers || {}),
     },

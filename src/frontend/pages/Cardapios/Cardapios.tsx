@@ -1,13 +1,19 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useApp } from '@frontend/contexts/AppContext';
-import type { Menu, MenuCategory, MenuItem } from '@backend/infra/data/mockData';
-import { mockMenus } from '@backend/infra/data/mockData';
 import styles from './Cardapios.module.scss';
+
+type MenuItem = { id: string; name: string; description: string; price: number; };
+type MenuCategory = { id: string; name: string; items: MenuItem[]; };
+type Menu = { id: string; name: string; eventId?: string; headerText: string; footerText: string; categories: MenuCategory[]; createdAt: string; };
 import ConfirmModal from '@frontend/components/ConfirmModal/ConfirmModal';
 
 export default function Cardapios() {
   const { events } = useApp();
-  const [menus, setMenus] = useState<Menu[]>(mockMenus);
+  const [menus, setMenus] = useState<Menu[]>([]);
+
+  useEffect(() => {
+    fetch('/api/menus').then(r => r.json()).then(setMenus).catch(() => {});
+  }, []);
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -62,26 +68,33 @@ export default function Cardapios() {
     resetForm();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formName) return;
-    const data: Omit<Menu, 'id' | 'createdAt'> = {
+    const data = {
       name: formName,
-      eventId: formEventId || undefined,
+      eventId: formEventId || '',
       headerText: formHeaderText,
       footerText: formFooterText,
       categories: formCategories,
     };
     if (editingId) {
-      setMenus((prev) => prev.map((m) => m.id === editingId ? { ...m, ...data } : m));
+      const res = await fetch(`/api/menus/${editingId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const updated: Menu = await res.json();
+      setMenus((prev) => prev.map((m) => m.id === editingId ? updated : m));
     } else {
-      setMenus((prev) => [...prev, { ...data, id: `men-${Date.now()}`, createdAt: new Date().toISOString() }]);
+      const res = await fetch('/api/menus', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const created: Menu = await res.json();
+      setMenus((prev) => [created, ...prev]);
     }
     closeModal();
   };
 
   const handleDelete = (id: string) => { setDeleteTargetId(id); };
-  const confirmDelete = () => {
-    if (deleteTargetId) setMenus((prev) => prev.filter((m) => m.id !== deleteTargetId));
+  const confirmDelete = async () => {
+    if (deleteTargetId) {
+      await fetch(`/api/menus/${deleteTargetId}`, { method: 'DELETE' });
+      setMenus((prev) => prev.filter((m) => m.id !== deleteTargetId));
+    }
     setDeleteTargetId(null);
   };
 

@@ -14,11 +14,15 @@ import utensilCategoriesRouter from './routes/utensil-categories';
 import supplyCategoriesRouter from './routes/supply-categories';
 import authRouter from './routes/auth';
 import usersRouter from './routes/users';
+import contractsRouter from './routes/contracts';
+import franchisesRouter from './routes/franchises';
+import menusRouter from './routes/menus';
+import invoicesRouter from './routes/invoices';
 import { optionalAuth } from './middleware/auth';
 
 const app = express();
 
-app.use(cors({ allowedHeaders: ['Content-Type', 'Authorization'] }));
+app.use(cors({ allowedHeaders: ['Content-Type', 'Authorization', 'X-System'] }));
 app.use(express.json());
 app.use(optionalAuth);
 
@@ -35,5 +39,9 @@ app.use('/api/utensil-categories', utensilCategoriesRouter);
 app.use('/api/supply-categories', supplyCategoriesRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/contracts', contractsRouter);
+app.use('/api/franchises', franchisesRouter);
+app.use('/api/menus', menusRouter);
+app.use('/api/invoices', invoicesRouter);
 
 export default app;

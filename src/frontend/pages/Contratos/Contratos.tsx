@@ -1,10 +1,25 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useApp } from '@frontend/contexts/AppContext';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import type { Contract } from '@backend/infra/data/mockData';
-import { mockContracts } from '@backend/infra/data/mockData';
 import styles from './Contratos.module.scss';
+
+type Contract = {
+  id: string;
+  clientName: string;
+  clientDocument?: string;
+  clientEmail?: string;
+  clientPhone?: string;
+  eventId?: string;
+  value: number;
+  startDate: string;
+  endDate?: string;
+  description: string;
+  paymentConditions?: string;
+  terms?: string;
+  status: string;
+  createdAt: string;
+};
 import ConfirmModal from '@frontend/components/ConfirmModal/ConfirmModal';
 import ContractDocument from './ContractDocument';
 
@@ -34,7 +49,11 @@ function formatDate(iso: string) {
 
 export default function Contratos() {
   const { events } = useApp();
-  const [contracts, setContracts] = useState<Contract[]>(mockContracts);
+  const [contracts, setContracts] = useState<Contract[]>([]);
+
+  useEffect(() => {
+    fetch('/api/contracts').then(r => r.json()).then(setContracts).catch(() => {});
+  }, []);
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [viewContract, setViewContract] = useState<Contract | null>(null);
@@ -76,32 +95,39 @@ export default function Contratos() {
   };
   const closeModal = () => { setShowModal(false); setEditingId(null); setForm(emptyForm); };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.clientName) return;
-    const data: Omit<Contract, 'id' | 'createdAt' | 'status'> = {
+    const data = {
       clientName: form.clientName,
-      clientDocument: form.clientDocument || undefined,
-      clientEmail: form.clientEmail || undefined,
-      clientPhone: form.clientPhone || undefined,
-      eventId: form.eventId || undefined,
+      clientDocument: form.clientDocument || '',
+      clientEmail: form.clientEmail || '',
+      clientPhone: form.clientPhone || '',
+      eventId: form.eventId || '',
       value: Number(form.value) || 0,
       startDate: form.startDate,
-      endDate: form.endDate || undefined,
+      endDate: form.endDate || '',
       description: form.description,
-      paymentConditions: form.paymentConditions || undefined,
-      terms: form.terms || undefined,
+      paymentConditions: form.paymentConditions || '',
+      terms: form.terms || '',
     };
     if (editingId) {
-      setContracts((prev) => prev.map((c) => c.id === editingId ? { ...c, ...data } : c));
+      const res = await fetch(`/api/contracts/${editingId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const updated: Contract = await res.json();
+      setContracts((prev) => prev.map((c) => c.id === editingId ? updated : c));
     } else {
-      setContracts((prev) => [...prev, { ...data, id: `cont-${Date.now()}`, status: 'rascunho', createdAt: new Date().toISOString() }]);
+      const res = await fetch('/api/contracts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const created: Contract = await res.json();
+      setContracts((prev) => [created, ...prev]);
     }
     closeModal();
   };
 
   const handleDelete = (id: string) => { setDeleteTargetId(id); };
-  const confirmDelete = () => {
-    if (deleteTargetId) setContracts((prev) => prev.filter((c) => c.id !== deleteTargetId));
+  const confirmDelete = async () => {
+    if (deleteTargetId) {
+      await fetch(`/api/contracts/${deleteTargetId}`, { method: 'DELETE' });
+      setContracts((prev) => prev.filter((c) => c.id !== deleteTargetId));
+    }
     setDeleteTargetId(null);
   };
 

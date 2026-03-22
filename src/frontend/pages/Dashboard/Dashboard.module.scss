@@ -201,9 +201,22 @@
 
 .calendarHeader {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-sm;
+  }
+}
+
+.calendarHeaderLeft {
+  display: flex;
   align-items: baseline;
   gap: $spacing-sm;
-  margin-bottom: $spacing-md;
 }
 
 .calendarMonth {
@@ -216,6 +229,44 @@
 .calendarCount {
   font-size: $font-size-sm;
   color: $text-muted;
+}
+
+.unitFilter {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 3px;
+  gap: 2px;
+}
+
+.unitFilterBtn {
+  padding: 5px 14px;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-muted;
+  background: none;
+  border: none;
+  border-radius: calc(#{$radius-sm} - 2px);
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.unitFilterBtnActive {
+  background: $accent;
+  color: #0a0f1e;
+  font-weight: $font-weight-semibold;
+
+  &:hover {
+    background: $accent-hover;
+    color: #0a0f1e;
+  }
 }
 
 // Sections

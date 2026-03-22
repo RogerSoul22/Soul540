@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '@/lib/api';
 import styles from './Permissoes.module.scss';
 
 type AppUser = {
@@ -46,9 +47,10 @@ export default function Permissoes() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<AppUser | null>(null);
+  const [showInfo, setShowInfo] = useState(false);
 
   useEffect(() => {
-    fetch('/api/users').then(r => r.json()).then(setUsers);
+    apiFetch('/api/users').then(r => r.json()).then(setUsers);
   }, []);
 
   const selectUser = (u: AppUser) => {
@@ -69,7 +71,7 @@ export default function Permissoes() {
   const savePermissions = async () => {
     if (!selected) return;
     setSaving(true);
-    const res = await fetch(`/api/users/${selected.id}`, {
+    const res = await apiFetch(`/api/users/${selected.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ permissions: draftPerms }),
@@ -82,7 +84,7 @@ export default function Permissoes() {
 
   const createUser = async () => {
     if (!form.name.trim() || !form.email.trim() || !form.password) return;
-    const res = await fetch('/api/users', {
+    const res = await apiFetch('/api/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...form, permissions: form.isAdmin ? ALL_KEYS : [] }),
@@ -94,7 +96,7 @@ export default function Permissoes() {
   };
 
   const deleteUser = async (u: AppUser) => {
-    await fetch(`/api/users/${u.id}`, { method: 'DELETE' });
+    await apiFetch(`/api/users/${u.id}`, { method: 'DELETE' });
     setUsers(prev => prev.filter(x => x.id !== u.id));
     if (selected?.id === u.id) setSelected(null);
     setDeleteTarget(null);
@@ -106,7 +108,12 @@ export default function Permissoes() {
     <div className={styles.page}>
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>Permissões</h1>
+          <div className={styles.titleRow}>
+            <h1 className={styles.title}>Permissões</h1>
+            <button className={styles.btnInfo} onClick={() => setShowInfo(true)} title="Informações">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+            </button>
+          </div>
           <p className={styles.subtitle}>Gerencie usuários e controle o acesso às páginas</p>
         </div>
         <button className={styles.btnPrimary} onClick={() => setShowModal(true)}>
@@ -230,6 +237,40 @@ export default function Permissoes() {
       )}
 
       {/* Delete confirm */}
+      {showInfo && (
+        <div className={styles.overlay} onClick={() => setShowInfo(false)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Sobre esta página</h2>
+              <button className={styles.modalClose} onClick={() => setShowInfo(false)}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.infoSection}>
+                <p className={styles.infoSectionTitle}>Permissões</p>
+                <p className={styles.infoText}>Crie e gerencie usuários do sistema, definindo quais páginas cada um pode acessar.</p>
+              </div>
+              <div className={styles.infoSection}>
+                <p className={styles.infoSectionTitle}>Usuários</p>
+                <ul className={styles.infoList}>
+                  <li>Cadastre novos usuários com nome, email e senha</li>
+                  <li>Remova usuários clicando no ícone de lixeira</li>
+                </ul>
+              </div>
+              <div className={styles.infoSection}>
+                <p className={styles.infoSectionTitle}>Controle de Acesso</p>
+                <ul className={styles.infoList}>
+                  <li>Selecione um usuário na lista para editar suas permissões</li>
+                  <li>Marque as páginas que o usuário pode visualizar</li>
+                  <li>Administradores têm acesso automático a todas as páginas</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {deleteTarget && (
         <div className={styles.overlay} onClick={() => setDeleteTarget(null)}>
           <div className={styles.modal} style={{ maxWidth: 400 }} onClick={e => e.stopPropagation()}>

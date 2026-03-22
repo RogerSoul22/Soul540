@@ -1,6 +1,16 @@
-import { useState, useMemo } from 'react';
-import type { Franchise } from '@backend/infra/data/mockData';
-import { mockFranchises } from '@backend/infra/data/mockData';
+import { useState, useMemo, useEffect } from 'react';
+
+type Franchise = {
+  id: string;
+  name: string;
+  owner: string;
+  city: string;
+  state: string;
+  monthlyFee: number;
+  status: 'ativa' | 'em_implantacao' | 'suspensa' | 'encerrada';
+  openDate: string;
+  createdAt: string;
+};
 import Badge from '@frontend/components/Badge/Badge';
 import styles from './Franquias.module.scss';
 import ConfirmModal from '@frontend/components/ConfirmModal/ConfirmModal';
@@ -27,7 +37,11 @@ const emptyForm: FormData = {
 };
 
 export default function Franquias() {
-  const [franchises, setFranchises] = useState<Franchise[]>(mockFranchises);
+  const [franchises, setFranchises] = useState<Franchise[]>([]);
+
+  useEffect(() => {
+    fetch('/api/franchises').then(r => r.json()).then(setFranchises).catch(() => {});
+  }, []);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showModal, setShowModal] = useState(false);
@@ -56,23 +70,30 @@ export default function Franquias() {
   };
   const closeModal = () => { setShowModal(false); setEditingId(null); setForm(emptyForm); };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!form.name || !form.owner) return;
-    const data: Omit<Franchise, 'id' | 'createdAt'> = {
+    const data = {
       name: form.name, owner: form.owner, city: form.city, state: form.state,
       monthlyFee: Number(form.monthlyFee) || 0, status: form.status, openDate: form.openDate,
     };
     if (editingId) {
-      setFranchises((prev) => prev.map((f) => f.id === editingId ? { ...f, ...data } : f));
+      const res = await fetch(`/api/franchises/${editingId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const updated: Franchise = await res.json();
+      setFranchises((prev) => prev.map((f) => f.id === editingId ? updated : f));
     } else {
-      setFranchises((prev) => [...prev, { ...data, id: `fra-${Date.now()}`, createdAt: new Date().toISOString() }]);
+      const res = await fetch('/api/franchises', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const created: Franchise = await res.json();
+      setFranchises((prev) => [created, ...prev]);
     }
     closeModal();
   };
 
   const handleDelete = (id: string) => { setDeleteTargetId(id); };
-  const confirmDelete = () => {
-    if (deleteTargetId) setFranchises((prev) => prev.filter((f) => f.id !== deleteTargetId));
+  const confirmDelete = async () => {
+    if (deleteTargetId) {
+      await fetch(`/api/franchises/${deleteTargetId}`, { method: 'DELETE' });
+      setFranchises((prev) => prev.filter((f) => f.id !== deleteTargetId));
+    }
     setDeleteTargetId(null);
   };
 
@@ -80,11 +101,10 @@ export default function Franquias() {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       try {
         const data = JSON.parse(ev.target?.result as string);
-        const newFranchise: Franchise = {
-          id: `fra-${Date.now()}`,
+        const payload = {
           name: data.name || 'Nova Franquia',
           owner: data.owner || '',
           city: data.city || '',
@@ -92,9 +112,10 @@ export default function Franquias() {
           monthlyFee: Number(data.monthlyFee) || 0,
           status: data.status || 'em_implantacao',
           openDate: data.openDate || new Date().toISOString().split('T')[0],
-          createdAt: new Date().toISOString(),
         };
-        setFranchises((prev) => [...prev, newFranchise]);
+        const res = await fetch('/api/franchises', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const created: Franchise = await res.json();
+        setFranchises((prev) => [created, ...prev]);
         alert('Franquia importada com sucesso!');
       } catch {
         alert('Erro ao importar JSON. Verifique o formato do arquivo.');

@@ -15,20 +15,29 @@ function getGreeting(name?: string): string {
   return `Boa noite${suffix}`;
 }
 
+type UnitFilter = 'all' | 'main' | 'franchise';
+
 export default function Dashboard() {
   const { events, tasks } = useApp();
   const { user } = useAuth();
   const [showInfo, setShowInfo] = useState(false);
+  const [unitFilter, setUnitFilter] = useState<UnitFilter>('all');
 
   const urgentTasks = useMemo(() => tasks.filter((t) => t.priority === 'urgent' && t.status !== 'done'), [tasks]);
 
+  const filteredEvents = useMemo(() => {
+    if (unitFilter === 'main') return events.filter((e) => !e.unit || e.unit === 'main');
+    if (unitFilter === 'franchise') return events.filter((e) => e.unit === 'franchise');
+    return events;
+  }, [events, unitFilter]);
+
   const now = new Date();
   const monthEventCount = useMemo(() => {
-    return events.filter((e) => {
+    return filteredEvents.filter((e) => {
       const d = parseISO(e.date);
       return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
     }).length;
-  }, [events]);
+  }, [filteredEvents]);
 
   const today = format(now, "EEEE, d 'de' MMMM", { locale: ptBR });
   const currentMonth = format(now, 'MMMM', { locale: ptBR });
@@ -54,16 +63,37 @@ export default function Dashboard() {
         </div>
       </div>
 
-
-{/* Calendar */}
+      {/* Calendar */}
       <div className={styles.calendarSection}>
         <div className={styles.calendarHeader}>
-          <span className={styles.calendarMonth}>{currentMonth}</span>
-          <span className={styles.calendarCount}>
-            {monthEventCount} evento{monthEventCount !== 1 ? 's' : ''}
-          </span>
+          <div className={styles.calendarHeaderLeft}>
+            <span className={styles.calendarMonth}>{currentMonth}</span>
+            <span className={styles.calendarCount}>
+              {monthEventCount} evento{monthEventCount !== 1 ? 's' : ''}
+            </span>
+          </div>
+          <div className={styles.unitFilter}>
+            <button
+              className={`${styles.unitFilterBtn} ${unitFilter === 'all' ? styles.unitFilterBtnActive : ''}`}
+              onClick={() => setUnitFilter('all')}
+            >
+              Todos
+            </button>
+            <button
+              className={`${styles.unitFilterBtn} ${unitFilter === 'main' ? styles.unitFilterBtnActive : ''}`}
+              onClick={() => setUnitFilter('main')}
+            >
+              Principal
+            </button>
+            <button
+              className={`${styles.unitFilterBtn} ${unitFilter === 'franchise' ? styles.unitFilterBtnActive : ''}`}
+              onClick={() => setUnitFilter('franchise')}
+            >
+              Franquia
+            </button>
+          </div>
         </div>
-        <CalendarView events={events} />
+        <CalendarView events={filteredEvents} />
       </div>
 
       {showInfo && (

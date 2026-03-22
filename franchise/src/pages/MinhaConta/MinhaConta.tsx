@@ -12,6 +12,7 @@ export default function MinhaConta() {
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [saved, setSaved] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
 
   const handleSave = (e: FormEvent) => {
     e.preventDefault();
@@ -22,7 +23,12 @@ export default function MinhaConta() {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Minha Conta</h1>
+        <div className={styles.titleRow}>
+          <h1 className={styles.title}>Minha Conta</h1>
+          <button className={styles.btnInfo} onClick={() => setShowInfo(true)} title="Informações">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          </button>
+        </div>
         <p className={styles.subtitle}>Gerencie seu perfil</p>
       </div>
 
@@ -79,6 +85,39 @@ export default function MinhaConta() {
           </label>
         </div>
       </div>
+
+      {showInfo && (
+        <div className={styles.overlay} onClick={() => setShowInfo(false)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Sobre esta página</h2>
+              <button className={styles.modalClose} onClick={() => setShowInfo(false)}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.infoSection}>
+                <p className={styles.infoSectionTitle}>Minha Conta</p>
+                <p className={styles.infoText}>Gerencie suas informações pessoais e preferências do sistema.</p>
+              </div>
+              <div className={styles.infoSection}>
+                <p className={styles.infoSectionTitle}>Dados Pessoais</p>
+                <ul className={styles.infoList}>
+                  <li>Atualize seu nome, telefone e endereço a qualquer momento</li>
+                  <li>Clique em "Salvar Alterações" para confirmar as mudanças</li>
+                </ul>
+              </div>
+              <div className={styles.infoSection}>
+                <p className={styles.infoSectionTitle}>Aparência</p>
+                <ul className={styles.infoList}>
+                  <li>Alterne entre o tema escuro e o tema claro</li>
+                  <li>A preferência é salva automaticamente no navegador</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
