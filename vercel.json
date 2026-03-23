@@ -2,6 +2,10 @@
   "outputDirectory": "dist",
   "rewrites": [
     { "source": "/api/:path*", "destination": "https://soul540-production.up.railway.app/api/:path*" },
+    { "source": "/franquia/:path*", "destination": "https://soul540-production.up.railway.app/franquia/:path*" },
+    { "source": "/franquia", "destination": "https://soul540-production.up.railway.app/franquia" },
+    { "source": "/fabrica/:path*", "destination": "https://soul540-production.up.railway.app/fabrica/:path*" },
+    { "source": "/fabrica", "destination": "https://soul540-production.up.railway.app/fabrica" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
