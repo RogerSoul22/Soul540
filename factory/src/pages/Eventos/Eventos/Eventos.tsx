@@ -45,11 +45,22 @@ function EventCard({ ev, employeeMap, onView }: {
   employeeMap: Record<string, string>;
   onView: (ev: PizzaEvent) => void;
 }) {
+  const isFranchise = (ev as any).source === 'franchise';
   return (
     <div className={styles.card} onClick={() => onView(ev)}>
       <div className={styles.cardTop}>
         <div>
-          <h3 className={styles.cardTitle}>{ev.name}</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+            <h3 className={styles.cardTitle} style={{ margin: 0 }}>{ev.name}</h3>
+            <span style={{
+              fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 10,
+              background: isFranchise ? '#7c3aed22' : '#0369a122',
+              color: isFranchise ? '#7c3aed' : '#0369a1',
+              textTransform: 'uppercase', letterSpacing: 1, whiteSpace: 'nowrap',
+            }}>
+              {isFranchise ? 'Franquia' : 'Principal'}
+            </span>
+          </div>
           <p className={styles.cardSub}>
             {format(parseISO(ev.date), "dd 'de' MMM, yyyy", { locale: ptBR })}
             {ev.endDate && ` → ${format(parseISO(ev.endDate), "dd 'de' MMM", { locale: ptBR })}`}
@@ -186,6 +197,12 @@ export default function Eventos() {
               <div className={styles.detailSection}>
                 <p className={styles.detailSectionTitle}>Informações</p>
                 <div className={styles.detailGrid}>
+                  <div className={styles.detailItem}>
+                    <span className={styles.detailLabel}>Origem</span>
+                    <span className={styles.detailValue}>
+                      {(viewingEvent as any).source === 'franchise' ? 'Franquia' : 'Principal'}
+                    </span>
+                  </div>
                   <div className={styles.detailItem}>
                     <span className={styles.detailLabel}>Data</span>
                     <span className={styles.detailValue}>

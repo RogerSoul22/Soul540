@@ -32,30 +32,55 @@ const FranchiseFinanceSchema = new mongoose.Schema(
   { collection: 'franchisefinances', toJSON: { virtuals: true, versionKey: false }, id: true },
 );
 
+const FactoryFinanceSchema = new mongoose.Schema(
+  {
+    eventId: { type: String, default: '' },
+    type: { type: String, enum: ['revenue', 'cost'], required: true },
+    category: { type: String, required: true },
+    description: { type: String, required: true },
+    amount: { type: Number, required: true },
+    date: { type: String, required: true },
+    status: { type: String, enum: ['pending', 'paid', 'received'], default: 'pending' },
+    autoEventBudget: { type: Boolean, default: false },
+    source: { type: String, default: 'factory' },
+  },
+  { collection: 'factoryfinances', toJSON: { virtuals: true, versionKey: false }, id: true },
+);
+
 export const Finance = mongoose.models.Finance || mongoose.model('Finance', FinanceSchema);
 export const FranchiseFinance = mongoose.models.FranchiseFinance || mongoose.model('FranchiseFinance', FranchiseFinanceSchema);
+export const FactoryFinance = mongoose.models.FactoryFinance || mongoose.model('FactoryFinance', FactoryFinanceSchema);
 
-function isFromFranchise(req: any): boolean {
-  return getTenantUnit(req) === 'franchise';
-}
+function isFromFranchise(req: any): boolean { return getTenantUnit(req) === 'franchise'; }
+function isFromFactory(req: any): boolean { return getTenantUnit(req) === 'factory'; }
 
 async function findFinanceInBothCollections(id: string) {
   const doc = await Finance.findById(id);
   if (doc) return { doc, model: Finance };
   const fdoc = await FranchiseFinance.findById(id);
   if (fdoc) return { doc: fdoc, model: FranchiseFinance };
+  const factDoc = await FactoryFinance.findById(id);
+  if (factDoc) return { doc: factDoc, model: FactoryFinance };
   return null;
 }
 
 const router = Router();
 
 router.get('/', async (req, res) => {
+  if (isFromFactory(req)) {
+    const items = await FactoryFinance.find({});
+    return res.json(items);
+  }
   const Model = isFromFranchise(req) ? FranchiseFinance : Finance;
   const items = await Model.find({});
   res.json(items);
 });
 
 router.post('/', async (req, res) => {
+  if (isFromFactory(req)) {
+    const finance = await FactoryFinance.create({ ...req.body, source: 'factory' });
+    return res.status(201).json(finance);
+  }
   if (isFromFranchise(req)) {
     const finance = await FranchiseFinance.create({ ...req.body, source: 'franchise' });
     return res.status(201).json(finance);

@@ -10,11 +10,19 @@ const FranchiseCategorySchema = new Schema({
   name: { type: String, required: true, unique: true },
 }, { collection: 'franchiseutensilcategories', toJSON: { virtuals: true, versionKey: false } });
 
+const FactoryCategorySchema = new Schema({
+  name: { type: String, required: true, unique: true },
+}, { collection: 'factoryutensilcategories', toJSON: { virtuals: true, versionKey: false } });
+
 const Category = mongoose.models.UtensilCategory || mongoose.model('UtensilCategory', CategorySchema);
 const FranchiseCategory = mongoose.models.FranchiseUtensilCategory || mongoose.model('FranchiseUtensilCategory', FranchiseCategorySchema);
+const FactoryCategory = mongoose.models.FactoryUtensilCategory || mongoose.model('FactoryUtensilCategory', FactoryCategorySchema);
 
 function getModel(req: any) {
-  return getTenantUnit(req) === 'franchise' ? FranchiseCategory : Category;
+  const unit = getTenantUnit(req);
+  if (unit === 'factory') return FactoryCategory;
+  if (unit === 'franchise') return FranchiseCategory;
+  return Category;
 }
 
 const router = Router();

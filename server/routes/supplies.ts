@@ -30,30 +30,54 @@ const FranchiseSupplySchema = new Schema({
   createdAt: { type: String, default: () => new Date().toISOString() },
 }, { collection: 'franchisesupplies', toJSON: { virtuals: true, versionKey: false } });
 
+const FactorySupplySchema = new Schema({
+  name: { type: String, required: true },
+  category: { type: String, default: '' },
+  measureUnit: { type: String, default: 'kg' },
+  quantity: { type: Number, default: 0 },
+  minStock: { type: Number, default: 0 },
+  costPerUnit: { type: Number, default: 0 },
+  supplier: { type: String, default: '' },
+  expirationDate: String,
+  status: { type: String, default: 'em_estoque' },
+  source: { type: String, default: 'factory' },
+  createdAt: { type: String, default: () => new Date().toISOString() },
+}, { collection: 'factorysupplies', toJSON: { virtuals: true, versionKey: false } });
+
 const Supply = mongoose.models.Supply || mongoose.model('Supply', SupplySchema);
 const FranchiseSupply = mongoose.models.FranchiseSupply || mongoose.model('FranchiseSupply', FranchiseSupplySchema);
+const FactorySupply = mongoose.models.FactorySupply || mongoose.model('FactorySupply', FactorySupplySchema);
 
-function isFromFranchise(req: any): boolean {
-  return getTenantUnit(req) === 'franchise';
-}
+function isFromFranchise(req: any): boolean { return getTenantUnit(req) === 'franchise'; }
+function isFromFactory(req: any): boolean { return getTenantUnit(req) === 'factory'; }
 
 async function findInBothCollections(id: string) {
   const doc = await Supply.findById(id);
   if (doc) return { doc, model: Supply };
   const fdoc = await FranchiseSupply.findById(id);
   if (fdoc) return { doc: fdoc, model: FranchiseSupply };
+  const factDoc = await FactorySupply.findById(id);
+  if (factDoc) return { doc: factDoc, model: FactorySupply };
   return null;
 }
 
 const router = Router();
 
 router.get('/', async (req, res) => {
+  if (isFromFactory(req)) {
+    const items = await FactorySupply.find({});
+    return res.json(items);
+  }
   const Model = isFromFranchise(req) ? FranchiseSupply : Supply;
   const items = await Model.find({});
   res.json(items);
 });
 
 router.post('/', async (req, res) => {
+  if (isFromFactory(req)) {
+    const supply = await FactorySupply.create({ ...req.body, source: 'factory' });
+    return res.status(201).json(supply);
+  }
   if (isFromFranchise(req)) {
     const supply = await FranchiseSupply.create({ ...req.body, source: 'franchise' });
     return res.status(201).json(supply);

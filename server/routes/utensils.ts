@@ -24,30 +24,51 @@ const FranchiseUtensilSchema = new Schema({
   createdAt: { type: String, default: () => new Date().toISOString() },
 }, { collection: 'franchiseutensils', toJSON: { virtuals: true, versionKey: false } });
 
+const FactoryUtensilSchema = new Schema({
+  name: { type: String, required: true },
+  category: { type: String, default: '' },
+  quantity: { type: Number, default: 1 },
+  unitValue: Number,
+  location: { type: String, default: '' },
+  status: { type: String, default: 'disponivel' },
+  source: { type: String, default: 'factory' },
+  createdAt: { type: String, default: () => new Date().toISOString() },
+}, { collection: 'factoryutensils', toJSON: { virtuals: true, versionKey: false } });
+
 const Utensil = mongoose.models.Utensil || mongoose.model('Utensil', UtensilSchema);
 const FranchiseUtensil = mongoose.models.FranchiseUtensil || mongoose.model('FranchiseUtensil', FranchiseUtensilSchema);
+const FactoryUtensil = mongoose.models.FactoryUtensil || mongoose.model('FactoryUtensil', FactoryUtensilSchema);
 
-function isFromFranchise(req: any): boolean {
-  return getTenantUnit(req) === 'franchise';
-}
+function isFromFranchise(req: any): boolean { return getTenantUnit(req) === 'franchise'; }
+function isFromFactory(req: any): boolean { return getTenantUnit(req) === 'factory'; }
 
 async function findInBothCollections(id: string) {
   const doc = await Utensil.findById(id);
   if (doc) return { doc, model: Utensil };
   const fdoc = await FranchiseUtensil.findById(id);
   if (fdoc) return { doc: fdoc, model: FranchiseUtensil };
+  const factDoc = await FactoryUtensil.findById(id);
+  if (factDoc) return { doc: factDoc, model: FactoryUtensil };
   return null;
 }
 
 const router = Router();
 
 router.get('/', async (req, res) => {
+  if (isFromFactory(req)) {
+    const items = await FactoryUtensil.find({});
+    return res.json(items);
+  }
   const Model = isFromFranchise(req) ? FranchiseUtensil : Utensil;
   const items = await Model.find({});
   res.json(items);
 });
 
 router.post('/', async (req, res) => {
+  if (isFromFactory(req)) {
+    const utensil = await FactoryUtensil.create({ ...req.body, source: 'factory' });
+    return res.status(201).json(utensil);
+  }
   if (isFromFranchise(req)) {
     const utensil = await FranchiseUtensil.create({ ...req.body, source: 'franchise' });
     return res.status(201).json(utensil);
