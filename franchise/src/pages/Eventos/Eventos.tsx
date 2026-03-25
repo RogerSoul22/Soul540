@@ -543,7 +543,7 @@ return (
                                 const next = selected ? current.filter(n => n !== name) : [...current, name];
                                 setForm({ ...form, menu: next.join(', ') });
                               }} />
-                              <span style={{ fontSize: 13 }}>{name}</span>
+                              <span style={{ fontSize: 13, color: '#e2e8f0' }}>{name}</span>
                             </label>
                           );
                         })}
