@@ -57,6 +57,30 @@
   max-width: 420px;
 }
 
+.brandingLogo {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba($accent, 0.4);
+  box-shadow: 0 0 40px rgba($accent, 0.2), 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.formLogo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: $spacing-xl;
+}
+
+.formLogoImg {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba($accent, 0.3);
+  box-shadow: 0 0 16px rgba($accent, 0.15);
+}
+
 .brandingTitle {
   font-family: $font-display;
   font-size: 3.2rem;

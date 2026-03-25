@@ -62,9 +62,9 @@ const FactoryEmployeeSchema = new Schema({
   source: { type: String, default: 'factory' },
 }, { collection: 'factoryemployees', toJSON: { virtuals: true, versionKey: false } });
 
-const Employee = mongoose.models.Employee || mongoose.model('Employee', EmployeeSchema);
-const FranchiseEmployee = mongoose.models.FranchiseEmployee || mongoose.model('FranchiseEmployee', FranchiseEmployeeSchema);
-const FactoryEmployee = mongoose.models.FactoryEmployee || mongoose.model('FactoryEmployee', FactoryEmployeeSchema);
+export const Employee = mongoose.models.Employee || mongoose.model('Employee', EmployeeSchema);
+export const FranchiseEmployee = mongoose.models.FranchiseEmployee || mongoose.model('FranchiseEmployee', FranchiseEmployeeSchema);
+export const FactoryEmployee = mongoose.models.FactoryEmployee || mongoose.model('FactoryEmployee', FactoryEmployeeSchema);
 
 function isFromFranchise(req: any): boolean { return getTenantUnit(req) === 'franchise'; }
 function isFromFactory(req: any): boolean { return getTenantUnit(req) === 'factory'; }

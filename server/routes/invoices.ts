@@ -42,30 +42,62 @@ const FranchiseInvoiceSchema = new Schema({
   createdAt: { type: String, default: () => new Date().toISOString() },
 }, { collection: 'franchiseinvoices', toJSON: { virtuals: true, versionKey: false } });
 
+const FactoryInvoiceSchema = new Schema({
+  eventId: { type: String, default: '' },
+  clientName: { type: String, default: '' },
+  clientDocument: { type: String, default: '' },
+  clientEmail: { type: String, default: '' },
+  items: [InvoiceItemSchema],
+  subtotal: { type: Number, default: 0 },
+  taxRate: { type: Number, default: 0 },
+  taxAmount: { type: Number, default: 0 },
+  totalValue: { type: Number, default: 0 },
+  issueDate: { type: String, default: '' },
+  notes: { type: String, default: '' },
+  status: { type: String, default: 'rascunho' },
+  source: { type: String, default: 'factory' },
+  createdAt: { type: String, default: () => new Date().toISOString() },
+}, { collection: 'factoryinvoices', toJSON: { virtuals: true, versionKey: false } });
+
 const Invoice = mongoose.models.Invoice || mongoose.model('Invoice', InvoiceSchema);
 const FranchiseInvoice = mongoose.models.FranchiseInvoice || mongoose.model('FranchiseInvoice', FranchiseInvoiceSchema);
+const FactoryInvoice = mongoose.models.FactoryInvoice || mongoose.model('FactoryInvoice', FactoryInvoiceSchema);
 
 function isFromFranchise(req: any): boolean {
   return getTenantUnit(req) === 'franchise';
 }
 
-async function findInBothCollections(id: string) {
+function isFromFactory(req: any): boolean {
+  return getTenantUnit(req) === 'factory';
+}
+
+async function findInAllCollections(id: string) {
   const doc = await Invoice.findById(id);
   if (doc) return { doc, model: Invoice };
   const fdoc = await FranchiseInvoice.findById(id);
   if (fdoc) return { doc: fdoc, model: FranchiseInvoice };
+  const factDoc = await FactoryInvoice.findById(id);
+  if (factDoc) return { doc: factDoc, model: FactoryInvoice };
   return null;
 }
 
 const router = Router();
 
 router.get('/', async (req, res) => {
+  if (isFromFactory(req)) {
+    const items = await FactoryInvoice.find({});
+    return res.json(items);
+  }
   const Model = isFromFranchise(req) ? FranchiseInvoice : Invoice;
   const items = await Model.find({});
   res.json(items);
 });
 
 router.post('/', async (req, res) => {
+  if (isFromFactory(req)) {
+    const invoice = await FactoryInvoice.create({ ...req.body, source: 'factory' });
+    return res.status(201).json(invoice);
+  }
   if (isFromFranchise(req)) {
     const invoice = await FranchiseInvoice.create({ ...req.body, source: 'franchise' });
     return res.status(201).json(invoice);
@@ -75,14 +107,14 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  const found = await findInBothCollections(req.params.id);
+  const found = await findInAllCollections(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   const invoice = await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true });
   res.json(invoice);
 });
 
 router.delete('/:id', async (req, res) => {
-  const found = await findInBothCollections(req.params.id);
+  const found = await findInAllCollections(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   await found.model.findByIdAndDelete(req.params.id);
   res.status(204).end();

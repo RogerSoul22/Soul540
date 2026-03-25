@@ -29,17 +29,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [tasks, setTasks] = useState<Task[]>([]);
 
   useEffect(() => {
-    apiFetch('/api/events').then(r => r.json()).then(setEvents).catch(() => {});
-    apiFetch('/api/tasks').then(r => r.json()).then(setTasks).catch(() => {});
-    apiFetch('/api/finances').then(r => r.json()).then(setFinances).catch(() => {});
+    apiFetch('/api/events').then(r => r.json()).then(setEvents).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/tasks').then(r => r.json()).then(setTasks).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/finances').then(r => r.json()).then(setFinances).catch((err) => console.error('Falha ao carregar dados:', err));
   }, []);
 
   const refreshFinances = useCallback(() => {
-    apiFetch('/api/finances').then(r => r.json()).then(setFinances).catch(() => {});
+    apiFetch('/api/finances').then(r => r.json()).then(setFinances).catch((err) => console.error('Falha ao carregar dados:', err));
   }, []);
 
   const addFinance = useCallback(async (data: Omit<FinanceEntry, 'id'>) => {
     const res = await apiFetch('/api/finances', { method: 'POST', body: JSON.stringify(data) });
+    if (!res.ok) throw new Error('Falha ao criar lançamento financeiro');
     const created: FinanceEntry = await res.json();
     setFinances((prev) => [created, ...prev]);
     return created;
@@ -47,17 +48,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const updateFinance = useCallback(async (id: string, data: Partial<FinanceEntry>) => {
     const res = await apiFetch(`/api/finances/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+    if (!res.ok) throw new Error('Falha ao atualizar lançamento financeiro');
     const updated: FinanceEntry = await res.json();
     setFinances((prev) => prev.map((f) => (f.id === id ? updated : f)));
   }, []);
 
   const deleteFinance = useCallback(async (id: string) => {
-    await apiFetch(`/api/finances/${id}`, { method: 'DELETE' });
+    const res = await apiFetch(`/api/finances/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Falha ao excluir lançamento financeiro');
     setFinances((prev) => prev.filter((f) => f.id !== id));
   }, []);
 
   const addEvent = useCallback(async (data: Omit<PizzaEvent, 'id' | 'createdAt'>) => {
     const res = await apiFetch('/api/events', { method: 'POST', body: JSON.stringify(data) });
+    if (!res.ok) throw new Error('Falha ao criar evento');
     const created: PizzaEvent = await res.json();
     setEvents((prev) => [...prev, created]);
     refreshFinances();
@@ -66,19 +70,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const updateEvent = useCallback(async (id: string, data: Partial<PizzaEvent>) => {
     const res = await apiFetch(`/api/events/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+    if (!res.ok) throw new Error('Falha ao atualizar evento');
     const updated: PizzaEvent = await res.json();
     setEvents((prev) => prev.map((e) => (e.id === id ? updated : e)));
     refreshFinances();
   }, [refreshFinances]);
 
   const deleteEvent = useCallback(async (id: string) => {
-    await apiFetch(`/api/events/${id}`, { method: 'DELETE' });
+    const res = await apiFetch(`/api/events/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Falha ao excluir evento');
     setEvents((prev) => prev.filter((e) => e.id !== id));
     setFinances((prev) => prev.filter((f) => f.eventId !== id));
   }, []);
 
   const addTask = useCallback(async (data: Omit<Task, 'id' | 'createdAt'>) => {
     const res = await apiFetch('/api/tasks', { method: 'POST', body: JSON.stringify(data) });
+    if (!res.ok) throw new Error('Falha ao criar tarefa');
     const created: Task = await res.json();
     setTasks((prev) => [...prev, created]);
     return created;
@@ -86,12 +93,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const updateTask = useCallback(async (id: string, data: Partial<Task>) => {
     const res = await apiFetch(`/api/tasks/${id}`, { method: 'PUT', body: JSON.stringify(data) });
+    if (!res.ok) throw new Error('Falha ao atualizar tarefa');
     const updated: Task = await res.json();
     setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
   }, []);
 
   const deleteTask = useCallback(async (id: string) => {
-    await apiFetch(`/api/tasks/${id}`, { method: 'DELETE' });
+    const res = await apiFetch(`/api/tasks/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Falha ao excluir tarefa');
     setTasks((prev) => prev.filter((t) => t.id !== id));
   }, []);
 

@@ -1,0 +1,38 @@
+# ── Stage 1: build main app ──────────────────────────────────
+FROM node:20-alpine AS build-main
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY tsconfig.json tsconfig.node.json index.html vite.config.ts ./
+COPY src/ ./src/
+COPY public/ ./public/
+RUN npx vite build
+
+# ── Stage 2: build franchise app ─────────────────────────────
+FROM node:20-alpine AS build-franchise
+WORKDIR /app
+COPY franchise/package*.json ./
+RUN npm install
+COPY franchise/ .
+RUN npm run build
+
+# ── Stage 3: build factory app ───────────────────────────────
+FROM node:20-alpine AS build-factory
+WORKDIR /app
+COPY factory/package*.json ./
+RUN npm install
+COPY factory/ .
+RUN npm run build
+
+# ── Stage 4: Express serving API + all three SPAs ────────────
+FROM node:20-alpine
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
+COPY server/ ./server/
+COPY tsconfig.json ./
+COPY --from=build-main     /app/dist ./dist
+COPY --from=build-franchise /app/dist ./franchise/dist
+COPY --from=build-factory   /app/dist ./factory/dist
+EXPOSE 3001
+CMD node_modules/.bin/tsx server/index.ts

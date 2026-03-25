@@ -43,9 +43,28 @@
   }
 }
 
+.logoWrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: $spacing-lg $spacing-md $spacing-sm;
+  flex-shrink: 0;
+
+  @include mobile { display: none; }
+}
+
+.logoImg {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba($accent, 0.3);
+  box-shadow: 0 0 16px rgba($accent, 0.15);
+}
+
 .nav {
   flex: 1;
-  padding: $spacing-md $spacing-sm 0;
+  padding: $spacing-sm $spacing-sm 0;
   @include flex-column;
   overflow-y: auto;
   gap: 0;

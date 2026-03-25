@@ -38,9 +38,9 @@ const FactoryTaskSchema = new Schema({
   source: { type: String, default: 'factory' },
 }, { collection: 'factorytasks', toJSON: { virtuals: true, versionKey: false } });
 
-const Task = mongoose.models.Task || mongoose.model('Task', TaskSchema);
-const FranchiseTask = mongoose.models.FranchiseTask || mongoose.model('FranchiseTask', FranchiseTaskSchema);
-const FactoryTask = mongoose.models.FactoryTask || mongoose.model('FactoryTask', FactoryTaskSchema);
+export const Task = mongoose.models.Task || mongoose.model('Task', TaskSchema);
+export const FranchiseTask = mongoose.models.FranchiseTask || mongoose.model('FranchiseTask', FranchiseTaskSchema);
+export const FactoryTask = mongoose.models.FactoryTask || mongoose.model('FactoryTask', FactoryTaskSchema);
 
 function getModel(req: any) {
   const unit = getTenantUnit(req);

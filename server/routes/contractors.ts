@@ -53,9 +53,9 @@ const FactoryContractorSchema = new Schema({
   createdAt: { type: String, default: () => new Date().toISOString() },
 }, { collection: 'factorycontractors', toJSON: { virtuals: true, versionKey: false } });
 
-const Contractor = mongoose.models.Contractor || mongoose.model('Contractor', ContractorSchema);
-const FranchiseContractor = mongoose.models.FranchiseContractor || mongoose.model('FranchiseContractor', FranchiseContractorSchema);
-const FactoryContractor = mongoose.models.FactoryContractor || mongoose.model('FactoryContractor', FactoryContractorSchema);
+export const Contractor = mongoose.models.Contractor || mongoose.model('Contractor', ContractorSchema);
+export const FranchiseContractor = mongoose.models.FranchiseContractor || mongoose.model('FranchiseContractor', FranchiseContractorSchema);
+export const FactoryContractor = mongoose.models.FactoryContractor || mongoose.model('FactoryContractor', FactoryContractorSchema);
 
 function isFromFranchise(req: any): boolean { return getTenantUnit(req) === 'franchise'; }
 function isFromFactory(req: any): boolean { return getTenantUnit(req) === 'factory'; }

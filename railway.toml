@@ -1,0 +1,7 @@
+[build]
+dockerfile = "Dockerfile.prod"
+
+[deploy]
+healthcheckPath = "/api/dashboard"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3

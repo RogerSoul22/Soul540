@@ -1,172 +1,139 @@
-@use '../../styles/variables' as *;
-@use '../../styles/mixins' as *;
+$accent: #f59e0b;
+$bg: #0a0a0f;
+$surface: #13131a;
+$surface2: #1a1a24;
+$border: rgba(255, 255, 255, 0.06);
+$text: #e2e8f0;
+$muted: #64748b;
 
-.page {
-  padding: $spacing-2xl $spacing-xl;
-  animation: fadeIn 0.4s ease;
-  height: 100%;
+.container {
   display: flex;
   flex-direction: column;
-
-  @include mobile {
-    padding: $spacing-md;
-    height: calc(100vh - 72px - #{$spacing-md * 2});
-  }
+  height: 100%;
+  background: $bg;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .header {
-  @include flex-between;
-  margin-bottom: $spacing-xl;
-  flex-wrap: wrap;
-  gap: $spacing-md;
+  padding: 20px 24px;
+  border-bottom: 1px solid $border;
+  background: $surface;
 }
 
 .headerInfo {
   display: flex;
   align-items: center;
-  gap: $spacing-md;
+  gap: 12px;
 }
 
-.aiAvatar {
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, rgba($accent, 0.2), rgba($accent, 0.05));
-  border: 1px solid $border-accent;
-  border-radius: $radius-md;
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $accent, darken($accent, 15%));
   display: flex;
   align-items: center;
   justify-content: center;
-  color: $accent;
+  font-size: 12px;
+  font-weight: 700;
+  color: #000;
+  flex-shrink: 0;
 }
 
 .title {
-  font-size: $font-size-3xl;
-  font-weight: $font-weight-bold;
-  color: $text-primary;
-  letter-spacing: -0.5px;
+  font-size: 16px;
+  font-weight: 600;
+  color: $text;
+  margin: 0;
 }
 
 .subtitle {
-  font-size: $font-size-sm;
-  color: $text-muted;
-  margin-top: 4px;
-}
-
-.btnClear {
-  padding: 8px $spacing-md;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid $border;
-  border-radius: $radius-sm;
-  color: $text-muted;
-  font-size: $font-size-sm;
-  cursor: pointer;
-  transition: all $transition-fast;
-
-  &:hover { background: rgba(255,255,255,0.08); color: $text-primary; }
-}
-
-.chatArea {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: $bg-secondary;
-  border: 1px solid $border;
-  border-radius: $radius-lg;
-  overflow: hidden;
-  min-height: 500px;
-
-  @include mobile {
-    min-height: 0;
-    border-radius: $radius-md;
-  }
+  font-size: 12px;
+  color: $muted;
 }
 
 .messages {
   flex: 1;
   overflow-y: auto;
-  padding: $spacing-lg;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: $spacing-md;
+  gap: 16px;
 
-  &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-thumb { background: $border; border-radius: 2px; }
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+  }
 }
 
-.message {
+.bubble {
   display: flex;
-  align-items: flex-start;
-  gap: $spacing-sm;
-}
+  gap: 10px;
+  max-width: 80%;
 
-.messageUser {
-  flex-direction: row-reverse;
+  &.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
 
-  .msgBubble {
-    background: rgba($accent, 0.12);
-    border: 1px solid $border-accent;
-    border-radius: $radius-md $radius-xs $radius-md $radius-md;
+    .bubbleContent {
+      background: $accent;
+      color: #000;
+      border-radius: 18px 18px 4px 18px;
+    }
   }
 
-  .msgContent { color: $text-primary; }
-}
+  &.assistant {
+    align-self: flex-start;
 
-.messageAI {
-  .msgBubble {
-    background: $bg-card;
-    border: 1px solid $border;
-    border-radius: $radius-xs $radius-md $radius-md $radius-md;
+    .bubbleContent {
+      background: $surface2;
+      color: $text;
+      border-radius: 18px 18px 18px 4px;
+      border: 1px solid $border;
+    }
   }
 }
 
-.msgAvatar {
+.bubbleAvatar {
   width: 32px;
   height: 32px;
-  background: rgba($accent, 0.1);
-  border: 1px solid $border-accent;
-  border-radius: $radius-sm;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $accent, darken($accent, 15%));
   display: flex;
   align-items: center;
   justify-content: center;
-  color: $accent;
-  flex-shrink: 0;
-}
-
-.msgBubble {
-  max-width: 75%;
-  padding: $spacing-md;
-  border-radius: $radius-md;
-}
-
-.msgContent {
-  font-size: $font-size-sm;
-  color: $text-secondary;
-  line-height: 1.6;
-
-  p { margin: 0; }
-  p + p { margin-top: 6px; }
-  strong { color: $text-primary; font-weight: $font-weight-semibold; }
-}
-
-.msgTime {
   font-size: 10px;
-  color: $text-muted;
-  margin-top: 6px;
-  text-align: right;
+  font-weight: 700;
+  color: #000;
+  flex-shrink: 0;
+  margin-top: 4px;
 }
 
-// Typing indicator
+.bubbleContent {
+  padding: 10px 14px;
+  font-size: 14px;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
 .typing {
   display: flex;
-  align-items: center;
   gap: 4px;
-  padding: 4px 0;
+  align-items: center;
+  height: 20px;
 
   span {
     width: 6px;
     height: 6px;
-    background: $text-muted;
     border-radius: 50%;
+    background: $muted;
     animation: bounce 1.2s infinite;
 
     &:nth-child(2) { animation-delay: 0.2s; }
@@ -175,93 +142,62 @@
 }
 
 @keyframes bounce {
-  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
-  30% { transform: translateY(-6px); opacity: 1; }
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
 }
 
-// Suggestions
-.suggestions {
-  padding: $spacing-md $spacing-lg;
-  border-top: 1px solid $border;
-}
-
-.suggestionsTitle {
-  font-size: $font-size-xs;
-  color: $text-muted;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: $spacing-sm;
-}
-
-.suggestionsList {
+.inputBar {
   display: flex;
-  flex-wrap: wrap;
-  gap: $spacing-sm;
-}
-
-.suggestionBtn {
-  padding: 6px 12px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid $border;
-  border-radius: $radius-full;
-  color: $text-secondary;
-  font-size: $font-size-xs;
-  cursor: pointer;
-  transition: all $transition-fast;
-
-  &:hover {
-    background: rgba($accent, 0.1);
-    border-color: $border-accent;
-    color: $accent;
-  }
-}
-
-// Input area
-.inputArea {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  padding: $spacing-md $spacing-lg;
+  gap: 10px;
+  padding: 16px 24px;
   border-top: 1px solid $border;
-  background: $bg-secondary;
+  background: $surface;
 }
 
 .input {
   flex: 1;
-  background: $bg-input;
+  background: $surface2;
   border: 1px solid $border;
-  border-radius: $radius-sm;
-  padding: 10px $spacing-md;
-  font-size: $font-size-sm;
-  color: $text-primary;
-  transition: border-color $transition-fast;
-  font-family: inherit;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: $text;
+  outline: none;
+  transition: border-color 0.2s;
 
-  &::placeholder { color: $text-muted; }
-  &:focus { outline: none; border-color: $border-accent; }
-  &:disabled { opacity: 0.5; }
+  &::placeholder { color: $muted; }
+
+  &:focus {
+    border-color: rgba($accent, 0.5);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
 }
 
 .sendBtn {
-  @include flex-center;
-  width: 42px;
-  height: 42px;
   background: $accent;
+  color: #000;
   border: none;
-  border-radius: $radius-sm;
-  color: #0a0f1e;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background $transition-fast;
-  flex-shrink: 0;
+  transition: opacity 0.2s, transform 0.1s;
+  white-space: nowrap;
 
-  &:hover { background: $accent-hover; }
-  &:disabled { opacity: 0.4; cursor: not-allowed; }
-}
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
 
-.disclaimer {
-  font-size: 10px;
-  color: $text-muted;
-  text-align: center;
-  padding: 0 $spacing-lg $spacing-sm;
-  opacity: 0.6;
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
 }

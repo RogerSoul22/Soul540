@@ -30,12 +30,18 @@ export default function Login() {
   return (
     <div className={styles.container}>
       {/* Lado esquerdo - Branding */}
-      <div className={styles.branding} />
+      <div className={styles.branding}>
+        <div className={styles.brandingContent}>
+          <img src="/logo.jpeg" alt="Soul540" className={styles.brandingLogo} />
+        </div>
+      </div>
 
       {/* Lado direito - Formulario */}
       <div className={styles.formSide}>
         <div className={styles.formContainer}>
-
+          <div className={styles.formLogo}>
+            <img src="/logo.jpeg" alt="Soul540" className={styles.formLogoImg} />
+          </div>
 
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.formFields}>

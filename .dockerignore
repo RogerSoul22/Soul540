@@ -1,0 +1,14 @@
+node_modules
+franchise/node_modules
+factory/node_modules
+dist
+franchise/dist
+factory/dist
+.git
+.env
+.env.local
+franchise/.env
+franchise/.env.local
+factory/.env
+factory/.env.local
+*.log

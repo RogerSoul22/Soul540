@@ -27,6 +27,11 @@ router.post('/', async (req, res) => {
 
 // PUT /api/users/:id
 router.put('/:id', async (req, res) => {
+  const user = await UserModel.findById(req.params.id);
+  if (!user) return res.status(404).json({ error: 'not found' });
+  if ((req as any).user?.role !== 'admin' && user.unit !== getTenantUnit(req)) {
+    return res.status(403).json({ error: 'forbidden' });
+  }
   const { name, isAdmin, permissions, password } = req.body;
   const update: Record<string, unknown> = {};
   if (name !== undefined) update.name = name;
@@ -36,13 +41,17 @@ router.put('/:id', async (req, res) => {
     update.passwordHash = await bcrypt.hash(password, 10);
     update.passwordPlain = password;
   }
-  const user = await UserModel.findByIdAndUpdate(req.params.id, update, { new: true }).select('-passwordHash');
-  if (!user) return res.status(404).json({ error: 'not found' });
-  res.json(user);
+  const updated = await UserModel.findByIdAndUpdate(req.params.id, update, { new: true }).select('-passwordHash');
+  res.json(updated);
 });
 
 // DELETE /api/users/:id
 router.delete('/:id', async (req, res) => {
+  const user = await UserModel.findById(req.params.id);
+  if (!user) return res.status(404).json({ error: 'not found' });
+  if ((req as any).user?.role !== 'admin' && user.unit !== getTenantUnit(req)) {
+    return res.status(403).json({ error: 'forbidden' });
+  }
   await UserModel.findByIdAndDelete(req.params.id);
   res.status(204).end();
 });

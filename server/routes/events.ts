@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import mongoose, { Schema } from 'mongoose';
-import { Finance, FranchiseFinance } from './finances';
+import { Finance, FranchiseFinance, FactoryFinance } from './finances';
 import { getTenantUnit } from '../middleware/tenant';
 
 const EventSchema = new Schema({
@@ -51,24 +51,59 @@ const FranchiseEventSchema = new Schema({
   source: { type: String, default: 'franchise' },
 }, { collection: 'franchiseevents', toJSON: { virtuals: true, versionKey: false } });
 
-const Event = mongoose.models.Event || mongoose.model('Event', EventSchema);
-const FranchiseEvent = mongoose.models.FranchiseEvent || mongoose.model('FranchiseEvent', FranchiseEventSchema);
+const FactoryEventSchema = new Schema({
+  name: String,
+  date: String,
+  endDate: String,
+  time: String,
+  duration: String,
+  location: String,
+  outOfCity: Boolean,
+  phone: String,
+  guestCount: { type: Number, default: 0 },
+  status: { type: String, default: 'planning' },
+  budget: { type: Number, default: 0 },
+  menu: [String],
+  notes: { type: String, default: '' },
+  responsibleEmployeeId: String,
+  staffCount: Number,
+  selectedEmployeeIds: [String],
+  paymentProofName: String,
+  contractPdfName: String,
+  createdBy: String,
+  createdAt: { type: String, default: () => new Date().toISOString() },
+  source: { type: String, default: 'factory' },
+}, { collection: 'factoryevents', toJSON: { virtuals: true, versionKey: false } });
+
+export const Event = mongoose.models.Event || mongoose.model('Event', EventSchema);
+export const FranchiseEvent = mongoose.models.FranchiseEvent || mongoose.model('FranchiseEvent', FranchiseEventSchema);
+export const FactoryEvent = mongoose.models.FactoryEvent || mongoose.model('FactoryEvent', FactoryEventSchema);
 
 function isFromFranchise(req: any): boolean {
   return getTenantUnit(req) === 'franchise';
 }
 
-async function findEventInBothCollections(id: string) {
+function isFromFactory(req: any): boolean {
+  return getTenantUnit(req) === 'factory';
+}
+
+async function findEventInAllCollections(id: string) {
   const doc = await Event.findById(id);
-  if (doc) return { doc, model: Event, isfranchise: false };
+  if (doc) return { doc, model: Event, financeModel: Finance, financeSource: 'main' };
   const fdoc = await FranchiseEvent.findById(id);
-  if (fdoc) return { doc: fdoc, model: FranchiseEvent, isfranchise: true };
+  if (fdoc) return { doc: fdoc, model: FranchiseEvent, financeModel: FranchiseFinance, financeSource: 'franchise' };
+  const factDoc = await FactoryEvent.findById(id);
+  if (factDoc) return { doc: factDoc, model: FactoryEvent, financeModel: FactoryFinance, financeSource: 'factory' };
   return null;
 }
 
 const router = Router();
 
 router.get('/', async (req, res) => {
+  if (isFromFactory(req)) {
+    const events = await FactoryEvent.find({}).sort({ date: 1 });
+    return res.json(events);
+  }
   if (isFromFranchise(req)) {
     const events = await FranchiseEvent.find({}).sort({ date: 1 });
     return res.json(events);
@@ -82,10 +117,23 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const xSystem = (req.headers['x-system'] as string) || '';
-  const userUnit = (req as any).user?.unit;
-  const isFactory = xSystem === 'factory' || (!xSystem && userUnit === 'factory');
-  if (isFactory) return res.status(403).json({ error: 'Forbidden' });
+  if (isFromFactory(req)) {
+    const event = await FactoryEvent.create({ ...req.body, source: 'factory' });
+    if (event.budget && event.budget > 0) {
+      await FactoryFinance.create({
+        eventId: event.id,
+        type: 'revenue',
+        category: 'contrato',
+        description: `Contrato - ${event.name}`,
+        amount: event.budget,
+        date: event.date,
+        status: 'pending',
+        autoEventBudget: true,
+        source: 'factory',
+      });
+    }
+    return res.status(201).json(event);
+  }
   if (isFromFranchise(req)) {
     const event = await FranchiseEvent.create({ ...req.body, source: 'franchise' });
     if (event.budget && event.budget > 0) {
@@ -121,16 +169,12 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  const xSystem = (req.headers['x-system'] as string) || '';
-  const userUnit = (req as any).user?.unit;
-  const isFactory = xSystem === 'factory' || (!xSystem && userUnit === 'factory');
-  if (isFactory) return res.status(403).json({ error: 'Forbidden' });
-  const found = await findEventInBothCollections(req.params.id);
+  const found = await findEventInAllCollections(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   const event = await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true });
   if (!event) return res.status(404).json({ error: 'Not found' });
-  const FinanceModel = found.isfranchise ? FranchiseFinance : Finance;
-  const financeSource = found.isfranchise ? 'franchise' : 'main';
+  const FinanceModel = found.financeModel;
+  const financeSource = found.financeSource;
   const existing = await FinanceModel.findOne({ eventId: event.id, autoEventBudget: true });
   if (event.budget && event.budget > 0) {
     if (existing) {
@@ -159,15 +203,10 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
-  const xSystem = (req.headers['x-system'] as string) || '';
-  const userUnit = (req as any).user?.unit;
-  const isFactory = xSystem === 'factory' || (!xSystem && userUnit === 'factory');
-  if (isFactory) return res.status(403).json({ error: 'Forbidden' });
-  const found = await findEventInBothCollections(req.params.id);
+  const found = await findEventInAllCollections(req.params.id);
   if (!found) return res.status(204).end();
   await found.model.findByIdAndDelete(req.params.id);
-  const FinanceModel = found.isfranchise ? FranchiseFinance : Finance;
-  await FinanceModel.deleteMany({ eventId: req.params.id, autoEventBudget: true });
+  await found.financeModel.deleteMany({ eventId: req.params.id, autoEventBudget: true });
   res.status(204).end();
 });
 

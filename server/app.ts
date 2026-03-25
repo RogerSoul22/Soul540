@@ -19,6 +19,7 @@ import contractsRouter from './routes/contracts';
 import franchisesRouter from './routes/franchises';
 import menusRouter from './routes/menus';
 import invoicesRouter from './routes/invoices';
+import chatRouter from './routes/chat';
 import { optionalAuth } from './middleware/auth';
 
 const app = express();
@@ -44,6 +45,7 @@ app.use('/api/contracts', contractsRouter);
 app.use('/api/franchises', franchisesRouter);
 app.use('/api/menus', menusRouter);
 app.use('/api/invoices', invoicesRouter);
+app.use('/api/chat', chatRouter);
 
 // Serve franchise app at /franquia
 const franchiseDist = path.join(process.cwd(), 'franchise/dist');

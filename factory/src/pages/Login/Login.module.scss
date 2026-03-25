@@ -56,20 +56,14 @@
 }
 
 .brandingLogo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-  background: linear-gradient(135deg, $accent, #f97316);
-  border-radius: $radius-md;
-  font-family: $font-display;
-  font-size: 1.3rem;
-  font-weight: $font-weight-bold;
-  color: #fff;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid rgba($accent, 0.4);
+  box-shadow: 0 0 40px rgba($accent, 0.2), 0 8px 32px rgba(0,0,0,0.3);
   margin-bottom: $spacing-xl;
-  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.28);
-  letter-spacing: -1px;
+  display: block;
 }
 
 .brandingTitle {

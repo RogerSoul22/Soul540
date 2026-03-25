@@ -355,7 +355,7 @@ export default function Financeiro() {
                     tickLine={false}
                   />
                   <YAxis
-                    tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
+                    tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`}
                     tick={{ fill: '#64748b', fontSize: 12 }}
                     axisLine={false}
                     tickLine={false}

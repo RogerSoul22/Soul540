@@ -29,12 +29,21 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  const franchise = await Franchise.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  const franchise = await Franchise.findById(req.params.id);
   if (!franchise) return res.status(404).json({ error: 'Not found' });
-  res.json(franchise);
+  if ((req as any).user?.role !== 'admin' && franchise.unit !== getTenantUnit(req)) {
+    return res.status(403).json({ error: 'forbidden' });
+  }
+  const updated = await Franchise.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  res.json(updated);
 });
 
 router.delete('/:id', async (req, res) => {
+  const franchise = await Franchise.findById(req.params.id);
+  if (!franchise) return res.status(404).json({ error: 'Not found' });
+  if ((req as any).user?.role !== 'admin' && franchise.unit !== getTenantUnit(req)) {
+    return res.status(403).json({ error: 'forbidden' });
+  }
   await Franchise.findByIdAndDelete(req.params.id);
   res.status(204).end();
 });

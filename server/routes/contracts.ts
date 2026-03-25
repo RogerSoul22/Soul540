@@ -41,30 +41,50 @@ const FranchiseContractSchema = new Schema(
   { collection: 'franchisecontracts', toJSON: { virtuals: true, versionKey: false } },
 );
 
+const FactoryContractSchema = new Schema(
+  { ...contractFields, source: { type: String, default: 'factory' } },
+  { collection: 'factorycontracts', toJSON: { virtuals: true, versionKey: false } },
+);
+
 const Contract = mongoose.models.Contract || mongoose.model('Contract', ContractSchema);
 const FranchiseContract = mongoose.models.FranchiseContract || mongoose.model('FranchiseContract', FranchiseContractSchema);
+const FactoryContract = mongoose.models.FactoryContract || mongoose.model('FactoryContract', FactoryContractSchema);
 
 function isFromFranchise(req: any): boolean {
   return getTenantUnit(req) === 'franchise';
 }
 
-async function findInBothCollections(id: string) {
+function isFromFactory(req: any): boolean {
+  return getTenantUnit(req) === 'factory';
+}
+
+async function findInAllCollections(id: string) {
   const doc = await Contract.findById(id);
   if (doc) return { doc, model: Contract };
   const fdoc = await FranchiseContract.findById(id);
   if (fdoc) return { doc: fdoc, model: FranchiseContract };
+  const factDoc = await FactoryContract.findById(id);
+  if (factDoc) return { doc: factDoc, model: FactoryContract };
   return null;
 }
 
 const router = Router();
 
 router.get('/', async (req, res) => {
+  if (isFromFactory(req)) {
+    const items = await FactoryContract.find({});
+    return res.json(items);
+  }
   const Model = isFromFranchise(req) ? FranchiseContract : Contract;
   const items = await Model.find({});
   res.json(items);
 });
 
 router.post('/', async (req, res) => {
+  if (isFromFactory(req)) {
+    const contract = await FactoryContract.create({ ...req.body, source: 'factory' });
+    return res.status(201).json(contract);
+  }
   if (isFromFranchise(req)) {
     const contract = await FranchiseContract.create({ ...req.body, source: 'franchise' });
     return res.status(201).json(contract);
@@ -74,14 +94,14 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  const found = await findInBothCollections(req.params.id);
+  const found = await findInAllCollections(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   const contract = await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true });
   res.json(contract);
 });
 
 router.delete('/:id', async (req, res) => {
-  const found = await findInBothCollections(req.params.id);
+  const found = await findInAllCollections(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   await found.model.findByIdAndDelete(req.params.id);
   res.status(204).end();

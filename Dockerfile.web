@@ -1,0 +1,33 @@
+# ── Stage 1: build main app ──────────────────────────────────
+FROM node:20-alpine AS build-main
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY tsconfig.json tsconfig.node.json index.html vite.config.ts ./
+COPY src/ ./src/
+COPY public/ ./public/
+RUN npx vite build
+
+# ── Stage 2: build franchise app ─────────────────────────────
+FROM node:20-alpine AS build-franchise
+WORKDIR /app
+COPY franchise/package*.json ./
+RUN npm install
+COPY franchise/ .
+RUN npm run build
+
+# ── Stage 3: build factory app ───────────────────────────────
+FROM node:20-alpine AS build-factory
+WORKDIR /app
+COPY factory/package*.json ./
+RUN npm install
+COPY factory/ .
+RUN npm run build
+
+# ── Stage 4: Nginx serving all three ─────────────────────────
+FROM nginx:alpine
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build-main     /app/dist /usr/share/nginx/html
+COPY --from=build-franchise /app/dist /usr/share/nginx/html/franquia
+COPY --from=build-factory   /app/dist /usr/share/nginx/html/fabrica
+EXPOSE 80

@@ -44,16 +44,21 @@
 }
 
 .logo {
-  padding: $spacing-md $spacing-lg;
+  padding: $spacing-md $spacing-lg $spacing-sm;
   border-bottom: 1px solid var(--border);
   margin-bottom: $spacing-sm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-xs;
 }
-.logoText {
-  font-family: $font-display;
-  font-size: $font-size-lg;
-  font-weight: $font-weight-semibold;
-  color: var(--text-primary);
-  display: block;
+.logoImg {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba($accent, 0.3);
+  box-shadow: 0 0 16px rgba($accent, 0.15);
 }
 .logoTag {
   font-size: $font-size-xs;

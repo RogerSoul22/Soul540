@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 const UserSchema = new Schema({
   name: { type: String, required: true },
@@ -35,7 +36,11 @@ router.post('/login', async (req, res) => {
     return res.status(403).json({ error: 'Acesso não permitido neste sistema' });
   }
 
-  const token = 'token-' + user._id + '-' + Date.now();
+  const token = jwt.sign(
+    { userId: user._id.toString(), unit: userUnit, role: (user as any).role },
+    process.env.JWT_SECRET || 'soul540-secret',
+    { expiresIn: '7d' }
+  );
   res.json({ token, user: { id: user.id, name: user.name, email: user.email, isAdmin: user.isAdmin, permissions: user.permissions, unit: userUnit } });
 });
 

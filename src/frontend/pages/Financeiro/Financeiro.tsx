@@ -191,7 +191,7 @@ export default function Financeiro() {
         );
       }
       return true;
-    });
+    }).sort((a, b) => b.date.localeCompare(a.date));
   }, [finances, filterType, search, events]);
 
   // Events with budget joined with their finance entry
