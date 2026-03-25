@@ -101,8 +101,14 @@ const router = Router();
 
 router.get('/', async (req, res) => {
   if (isFromFactory(req)) {
-    const events = await FactoryEvent.find({}).sort({ date: 1 });
-    return res.json(events);
+    const [mainClosed, franchiseClosed, factoryEvents] = await Promise.all([
+      Event.find({ status: { $ne: 'planning' } }).sort({ date: -1 }),
+      FranchiseEvent.find({ status: { $ne: 'planning' } }).sort({ date: -1 }),
+      FactoryEvent.find({}).sort({ date: -1 }),
+    ]);
+    const merged = [...mainClosed, ...franchiseClosed, ...factoryEvents]
+      .sort((a, b) => (a.date > b.date ? -1 : 1));
+    return res.json(merged);
   }
   if (isFromFranchise(req)) {
     const events = await FranchiseEvent.find({}).sort({ date: 1 });
