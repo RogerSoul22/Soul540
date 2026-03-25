@@ -520,4 +520,36 @@
   .topBar { display: none; }
   .scrollArea { padding: 0; background: white; }
   .paper { box-shadow: none; max-width: 100%; }
+
+  // Force all text to black and backgrounds to white
+  .paperInner * {
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .clauseBox {
+    background: #f9fafb !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .paymentBox {
+    background: #fffbeb !important;
+    border-color: #fde68a !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .menuTable th {
+    background: #f3f4f6 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .menuTable tr:nth-child(even) td {
+    background: #f9fafb !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
 }
