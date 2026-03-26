@@ -27,6 +27,7 @@ const contractFields = {
   description: { type: String, default: '' },
   paymentConditions: { type: String, default: '' },
   terms: { type: String, default: '' },
+  menuId: { type: String, default: '' },
   status: { type: String, default: 'rascunho' },
   createdAt: { type: String, default: () => new Date().toISOString() },
 };
