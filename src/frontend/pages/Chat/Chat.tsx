@@ -55,6 +55,42 @@ export default function Chat() {
     }
   }
 
+  const SUGGESTIONS = [
+    'Ver eventos do mês',
+    'Criar lançamento financeiro',
+    'Listar tarefas pendentes',
+    'Ver funcionários',
+  ];
+
+  async function handleSuggestion(text: string) {
+    if (loading) return;
+    const userMessage: Message = { role: 'user', content: text };
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('soul540_token');
+      const history = newMessages.slice(-10).map(m => ({ role: m.role, content: m.content }));
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-System': 'main',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ message: text, history }),
+      });
+      const data = await res.json() as { reply: string; action?: string };
+      setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
+      if (data.action === 'create_finance') refreshFinances();
+      if (data.action === 'create_task') refreshTasks();
+    } catch {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Erro ao conectar com o assistente.' }]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -87,6 +123,20 @@ export default function Chat() {
           </div>
         )}
         <div ref={bottomRef} />
+      </div>
+
+      <div className={styles.suggestions}>
+        {SUGGESTIONS.map((s) => (
+          <button
+            key={s}
+            className={styles.suggestionChip}
+            onClick={() => handleSuggestion(s)}
+            disabled={loading}
+            type="button"
+          >
+            {s}
+          </button>
+        ))}
       </div>
 
       <form className={styles.inputBar} onSubmit={handleSubmit}>
