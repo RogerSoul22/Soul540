@@ -90,7 +90,9 @@ export default function Permissoes() {
   };
 
   const toggleAll = () => {
-    setDraftPerms(prev => prev.length === ALL_KEYS.length ? [] : [...ALL_KEYS]);
+    const isAllSelected = draftPerms.length === ALL_KEYS.length;
+    setDraftPerms(isAllSelected ? [] : [...ALL_KEYS]);
+    setDraftIsAdmin(!isAllSelected);
   };
 
   const savePermissions = async () => {
