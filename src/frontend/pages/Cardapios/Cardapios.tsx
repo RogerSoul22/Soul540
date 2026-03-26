@@ -58,7 +58,7 @@ async function generateMenuPdf(menu: StaticMenu) {
       <div class="doc-header">
         <div class="brand">Soul<span>540</span> Pizzas</div>
         <div class="tagline">· artesanal food ·</div>
-        <div class="menu-title-wrap"><div class="menu-title">${menu.name}</div></div>
+        <div class="menu-title-wrap"><div class="menu-title" style="color: #8b1a1a; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: 3px;">${menu.name}</div></div>
         <div class="menu-sub">${menu.tagline}</div>
       </div>
       <div class="body">
