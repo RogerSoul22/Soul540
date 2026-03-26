@@ -113,7 +113,7 @@ export default function Permissoes() {
     const res = await fetch('/api/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, unit: form.unit, permissions: form.isAdmin ? [...ALL_KEYS, 'permissoes'] : [] }),
+      body: JSON.stringify({ ...form, unit: form.unit, permissions: form.isAdmin ? ALL_KEYS : [] }),
     });
     const created = await res.json();
     setUsers(prev => [...prev, created]);
@@ -212,7 +212,9 @@ export default function Permissoes() {
                   onChange={(e) => {
                     setDraftIsAdmin(e.target.checked);
                     if (e.target.checked) {
-                      setDraftPerms([...ALL_KEYS, 'permissoes']);
+                      setDraftPerms([...ALL_KEYS]);
+                    } else {
+                      setDraftPerms([]);
                     }
                   }}
                 />

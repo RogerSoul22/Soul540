@@ -15,12 +15,12 @@ router.get('/', async (req, res) => {
 
 // POST /api/users
 router.post('/', async (req, res) => {
-  const { name, email, password, isAdmin, permissions } = req.body;
+  const { name, email, password, isAdmin, permissions, unit: bodyUnit } = req.body;
   if (!name?.trim() || !email?.trim() || !password) {
     return res.status(400).json({ error: 'name, email e password obrigatorios' });
   }
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = await UserModel.create({ name: name.trim(), email: email.toLowerCase().trim(), passwordHash, passwordPlain: password, isAdmin: !!isAdmin, permissions: permissions || [], unit: getTenantUnit(req) });
+  const user = await UserModel.create({ name: name.trim(), email: email.toLowerCase().trim(), passwordHash, passwordPlain: password, isAdmin: !!isAdmin, permissions: permissions || [], unit: bodyUnit || getTenantUnit(req) });
   const { passwordHash: _, ...safe } = user.toJSON();
   res.status(201).json(safe);
 });
