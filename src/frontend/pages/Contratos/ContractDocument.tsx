@@ -493,6 +493,8 @@ export default function ContractDocument({ contract, event, eventName, onClose }
                         <tr><td>MARGHERITA BÚFALA</td><td>Massa, molho de tomate, mussarela de búfala, parmesão, manjericão, azeite e orégano</td></tr>
                         <tr><td>CALABRESA TRADIZIONALE</td><td>Massa, molho de tomate, mussarela, calabresa, cebola, azeitona e orégano</td></tr>
                         <tr><td>QUATTRO FORAGGIO</td><td>Massa, molho, mussarela, parmesão, gorgonzola, catupiry e orégano</td></tr>
+                        <tr><td>MOZZARELLA SPECIALI</td><td>Massa, molho de tomate, mussarela, tomate em pedaços, azeitona, parmesão, manjericão, azeite e orégano</td></tr>
+                        <tr><td>SEM GLUTEN</td><td>Massa especial sem glúten com recheios disponíveis no mise en place</td></tr>
                         <tr><td>DUO FRANGO E BACON</td><td>Massa, molho de tomate, mussarela, frango desfiado, Catupiry, bacon e orégano</td></tr>
                       </tbody>
                     </table>
