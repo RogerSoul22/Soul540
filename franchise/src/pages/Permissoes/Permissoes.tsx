@@ -95,7 +95,7 @@ export default function Permissoes() {
     const res = await apiFetch('/api/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, unit: form.unit, permissions: form.isAdmin ? ALL_KEYS : [] }),
+      body: JSON.stringify({ ...form, permissions: form.isAdmin ? ALL_KEYS : [] }),
     });
     const created = await res.json();
     setUsers(prev => [...prev, created]);
