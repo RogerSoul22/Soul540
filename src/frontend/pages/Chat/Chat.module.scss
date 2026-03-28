@@ -1,17 +1,10 @@
-$accent: #f59e0b;
-$bg: #0a0a0f;
-$surface: #13131a;
-$surface2: #1a1a24;
-$border: rgba(255, 255, 255, 0.06);
-$text: #e2e8f0;
-$muted: #64748b;
-$danger: #ef4444;
+@use '../../styles/variables' as *;
 
 .container {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: $bg;
+  background: $bg-primary;
   border-radius: 12px;
   overflow: hidden;
 }
@@ -19,7 +12,7 @@ $danger: #ef4444;
 .header {
   padding: 20px 24px;
   border-bottom: 1px solid $border;
-  background: $surface;
+  background: $bg-secondary;
 }
 
 .headerInfo {
@@ -45,13 +38,13 @@ $danger: #ef4444;
 .title {
   font-size: 16px;
   font-weight: 600;
-  color: $text;
+  color: $text-primary;
   margin: 0;
 }
 
 .subtitle {
   font-size: 12px;
-  color: $muted;
+  color: $text-muted;
 }
 
 .messages {
@@ -94,8 +87,8 @@ $danger: #ef4444;
     align-self: flex-start;
 
     .bubbleContent {
-      background: $surface2;
-      color: $text;
+      background: $bg-elevated;
+      color: $text-primary;
       border-radius: 18px 18px 18px 4px;
       border: 1px solid $border;
     }
@@ -134,7 +127,7 @@ $danger: #ef4444;
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: $muted;
+    background: $text-muted;
     animation: bounce 1.2s infinite;
 
     &:nth-child(2) { animation-delay: 0.2s; }
@@ -152,24 +145,24 @@ $danger: #ef4444;
   gap: 10px;
   padding: 16px 24px;
   border-top: 1px solid $border;
-  background: $surface;
+  background: $bg-secondary;
 }
 
 .input {
   flex: 1;
-  background: $surface2;
+  background: $bg-input;
   border: 1px solid $border;
   border-radius: 8px;
   padding: 10px 14px;
   font-size: 14px;
-  color: $text;
+  color: $text-primary;
   outline: none;
   transition: border-color 0.2s;
 
-  &::placeholder { color: $muted; }
+  &::placeholder { color: $text-muted; }
 
   &:focus {
-    border-color: rgba($accent, 0.5);
+    border-color: $border-accent;
   }
 
   &:disabled {
@@ -205,7 +198,7 @@ $danger: #ef4444;
 
 .micBtn {
   background: transparent;
-  color: $muted;
+  color: $text-muted;
   border: 1px solid $border;
   border-radius: 8px;
   padding: 10px 12px;
@@ -218,8 +211,8 @@ $danger: #ef4444;
   flex-shrink: 0;
 
   &:hover:not(:disabled) {
-    color: $text;
-    border-color: rgba(255, 255, 255, 0.2);
+    color: $text-primary;
+    border-color: $border-subtle;
   }
 
   &:disabled {
@@ -251,9 +244,9 @@ $danger: #ef4444;
 }
 
 .suggestionChip {
-  background: rgba(245, 158, 11, 0.08);
+  background: $accent-light;
   border: 1px solid rgba(245, 158, 11, 0.3);
-  color: #f59e0b;
+  color: $accent;
   border-radius: 20px;
   padding: 5px 14px;
   font-size: 0.78rem;
@@ -263,7 +256,7 @@ $danger: #ef4444;
 
   &:hover:not(:disabled) {
     background: rgba(245, 158, 11, 0.18);
-    border-color: #f59e0b;
+    border-color: $accent;
   }
 
   &:disabled {
