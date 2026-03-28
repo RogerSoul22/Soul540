@@ -7,6 +7,12 @@ interface Message {
   content: string;
 }
 
+const SpeechRecognitionAPI =
+  (window as unknown as { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition })
+    .SpeechRecognition ||
+  (window as unknown as { webkitSpeechRecognition?: typeof SpeechRecognition })
+    .webkitSpeechRecognition;
+
 export default function Chat() {
   const { refreshFinances, refreshTasks } = useApp();
   const [messages, setMessages] = useState<Message[]>([
@@ -18,15 +24,15 @@ export default function Chat() {
   const [listening, setListening] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
-  const SpeechRecognitionAPI =
-    (window as unknown as { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition })
-      .SpeechRecognition ||
-    (window as unknown as { webkitSpeechRecognition?: typeof SpeechRecognition })
-      .webkitSpeechRecognition;
-
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
+
+  useEffect(() => {
+    return () => {
+      recognitionRef.current?.stop();
+    };
+  }, []);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -117,8 +123,14 @@ export default function Chat() {
       setInput(prev => prev ? `${prev} ${transcript}` : transcript);
     };
 
-    rec.onend = () => setListening(false);
-    rec.onerror = () => setListening(false);
+    rec.onend = () => {
+      setListening(false);
+      recognitionRef.current = null;
+    };
+    rec.onerror = () => {
+      setListening(false);
+      recognitionRef.current = null;
+    };
 
     recognitionRef.current = rec;
     rec.start();
