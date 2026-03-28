@@ -5,6 +5,7 @@ $surface2: #1a1a24;
 $border: rgba(255, 255, 255, 0.06);
 $text: #e2e8f0;
 $muted: #64748b;
+$danger: #ef4444;
 
 .container {
   display: flex;
@@ -228,14 +229,18 @@ $muted: #64748b;
 }
 
 .micBtnActive {
-  color: #ef4444;
-  border-color: #ef4444;
+  color: $danger;
+  border-color: $danger;
   animation: micPulse 1.2s ease-in-out infinite;
+
+  &:hover:not(:disabled) {
+    border-color: $danger;
+  }
 }
 
 @keyframes micPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-  50%       { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba($danger, 0.4); }
+  50%       { box-shadow: 0 0 0 6px rgba($danger, 0); }
 }
 
 .suggestions {
