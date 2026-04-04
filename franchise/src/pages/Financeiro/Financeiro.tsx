@@ -83,6 +83,7 @@ export default function Financeiro() {
 
   // Table filters
   const [filterType, setFilterType] = useState<FilterType>('all');
+  const [filterMonth, setFilterMonth] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -204,6 +205,7 @@ export default function Financeiro() {
   // Table filter
   const filtered = useMemo(() => {
     return finances.filter((f) => {
+      if (filterMonth !== 'all' && !f.date.startsWith(filterMonth)) return false;
       if (filterType !== 'all' && f.type !== filterType) return false;
       if (search) {
         const q = search.toLowerCase();
@@ -216,7 +218,7 @@ export default function Financeiro() {
       }
       return true;
     });
-  }, [finances, filterType, search, events]);
+  }, [finances, filterType, filterMonth, search, events]);
 
   // Events with budget joined with their finance entry
   const eventsWithBudget = useMemo(() => {
@@ -620,6 +622,16 @@ export default function Financeiro() {
                 </button>
               ))}
             </div>
+            <select
+              className={styles.searchInput}
+              value={filterMonth}
+              onChange={(e) => setFilterMonth(e.target.value)}
+            >
+              <option value="all">Todos os meses</option>
+              {availableMonths.map((m) => (
+                <option key={m} value={m}>{formatMonth(m)}</option>
+              ))}
+            </select>
             <input
               type="text"
               className={styles.searchInput}
