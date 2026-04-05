@@ -25,7 +25,7 @@ import { optionalAuth } from './middleware/auth';
 const app = express();
 
 app.use(cors({ allowedHeaders: ['Content-Type', 'Authorization', 'X-System'] }));
-app.use(express.json());
+app.use(express.json({ limit: '100mb' }));
 app.use(optionalAuth);
 
 app.use('/api/events', eventsRouter);

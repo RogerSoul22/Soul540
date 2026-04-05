@@ -18,6 +18,7 @@ const EmployeeSchema = new Schema({
   notes: String,
   pixKey: String,
   availableDays: [String],
+  skills: [{ name: String, stars: Number }],
   createdAt: { type: String, default: () => new Date().toISOString() },
   source: { type: String, default: 'main' },
 }, { collection: 'employees', toJSON: { virtuals: true, versionKey: false } });
@@ -38,6 +39,7 @@ const FranchiseEmployeeSchema = new Schema({
   notes: String,
   pixKey: String,
   availableDays: [String],
+  skills: [{ name: String, stars: Number }],
   createdAt: { type: String, default: () => new Date().toISOString() },
   source: { type: String, default: 'franchise' },
 }, { collection: 'franchiseemployees', toJSON: { virtuals: true, versionKey: false } });
@@ -58,6 +60,7 @@ const FactoryEmployeeSchema = new Schema({
   notes: String,
   pixKey: String,
   availableDays: [String],
+  skills: [{ name: String, stars: Number }],
   createdAt: { type: String, default: () => new Date().toISOString() },
   source: { type: String, default: 'factory' },
 }, { collection: 'factoryemployees', toJSON: { virtuals: true, versionKey: false } });

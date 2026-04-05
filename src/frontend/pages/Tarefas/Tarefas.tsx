@@ -214,6 +214,34 @@ export default function Tarefas() {
                         {task.dueDate && <span>{format(parseISO(task.dueDate), 'dd/MM', { locale: ptBR })}</span>}
                         {task.eventId && <span className={styles.taskEvent}>{eventMap[task.eventId] || ''}</span>}
                       </div>
+                      <div className={styles.taskMoveRow}>
+                        {(() => {
+                          const idx = COLUMNS.findIndex((c) => c.id === task.status);
+                          const prev = COLUMNS[idx - 1];
+                          const next = COLUMNS[idx + 1];
+                          return (
+                            <>
+                              <button
+                                className={styles.taskMoveBtn}
+                                disabled={!prev}
+                                onClick={() => prev && handleMove(task.id, prev.id)}
+                                title={prev ? `← ${prev.label}` : undefined}
+                              >
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                              </button>
+                              <span className={styles.taskMoveLabel}>{statusLabels[task.status]}</span>
+                              <button
+                                className={styles.taskMoveBtn}
+                                disabled={!next}
+                                onClick={() => next && handleMove(task.id, next.id)}
+                                title={next ? `${next.label} →` : undefined}
+                              >
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                              </button>
+                            </>
+                          );
+                        })()}
+                      </div>
                     </div>
                   ))
                 )}
@@ -238,7 +266,24 @@ export default function Tarefas() {
                 </div>
                 <div className={styles.listItemBadges}>
                   <Badge variant={priorityColors[task.priority]}>{priorityLabels[task.priority]}</Badge>
-                  <Badge variant={statusColors[task.status]}>{statusLabels[task.status]}</Badge>
+                  <div className={styles.taskMoveRow} style={{ marginTop: 0, paddingTop: 0, borderTop: 'none' }}>
+                    {(() => {
+                      const idx = COLUMNS.findIndex((c) => c.id === task.status);
+                      const prev = COLUMNS[idx - 1];
+                      const next = COLUMNS[idx + 1];
+                      return (
+                        <>
+                          <button className={styles.taskMoveBtn} disabled={!prev} onClick={() => prev && handleMove(task.id, prev.id)} title={prev ? `← ${prev.label}` : undefined}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                          </button>
+                          <Badge variant={statusColors[task.status]}>{statusLabels[task.status]}</Badge>
+                          <button className={styles.taskMoveBtn} disabled={!next} onClick={() => next && handleMove(task.id, next.id)} title={next ? `${next.label} →` : undefined}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                          </button>
+                        </>
+                      );
+                    })()}
+                  </div>
                   <button className={styles.btnDelete} onClick={() => handleDelete(task.id)}>Excluir</button>
                 </div>
               </div>

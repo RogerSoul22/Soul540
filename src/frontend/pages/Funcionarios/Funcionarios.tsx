@@ -47,6 +47,8 @@ function formatRG(v: string) {
   return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}-${d.slice(8)}`;
 }
 
+type Skill = { name: string; stars: number };
+
 type FormData = {
   name: string;
   role: Employee['role'];
@@ -58,10 +60,11 @@ type FormData = {
   pixKey: string;
   availableDays: string[];
   status: Employee['status'];
+  skills: Skill[];
 };
 
 const emptyForm: FormData = {
-  name: '', role: 'auxiliar', phone: '', cpf: '', rg: '', address: '', notes: '', pixKey: '', availableDays: [], status: 'ativo',
+  name: '', role: 'auxiliar', phone: '', cpf: '', rg: '', address: '', notes: '', pixKey: '', availableDays: [], status: 'ativo', skills: [],
 };
 
 export default function Funcionarios() {
@@ -126,7 +129,7 @@ export default function Funcionarios() {
     setForm({
       name: emp.name, role: emp.role, phone: emp.phone, status: emp.status,
       cpf: emp.cpf ?? '', rg: emp.rg ?? '', address: emp.address ?? '',
-      notes: emp.notes ?? '', pixKey: emp.pixKey ?? '', availableDays: emp.availableDays ?? [],
+      notes: emp.notes ?? '', pixKey: emp.pixKey ?? '', availableDays: emp.availableDays ?? [], skills: emp.skills ?? [],
     });
     setEditingId(emp.id);
     setShowModal(true);
@@ -149,6 +152,7 @@ export default function Funcionarios() {
       cpf: form.cpf || undefined, rg: form.rg || undefined, address: form.address || undefined,
       notes: form.notes || undefined, pixKey: form.pixKey || undefined,
       availableDays: form.availableDays.length > 0 ? form.availableDays : undefined,
+      skills: form.skills.length > 0 ? form.skills : undefined,
     };
     if (editingId) {
       const res = await fetch(`/api/employees/${editingId}`, {
@@ -337,6 +341,53 @@ export default function Funcionarios() {
                 <textarea className={`${styles.input} ${styles.textarea}`} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Anotações sobre o funcionário..." rows={3} />
               </div>
               <div className={styles.formGroup}>
+                <label className={styles.label}>Especialidades</label>
+                <div className={styles.skillsList}>
+                  {form.skills.map((skill, i) => (
+                    <div key={i} className={styles.skillRow}>
+                      <input
+                        className={styles.skillInput}
+                        value={skill.name}
+                        onChange={(e) => {
+                          const updated = [...form.skills];
+                          updated[i] = { ...updated[i], name: e.target.value };
+                          setForm({ ...form, skills: updated });
+                        }}
+                        placeholder="Ex: Pizzas napolitanas"
+                      />
+                      <div className={styles.starRow}>
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <button
+                            key={s}
+                            type="button"
+                            className={`${styles.starBtn} ${s <= skill.stars ? styles.starActive : ''}`}
+                            onClick={() => {
+                              const updated = [...form.skills];
+                              updated[i] = { ...updated[i], stars: s };
+                              setForm({ ...form, skills: updated });
+                            }}
+                          >★</button>
+                        ))}
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.skillRemove}
+                        onClick={() => setForm({ ...form, skills: form.skills.filter((_, j) => j !== i) })}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    className={styles.skillAdd}
+                    onClick={() => setForm({ ...form, skills: [...form.skills, { name: '', stars: 3 }] })}
+                  >
+                    + Adicionar especialidade
+                  </button>
+                </div>
+              </div>
+              <div className={styles.formGroup}>
                 <label className={styles.label}>Dias Disponíveis</label>
                 <div className={styles.dayPicker}>
                   {DAYS.map((day) => (
@@ -416,6 +467,23 @@ export default function Funcionarios() {
                     <span>—</span>
                   )}
                 </div>
+                {viewEmployee.skills && viewEmployee.skills.length > 0 && (
+                  <div className={`${styles.detailField} ${styles.detailFieldFull}`}>
+                    <span className={styles.detailFieldLabel}>Especialidades</span>
+                    <div className={styles.skillsViewGrid}>
+                      {viewEmployee.skills.map((skill, i) => (
+                        <div key={i} className={styles.skillViewRow}>
+                          <span className={styles.skillViewName}>{skill.name}</span>
+                          <span className={styles.skillViewStars}>
+                            {[1,2,3,4,5].map((s) => (
+                              <span key={s} className={s <= skill.stars ? styles.starOn : styles.starOff}>★</span>
+                            ))}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             <div className={styles.modalFooter}>

@@ -21,6 +21,7 @@ export interface Employee {
   notes?: string;
   pixKey?: string;
   availableDays?: string[];
+  skills?: { name: string; stars: number }[];
 }
 
 export interface Contractor {

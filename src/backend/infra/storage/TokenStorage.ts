@@ -15,9 +15,14 @@ export const TokenStorage = {
   },
 
   getUser<T>(): T | null {
-    const data = localStorage.getItem(USER_KEY);
-    if (!data) return null;
-    return JSON.parse(data) as T;
+    try {
+      const data = localStorage.getItem(USER_KEY);
+      if (!data) return null;
+      return JSON.parse(data) as T;
+    } catch {
+      localStorage.removeItem(USER_KEY);
+      return null;
+    }
   },
 
   setUser<T>(user: T): void {

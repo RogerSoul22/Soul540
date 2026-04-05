@@ -24,4 +24,22 @@ export interface PizzaEvent {
   createdAt: string;
   unit?: string;
   source?: string;
+  celebration?: string;
+  teamArrivalTime?: string;
+  city?: string;
+  guestsAdult?: number;
+  guestsTeen?: number;
+  guestsChild?: number;
+  travelCost?: number;
+  teamPizzaiolo?: string;
+  teamHelper?: string;
+  teamGarcon?: string;
+  extrasLoucas?: number;
+  extrasBebidas?: number;
+  finalValue?: number;
+  paymentMethod?: string;
+  locationImageName?: string;
+  locationImageData?: string;
+  paymentProofData?: string;
+  contractPdfData?: string;
 }

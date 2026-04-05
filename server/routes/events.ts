@@ -25,6 +25,24 @@ const EventSchema = new Schema({
   createdBy: String,
   createdAt: { type: String, default: () => new Date().toISOString() },
   source: { type: String, default: 'main' },
+  celebration: String,
+  teamArrivalTime: String,
+  city: String,
+  guestsAdult: Number,
+  guestsTeen: Number,
+  guestsChild: Number,
+  travelCost: Number,
+  teamPizzaiolo: String,
+  teamHelper: String,
+  teamGarcon: String,
+  extrasLoucas: Number,
+  extrasBebidas: Number,
+  finalValue: Number,
+  paymentMethod: String,
+  locationImageName: String,
+  locationImageData: String,
+  paymentProofData: String,
+  contractPdfData: String,
 }, { collection: 'events', toJSON: { virtuals: true, versionKey: false } });
 
 const FranchiseEventSchema = new Schema({
@@ -49,6 +67,24 @@ const FranchiseEventSchema = new Schema({
   createdBy: String,
   createdAt: { type: String, default: () => new Date().toISOString() },
   source: { type: String, default: 'franchise' },
+  celebration: String,
+  teamArrivalTime: String,
+  city: String,
+  guestsAdult: Number,
+  guestsTeen: Number,
+  guestsChild: Number,
+  travelCost: Number,
+  teamPizzaiolo: String,
+  teamHelper: String,
+  teamGarcon: String,
+  extrasLoucas: Number,
+  extrasBebidas: Number,
+  finalValue: Number,
+  paymentMethod: String,
+  locationImageName: String,
+  locationImageData: String,
+  paymentProofData: String,
+  contractPdfData: String,
 }, { collection: 'franchiseevents', toJSON: { virtuals: true, versionKey: false } });
 
 const FactoryEventSchema = new Schema({
@@ -73,6 +109,24 @@ const FactoryEventSchema = new Schema({
   createdBy: String,
   createdAt: { type: String, default: () => new Date().toISOString() },
   source: { type: String, default: 'factory' },
+  celebration: String,
+  teamArrivalTime: String,
+  city: String,
+  guestsAdult: Number,
+  guestsTeen: Number,
+  guestsChild: Number,
+  travelCost: Number,
+  teamPizzaiolo: String,
+  teamHelper: String,
+  teamGarcon: String,
+  extrasLoucas: Number,
+  extrasBebidas: Number,
+  finalValue: Number,
+  paymentMethod: String,
+  locationImageName: String,
+  locationImageData: String,
+  paymentProofData: String,
+  contractPdfData: String,
 }, { collection: 'factoryevents', toJSON: { virtuals: true, versionKey: false } });
 
 export const Event = mongoose.models.Event || mongoose.model('Event', EventSchema);
@@ -99,24 +153,40 @@ async function findEventInAllCollections(id: string) {
 
 const router = Router();
 
+const SLIM = '-locationImageData -paymentProofData -contractPdfData';
+
+// Lightweight count endpoint — used by portal cards
+router.get('/count', async (req, res) => {
+  if (isFromFactory(req)) {
+    const count = await FactoryEvent.countDocuments({});
+    return res.json({ count });
+  }
+  if (isFromFranchise(req)) {
+    const count = await FranchiseEvent.countDocuments({});
+    return res.json({ count });
+  }
+  const count = await Event.countDocuments({});
+  res.json({ count });
+});
+
 router.get('/', async (req, res) => {
   if (isFromFactory(req)) {
     const [mainClosed, franchiseClosed, factoryEvents] = await Promise.all([
-      Event.find({ status: { $ne: 'planning' } }).sort({ date: -1 }),
-      FranchiseEvent.find({ status: { $ne: 'planning' } }).sort({ date: -1 }),
-      FactoryEvent.find({}).sort({ date: -1 }),
+      Event.find({ status: { $ne: 'planning' } }).select(SLIM).sort({ date: -1 }),
+      FranchiseEvent.find({ status: { $ne: 'planning' } }).select(SLIM).sort({ date: -1 }),
+      FactoryEvent.find({}).select(SLIM).sort({ date: -1 }),
     ]);
     const merged = [...mainClosed, ...franchiseClosed, ...factoryEvents]
       .sort((a, b) => (a.date > b.date ? -1 : 1));
     return res.json(merged);
   }
   if (isFromFranchise(req)) {
-    const events = await FranchiseEvent.find({}).sort({ date: 1 });
+    const events = await FranchiseEvent.find({}).select(SLIM).sort({ date: 1 });
     return res.json(events);
   }
   const [main, franchise] = await Promise.all([
-    Event.find({}).sort({ date: 1 }),
-    FranchiseEvent.find({}).sort({ date: 1 }),
+    Event.find({}).select(SLIM).sort({ date: 1 }),
+    FranchiseEvent.find({}).select(SLIM).sort({ date: 1 }),
   ]);
   const merged = [...main, ...franchise].sort((a, b) => (a.date > b.date ? 1 : -1));
   res.json(merged);

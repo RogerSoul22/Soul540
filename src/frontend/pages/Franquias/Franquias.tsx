@@ -62,20 +62,20 @@ function PortalCard({ system, defaultUrl }: { system: PortalSystem; defaultUrl: 
     try {
       const headers = { 'Content-Type': 'application/json', 'X-System': system };
       const [evR, tkR, emR, fiR] = await Promise.all([
-        fetch('/api/events', { headers }),
+        fetch('/api/events/count', { headers }),
         fetch('/api/tasks', { headers }),
         fetch('/api/employees', { headers }),
         fetch('/api/finances', { headers }),
       ]);
       if (!evR.ok) throw new Error('offline');
-      const [events, tasks, employees, finances] = await Promise.all([
+      const [evCount, tasks, employees, finances] = await Promise.all([
         evR.json(), tkR.json(), emR.json(), fiR.json(),
       ]);
       const revenue = Array.isArray(finances)
-        ? finances.filter((f: any) => f.type === 'income').reduce((acc: number, f: any) => acc + (f.amount || 0), 0)
+        ? finances.filter((f: any) => f.type === 'revenue').reduce((acc: number, f: any) => acc + (f.amount || 0), 0)
         : 0;
       setStats({
-        events: Array.isArray(events) ? events.length : 0,
+        events: evCount?.count ?? 0,
         tasks: Array.isArray(tasks) ? tasks.length : 0,
         employees: Array.isArray(employees) ? employees.length : 0,
         revenue,

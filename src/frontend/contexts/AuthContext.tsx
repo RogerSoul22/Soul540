@@ -32,12 +32,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    authRepository.getCurrentUser().then((storedUser) => {
-      if (storedUser) {
-        setUser(storedUser);
-      }
-      setLoading(false);
-    });
+    authRepository.getCurrentUser()
+      .then((storedUser) => {
+        if (storedUser) setUser(storedUser);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {

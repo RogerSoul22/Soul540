@@ -136,16 +136,32 @@
 .paperInner {
   padding: 48px 56px;
   font-family: Georgia, 'Times New Roman', serif;
+  color: #111827;
 
   @media (max-width: 700px) { padding: 28px 24px; }
 }
 
 // ——— Document sections ———
 .docHeader {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 20px;
   border-bottom: 2px solid #111827;
   padding-bottom: 16px;
   margin-bottom: 8px;
+}
+
+.docLogo {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+
+.docHeaderInfo {
+  flex: 1;
+  text-align: center;
 }
 
 .docCompanyName {
@@ -189,6 +205,7 @@
   line-height: 1.75;
   margin-bottom: 24px;
   text-align: justify;
+  color: #111827;
 }
 
 // ——— Clauses ———
@@ -223,6 +240,7 @@
 .clauseField {
   font-size: 13px;
   line-height: 1.5;
+  color: #111827;
 }
 
 .clauseFieldLabel {
@@ -236,6 +254,7 @@
   font-size: 13px;
   line-height: 1.75;
   text-align: justify;
+  color: #111827;
 }
 
 .clausePostScript {
@@ -243,6 +262,7 @@
   line-height: 1.75;
   margin-top: 8px;
   text-align: justify;
+  color: #111827;
 }
 
 // Highlighted payment box
@@ -353,7 +373,7 @@
 
 // ——— Editable field ———
 .fieldView {
-  // inherits surrounding text style
+  color: inherit;
 }
 
 .fieldInput {
@@ -508,6 +528,36 @@
   font-style: italic;
   font-family: Arial, sans-serif;
   line-height: 1.6;
+}
+
+// ——— Menu edit controls ———
+.menuAddBtn {
+  margin-top: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-family: Arial, sans-serif;
+  border: 1px dashed #93c5fd;
+  border-radius: 4px;
+  background: none;
+  color: #3b82f6;
+  cursor: pointer;
+
+  &:hover { background: #eff6ff; }
+}
+
+.menuRemoveBtn {
+  float: right;
+  margin-left: 8px;
+  padding: 1px 5px;
+  font-size: 12px;
+  border: none;
+  background: none;
+  color: #ef4444;
+  cursor: pointer;
+  border-radius: 3px;
+  line-height: 1;
+
+  &:hover { background: #fee2e2; }
 }
 
 // ——— Print styles ———

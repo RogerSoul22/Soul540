@@ -5,11 +5,15 @@ import { apiFetch } from '@/lib/api';
 interface PizzaEvent { id: string; name: string; date: string; endDate?: string; time?: string; location?: string; outOfCity?: boolean; phone?: string; guestCount?: number; status?: string; budget?: number; menu?: string[]; notes?: string; responsibleEmployeeId?: string; staffCount?: number; selectedEmployeeIds?: string[]; createdAt?: string; [key: string]: any; }
 interface FinanceEntry { id: string; type: string; category: string; description: string; amount: number; date: string; status: string; eventId?: string; autoEventBudget?: boolean; [key: string]: any; }
 interface Task { id: string; title: string; description?: string; priority?: string; status?: string; dueDate?: string; createdAt?: string; [key: string]: any; }
+export interface InvoiceItem { description: string; quantity: number; unitPrice: number; }
+export type InvoiceStatus = 'rascunho' | 'emitida' | 'cancelada';
+export interface Invoice { id: string; eventId: string; clientName: string; clientDocument: string; clientEmail: string; items: InvoiceItem[]; subtotal: number; taxRate: number; taxAmount: number; totalValue: number; issueDate: string; notes: string; status: InvoiceStatus; createdAt: string; }
 
 interface AppContextData {
   events: PizzaEvent[];
   finances: FinanceEntry[];
   tasks: Task[];
+  invoices: Invoice[];
   addFinance: (entry: Omit<FinanceEntry, 'id'>) => Promise<FinanceEntry>;
   updateFinance: (id: string, data: Partial<FinanceEntry>) => Promise<void>;
   deleteFinance: (id: string) => Promise<void>;
@@ -19,6 +23,8 @@ interface AppContextData {
   addTask: (task: Omit<Task, 'id' | 'createdAt'>) => Promise<Task>;
   updateTask: (id: string, data: Partial<Task>) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
+  addInvoice: (invoice: Invoice) => Promise<void>;
+  deleteInvoice: (id: string) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextData>({} as AppContextData);
@@ -27,11 +33,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<PizzaEvent[]>([]);
   const [finances, setFinances] = useState<FinanceEntry[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
 
   useEffect(() => {
     apiFetch('/api/events').then(r => r.json()).then(setEvents).catch((err) => console.error('Falha ao carregar dados:', err));
     apiFetch('/api/tasks').then(r => r.json()).then(setTasks).catch((err) => console.error('Falha ao carregar dados:', err));
     apiFetch('/api/finances').then(r => r.json()).then(setFinances).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/invoices').then(r => r.json()).then(setInvoices).catch((err) => console.error('Falha ao carregar dados:', err));
   }, []);
 
   const refreshFinances = useCallback(() => {
@@ -104,8 +112,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setTasks((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
+  const addInvoice = useCallback(async (invoice: Invoice) => {
+    const { id: _id, ...data } = invoice;
+    const res = await apiFetch('/api/invoices', { method: 'POST', body: JSON.stringify(data) });
+    if (!res.ok) throw new Error('Falha ao criar nota fiscal');
+    const created: Invoice = await res.json();
+    setInvoices((prev) => [created, ...prev]);
+  }, []);
+
+  const deleteInvoice = useCallback(async (id: string) => {
+    const res = await apiFetch(`/api/invoices/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Falha ao excluir nota fiscal');
+    setInvoices((prev) => prev.filter((inv) => inv.id !== id));
+  }, []);
+
   return (
-    <AppContext.Provider value={{ events, finances, tasks, addFinance, updateFinance, deleteFinance, addEvent, updateEvent, deleteEvent, addTask, updateTask, deleteTask }}>
+    <AppContext.Provider value={{ events, finances, tasks, invoices, addFinance, updateFinance, deleteFinance, addEvent, updateEvent, deleteEvent, addTask, updateTask, deleteTask, addInvoice, deleteInvoice }}>
       {children}
     </AppContext.Provider>
   );

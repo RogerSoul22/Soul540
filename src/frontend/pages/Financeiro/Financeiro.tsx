@@ -26,7 +26,7 @@ function parseCurrency(value: string): number {
   return Number(value.replace(/[R$\s.]/g, '').replace(',', '.')) || 0;
 }
 
-type TabType = 'geral' | 'despesas' | 'mensal' | 'lancamentos';
+type TabType = 'geral' | 'despesas' | 'mensal' | 'lancamentos' | 'valores';
 type FilterType = 'all' | 'revenue' | 'cost';
 type CostFilter = 'all' | 'fixed' | 'variable';
 
@@ -51,14 +51,19 @@ const formCategories: Record<FinanceType, string[]> = {
 
 const formatBRL = (v: number) => `R$ ${v.toLocaleString('pt-BR')}`;
 
+type DataScope = 'main' | 'franchise' | 'combined';
+
 export default function Financeiro() {
   const { events, finances, addFinance, updateFinance, deleteFinance } = useApp();
   const [activeTab, setActiveTab] = useState<TabType>('geral');
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().substring(0, 7));
   const [costFilter, setCostFilter] = useState<CostFilter>('all');
+  const [dataScope, setDataScope] = useState<DataScope>('main');
+  const [franchiseFinances, setFranchiseFinances] = useState<typeof finances>([]);
 
   // Table filters
   const [filterType, setFilterType] = useState<FilterType>('all');
+  const [filterMonth, setFilterMonth] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -72,15 +77,29 @@ export default function Financeiro() {
   const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0]);
   const [formStatus, setFormStatus] = useState<FinanceStatus>('pending');
 
+  // Fetch franchise finances when scope is combined
+  useEffect(() => {
+    if (dataScope === 'main') { setFranchiseFinances([]); return; }
+    const token = localStorage.getItem('soul540_token');
+    const headers: HeadersInit = { 'X-System': 'franchise', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+    fetch('/api/finances', { headers }).then((r) => r.json()).then(setFranchiseFinances).catch(() => {});
+  }, [dataScope]);
+
+  const activeFinances = useMemo(() => {
+    if (dataScope === 'franchise') return franchiseFinances;
+    if (dataScope === 'combined') return [...finances, ...franchiseFinances];
+    return finances;
+  }, [finances, franchiseFinances, dataScope]);
+
   // === DATA COMPUTATIONS ===
 
   const totalRevenue = useMemo(
-    () => finances.filter((f) => f.type === 'revenue').reduce((acc, f) => acc + f.amount, 0),
-    [finances],
+    () => activeFinances.filter((f) => f.type === 'revenue').reduce((acc, f) => acc + f.amount, 0),
+    [activeFinances],
   );
   const totalCosts = useMemo(
-    () => finances.filter((f) => f.type === 'cost').reduce((acc, f) => acc + f.amount, 0),
-    [finances],
+    () => activeFinances.filter((f) => f.type === 'cost').reduce((acc, f) => acc + f.amount, 0),
+    [activeFinances],
   );
   const profit = totalRevenue - totalCosts;
   const margin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
@@ -88,7 +107,7 @@ export default function Financeiro() {
   // Monthly chart data
   const monthlyData = useMemo(() => {
     const map = new Map<string, { month: string; receita: number; despesa: number }>();
-    for (const f of finances) {
+    for (const f of activeFinances) {
       const ym = f.date.substring(0, 7);
       if (!map.has(ym)) map.set(ym, { month: ym, receita: 0, despesa: 0 });
       const entry = map.get(ym)!;
@@ -96,14 +115,14 @@ export default function Financeiro() {
       else entry.despesa += f.amount;
     }
     return [...map.values()].sort((a, b) => a.month.localeCompare(b.month));
-  }, [finances]);
+  }, [activeFinances]);
 
   // Available months for selector
   const availableMonths = useMemo(() => {
     const set = new Set<string>();
-    for (const f of finances) set.add(f.date.substring(0, 7));
+    for (const f of activeFinances) set.add(f.date.substring(0, 7));
     return [...set].sort();
-  }, [finances]);
+  }, [activeFinances]);
 
   // Auto-select most recent month when finances load
   useEffect(() => {
@@ -114,8 +133,8 @@ export default function Financeiro() {
 
   // Monthly detail data
   const monthFinances = useMemo(
-    () => finances.filter((f) => f.date.startsWith(selectedMonth)),
-    [finances, selectedMonth],
+    () => activeFinances.filter((f) => f.date.startsWith(selectedMonth)),
+    [activeFinances, selectedMonth],
   );
 
   const monthRevenue = useMemo(
@@ -179,7 +198,8 @@ export default function Financeiro() {
 
   // Table filter
   const filtered = useMemo(() => {
-    return finances.filter((f) => {
+    return activeFinances.filter((f) => {
+      if (filterMonth !== 'all' && !f.date.startsWith(filterMonth)) return false;
       if (filterType !== 'all' && f.type !== filterType) return false;
       if (search) {
         const q = search.toLowerCase();
@@ -192,7 +212,7 @@ export default function Financeiro() {
       }
       return true;
     }).sort((a, b) => b.date.localeCompare(a.date));
-  }, [finances, filterType, search, events]);
+  }, [activeFinances, filterType, filterMonth, search, events]);
 
   // Events with budget joined with their finance entry
   const eventsWithBudget = useMemo(() => {
@@ -200,12 +220,12 @@ export default function Financeiro() {
       .filter((e) => e.budget > 0)
       .map((e) => ({
         event: e,
-        finance: finances.find(
+        finance: activeFinances.find(
           (f) => f.eventId === e.id && f.type === 'revenue' && f.category === 'contrato',
         ),
       }))
       .sort((a, b) => b.event.date.localeCompare(a.event.date));
-  }, [events, finances]);
+  }, [events, activeFinances]);
 
   const totalContracted = useMemo(
     () => eventsWithBudget.reduce((acc, { event }) => acc + event.budget, 0),
@@ -266,6 +286,29 @@ export default function Financeiro() {
           <p className={styles.subtitle}>Controle completo de receitas, despesas e indicadores</p>
         </div>
         <div className={styles.headerActions}>
+          <div className={styles.scopeToggle}>
+            <button
+              className={`${styles.scopeBtn} ${dataScope === 'main' ? styles.scopeBtnActive : ''}`}
+              onClick={() => setDataScope('main')}
+              title="Exibir apenas dados do sistema principal"
+            >
+              Principal
+            </button>
+            <button
+              className={`${styles.scopeBtn} ${dataScope === 'franchise' ? styles.scopeBtnActive : ''}`}
+              onClick={() => setDataScope('franchise')}
+              title="Exibir apenas dados da franquia"
+            >
+              Franquia
+            </button>
+            <button
+              className={`${styles.scopeBtn} ${dataScope === 'combined' ? styles.scopeBtnActive : ''}`}
+              onClick={() => setDataScope('combined')}
+              title="Exibir dados do principal + franquia"
+            >
+              Combinado
+            </button>
+          </div>
           <Button onClick={() => setShowForm(true)}>+ Novo Lancamento</Button>
         </div>
       </div>
@@ -277,6 +320,7 @@ export default function Financeiro() {
           ['despesas', 'Painel Despesas'],
           ['mensal', 'Painel Mensal'],
           ['lancamentos', 'Lancamentos'],
+          ['valores', 'Estimado x Final'],
         ] as [TabType, string][]).map(([key, label]) => (
           <button
             key={key}
@@ -470,7 +514,7 @@ export default function Financeiro() {
               const totals = cats
                 .map((cat) => ({
                   cat,
-                  total: finances.filter((f) => f.type === 'cost' && f.category === cat).reduce((a, f) => a + f.amount, 0),
+                  total: activeFinances.filter((f) => f.type === 'cost' && f.category === cat).reduce((a, f) => a + f.amount, 0),
                 }))
                 .filter(({ total }) => total > 0)
                 .sort((a, b) => b.total - a.total);
@@ -596,6 +640,16 @@ export default function Financeiro() {
                 </button>
               ))}
             </div>
+            <select
+              className={styles.searchInput}
+              value={filterMonth}
+              onChange={(e) => setFilterMonth(e.target.value)}
+            >
+              <option value="all">Todos os meses</option>
+              {availableMonths.map((m) => (
+                <option key={m} value={m}>{formatMonth(m)}</option>
+              ))}
+            </select>
             <input
               type="text"
               className={styles.searchInput}
@@ -671,6 +725,85 @@ export default function Financeiro() {
           )}
         </div>
       )}
+
+      {/* ===== TAB: ESTIMADO x FINAL ===== */}
+      {activeTab === 'valores' && (() => {
+        const eventsWithValues = events
+          .filter((e) => e.budget > 0 || (e.finalValue ?? 0) > 0)
+          .sort((a, b) => b.date.localeCompare(a.date));
+        const totalEstimado = eventsWithValues.reduce((acc, e) => acc + (e.budget || 0), 0);
+        const totalFinal = eventsWithValues.reduce((acc, e) => acc + (e.finalValue || 0), 0);
+        const diff = totalFinal - totalEstimado;
+        return (
+          <div className={styles.tabContent}>
+            {/* Summary */}
+            <div className={styles.summaryBar}>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryItemLabel}>Total Estimado</span>
+                <span className={styles.summaryItemValue}>{formatBRL(totalEstimado)}</span>
+              </div>
+              <div className={styles.summaryDivider} />
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryItemLabel}>Total Final</span>
+                <span className={`${styles.summaryItemValue} ${totalFinal >= totalEstimado ? styles.green : styles.amber}`}>{formatBRL(totalFinal)}</span>
+              </div>
+              <div className={styles.summaryDivider} />
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryItemLabel}>Diferença</span>
+                <span className={`${styles.summaryItemValue} ${diff >= 0 ? styles.green : styles.red}`}>
+                  {diff >= 0 ? '+' : ''}{formatBRL(diff)}
+                </span>
+              </div>
+              <div className={styles.summaryDivider} />
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryItemLabel}>Eventos</span>
+                <span className={styles.summaryItemValue}>{eventsWithValues.length}</span>
+              </div>
+            </div>
+
+            {/* Table */}
+            {eventsWithValues.length === 0 ? (
+              <div className={styles.emptyState}>Nenhum evento com valor cadastrado.</div>
+            ) : (
+              <div className={styles.tableWrap}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>Evento</th>
+                      <th>Data</th>
+                      <th>Valor Estimado</th>
+                      <th>Valor Final</th>
+                      <th>Diferença</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {eventsWithValues.map((e) => {
+                      const estimado = e.budget || 0;
+                      const final = e.finalValue || 0;
+                      const d = final - estimado;
+                      return (
+                        <tr key={e.id}>
+                          <td>{e.name}</td>
+                          <td>{format(parseISO(e.date), "dd/MM/yyyy", { locale: ptBR })}</td>
+                          <td>{estimado > 0 ? formatBRL(estimado) : '—'}</td>
+                          <td>{final > 0 ? <span className={styles.green}>{formatBRL(final)}</span> : '—'}</td>
+                          <td>
+                            {estimado > 0 && final > 0 ? (
+                              <span className={d >= 0 ? styles.green : styles.red}>
+                                {d >= 0 ? '+' : ''}{formatBRL(d)}
+                              </span>
+                            ) : '—'}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Form Modal */}
       {showForm && (

@@ -265,6 +265,50 @@
   max-width: 100%;
 }
 
+.taskMoveRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid $border;
+}
+
+.taskMoveBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: $radius-xs;
+  border: 1px solid $border;
+  background: none;
+  color: $text-muted;
+  cursor: pointer;
+  transition: all $transition-fast;
+  flex-shrink: 0;
+
+  &:hover:not(:disabled) {
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.07);
+    border-color: $text-muted;
+  }
+
+  &:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+  }
+}
+
+.taskMoveLabel {
+  flex: 1;
+  text-align: center;
+  font-size: 10px;
+  font-weight: $font-weight-medium;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
 
 // List view
 .listView {

@@ -22,22 +22,31 @@ import EstoqueUtensilios from '@frontend/pages/EstoqueUtensilios/EstoqueUtensili
 import Chat from '@frontend/pages/Chat/Chat';
 import Permissoes from '@frontend/pages/Permissoes/Permissoes';
 
+function AppLoading() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--bg-primary)' }}>
+      <div style={{ width: 32, height: 32, border: '3px solid rgba(245,158,11,0.2)', borderTopColor: '#f59e0b', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
+
 function PrivateRoute() {
   const { authenticated, loading } = useAuth();
-  if (loading) return null;
+  if (loading) return <AppLoading />;
   return authenticated ? <Outlet /> : <Navigate to={ROUTES.LOGIN} replace />;
 }
 
 function PermissionRoute({ routeKey }: { routeKey: string }) {
   const { permissions, isAdmin, loading } = useAuth();
-  if (loading) return null;
+  if (loading) return <AppLoading />;
   if (isAdmin || permissions.includes(routeKey)) return <Outlet />;
   return <Navigate to={ROUTES.DASHBOARD} replace />;
 }
 
 function PublicRoute() {
   const { authenticated, loading } = useAuth();
-  if (loading) return null;
+  if (loading) return <AppLoading />;
   return authenticated ? <Navigate to={ROUTES.DASHBOARD} replace /> : <Outlet />;
 }
 

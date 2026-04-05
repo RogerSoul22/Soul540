@@ -18,9 +18,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const stored = Storage.getUser<User>();
-    if (stored) setUser(stored);
-    setLoading(false);
+    try {
+      const stored = Storage.getUser<User>();
+      if (stored) setUser(stored);
+    } catch {
+      // ignore corrupted data
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   const login = async (email: string, password: string) => {

@@ -14,16 +14,26 @@ import Permissoes from '@/pages/Permissoes/Permissoes/Permissoes';
 import Financeiro from '@/pages/Financeiro/Financeiro/Financeiro';
 import Tarefas from '@/pages/Tarefas/Tarefas/Tarefas';
 import MinhaConta from '@/pages/MinhaConta/MinhaConta';
+import NotasFiscais from '@/pages/NotasFiscais/NotasFiscais';
+
+function AppLoading() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: 'var(--bg-primary)' }}>
+      <div style={{ width: 32, height: 32, border: '3px solid rgba(245,158,11,0.2)', borderTopColor: '#f59e0b', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
 
 function PrivateRoute() {
   const { authenticated, loading } = useAuth();
-  if (loading) return null;
+  if (loading) return <AppLoading />;
   return authenticated ? <Outlet /> : <Navigate to={ROUTES.LOGIN} replace />;
 }
 
 function PublicRoute() {
   const { authenticated, loading } = useAuth();
-  if (loading) return null;
+  if (loading) return <AppLoading />;
   return authenticated ? <Navigate to={ROUTES.EVENTOS} replace /> : <Outlet />;
 }
 
@@ -46,6 +56,7 @@ export default function App() {
               <Route path={ROUTES.ESTOQUE_UTENSILIOS} element={<EstoqueUtensilios />} />
               <Route path={ROUTES.PERMISSOES} element={<Permissoes />} />
               <Route path={ROUTES.FINANCEIRO} element={<Financeiro />} />
+              <Route path={ROUTES.NOTAS_FISCAIS} element={<NotasFiscais />} />
               <Route path={ROUTES.TAREFAS} element={<Tarefas />} />
               <Route path={ROUTES.USUARIO} element={<MinhaConta />} />
             </Route>

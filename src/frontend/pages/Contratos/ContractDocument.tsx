@@ -43,6 +43,55 @@ interface Props {
   onClose: () => void;
 }
 
+type EditableMenuItem = { name: string; subtitle: string; description: string };
+type EditableMenuCategory = { name: string; headers: [string, string]; items: EditableMenuItem[] };
+
+function buildMenuCategories(menu: StaticMenu | undefined): EditableMenuCategory[] {
+  if (menu) {
+    return menu.categories.map((cat) => ({
+      name: cat.name,
+      headers: ['Item', 'Descrição'] as [string, string],
+      items: cat.items.map((item) => ({
+        name: item.name,
+        subtitle: item.subtitle || '',
+        description: item.description,
+      })),
+    }));
+  }
+  return [
+    {
+      name: 'Entradas',
+      headers: ['Item', 'Descrição'] as [string, string],
+      items: [
+        { name: 'Crostinis', subtitle: '', description: 'Torradinhas artesanais com azeite' },
+        { name: 'Pãozinho de Calabresa', subtitle: '', description: 'Massa leve com calabresa' },
+        { name: 'Maravilha de Queijo', subtitle: '', description: 'Massa recheada com queijo derretido' },
+      ],
+    },
+    {
+      name: 'Pizzas Salgadas',
+      headers: ['Nome', 'Ingredientes'] as [string, string],
+      items: [
+        { name: 'ZUCCHINI SPECIALI', subtitle: '', description: 'Massa, molho de tomate, abobrinha, alho frito, parmesão, azeite e orégano' },
+        { name: 'BLU AGRIDOCE', subtitle: '', description: 'Massa, molho de tomate, geleia de pimenta, mussarela, gorgonzola, bacon e orégano' },
+        { name: 'MARGHERITA BÚFALA', subtitle: '', description: 'Massa, molho de tomate, mussarela de búfala, parmesão, manjericão, azeite e orégano' },
+        { name: 'CALABRESA TRADIZIONALE', subtitle: '', description: 'Massa, molho de tomate, mussarela, calabresa, cebola, azeitona e orégano' },
+        { name: 'QUATTRO FORAGGIO', subtitle: '', description: 'Massa, molho, mussarela, parmesão, gorgonzola, catupiry e orégano' },
+        { name: 'MOZZARELLA SPECIALI', subtitle: '', description: 'Massa, molho de tomate, mussarela, tomate em pedaços, azeitona, parmesão, manjericão, azeite e orégano' },
+        { name: 'SEM GLUTEN', subtitle: '', description: 'Massa especial sem glúten com recheios disponíveis no mise en place' },
+        { name: 'DUO FRANGO E BACON', subtitle: '', description: 'Massa, molho de tomate, mussarela, frango desfiado, Catupiry, bacon e orégano' },
+      ],
+    },
+    {
+      name: 'Pizzas Doces',
+      headers: ['Nome', 'Ingredientes'] as [string, string],
+      items: [
+        { name: 'Chocolate', subtitle: '', description: 'Massa, Chocolate ao leite, confeitos' },
+      ],
+    },
+  ];
+}
+
 function EF({
   value, onChange, editing, multiline, bold, placeholder = '_______________',
 }: {
@@ -50,7 +99,14 @@ function EF({
   multiline?: boolean; bold?: boolean; placeholder?: string;
 }) {
   if (!editing) {
-    return <span className={styles.fieldView} style={{ fontWeight: bold ? 600 : undefined }}>{value || placeholder}</span>;
+    return (
+      <span
+        className={styles.fieldView}
+        style={{ fontWeight: bold ? 600 : undefined, whiteSpace: multiline ? 'pre-wrap' : undefined }}
+      >
+        {value || placeholder}
+      </span>
+    );
   }
   if (multiline) {
     return <textarea value={value} onChange={(e) => onChange(e.target.value)} className={styles.fieldTextarea} rows={3} />;
@@ -62,6 +118,9 @@ export default function ContractDocument({ contract, event, eventName, onClose }
   const docRef = useRef<HTMLDivElement>(null);
   const [editing, setEditing] = useState(false);
   const [generating, setGenerating] = useState(false);
+
+  // Menu (resolved once at mount)
+  const _initialMenu = contract.menuId ? SOUL540_MENUS.find((m) => m.id === contract.menuId) : undefined;
 
   // Company (real Soul540 data — editable for adjustments)
   const [companyName, setCompanyName] = useState('Soul Negócios Eventos e Consultoria Ltda');
@@ -97,6 +156,11 @@ export default function ContractDocument({ contract, event, eventName, onClose }
       : '',
   );
 
+  const [paymentOptions, setPaymentOptions] = useState(
+    contract.paymentConditions ||
+    'Opção 1: 30% na assinatura via Pix + saldo no dia do evento via Pix.\nOpção 2: Parcelamento em até 2x no cartão (link enviado pela CONTRATADA).',
+  );
+
   const adultTotal = (parseFloat(pricePerAdult.replace(',', '.')) || 0) * (parseInt(adultsCount) || 0);
   const childTotal = (parseFloat(pricePerChild.replace(',', '.')) || 0) * (parseInt(childrenCount) || 0);
 
@@ -117,6 +181,33 @@ export default function ContractDocument({ contract, event, eventName, onClose }
   // Team
   const [pizzaTeam, setPizzaTeam] = useState(contract.pizzaTeam || '');
   const [drinksTeam, setDrinksTeam] = useState(contract.drinksTeam || '');
+
+  // Menu (Annex I)
+  const [menuName, setMenuName] = useState(_initialMenu?.name || '');
+  const [menuObs, setMenuObs] = useState(
+    _initialMenu?.obs ||
+    'O serviço será realizado em formato coquetel e rodízio, com garçons servindo fatias aos convidados e mesa de apoio disponível para autoatendimento.',
+  );
+  const [menuCategories, setMenuCategories] = useState<EditableMenuCategory[]>(() =>
+    buildMenuCategories(_initialMenu),
+  );
+
+  const updateCatName = (ci: number, v: string) =>
+    setMenuCategories((prev) => prev.map((c, i) => i === ci ? { ...c, name: v } : c));
+  const updateItemField = (ci: number, ii: number, field: keyof EditableMenuItem, v: string) =>
+    setMenuCategories((prev) => prev.map((c, cIdx) => cIdx !== ci ? c : {
+      ...c, items: c.items.map((it, iIdx) => iIdx !== ii ? it : { ...it, [field]: v }),
+    }));
+  const addItem = (ci: number) =>
+    setMenuCategories((prev) => prev.map((c, cIdx) => cIdx !== ci ? c : {
+      ...c, items: [...c.items, { name: '', subtitle: '', description: '' }],
+    }));
+  const removeItem = (ci: number, ii: number) =>
+    setMenuCategories((prev) => prev.map((c, cIdx) => cIdx !== ci ? c : {
+      ...c, items: c.items.filter((_, iIdx) => iIdx !== ii),
+    }));
+  const addCategory = () =>
+    setMenuCategories((prev) => [...prev, { name: 'Nova Categoria', headers: ['Item', 'Descrição'], items: [] }]);
 
   // Signature location
   const [contractCity, setContractCity] = useState('Sorocaba/SP');
@@ -185,18 +276,21 @@ export default function ContractDocument({ contract, event, eventName, onClose }
 
             {/* ——— CABEÇALHO ——— */}
             <div className={styles.docHeader}>
-              <div className={styles.docCompanyName}>
-                <EF value={companyName} onChange={setCompanyName} editing={editing} bold />
-              </div>
-              <div className={styles.docCompanyMeta}>
-                CNPJ <EF value={companyCnpj} onChange={setCompanyCnpj} editing={editing} /> &nbsp;/&nbsp; IE&nbsp;
-                <EF value={companyIe} onChange={setCompanyIe} editing={editing} />
-              </div>
-              <div className={styles.docCompanyMeta}>
-                <EF value={companyAddress} onChange={setCompanyAddress} editing={editing} />
-              </div>
-              <div className={styles.docCompanyMeta}>
-                Marca fantasia: <strong><EF value={companyFantasy} onChange={setCompanyFantasy} editing={editing} /></strong>
+              <img src="/logo.jpeg" alt="Soul540" className={styles.docLogo} />
+              <div className={styles.docHeaderInfo}>
+                <div className={styles.docCompanyName}>
+                  <EF value={companyName} onChange={setCompanyName} editing={editing} bold />
+                </div>
+                <div className={styles.docCompanyMeta}>
+                  CNPJ <EF value={companyCnpj} onChange={setCompanyCnpj} editing={editing} /> &nbsp;/&nbsp; IE&nbsp;
+                  <EF value={companyIe} onChange={setCompanyIe} editing={editing} />
+                </div>
+                <div className={styles.docCompanyMeta}>
+                  <EF value={companyAddress} onChange={setCompanyAddress} editing={editing} />
+                </div>
+                <div className={styles.docCompanyMeta}>
+                  Marca fantasia: <strong><EF value={companyFantasy} onChange={setCompanyFantasy} editing={editing} /></strong>
+                </div>
               </div>
             </div>
 
@@ -283,11 +377,10 @@ export default function ContractDocument({ contract, event, eventName, onClose }
                     R$&nbsp;<EF value={totalValue} onChange={setTotalValue} editing={editing} bold placeholder="0,00" />
                   </span>
                 </div>
-                <p className={styles.paymentOptions}>
+                <div className={styles.paymentOptions}>
                   <strong>Formas de Pagamento:</strong><br />
-                  Opção 1: 30% na assinatura via Pix + saldo no dia do evento via Pix.<br />
-                  Opção 2: Parcelamento em até 2x no cartão (link enviado pela CONTRATADA).
-                </p>
+                  <EF value={paymentOptions} onChange={setPaymentOptions} editing={editing} multiline placeholder="Descreva as formas de pagamento" />
+                </div>
               </div>
 
               <p className={styles.clauseSubTitle}>2.2 Convidados</p>
@@ -435,83 +528,64 @@ export default function ContractDocument({ contract, event, eventName, onClose }
             {/* ——— ANEXO I – CARDÁPIO ——— */}
             <div className={styles.annex}>
               <div className={styles.annexTitle}>Anexo I – Cardápio do Evento</div>
-              {(() => {
-                const selectedMenu: StaticMenu | undefined = contract.menuId
-                  ? SOUL540_MENUS.find((m) => m.id === contract.menuId)
-                  : undefined;
 
-                if (selectedMenu) {
-                  return (
-                    <>
-                      <p className={styles.annexSection} style={{ fontWeight: 700, fontSize: '1em', marginBottom: 8 }}>
-                        {selectedMenu.name}
-                      </p>
-                      {selectedMenu.categories.map((cat) => (
-                        <div key={cat.name}>
-                          <p className={styles.annexSection}>{cat.name}</p>
-                          <table className={styles.menuTable}>
-                            <thead><tr><th>Item</th><th>Descrição</th></tr></thead>
-                            <tbody>
-                              {cat.items.map((item) => (
-                                <tr key={item.name}>
-                                  <td>
-                                    {item.name}
-                                    {item.subtitle ? <><br /><em style={{ fontSize: '0.85em', color: '#666' }}>{item.subtitle}</em></> : null}
-                                  </td>
-                                  <td>{item.description}</td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+              {(menuName || editing) && (
+                <p className={styles.annexSection} style={{ fontWeight: 700, fontSize: '1em', marginBottom: 8 }}>
+                  <EF value={menuName} onChange={setMenuName} editing={editing} placeholder="Nome do cardápio" />
+                </p>
+              )}
+
+              {menuCategories.map((cat, ci) => (
+                <div key={ci}>
+                  <p className={styles.annexSection}>
+                    <EF value={cat.name} onChange={(v) => updateCatName(ci, v)} editing={editing} />
+                  </p>
+                  <table className={styles.menuTable}>
+                    <thead>
+                      <tr><th>{cat.headers[0]}</th><th>{cat.headers[1]}</th></tr>
+                    </thead>
+                    <tbody>
+                      {cat.items.map((item, ii) => (
+                        <tr key={ii}>
+                          <td>
+                            <EF value={item.name} onChange={(v) => updateItemField(ci, ii, 'name', v)} editing={editing} placeholder="Item" />
+                            {(item.subtitle || editing) && (
+                              <>
+                                <br />
+                                <em style={{ fontSize: '0.85em', color: '#666' }}>
+                                  <EF value={item.subtitle} onChange={(v) => updateItemField(ci, ii, 'subtitle', v)} editing={editing} placeholder="subtítulo..." />
+                                </em>
+                              </>
+                            )}
+                          </td>
+                          <td>
+                            <EF value={item.description} onChange={(v) => updateItemField(ci, ii, 'description', v)} editing={editing} placeholder="—" />
+                            {editing && (
+                              <button className={styles.menuRemoveBtn} onClick={() => removeItem(ci, ii)} title="Remover linha">×</button>
+                            )}
+                          </td>
+                        </tr>
                       ))}
-                      {selectedMenu.obs && (
-                        <p className={styles.annexObs}><strong>Observação:</strong> {selectedMenu.obs}</p>
-                      )}
-                    </>
-                  );
-                }
+                    </tbody>
+                  </table>
+                  {editing && (
+                    <button className={styles.menuAddBtn} onClick={() => addItem(ci)}>+ Adicionar item</button>
+                  )}
+                </div>
+              ))}
 
-                // Cardápio genérico padrão
-                return (
-                  <>
-                    <p className={styles.annexSection}>Entradas</p>
-                    <table className={styles.menuTable}>
-                      <thead><tr><th>Item</th><th>Descrição</th></tr></thead>
-                      <tbody>
-                        <tr><td>Crostinis</td><td>Torradinhas artesanais com azeite</td></tr>
-                        <tr><td>Pãozinho de Calabresa</td><td>Massa leve com calabresa</td></tr>
-                        <tr><td>Maravilha de Queijo</td><td>Massa recheada com queijo derretido</td></tr>
-                      </tbody>
-                    </table>
-                    <p className={styles.annexSection}>Pizzas Salgadas</p>
-                    <table className={styles.menuTable}>
-                      <thead><tr><th>Nome</th><th>Ingredientes</th></tr></thead>
-                      <tbody>
-                        <tr><td>ZUCCHINI SPECIALI</td><td>Massa, molho de tomate, abobrinha, alho frito, parmesão, azeite e orégano</td></tr>
-                        <tr><td>BLU AGRIDOCE</td><td>Massa, molho de tomate, geleia de pimenta, mussarela, gorgonzola, bacon e orégano</td></tr>
-                        <tr><td>MARGHERITA BÚFALA</td><td>Massa, molho de tomate, mussarela de búfala, parmesão, manjericão, azeite e orégano</td></tr>
-                        <tr><td>CALABRESA TRADIZIONALE</td><td>Massa, molho de tomate, mussarela, calabresa, cebola, azeitona e orégano</td></tr>
-                        <tr><td>QUATTRO FORAGGIO</td><td>Massa, molho, mussarela, parmesão, gorgonzola, catupiry e orégano</td></tr>
-                        <tr><td>MOZZARELLA SPECIALI</td><td>Massa, molho de tomate, mussarela, tomate em pedaços, azeitona, parmesão, manjericão, azeite e orégano</td></tr>
-                        <tr><td>SEM GLUTEN</td><td>Massa especial sem glúten com recheios disponíveis no mise en place</td></tr>
-                        <tr><td>DUO FRANGO E BACON</td><td>Massa, molho de tomate, mussarela, frango desfiado, Catupiry, bacon e orégano</td></tr>
-                      </tbody>
-                    </table>
-                    <p className={styles.annexSection}>Pizzas Doces</p>
-                    <table className={styles.menuTable}>
-                      <thead><tr><th>Nome</th><th>Ingredientes</th></tr></thead>
-                      <tbody>
-                        <tr><td>Chocolate</td><td>Massa, Chocolate ao leite, confeitos</td></tr>
-                      </tbody>
-                    </table>
-                    <p className={styles.annexObs}>
-                      <strong>Observação:</strong> O serviço será realizado em formato coquetel e rodízio, com garçons
-                      servindo fatias aos convidados e mesa de apoio disponível para autoatendimento.
-                    </p>
-                  </>
-                );
-              })()}
+              {editing && (
+                <button className={styles.menuAddBtn} style={{ marginTop: 12 }} onClick={addCategory}>
+                  + Adicionar categoria
+                </button>
+              )}
+
+              {(menuObs || editing) && (
+                <p className={styles.annexObs}>
+                  <strong>Observação:</strong>{' '}
+                  <EF value={menuObs} onChange={setMenuObs} editing={editing} multiline placeholder="Observações sobre o cardápio..." />
+                </p>
+              )}
             </div>
 
           </div>
