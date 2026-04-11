@@ -7,6 +7,7 @@ export class AuthRepository implements IAuthRepository {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ email: credentials.email, password: credentials.password }),
     });
     if (!res.ok) {
@@ -14,18 +15,26 @@ export class AuthRepository implements IAuthRepository {
       throw new Error(err.error || 'Email ou senha incorretos');
     }
     const data = await res.json();
-    TokenStorage.setToken(data.token);
     TokenStorage.setUser(data.user);
-    return { user: data.user, token: data.token };
+    return { user: data.user, token: '' };
   }
 
   async logout(): Promise<void> {
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
     TokenStorage.clear();
   }
 
   async getCurrentUser(): Promise<User | null> {
-    const token = TokenStorage.getToken();
-    if (!token) return null;
-    return TokenStorage.getUser<User>();
+    const cached = TokenStorage.getUser<User>();
+    if (cached) return cached;
+    try {
+      const res = await fetch('/api/auth/me', { credentials: 'include' });
+      if (!res.ok) return null;
+      const data = await res.json();
+      TokenStorage.setUser(data.user);
+      return data.user;
+    } catch {
+      return null;
+    }
   }
 }

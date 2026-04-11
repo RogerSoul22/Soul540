@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 import 'dotenv/config';
 import eventsRouter from './routes/events';
@@ -26,6 +27,7 @@ const app = express();
 
 app.use(cors({ allowedHeaders: ['Content-Type', 'Authorization', 'X-System'] }));
 app.use(express.json({ limit: '100mb' }));
+app.use(cookieParser());
 app.use(optionalAuth);
 
 app.use('/api/events', eventsRouter);

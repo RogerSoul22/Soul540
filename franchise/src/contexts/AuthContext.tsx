@@ -18,14 +18,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const stored = Storage.getUser<User>();
-      if (stored) setUser(stored);
-    } catch {
-      // ignore corrupted data
-    } finally {
+    const cached = Storage.getUser<User>();
+    if (cached) {
+      setUser(cached);
       setLoading(false);
+      return;
     }
+    apiFetch('/api/auth/me')
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data?.user) { Storage.setUser(data.user); setUser(data.user); } })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -38,12 +41,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(err.error || 'Email ou senha incorretos');
     }
     const data = await res.json();
-    Storage.setToken(data.token);
     Storage.setUser(data.user);
     setUser(data.user);
   };
 
   const logout = () => {
+    apiFetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
     Storage.clear();
     setUser(null);
   };

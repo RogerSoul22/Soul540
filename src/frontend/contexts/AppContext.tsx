@@ -4,6 +4,7 @@ import type { PizzaEvent } from '@backend/domain/entities/Event';
 import type { FinanceEntry } from '@backend/domain/entities/Finance';
 import type { Invoice } from '@backend/domain/entities/Invoice';
 import type { Task } from '@backend/domain/entities/Task';
+import { apiFetch } from '@frontend/lib/api';
 
 interface AppContextData {
   events: PizzaEvent[];
@@ -35,12 +36,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [tasks, setTasks] = useState<Task[]>([]);
 
   const loadData = () => {
-    const token = localStorage.getItem('soul540_token');
-    const headers: HeadersInit = { 'X-System': 'main', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
-    fetch('/api/events', { headers }).then(r => r.json()).then(setEvents).catch((err) => console.error('Falha ao carregar dados:', err));
-    fetch('/api/tasks', { headers }).then(r => r.json()).then(setTasks).catch((err) => console.error('Falha ao carregar dados:', err));
-    fetch('/api/finances', { headers }).then(r => r.json()).then(setFinances).catch((err) => console.error('Falha ao carregar dados:', err));
-    fetch('/api/invoices', { headers }).then(r => r.json()).then(setInvoices).catch((err) => console.error('Falha ao carregar dados:', err));
+    const headers: HeadersInit = { 'X-System': 'main' };
+    apiFetch('/api/events', { headers }).then(r => r.json()).then(setEvents).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/tasks', { headers }).then(r => r.json()).then(setTasks).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/finances', { headers }).then(r => r.json()).then(setFinances).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/invoices', { headers }).then(r => r.json()).then(setInvoices).catch((err) => console.error('Falha ao carregar dados:', err));
   };
 
   useEffect(() => {
@@ -50,17 +50,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const buildHeaders = (withBody = false): HeadersInit => {
-    const token = localStorage.getItem('soul540_token');
     return {
       ...(withBody ? { 'Content-Type': 'application/json' } : {}),
       'X-System': 'main',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
   };
 
   // Finance (API)
   const addFinance = useCallback(async (data: Omit<FinanceEntry, 'id'>) => {
-    const res = await fetch('/api/finances', {
+    const res = await apiFetch('/api/finances', {
       method: 'POST',
       headers: buildHeaders(true),
       body: JSON.stringify(data),
@@ -71,7 +69,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return created;
   }, []);
   const updateFinance = useCallback(async (id: string, data: Partial<FinanceEntry>) => {
-    const res = await fetch(`/api/finances/${id}`, {
+    const res = await apiFetch(`/api/finances/${id}`, {
       method: 'PUT',
       headers: buildHeaders(true),
       body: JSON.stringify(data),
@@ -81,7 +79,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setFinances((prev) => prev.map((f) => (f.id === id ? updated : f)));
   }, []);
   const deleteFinance = useCallback(async (id: string) => {
-    const res = await fetch(`/api/finances/${id}`, { method: 'DELETE', headers: buildHeaders() });
+    const res = await apiFetch(`/api/finances/${id}`, { method: 'DELETE', headers: buildHeaders() });
     if (!res.ok) throw new Error('Falha ao excluir lançamento financeiro');
     setFinances((prev) => prev.filter((f) => f.id !== id));
   }, []);
@@ -89,7 +87,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // Invoice (API)
   const addInvoice = useCallback(async (invoice: Invoice) => {
     const { id: _id, ...data } = invoice;
-    const res = await fetch('/api/invoices', {
+    const res = await apiFetch('/api/invoices', {
       method: 'POST',
       headers: buildHeaders(true),
       body: JSON.stringify(data),
@@ -99,7 +97,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setInvoices((prev) => [created, ...prev]);
   }, []);
   const updateInvoice = useCallback(async (id: string, data: Partial<Invoice>) => {
-    const res = await fetch(`/api/invoices/${id}`, {
+    const res = await apiFetch(`/api/invoices/${id}`, {
       method: 'PUT',
       headers: buildHeaders(true),
       body: JSON.stringify(data),
@@ -109,26 +107,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setInvoices((prev) => prev.map((inv) => (inv.id === id ? updated : inv)));
   }, []);
   const deleteInvoice = useCallback(async (id: string) => {
-    const res = await fetch(`/api/invoices/${id}`, { method: 'DELETE', headers: buildHeaders() });
+    const res = await apiFetch(`/api/invoices/${id}`, { method: 'DELETE', headers: buildHeaders() });
     if (!res.ok) throw new Error('Falha ao excluir nota fiscal');
     setInvoices((prev) => prev.filter((inv) => inv.id !== id));
   }, []);
 
   const refreshFinances = useCallback(() => {
-    const token = localStorage.getItem('soul540_token');
-    const headers: HeadersInit = { 'X-System': 'main', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
-    fetch('/api/finances', { headers }).then(r => r.json()).then(setFinances).catch((err) => console.error('Falha ao carregar dados:', err));
+    const headers: HeadersInit = { 'X-System': 'main' };
+    apiFetch('/api/finances', { headers }).then(r => r.json()).then(setFinances).catch((err) => console.error('Falha ao carregar dados:', err));
   }, []);
 
   const refreshTasks = useCallback(() => {
-    const token = localStorage.getItem('soul540_token');
-    const headers: HeadersInit = { 'X-System': 'main', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
-    fetch('/api/tasks', { headers }).then(r => r.json()).then(setTasks).catch((err) => console.error('Falha ao carregar dados:', err));
+    const headers: HeadersInit = { 'X-System': 'main' };
+    apiFetch('/api/tasks', { headers }).then(r => r.json()).then(setTasks).catch((err) => console.error('Falha ao carregar dados:', err));
   }, []);
 
   // Events (API)
   const addEvent = useCallback(async (data: Omit<PizzaEvent, 'id' | 'createdAt'>) => {
-    const res = await fetch('/api/events', {
+    const res = await apiFetch('/api/events', {
       method: 'POST',
       headers: buildHeaders(true),
       body: JSON.stringify(data),
@@ -141,7 +137,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [refreshFinances]);
 
   const updateEvent = useCallback(async (id: string, data: Partial<PizzaEvent>) => {
-    const res = await fetch(`/api/events/${id}`, {
+    const res = await apiFetch(`/api/events/${id}`, {
       method: 'PUT',
       headers: buildHeaders(true),
       body: JSON.stringify(data),
@@ -153,7 +149,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [refreshFinances]);
 
   const deleteEvent = useCallback(async (id: string) => {
-    const res = await fetch(`/api/events/${id}`, { method: 'DELETE', headers: buildHeaders() });
+    const res = await apiFetch(`/api/events/${id}`, { method: 'DELETE', headers: buildHeaders() });
     if (!res.ok) throw new Error('Falha ao excluir evento');
     setEvents((prev) => prev.filter((e) => e.id !== id));
     setFinances((prev) => prev.filter((f) => f.eventId !== id));
@@ -161,7 +157,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // Tasks (API)
   const addTask = useCallback(async (data: Omit<Task, 'id' | 'createdAt'>) => {
-    const res = await fetch('/api/tasks', {
+    const res = await apiFetch('/api/tasks', {
       method: 'POST',
       headers: buildHeaders(true),
       body: JSON.stringify(data),
@@ -173,7 +169,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const updateTask = useCallback(async (id: string, data: Partial<Task>) => {
-    const res = await fetch(`/api/tasks/${id}`, {
+    const res = await apiFetch(`/api/tasks/${id}`, {
       method: 'PUT',
       headers: buildHeaders(true),
       body: JSON.stringify(data),
@@ -184,7 +180,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const deleteTask = useCallback(async (id: string) => {
-    const res = await fetch(`/api/tasks/${id}`, { method: 'DELETE', headers: buildHeaders() });
+    const res = await apiFetch(`/api/tasks/${id}`, { method: 'DELETE', headers: buildHeaders() });
     if (!res.ok) throw new Error('Falha ao excluir tarefa');
     setTasks((prev) => prev.filter((t) => t.id !== id));
   }, []);

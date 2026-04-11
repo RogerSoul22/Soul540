@@ -40,7 +40,33 @@ router.post('/login', async (req, res) => {
     process.env.JWT_SECRET || 'soul540-secret',
     { expiresIn: '7d' }
   );
-  res.json({ token, user: { id: user.id, name: user.name, email: user.email, isAdmin: user.isAdmin, permissions: user.permissions, unit: userUnit } });
+  res.cookie('soul540_token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+  res.json({ user: { id: user.id, name: user.name, email: user.email, isAdmin: user.isAdmin, permissions: user.permissions, unit: userUnit } });
+});
+
+// GET /api/auth/me
+router.get('/me', async (req, res) => {
+  const token = (req as any).cookies?.soul540_token;
+  if (!token) return res.status(401).json({ error: 'not authenticated' });
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET || 'soul540-secret') as any;
+    const user = await UserModel.findById(payload.userId).select('-passwordHash').lean() as any;
+    if (!user) return res.status(401).json({ error: 'user not found' });
+    res.json({ user: { id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin, permissions: user.permissions, unit: user.unit } });
+  } catch {
+    res.status(401).json({ error: 'invalid token' });
+  }
+});
+
+// POST /api/auth/logout
+router.post('/logout', (_req, res) => {
+  res.clearCookie('soul540_token', { httpOnly: true, sameSite: 'strict' });
+  res.json({ ok: true });
 });
 
 export default router;
