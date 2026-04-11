@@ -1,13 +1,12 @@
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
-
-interface PizzaEvent { id: string; name: string; date: string; endDate?: string; time?: string; location?: string; outOfCity?: boolean; phone?: string; guestCount?: number; status?: string; budget?: number; menu?: string[]; notes?: string; responsibleEmployeeId?: string; staffCount?: number; selectedEmployeeIds?: string[]; createdAt?: string; [key: string]: any; }
-interface FinanceEntry { id: string; type: string; category: string; description: string; amount: number; date: string; status: string; eventId?: string; autoEventBudget?: boolean; [key: string]: any; }
-interface Task { id: string; title: string; description?: string; priority?: string; status?: string; dueDate?: string; createdAt?: string; [key: string]: any; }
+import type { PizzaEvent, FinanceEntry, Task } from '@shared/types';
 
 interface AppContextData {
   events: PizzaEvent[];
+  hasMoreEvents: boolean;
+  loadMoreEvents: () => void;
   finances: FinanceEntry[];
   tasks: Task[];
   addFinance: (entry: Omit<FinanceEntry, 'id'>) => Promise<FinanceEntry>;
@@ -25,11 +24,29 @@ const AppContext = createContext<AppContextData>({} as AppContextData);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<PizzaEvent[]>([]);
+  const [eventsPage, setEventsPage] = useState(1);
+  const [hasMoreEvents, setHasMoreEvents] = useState(false);
   const [finances, setFinances] = useState<FinanceEntry[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
 
+  const loadEvents = useCallback((page = 1, append = false) => {
+    apiFetch(`/api/events?page=${page}&limit=100`)
+      .then(r => r.json())
+      .then((res) => {
+        const data: PizzaEvent[] = res.data ?? res;
+        setEvents(prev => append ? [...prev, ...data] : data);
+        setHasMoreEvents(res.hasMore ?? false);
+        setEventsPage(page);
+      })
+      .catch((err) => console.error('Falha ao carregar eventos:', err));
+  }, []);
+
+  const loadMoreEvents = useCallback(() => {
+    loadEvents(eventsPage + 1, true);
+  }, [eventsPage, loadEvents]);
+
   useEffect(() => {
-    apiFetch('/api/events').then(r => r.json()).then(setEvents).catch((err) => console.error('Falha ao carregar dados:', err));
+    loadEvents(1, false);
     apiFetch('/api/tasks').then(r => r.json()).then(setTasks).catch((err) => console.error('Falha ao carregar dados:', err));
     apiFetch('/api/finances').then(r => r.json()).then(setFinances).catch((err) => console.error('Falha ao carregar dados:', err));
   }, []);
@@ -105,7 +122,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AppContext.Provider value={{ events, finances, tasks, addFinance, updateFinance, deleteFinance, addEvent, updateEvent, deleteEvent, addTask, updateTask, deleteTask }}>
+    <AppContext.Provider value={{ events, hasMoreEvents, loadMoreEvents, finances, tasks, addFinance, updateFinance, deleteFinance, addEvent, updateEvent, deleteEvent, addTask, updateTask, deleteTask }}>
       {children}
     </AppContext.Provider>
   );
