@@ -414,7 +414,7 @@ export default function NotasFiscais() {
                 </tr>
               </thead>
               <tbody>
-                {previewInvoice.items.map((item, i) => (
+                {previewInvoice.items.map((item: InvoiceItem, i: number) => (
                   <tr key={i}>
                     <td>{item.description}</td>
                     <td>{item.quantity}</td>
