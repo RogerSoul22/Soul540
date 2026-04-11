@@ -20,7 +20,7 @@ router.post('/', async (req, res) => {
     return res.status(400).json({ error: 'name, email e password obrigatorios' });
   }
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = await UserModel.create({ name: name.trim(), email: email.toLowerCase().trim(), passwordHash, passwordPlain: password, isAdmin: !!isAdmin, permissions: permissions || [], unit: bodyUnit || getTenantUnit(req) });
+  const user = await UserModel.create({ name: name.trim(), email: email.toLowerCase().trim(), passwordHash, isAdmin: !!isAdmin, permissions: permissions || [], unit: bodyUnit || getTenantUnit(req) });
   const { passwordHash: _, ...safe } = user.toJSON();
   res.status(201).json(safe);
 });
@@ -39,7 +39,6 @@ router.put('/:id', async (req, res) => {
   if (permissions !== undefined) update.permissions = permissions;
   if (password) {
     update.passwordHash = await bcrypt.hash(password, 10);
-    update.passwordPlain = password;
   }
   const updated = await UserModel.findByIdAndUpdate(req.params.id, update, { new: true }).select('-passwordHash');
   res.json(updated);

@@ -7,7 +7,6 @@ const UserSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true },
   passwordHash: { type: String, required: true },
-  passwordPlain: { type: String, default: '' },
   isAdmin: { type: Boolean, default: false },
   permissions: { type: [String], default: [] },
   unit: { type: String, enum: ['main', 'franchise', 'factory'], default: 'main' },
