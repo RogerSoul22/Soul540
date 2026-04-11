@@ -243,3 +243,20 @@
   font-size: $font-size-xs;
   color: rgba($text-muted, 0.6);
 }
+
+.forgotTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  margin-bottom: $spacing-sm;
+  text-align: center;
+}
+
+.forgotDesc {
+  font-size: $font-size-sm;
+  color: $text-muted;
+  line-height: 1.6;
+  text-align: center;
+  margin-bottom: $spacing-lg;
+  strong { color: $text-secondary; }
+}

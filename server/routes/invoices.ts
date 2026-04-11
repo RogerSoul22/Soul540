@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import mongoose, { Schema } from 'mongoose';
 import { getTenantUnit } from '../middleware/tenant';
+import { logAudit } from '../utils/audit';
 
 const InvoiceItemSchema = new Schema({
   description: { type: String, default: '' },
@@ -96,13 +97,16 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   if (isFromFactory(req)) {
     const invoice = await FactoryInvoice.create({ ...req.body, source: 'factory' });
+    await logAudit({ req, action: 'create', resource: 'invoices', resourceId: invoice.id, description: `Criou nota fiscal: ${invoice.clientName} (R$ ${invoice.totalValue})` });
     return res.status(201).json(invoice);
   }
   if (isFromFranchise(req)) {
     const invoice = await FranchiseInvoice.create({ ...req.body, source: 'franchise' });
+    await logAudit({ req, action: 'create', resource: 'invoices', resourceId: invoice.id, description: `Criou nota fiscal: ${invoice.clientName} (R$ ${invoice.totalValue})` });
     return res.status(201).json(invoice);
   }
   const invoice = await Invoice.create({ ...req.body, source: 'main' });
+  await logAudit({ req, action: 'create', resource: 'invoices', resourceId: invoice.id, description: `Criou nota fiscal: ${invoice.clientName} (R$ ${invoice.totalValue})` });
   res.status(201).json(invoice);
 });
 
@@ -110,13 +114,16 @@ router.put('/:id', async (req, res) => {
   const found = await findInAllCollections(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   const invoice = await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  await logAudit({ req, action: 'update', resource: 'invoices', resourceId: req.params.id, description: `Atualizou nota fiscal: ${invoice?.clientName}` });
   res.json(invoice);
 });
 
 router.delete('/:id', async (req, res) => {
   const found = await findInAllCollections(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
+  const clientName = found.doc?.clientName || req.params.id;
   await found.model.findByIdAndDelete(req.params.id);
+  await logAudit({ req, action: 'delete', resource: 'invoices', resourceId: req.params.id, description: `Excluiu nota fiscal: ${clientName}` });
   res.status(204).end();
 });
 

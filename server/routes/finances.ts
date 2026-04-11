@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { getTenantUnit } from '../middleware/tenant';
 import { validate } from '../middleware/validate';
 import { createFinanceSchema, updateFinanceSchema } from '../schemas/finances';
+import { logAudit } from '../utils/audit';
 
 const FinanceSchema = new mongoose.Schema(
   {
@@ -84,13 +85,16 @@ router.get('/', async (req, res) => {
 router.post('/', validate(createFinanceSchema), async (req, res) => {
   if (isFromFactory(req)) {
     const finance = await FactoryFinance.create({ ...req.body, source: 'factory' });
+    await logAudit({ req, action: 'create', resource: 'finances', resourceId: finance.id, description: `Criou lançamento: ${finance.description} (R$ ${finance.amount})` });
     return res.status(201).json(finance);
   }
   if (isFromFranchise(req)) {
     const finance = await FranchiseFinance.create({ ...req.body, source: 'franchise' });
+    await logAudit({ req, action: 'create', resource: 'finances', resourceId: finance.id, description: `Criou lançamento: ${finance.description} (R$ ${finance.amount})` });
     return res.status(201).json(finance);
   }
   const finance = await Finance.create({ ...req.body, source: 'main' });
+  await logAudit({ req, action: 'create', resource: 'finances', resourceId: finance.id, description: `Criou lançamento: ${finance.description} (R$ ${finance.amount})` });
   res.status(201).json(finance);
 });
 
@@ -98,13 +102,16 @@ router.put('/:id', validate(updateFinanceSchema), async (req, res) => {
   const found = await findFinanceInBothCollections(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   const finance = await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  await logAudit({ req, action: 'update', resource: 'finances', resourceId: req.params.id, description: `Atualizou lançamento: ${finance?.description} (R$ ${finance?.amount})` });
   res.json(finance);
 });
 
 router.delete('/:id', async (req, res) => {
   const found = await findFinanceInBothCollections(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
+  const finance = found.doc;
   await found.model.findByIdAndDelete(req.params.id);
+  await logAudit({ req, action: 'delete', resource: 'finances', resourceId: req.params.id, description: `Excluiu lançamento: ${finance?.description}` });
   res.status(204).end();
 });
 

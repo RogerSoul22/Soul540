@@ -4,6 +4,7 @@ import { UserModel } from './auth';
 import { getTenantUnit } from '../middleware/tenant';
 import { validate } from '../middleware/validate';
 import { createUserSchema, updateUserSchema } from '../schemas/users';
+import { logAudit } from '../utils/audit';
 
 const router = Router();
 
@@ -21,6 +22,7 @@ router.post('/', validate(createUserSchema), async (req, res) => {
   const passwordHash = await bcrypt.hash(password, 10);
   const user = await UserModel.create({ name, email: email.toLowerCase().trim(), passwordHash, isAdmin, permissions, unit: bodyUnit || getTenantUnit(req) });
   const { passwordHash: _, ...safe } = user.toJSON();
+  await logAudit({ req, action: 'create', resource: 'users', resourceId: user.id, description: `Criou usuário: ${name} (${email})` });
   res.status(201).json(safe);
 });
 
@@ -40,6 +42,8 @@ router.put('/:id', validate(updateUserSchema), async (req, res) => {
     update.passwordHash = await bcrypt.hash(password, 10);
   }
   const updated = await UserModel.findByIdAndUpdate(req.params.id, update, { new: true }).select('-passwordHash');
+  const desc = password ? `Alterou senha do usuário: ${user.name}` : `Atualizou usuário: ${user.name}`;
+  await logAudit({ req, action: 'update', resource: 'users', resourceId: req.params.id, description: desc });
   res.json(updated);
 });
 
@@ -51,6 +55,7 @@ router.delete('/:id', async (req, res) => {
     return res.status(403).json({ error: 'forbidden' });
   }
   await UserModel.findByIdAndDelete(req.params.id);
+  await logAudit({ req, action: 'delete', resource: 'users', resourceId: req.params.id, description: `Excluiu usuário: ${user.name} (${user.email})` });
   res.status(204).end();
 });
 

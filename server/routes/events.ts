@@ -2,6 +2,7 @@ import { Router } from 'express';
 import mongoose, { Schema } from 'mongoose';
 import { Finance, FranchiseFinance, FactoryFinance } from './finances';
 import { getTenantUnit } from '../middleware/tenant';
+import { logAudit } from '../utils/audit';
 
 const EventSchema = new Schema({
   name: String,
@@ -208,6 +209,7 @@ router.post('/', async (req, res) => {
         source: 'factory',
       });
     }
+    await logAudit({ req, action: 'create', resource: 'events', resourceId: event.id, description: `Criou evento: ${event.name} (${event.date})` });
     return res.status(201).json(event);
   }
   if (isFromFranchise(req)) {
@@ -225,6 +227,7 @@ router.post('/', async (req, res) => {
         source: 'franchise',
       });
     }
+    await logAudit({ req, action: 'create', resource: 'events', resourceId: event.id, description: `Criou evento: ${event.name} (${event.date})` });
     return res.status(201).json(event);
   }
   const event = await Event.create({ ...req.body, source: 'main' });
@@ -241,6 +244,7 @@ router.post('/', async (req, res) => {
       source: 'main',
     });
   }
+  await logAudit({ req, action: 'create', resource: 'events', resourceId: event.id, description: `Criou evento: ${event.name} (${event.date})` });
   res.status(201).json(event);
 });
 
@@ -275,14 +279,17 @@ router.put('/:id', async (req, res) => {
   } else if (existing) {
     await FinanceModel.findByIdAndDelete(existing._id);
   }
+  await logAudit({ req, action: 'update', resource: 'events', resourceId: req.params.id, description: `Atualizou evento: ${event.name}` });
   res.json(event);
 });
 
 router.delete('/:id', async (req, res) => {
   const found = await findEventInAllCollections(req.params.id);
   if (!found) return res.status(204).end();
+  const eventName = found.doc?.name || req.params.id;
   await found.model.findByIdAndDelete(req.params.id);
   await found.financeModel.deleteMany({ eventId: req.params.id, autoEventBudget: true });
+  await logAudit({ req, action: 'delete', resource: 'events', resourceId: req.params.id, description: `Excluiu evento: ${eventName}` });
   res.status(204).end();
 });
 
