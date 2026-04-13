@@ -1,8 +1,7 @@
 import { Router } from 'express';
-import mongoose, { Schema } from 'mongoose';
-import { getTenantUnit } from '../middleware/tenant';
+import { createTenantModels } from '../utils/tenantModel';
 
-const SupplySchema = new Schema({
+const models = createTenantModels('Supply', {
   name: { type: String, required: true },
   category: { type: String, default: '' },
   measureUnit: { type: String, default: 'kg' },
@@ -12,89 +11,24 @@ const SupplySchema = new Schema({
   supplier: { type: String, default: '' },
   expirationDate: String,
   status: { type: String, default: 'em_estoque' },
-  source: { type: String, default: 'main' },
   createdAt: { type: String, default: () => new Date().toISOString() },
-}, { collection: 'supplies', toJSON: { virtuals: true, versionKey: false } });
-
-const FranchiseSupplySchema = new Schema({
-  name: { type: String, required: true },
-  category: { type: String, default: '' },
-  measureUnit: { type: String, default: 'kg' },
-  quantity: { type: Number, default: 0 },
-  minStock: { type: Number, default: 0 },
-  costPerUnit: { type: Number, default: 0 },
-  supplier: { type: String, default: '' },
-  expirationDate: String,
-  status: { type: String, default: 'em_estoque' },
-  source: { type: String, default: 'franchise' },
-  createdAt: { type: String, default: () => new Date().toISOString() },
-}, { collection: 'franchisesupplies', toJSON: { virtuals: true, versionKey: false } });
-
-const FactorySupplySchema = new Schema({
-  name: { type: String, required: true },
-  category: { type: String, default: '' },
-  measureUnit: { type: String, default: 'kg' },
-  quantity: { type: Number, default: 0 },
-  minStock: { type: Number, default: 0 },
-  costPerUnit: { type: Number, default: 0 },
-  supplier: { type: String, default: '' },
-  expirationDate: String,
-  status: { type: String, default: 'em_estoque' },
-  source: { type: String, default: 'factory' },
-  createdAt: { type: String, default: () => new Date().toISOString() },
-}, { collection: 'factorysupplies', toJSON: { virtuals: true, versionKey: false } });
-
-const Supply = mongoose.models.Supply || mongoose.model('Supply', SupplySchema);
-const FranchiseSupply = mongoose.models.FranchiseSupply || mongoose.model('FranchiseSupply', FranchiseSupplySchema);
-const FactorySupply = mongoose.models.FactorySupply || mongoose.model('FactorySupply', FactorySupplySchema);
-
-function isFromFranchise(req: any): boolean { return getTenantUnit(req) === 'franchise'; }
-function isFromFactory(req: any): boolean { return getTenantUnit(req) === 'factory'; }
-
-async function findInBothCollections(id: string) {
-  const doc = await Supply.findById(id);
-  if (doc) return { doc, model: Supply };
-  const fdoc = await FranchiseSupply.findById(id);
-  if (fdoc) return { doc: fdoc, model: FranchiseSupply };
-  const factDoc = await FactorySupply.findById(id);
-  if (factDoc) return { doc: factDoc, model: FactorySupply };
-  return null;
-}
+}, { main: 'supplies', franchise: 'franchisesupplies', factory: 'factorysupplies' });
 
 const router = Router();
 
-router.get('/', async (req, res) => {
-  if (isFromFactory(req)) {
-    const items = await FactorySupply.find({});
-    return res.json(items);
-  }
-  const Model = isFromFranchise(req) ? FranchiseSupply : Supply;
-  const items = await Model.find({});
-  res.json(items);
-});
+router.get('/', async (req, res) => res.json(await models.getModel(req).find({})));
 
-router.post('/', async (req, res) => {
-  if (isFromFactory(req)) {
-    const supply = await FactorySupply.create({ ...req.body, source: 'factory' });
-    return res.status(201).json(supply);
-  }
-  if (isFromFranchise(req)) {
-    const supply = await FranchiseSupply.create({ ...req.body, source: 'franchise' });
-    return res.status(201).json(supply);
-  }
-  const supply = await Supply.create({ ...req.body, source: 'main' });
-  res.status(201).json(supply);
-});
+router.post('/', async (req, res) =>
+  res.status(201).json(await models.getModel(req).create({ ...req.body, source: models.getSource(req) })));
 
 router.put('/:id', async (req, res) => {
-  const found = await findInBothCollections(req.params.id);
+  const found = await models.findInAll(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
-  const supply = await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json(supply);
+  res.json(await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true }));
 });
 
 router.delete('/:id', async (req, res) => {
-  const found = await findInBothCollections(req.params.id);
+  const found = await models.findInAll(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   await found.model.findByIdAndDelete(req.params.id);
   res.status(204).end();

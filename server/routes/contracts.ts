@@ -1,8 +1,7 @@
 import { Router } from 'express';
-import mongoose, { Schema } from 'mongoose';
-import { getTenantUnit } from '../middleware/tenant';
+import { createTenantModels } from '../utils/tenantModel';
 
-const contractFields = {
+const models = createTenantModels('Contract', {
   clientName: String,
   clientDocument: { type: String, default: '' },
   clientRg: { type: String, default: '' },
@@ -30,79 +29,23 @@ const contractFields = {
   menuId: { type: String, default: '' },
   status: { type: String, default: 'rascunho' },
   createdAt: { type: String, default: () => new Date().toISOString() },
-};
-
-const ContractSchema = new Schema(
-  { ...contractFields, source: { type: String, default: 'main' } },
-  { collection: 'contracts', toJSON: { virtuals: true, versionKey: false } },
-);
-
-const FranchiseContractSchema = new Schema(
-  { ...contractFields, source: { type: String, default: 'franchise' } },
-  { collection: 'franchisecontracts', toJSON: { virtuals: true, versionKey: false } },
-);
-
-const FactoryContractSchema = new Schema(
-  { ...contractFields, source: { type: String, default: 'factory' } },
-  { collection: 'factorycontracts', toJSON: { virtuals: true, versionKey: false } },
-);
-
-const Contract = mongoose.models.Contract || mongoose.model('Contract', ContractSchema);
-const FranchiseContract = mongoose.models.FranchiseContract || mongoose.model('FranchiseContract', FranchiseContractSchema);
-const FactoryContract = mongoose.models.FactoryContract || mongoose.model('FactoryContract', FactoryContractSchema);
-
-function isFromFranchise(req: any): boolean {
-  return getTenantUnit(req) === 'franchise';
-}
-
-function isFromFactory(req: any): boolean {
-  return getTenantUnit(req) === 'factory';
-}
-
-async function findInAllCollections(id: string) {
-  const doc = await Contract.findById(id);
-  if (doc) return { doc, model: Contract };
-  const fdoc = await FranchiseContract.findById(id);
-  if (fdoc) return { doc: fdoc, model: FranchiseContract };
-  const factDoc = await FactoryContract.findById(id);
-  if (factDoc) return { doc: factDoc, model: FactoryContract };
-  return null;
-}
+}, { main: 'contracts', franchise: 'franchisecontracts', factory: 'factorycontracts' });
 
 const router = Router();
 
-router.get('/', async (req, res) => {
-  if (isFromFactory(req)) {
-    const items = await FactoryContract.find({});
-    return res.json(items);
-  }
-  const Model = isFromFranchise(req) ? FranchiseContract : Contract;
-  const items = await Model.find({});
-  res.json(items);
-});
+router.get('/', async (req, res) => res.json(await models.getModel(req).find({})));
 
-router.post('/', async (req, res) => {
-  if (isFromFactory(req)) {
-    const contract = await FactoryContract.create({ ...req.body, source: 'factory' });
-    return res.status(201).json(contract);
-  }
-  if (isFromFranchise(req)) {
-    const contract = await FranchiseContract.create({ ...req.body, source: 'franchise' });
-    return res.status(201).json(contract);
-  }
-  const contract = await Contract.create({ ...req.body, source: 'main' });
-  res.status(201).json(contract);
-});
+router.post('/', async (req, res) =>
+  res.status(201).json(await models.getModel(req).create({ ...req.body, source: models.getSource(req) })));
 
 router.put('/:id', async (req, res) => {
-  const found = await findInAllCollections(req.params.id);
+  const found = await models.findInAll(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
-  const contract = await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json(contract);
+  res.json(await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true }));
 });
 
 router.delete('/:id', async (req, res) => {
-  const found = await findInAllCollections(req.params.id);
+  const found = await models.findInAll(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   await found.model.findByIdAndDelete(req.params.id);
   res.status(204).end();

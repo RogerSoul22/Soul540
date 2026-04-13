@@ -1,91 +1,31 @@
 import { Router } from 'express';
-import mongoose, { Schema } from 'mongoose';
-import { getTenantUnit } from '../middleware/tenant';
+import { createTenantModels } from '../utils/tenantModel';
 
-const UtensilSchema = new Schema({
+const models = createTenantModels('Utensil', {
   name: { type: String, required: true },
   category: { type: String, default: '' },
   quantity: { type: Number, default: 1 },
   unitValue: Number,
   location: { type: String, default: '' },
   status: { type: String, default: 'disponivel' },
-  source: { type: String, default: 'main' },
   createdAt: { type: String, default: () => new Date().toISOString() },
-}, { collection: 'utensils', toJSON: { virtuals: true, versionKey: false } });
-
-const FranchiseUtensilSchema = new Schema({
-  name: { type: String, required: true },
-  category: { type: String, default: '' },
-  quantity: { type: Number, default: 1 },
-  unitValue: Number,
-  location: { type: String, default: '' },
-  status: { type: String, default: 'disponivel' },
-  source: { type: String, default: 'franchise' },
-  createdAt: { type: String, default: () => new Date().toISOString() },
-}, { collection: 'franchiseutensils', toJSON: { virtuals: true, versionKey: false } });
-
-const FactoryUtensilSchema = new Schema({
-  name: { type: String, required: true },
-  category: { type: String, default: '' },
-  quantity: { type: Number, default: 1 },
-  unitValue: Number,
-  location: { type: String, default: '' },
-  status: { type: String, default: 'disponivel' },
-  source: { type: String, default: 'factory' },
-  createdAt: { type: String, default: () => new Date().toISOString() },
-}, { collection: 'factoryutensils', toJSON: { virtuals: true, versionKey: false } });
-
-const Utensil = mongoose.models.Utensil || mongoose.model('Utensil', UtensilSchema);
-const FranchiseUtensil = mongoose.models.FranchiseUtensil || mongoose.model('FranchiseUtensil', FranchiseUtensilSchema);
-const FactoryUtensil = mongoose.models.FactoryUtensil || mongoose.model('FactoryUtensil', FactoryUtensilSchema);
-
-function isFromFranchise(req: any): boolean { return getTenantUnit(req) === 'franchise'; }
-function isFromFactory(req: any): boolean { return getTenantUnit(req) === 'factory'; }
-
-async function findInBothCollections(id: string) {
-  const doc = await Utensil.findById(id);
-  if (doc) return { doc, model: Utensil };
-  const fdoc = await FranchiseUtensil.findById(id);
-  if (fdoc) return { doc: fdoc, model: FranchiseUtensil };
-  const factDoc = await FactoryUtensil.findById(id);
-  if (factDoc) return { doc: factDoc, model: FactoryUtensil };
-  return null;
-}
+}, { main: 'utensils', franchise: 'franchiseutensils', factory: 'factoryutensils' });
 
 const router = Router();
 
-router.get('/', async (req, res) => {
-  if (isFromFactory(req)) {
-    const items = await FactoryUtensil.find({});
-    return res.json(items);
-  }
-  const Model = isFromFranchise(req) ? FranchiseUtensil : Utensil;
-  const items = await Model.find({});
-  res.json(items);
-});
+router.get('/', async (req, res) => res.json(await models.getModel(req).find({})));
 
-router.post('/', async (req, res) => {
-  if (isFromFactory(req)) {
-    const utensil = await FactoryUtensil.create({ ...req.body, source: 'factory' });
-    return res.status(201).json(utensil);
-  }
-  if (isFromFranchise(req)) {
-    const utensil = await FranchiseUtensil.create({ ...req.body, source: 'franchise' });
-    return res.status(201).json(utensil);
-  }
-  const utensil = await Utensil.create({ ...req.body, source: 'main' });
-  res.status(201).json(utensil);
-});
+router.post('/', async (req, res) =>
+  res.status(201).json(await models.getModel(req).create({ ...req.body, source: models.getSource(req) })));
 
 router.put('/:id', async (req, res) => {
-  const found = await findInBothCollections(req.params.id);
+  const found = await models.findInAll(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
-  const utensil = await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json(utensil);
+  res.json(await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true }));
 });
 
 router.delete('/:id', async (req, res) => {
-  const found = await findInBothCollections(req.params.id);
+  const found = await models.findInAll(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   await found.model.findByIdAndDelete(req.params.id);
   res.status(204).end();

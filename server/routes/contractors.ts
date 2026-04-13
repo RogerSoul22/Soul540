@@ -1,8 +1,7 @@
 import { Router } from 'express';
-import mongoose, { Schema } from 'mongoose';
-import { getTenantUnit } from '../middleware/tenant';
+import { createTenantModels } from '../utils/tenantModel';
 
-const ContractorSchema = new Schema({
+const models = createTenantModels('Contractor', {
   name: String,
   type: { type: String, default: 'pessoa_fisica' },
   document: { type: String, default: '' },
@@ -15,95 +14,32 @@ const ContractorSchema = new Schema({
   category: String,
   status: { type: String, default: 'ativo' },
   totalRevenue: { type: Number, default: 0 },
-  source: { type: String, default: 'main' },
   createdAt: { type: String, default: () => new Date().toISOString() },
-}, { collection: 'contractors', toJSON: { virtuals: true, versionKey: false } });
+}, { main: 'contractors', franchise: 'franchisecontractors', factory: 'factorycontractors' }, {
+  overrides: {
+    factory: { type: { type: String, default: 'pessoa_juridica' } },
+  },
+});
 
-const FranchiseContractorSchema = new Schema({
-  name: String,
-  type: { type: String, default: 'pessoa_fisica' },
-  document: { type: String, default: '' },
-  documentType: String,
-  email: { type: String, default: '' },
-  phone: { type: String, default: '' },
-  address: String,
-  maritalStatus: String,
-  profession: String,
-  category: String,
-  status: { type: String, default: 'ativo' },
-  totalRevenue: { type: Number, default: 0 },
-  source: { type: String, default: 'franchise' },
-  createdAt: { type: String, default: () => new Date().toISOString() },
-}, { collection: 'franchisecontractors', toJSON: { virtuals: true, versionKey: false } });
-
-const FactoryContractorSchema = new Schema({
-  name: String,
-  type: { type: String, default: 'pessoa_juridica' },
-  document: { type: String, default: '' },
-  documentType: String,
-  email: { type: String, default: '' },
-  phone: { type: String, default: '' },
-  address: String,
-  maritalStatus: String,
-  profession: String,
-  category: String,
-  status: { type: String, default: 'ativo' },
-  totalRevenue: { type: Number, default: 0 },
-  source: { type: String, default: 'factory' },
-  createdAt: { type: String, default: () => new Date().toISOString() },
-}, { collection: 'factorycontractors', toJSON: { virtuals: true, versionKey: false } });
-
-export const Contractor = mongoose.models.Contractor || mongoose.model('Contractor', ContractorSchema);
-export const FranchiseContractor = mongoose.models.FranchiseContractor || mongoose.model('FranchiseContractor', FranchiseContractorSchema);
-export const FactoryContractor = mongoose.models.FactoryContractor || mongoose.model('FactoryContractor', FactoryContractorSchema);
-
-function isFromFranchise(req: any): boolean { return getTenantUnit(req) === 'franchise'; }
-function isFromFactory(req: any): boolean { return getTenantUnit(req) === 'factory'; }
-
-async function findInBothCollections(id: string) {
-  const doc = await Contractor.findById(id);
-  if (doc) return { doc, model: Contractor };
-  const fdoc = await FranchiseContractor.findById(id);
-  if (fdoc) return { doc: fdoc, model: FranchiseContractor };
-  const factDoc = await FactoryContractor.findById(id);
-  if (factDoc) return { doc: factDoc, model: FactoryContractor };
-  return null;
-}
+export const Contractor = models.Main;
+export const FranchiseContractor = models.Franchise;
+export const FactoryContractor = models.Factory;
 
 const router = Router();
 
-router.get('/', async (req, res) => {
-  if (isFromFactory(req)) {
-    const items = await FactoryContractor.find({});
-    return res.json(items);
-  }
-  const Model = isFromFranchise(req) ? FranchiseContractor : Contractor;
-  const items = await Model.find({});
-  res.json(items);
-});
+router.get('/', async (req, res) => res.json(await models.getModel(req).find({})));
 
-router.post('/', async (req, res) => {
-  if (isFromFactory(req)) {
-    const contractor = await FactoryContractor.create({ ...req.body, source: 'factory' });
-    return res.status(201).json(contractor);
-  }
-  if (isFromFranchise(req)) {
-    const contractor = await FranchiseContractor.create({ ...req.body, source: 'franchise' });
-    return res.status(201).json(contractor);
-  }
-  const contractor = await Contractor.create({ ...req.body, source: 'main' });
-  res.status(201).json(contractor);
-});
+router.post('/', async (req, res) =>
+  res.status(201).json(await models.getModel(req).create({ ...req.body, source: models.getSource(req) })));
 
 router.put('/:id', async (req, res) => {
-  const found = await findInBothCollections(req.params.id);
+  const found = await models.findInAll(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
-  const contractor = await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json(contractor);
+  res.json(await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true }));
 });
 
 router.delete('/:id', async (req, res) => {
-  const found = await findInBothCollections(req.params.id);
+  const found = await models.findInAll(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   await found.model.findByIdAndDelete(req.params.id);
   res.status(204).end();
