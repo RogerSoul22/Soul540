@@ -35,7 +35,7 @@ export type Contract = {
   menuId?: string;
 };
 
-type PizzaEvent = { date?: string; location?: string; [key: string]: unknown };
+type PizzaEvent = { date?: string; location?: string };
 
 interface Props {
   contract: Contract;
