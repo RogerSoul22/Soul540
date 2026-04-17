@@ -20,7 +20,11 @@ function nfeioHeaders() {
 }
 
 function nfeioBase() {
-  return `https://api.nfe.io/v1/companies/${process.env.NFEIO_COMPANY_ID}`;
+  return `https://api.nfe.io/v1/companies/${process.env.NFEIO_COMPANY_ID_NFSE}`;
+}
+
+function nfeioBaseNfe() {
+  return `https://api.nfse.io/v2/companies/${process.env.NFEIO_COMPANY_ID_NFE}`;
 }
 
 const models = createTenantModels('Invoice', {
@@ -95,8 +99,9 @@ router.post('/:id/emit', async (req, res) => {
   if (!inv) return res.status(404).json({ error: 'Not found' });
   const found = { doc: inv, model };
 
-  if (!process.env.NFEIO_API_KEY || !process.env.NFEIO_COMPANY_ID) {
-    return res.status(503).json({ error: 'NFEIO_API_KEY e NFEIO_COMPANY_ID não configurados no servidor.' });
+  const companyId = inv.type === 'nfe' ? process.env.NFEIO_COMPANY_ID_NFE : process.env.NFEIO_COMPANY_ID_NFSE;
+  if (!process.env.NFEIO_API_KEY || !companyId) {
+    return res.status(503).json({ error: `NFEIO_API_KEY e NFEIO_COMPANY_ID_${(inv.type ?? 'nfse').toUpperCase()} não configurados no servidor.` });
   }
 
   let endpoint: string;
@@ -105,7 +110,7 @@ router.post('/:id/emit', async (req, res) => {
   const borrowerDoc = (inv.clientDocument ?? '').replace(/\D/g, '');
 
   if (inv.type === 'nfe') {
-    endpoint = `${nfeioBase()}/nfe`;
+    endpoint = `${nfeioBaseNfe()}/productinvoices`;
     payload = {
       nature: 'Sale',
       buyer: {
@@ -165,7 +170,12 @@ router.post('/:id/emit', async (req, res) => {
       headers: nfeioHeaders(),
       body: JSON.stringify(payload),
     });
-    nfeData = await nfeRes.json();
+    const rawText = await nfeRes.text();
+    try {
+      nfeData = JSON.parse(rawText);
+    } catch {
+      nfeData = { message: rawText || `HTTP ${nfeRes.status}` };
+    }
   } catch (err) {
     return res.status(502).json({ error: 'Falha de comunicação com nfe.io', detail: String(err) });
   }
@@ -200,18 +210,23 @@ router.get('/:id/nfeio-status', async (req, res) => {
 
   const isNfe = inv.type === 'nfe';
   const endpoint = isNfe
-    ? `${nfeioBase()}/nfe/${inv.nfeioId}`
+    ? `${nfeioBaseNfe()}/productinvoices/${inv.nfeioId}`
     : `${nfeioBase()}/serviceinvoices/${inv.nfeioId}`;
 
   let nfeRes: Response;
   let nfeData: any;
   try {
     nfeRes = await fetch(endpoint, { headers: nfeioHeaders() });
-    nfeData = await nfeRes.json();
+    const rawText = await nfeRes.text();
+    try {
+      nfeData = JSON.parse(rawText);
+    } catch {
+      nfeData = { message: rawText || `HTTP ${nfeRes.status}` };
+    }
   } catch (err) {
     return res.status(502).json({ error: 'Falha de comunicação com nfe.io', detail: String(err) });
   }
-  if (!nfeRes.ok) return res.status(nfeRes.status).json({ error: 'Erro ao consultar nfe.io' });
+  if (!nfeRes.ok) return res.status(nfeRes.status).json({ error: nfeData?.message ?? 'Erro ao consultar nfe.io', nfeioRaw: nfeData });
 
   const flowStatus: string = (nfeData.flowStatus ?? nfeData.status ?? '').toLowerCase();
   let nfeioStatus: 'processing' | 'issued' | 'error';

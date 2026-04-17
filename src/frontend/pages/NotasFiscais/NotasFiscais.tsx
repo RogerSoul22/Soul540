@@ -33,6 +33,22 @@ export default function NotasFiscais() {
   const [confirmEmitId, setConfirmEmitId] = useState<string | null>(null);
   const [emitError, setEmitError] = useState<string | null>(null);
 
+  // CPF/CNPJ mask
+  const maskCpfCnpj = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 14);
+    if (digits.length <= 11) {
+      return digits
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    }
+    return digits
+      .replace(/(\d{2})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1/$2')
+      .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+  };
+
   // Form state
   const [formEventId, setFormEventId] = useState('');
   const [formClientName, setFormClientName] = useState('');
@@ -446,12 +462,14 @@ export default function NotasFiscais() {
                 />
               </div>
               <div className={styles.formField}>
-                <label className={styles.formLabel}>Documento (CNPJ/CPF)</label>
+                <label className={styles.formLabel}>Documento (CPF/CNPJ)</label>
                 <input
                   type="text"
                   className={styles.formInput}
                   value={formClientDoc}
-                  onChange={(e) => setFormClientDoc(e.target.value)}
+                  onChange={(e) => setFormClientDoc(maskCpfCnpj(e.target.value))}
+                  placeholder="000.000.000-00"
+                  maxLength={18}
                 />
               </div>
             </div>
@@ -694,7 +712,7 @@ export default function NotasFiscais() {
                 </tr>
               </thead>
               <tbody>
-                {previewInvoice.items.map((item, i) => (
+                {previewInvoice.items.map((item: InvoiceItem, i: number) => (
                   <tr key={i}>
                     <td>{item.description}</td>
                     <td>{item.quantity}</td>
