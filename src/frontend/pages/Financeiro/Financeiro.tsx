@@ -585,7 +585,13 @@ export default function Financeiro() {
                 .filter(({ total }) => total > 0)
                 .sort((a, b) => b.total - a.total);
               const max = totals[0]?.total || 1;
-              if (totals.length === 0) return <p className={styles.emptyState}>Nenhuma despesa registrada.</p>;
+              if (totals.length === 0) return (
+                <div className={styles.emptyStateBox}>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#64748b', marginBottom: 8 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  <p className={styles.emptyStateTitle}>Nenhuma despesa{pageMonth !== 'all' ? ` em ${formatMonth(pageMonth)}` : ''}</p>
+                  <p className={styles.emptyStateHint}>Registre despesas clicando em <strong>+ Novo Lancamento</strong> e escolhendo o tipo <strong>Custo</strong>.</p>
+                </div>
+              );
               return (
                 <div className={styles.catList}>
                   {totals.map(({ cat, total }) => (
@@ -805,7 +811,10 @@ export default function Financeiro() {
       {/* ===== TAB: ESTIMADO x FINAL ===== */}
       {activeTab === 'valores' && (() => {
         const eventsWithValues = activeEvents
-          .filter((e) => e.budget > 0 || (e.finalValue ?? 0) > 0)
+          .filter((e) =>
+            (e.budget > 0 || (e.finalValue ?? 0) > 0) &&
+            (pageMonth === 'all' || e.date.startsWith(pageMonth)),
+          )
           .sort((a, b) => b.date.localeCompare(a.date));
         const totalEstimado = eventsWithValues.reduce((acc, e) => acc + (e.budget || 0), 0);
         const totalFinal = eventsWithValues.reduce((acc, e) => acc + (e.finalValue || 0), 0);
