@@ -62,6 +62,9 @@ export default function Financeiro() {
   const [franchiseFinances, setFranchiseFinances] = useState<typeof finances>([]);
   const [franchiseEvents, setFranchiseEvents] = useState<typeof events>([]);
 
+  // Page-level month filter (shared by geral / despesas / valores tabs)
+  const [pageMonth, setPageMonth] = useState<string>('all');
+
   // Table filters
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [filterMonth, setFilterMonth] = useState<string>('all');
@@ -100,13 +103,19 @@ export default function Financeiro() {
 
   // === DATA COMPUTATIONS ===
 
+  // Finances / events filtered by the page-level month selector
+  const pageMonthFinances = useMemo(
+    () => pageMonth === 'all' ? activeFinances : activeFinances.filter((f) => f.date.startsWith(pageMonth)),
+    [activeFinances, pageMonth],
+  );
+
   const totalRevenue = useMemo(
-    () => activeFinances.filter((f) => f.type === 'revenue').reduce((acc, f) => acc + f.amount, 0),
-    [activeFinances],
+    () => pageMonthFinances.filter((f) => f.type === 'revenue').reduce((acc, f) => acc + f.amount, 0),
+    [pageMonthFinances],
   );
   const totalCosts = useMemo(
-    () => activeFinances.filter((f) => f.type === 'cost').reduce((acc, f) => acc + f.amount, 0),
-    [activeFinances],
+    () => pageMonthFinances.filter((f) => f.type === 'cost').reduce((acc, f) => acc + f.amount, 0),
+    [pageMonthFinances],
   );
   const profit = totalRevenue - totalCosts;
   const margin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
@@ -188,15 +197,30 @@ export default function Financeiro() {
       .sort((a, b) => b.value - a.value);
   }, [monthFinances]);
 
-  // Gauge values for selected month
+  // Gauge values for page-level month filter (used in Visão Geral)
   const insumosRatio = useMemo(() => {
+    const insumos = pageMonthFinances
+      .filter((f) => f.type === 'cost' && f.category === 'insumos')
+      .reduce((acc, f) => acc + f.amount, 0);
+    return totalRevenue > 0 ? (insumos / totalRevenue) * 100 : 0;
+  }, [pageMonthFinances, totalRevenue]);
+
+  const maoObraRatio = useMemo(() => {
+    const mo = pageMonthFinances
+      .filter((f) => f.type === 'cost' && (f.category === 'salario' || f.category === 'pro-labore'))
+      .reduce((acc, f) => acc + f.amount, 0);
+    return totalRevenue > 0 ? (mo / totalRevenue) * 100 : 0;
+  }, [pageMonthFinances, totalRevenue]);
+
+  // Gauge values for selected month (used in Painel Mensal)
+  const insumosRatioMensal = useMemo(() => {
     const insumos = monthFinances
       .filter((f) => f.type === 'cost' && f.category === 'insumos')
       .reduce((acc, f) => acc + f.amount, 0);
     return monthRevenue > 0 ? (insumos / monthRevenue) * 100 : 0;
   }, [monthFinances, monthRevenue]);
 
-  const maoObraRatio = useMemo(() => {
+  const maoObraRatioMensal = useMemo(() => {
     const mo = monthFinances
       .filter((f) => f.type === 'cost' && (f.category === 'salario' || f.category === 'pro-labore'))
       .reduce((acc, f) => acc + f.amount, 0);
@@ -247,9 +271,9 @@ export default function Financeiro() {
 
   const eventsWithFinalValue = useMemo(
     () => activeEvents
-      .filter((e) => (e.finalValue ?? 0) > 0)
+      .filter((e) => (e.finalValue ?? 0) > 0 && (pageMonth === 'all' || e.date.startsWith(pageMonth)))
       .sort((a, b) => b.date.localeCompare(a.date)),
-    [activeEvents],
+    [activeEvents, pageMonth],
   );
   const totalFinalValue = useMemo(
     () => eventsWithFinalValue.reduce((acc, e) => acc + (e.finalValue || 0), 0),
@@ -372,6 +396,27 @@ export default function Financeiro() {
           </button>
         ))}
       </div>
+
+      {/* ===== MONTH FILTER BAR (Geral / Despesas / Valores) ===== */}
+      {['geral', 'despesas', 'valores'].includes(activeTab) && availableMonths.length > 0 && (
+        <div className={styles.pageMonthBar}>
+          <button
+            className={`${styles.pageMonthChip} ${pageMonth === 'all' ? styles.pageMonthChipActive : ''}`}
+            onClick={() => setPageMonth('all')}
+          >
+            Todos
+          </button>
+          {availableMonths.map((m) => (
+            <button
+              key={m}
+              className={`${styles.pageMonthChip} ${pageMonth === m ? styles.pageMonthChipActive : ''}`}
+              onClick={() => setPageMonth(m)}
+            >
+              {formatMonth(m)}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* ===== TAB: VISAO GERAL ===== */}
       {activeTab === 'geral' && (
@@ -535,7 +580,7 @@ export default function Financeiro() {
               const totals = cats
                 .map((cat) => ({
                   cat,
-                  total: activeFinances.filter((f) => f.type === 'cost' && f.category === cat).reduce((a, f) => a + f.amount, 0),
+                  total: pageMonthFinances.filter((f) => f.type === 'cost' && f.category === cat).reduce((a, f) => a + f.amount, 0),
                 }))
                 .filter(({ total }) => total > 0)
                 .sort((a, b) => b.total - a.total);
@@ -608,19 +653,19 @@ export default function Financeiro() {
             <div className={styles.gaugeCard}>
               <GaugeChart
                 label="Insumos"
-                value={insumosRatio}
+                value={insumosRatioMensal}
                 max={100}
                 suffix="%"
-                color={insumosRatio <= 30 ? '#4ade80' : insumosRatio <= 45 ? '#fbbf24' : '#f87171'}
+                color={insumosRatioMensal <= 30 ? '#4ade80' : insumosRatioMensal <= 45 ? '#fbbf24' : '#f87171'}
               />
             </div>
             <div className={styles.gaugeCard}>
               <GaugeChart
                 label="Mao de Obra"
-                value={maoObraRatio}
+                value={maoObraRatioMensal}
                 max={100}
                 suffix="%"
-                color={maoObraRatio <= 25 ? '#4ade80' : maoObraRatio <= 40 ? '#fbbf24' : '#f87171'}
+                color={maoObraRatioMensal <= 25 ? '#4ade80' : maoObraRatioMensal <= 40 ? '#fbbf24' : '#f87171'}
               />
             </div>
           </div>

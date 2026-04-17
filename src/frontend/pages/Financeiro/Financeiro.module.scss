@@ -681,6 +681,19 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  max-height: 360px;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 2px;
+  }
 }
 
 .agendamentoRow {
@@ -832,3 +845,37 @@
 .infoSectionTitle { font-size: $font-size-sm; font-weight: $font-weight-semibold; color: $text-primary; }
 .infoText { font-size: $font-size-sm; color: $text-secondary; line-height: 1.6; strong { color: $text-primary; } }
 .infoList { font-size: $font-size-sm; color: $text-secondary; line-height: 1.8; padding-left: $spacing-lg; margin: 0; strong { color: $text-primary; } }
+
+// ── Page-level month filter bar ───────────────────────────────────────────────
+.pageMonthBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: $spacing-md 0 $spacing-sm;
+}
+
+.pageMonthChip {
+  padding: 5px 12px;
+  border-radius: $radius-sm;
+  border: 1px solid $border;
+  background: transparent;
+  color: $text-secondary;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-fast;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.04);
+  }
+}
+
+.pageMonthChipActive {
+  background: rgba($accent, 0.12) !important;
+  border-color: rgba($accent, 0.4) !important;
+  color: $accent !important;
+  font-weight: $font-weight-semibold;
+}
