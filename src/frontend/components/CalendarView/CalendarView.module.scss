@@ -32,11 +32,139 @@
   text-transform: capitalize;
 }
 
+.monthTitleWrap {
+  position: relative;
+}
+
+.monthTitleBtn {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: $radius-sm;
+  transition: background $transition-fast;
+  outline: none;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  &:hover .monthTitleChevron {
+    opacity: 1;
+  }
+}
+
+.monthTitleText {
+  font-family: $font-display;
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  letter-spacing: -0.5px;
+  text-transform: capitalize;
+}
+
+.monthTitleChevron {
+  align-self: center;
+  color: $text-muted;
+  opacity: 0.5;
+  transition: opacity $transition-fast;
+  margin-left: 2px;
+}
+
 .monthYear {
   font-family: $font-family;
   font-size: $font-size-xl;
   font-weight: $font-weight-normal;
   color: $text-muted;
+}
+
+// ── Month picker dropdown ─────────────────────────────────────────────────────
+.pickerOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+}
+
+.picker {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 100;
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  padding: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  min-width: 220px;
+  animation: fadeIn 0.15s ease;
+}
+
+.pickerYearRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.pickerYearLabel {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  letter-spacing: 0.5px;
+}
+
+.pickerYearBtn {
+  @include flex-center;
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  color: $text-muted;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    color: $text-primary;
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.pickerMonths {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+.pickerMonth {
+  padding: 7px 4px;
+  text-align: center;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+  text-transform: capitalize;
+
+  &:hover {
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.06);
+    border-color: $border;
+  }
+}
+
+.pickerMonthActive {
+  color: $accent !important;
+  background: rgba($accent, 0.12) !important;
+  border-color: rgba($accent, 0.3) !important;
+  font-weight: $font-weight-semibold;
 }
 
 .headerRight {

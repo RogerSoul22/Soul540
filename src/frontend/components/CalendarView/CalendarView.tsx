@@ -45,6 +45,7 @@ function buildWhatsAppUrl(ev: PizzaEvent): string {
 
 const WEEK_DAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 const HOURS = Array.from({ length: 16 }, (_, i) => i + 7); // 07h–22h
+const MONTHS_PT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
 type ViewMode = 'month' | 'day';
 
@@ -372,6 +373,18 @@ export default function CalendarView({ events, month: controlledMonth, onMonthCh
   };
   const [selectedDay, setSelectedDay] = useState<Date>(new Date());
   const [selectedEvent, setSelectedEvent] = useState<PizzaEvent | null>(null);
+  const [showPicker, setShowPicker] = useState(false);
+  const [pickerYear, setPickerYear] = useState(currentMonth.getFullYear());
+
+  const openPicker = () => {
+    setPickerYear(currentMonth.getFullYear());
+    setShowPicker(true);
+  };
+
+  const selectPickerMonth = (monthIndex: number) => {
+    setCurrentMonth(new Date(pickerYear, monthIndex, 1));
+    setShowPicker(false);
+  };
 
   const days = useMemo(() => {
     const start = startOfWeek(startOfMonth(currentMonth), { weekStartsOn: 0 });
@@ -413,10 +426,50 @@ export default function CalendarView({ events, month: controlledMonth, onMonthCh
       <>
         <div className={styles.wrapper}>
           <div className={styles.header}>
-            <h2 className={styles.monthTitle}>
-              {format(currentMonth, 'MMMM', { locale: ptBR })}
-              <span className={styles.monthYear}>{format(currentMonth, ' yyyy')}</span>
-            </h2>
+            <div className={styles.monthTitleWrap}>
+              <button className={styles.monthTitleBtn} onClick={openPicker} title="Ir para um mês específico">
+                <span className={styles.monthTitleText}>
+                  {format(currentMonth, 'MMMM', { locale: ptBR })}
+                </span>
+                <span className={styles.monthYear}>{format(currentMonth, ' yyyy')}</span>
+                <svg className={styles.monthTitleChevron} width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+
+              {showPicker && (
+                <>
+                  <div className={styles.pickerOverlay} onClick={() => setShowPicker(false)} />
+                  <div className={styles.picker}>
+                    <div className={styles.pickerYearRow}>
+                      <button className={styles.pickerYearBtn} onClick={() => setPickerYear((y) => y - 1)} aria-label="Ano anterior">
+                        <IconChevronLeft />
+                      </button>
+                      <span className={styles.pickerYearLabel}>{pickerYear}</span>
+                      <button className={styles.pickerYearBtn} onClick={() => setPickerYear((y) => y + 1)} aria-label="Próximo ano">
+                        <IconChevronRight />
+                      </button>
+                    </div>
+                    <div className={styles.pickerMonths}>
+                      {MONTHS_PT.map((name, i) => (
+                        <button
+                          key={i}
+                          className={[
+                            styles.pickerMonth,
+                            pickerYear === currentMonth.getFullYear() && i === currentMonth.getMonth()
+                              ? styles.pickerMonthActive : '',
+                          ].filter(Boolean).join(' ')}
+                          onClick={() => selectPickerMonth(i)}
+                        >
+                          {name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
             <div className={styles.headerRight}>
               <button className={styles.todayBtn} onClick={goToday}>Hoje</button>
               <div className={styles.navBtns}>
