@@ -182,9 +182,13 @@ router.post('/:id/emit', async (req, res) => {
           ncm: item.ncm,
           cfop: item.cfop,
           tax: {
+            totalTax: 0,
             icms: {
               origin: '0',   // 0 = Nacional
               cst: '40',     // 40 = Isento
+              amount: 0,
+              rate: 0,
+              baseTax: 0,
             },
             pis: {
               cst: '07',     // 07 = Operação Isenta
@@ -226,6 +230,7 @@ router.post('/:id/emit', async (req, res) => {
     };
   }
 
+  console.log(`[emit] payload=${JSON.stringify(payload)}`);
   let nfeRes: Response;
   let nfeData: any;
   try {
