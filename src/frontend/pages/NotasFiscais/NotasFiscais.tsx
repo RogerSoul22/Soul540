@@ -793,4 +793,16 @@ export default function NotasFiscais() {
                 <span>R$ {previewInvoice.taxAmount.toLocaleString('pt-BR')}</span>
               </div>
               <div className={`${styles.previewTotalRow} ${styles.previewTotalFinal}`}>
+                <span>Total:</span>
+                <span>R$ {previewInvoice.totalValue.toLocaleString('pt-BR')}</span>
+              </div>
+            </div>
+          </div>
+        </Modal>
+      )}
+    </div>
+  );
+};
+
+export default NotasFiscais;
         
