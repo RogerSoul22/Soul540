@@ -329,16 +329,22 @@ export default function NotasFiscais() {
                         <span className={styles.nfeioNumber}>NF {invoice.nfeioNumber}</span>
                       )}
                       <div className={styles.nfeioLinks}>
-                        {invoice.nfeioPdfUrl && (
-                          <a className={styles.nfeioLink} href={invoice.nfeioPdfUrl} target="_blank" rel="noreferrer">
-                            PDF
-                          </a>
-                        )}
-                        {invoice.nfeioXmlUrl && (
-                          <a className={styles.nfeioLink} href={invoice.nfeioXmlUrl} target="_blank" rel="noreferrer">
-                            XML
-                          </a>
-                        )}
+                        <a
+                          className={styles.nfeioLink}
+                          href={`/api/invoices/${invoice.id}/download/pdf`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          PDF
+                        </a>
+                        <a
+                          className={styles.nfeioLink}
+                          href={`/api/invoices/${invoice.id}/download/xml`}
+                          rel="noreferrer"
+                          download
+                        >
+                          XML
+                        </a>
                       </div>
                     </div>
                   )}
@@ -787,28 +793,4 @@ export default function NotasFiscais() {
                 <span>R$ {previewInvoice.taxAmount.toLocaleString('pt-BR')}</span>
               </div>
               <div className={`${styles.previewTotalRow} ${styles.previewTotalFinal}`}>
-                <span>Total:</span>
-                <span>R$ {previewInvoice.totalValue.toLocaleString('pt-BR')}</span>
-              </div>
-            </div>
-
-            {previewInvoice.notes && (
-              <div className={styles.previewNotes}>
-                <strong>Observacoes:</strong> {previewInvoice.notes}
-              </div>
-            )}
-
-            <div className={styles.previewFooter}>
-              Documento gerado em {format(new Date(), "dd/MM/yyyy 'as' HH:mm")}
-            </div>
-          </div>
-
-          <div className={styles.previewActions}>
-            <Button variant="secondary" onClick={() => setPreviewInvoice(null)}>Fechar</Button>
-            <Button onClick={() => window.print()}>Imprimir</Button>
-          </div>
-        </Modal>
-      )}
-    </div>
-  );
-}
+        
