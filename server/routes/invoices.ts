@@ -177,8 +177,8 @@ router.post('/:id/emit', async (req, res) => {
           description: item.description,
           quantity: item.quantity,
           unitOfMeasure: item.unit || 'UN',
-          unitPrice: item.unitPrice,
-          totalPrice: total,
+          unitAmount: item.unitPrice,
+          amount: total,
           ncm: item.ncm,
           cfop: item.cfop,
           tax: {
