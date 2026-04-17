@@ -170,16 +170,31 @@ router.post('/:id/emit', async (req, res) => {
           state: inv.clientState,
         },
       },
-      items: (inv.items ?? []).map((item: any, i: number) => ({
-        code: String(i + 1),
-        description: item.description,
-        quantity: item.quantity,
-        unitOfMeasure: item.unit || 'UN',
-        unitPrice: item.unitPrice,
-        totalPrice: item.quantity * item.unitPrice,
-        ncm: item.ncm,
-        cfop: item.cfop,
-      })),
+      items: (inv.items ?? []).map((item: any, i: number) => {
+        const total = item.quantity * item.unitPrice;
+        return {
+          code: String(i + 1),
+          description: item.description,
+          quantity: item.quantity,
+          unitOfMeasure: item.unit || 'UN',
+          unitPrice: item.unitPrice,
+          totalPrice: total,
+          ncm: item.ncm,
+          cfop: item.cfop,
+          taxes: {
+            icms: {
+              origin: 0,       // 0 = Nacional
+              cst: '40',       // 40 = Isento
+            },
+            pis: {
+              cst: '07',       // 07 = Operação Isenta
+            },
+            cofins: {
+              cst: '07',       // 07 = Operação Isenta
+            },
+          },
+        };
+      }),
     };
   } else {
     endpoint = `${nfeioBase()}/serviceinvoices`;
