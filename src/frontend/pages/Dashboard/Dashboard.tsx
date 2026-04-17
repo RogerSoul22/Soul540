@@ -22,6 +22,7 @@ export default function Dashboard() {
   const { user } = useAuth();
   const [showInfo, setShowInfo] = useState(false);
   const [unitFilter, setUnitFilter] = useState<UnitFilter>('all');
+  const [calendarMonth, setCalendarMonth] = useState(new Date());
 
   const urgentTasks = useMemo(() => tasks.filter((t) => t.priority === 'urgent' && t.status !== 'done'), [tasks]);
 
@@ -31,16 +32,16 @@ export default function Dashboard() {
     return events;
   }, [events, unitFilter]);
 
-  const now = new Date();
   const monthEventCount = useMemo(() => {
     return filteredEvents.filter((e) => {
       const d = parseISO(e.date);
-      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      return d.getMonth() === calendarMonth.getMonth() && d.getFullYear() === calendarMonth.getFullYear();
     }).length;
-  }, [filteredEvents]);
+  }, [filteredEvents, calendarMonth]);
 
+  const now = new Date();
   const today = format(now, "EEEE, d 'de' MMMM", { locale: ptBR });
-  const currentMonth = format(now, 'MMMM', { locale: ptBR });
+  const currentMonth = format(calendarMonth, 'MMMM', { locale: ptBR });
 
   return (
     <div className={styles.page}>
@@ -93,7 +94,7 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
-        <CalendarView events={filteredEvents} />
+        <CalendarView events={filteredEvents} month={calendarMonth} onMonthChange={setCalendarMonth} />
       </div>
 
       {showInfo && (

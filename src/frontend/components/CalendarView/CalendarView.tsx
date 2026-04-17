@@ -50,6 +50,8 @@ type ViewMode = 'month' | 'day';
 
 interface Props {
   events: PizzaEvent[];
+  month?: Date;
+  onMonthChange?: (m: Date) => void;
 }
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
@@ -358,10 +360,16 @@ function EventModal({ event, onClose, onUpdate, onDelete }: {
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-export default function CalendarView({ events }: Props) {
+export default function CalendarView({ events, month: controlledMonth, onMonthChange }: Props) {
   const { updateEvent, deleteEvent } = useApp();
   const [view, setView] = useState<ViewMode>('month');
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [internalMonth, setInternalMonth] = useState(new Date());
+  const currentMonth = controlledMonth ?? internalMonth;
+  const setCurrentMonth = (m: Date | ((prev: Date) => Date)) => {
+    const next = typeof m === 'function' ? m(currentMonth) : m;
+    setInternalMonth(next);
+    onMonthChange?.(next);
+  };
   const [selectedDay, setSelectedDay] = useState<Date>(new Date());
   const [selectedEvent, setSelectedEvent] = useState<PizzaEvent | null>(null);
 
@@ -394,7 +402,8 @@ export default function CalendarView({ events }: Props) {
 
   const goToday = () => {
     const t = new Date();
-    setCurrentMonth(t);
+    setInternalMonth(t);
+    onMonthChange?.(t);
     setSelectedDay(t);
   };
 
