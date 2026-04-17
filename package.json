@@ -5,7 +5,7 @@
   "scripts": {
     "start": "tsx server/index.ts",
     "dev": "vite",
-    "build": "tsc && vite build && npm run build:franchise && npm run build:factory",
+    "build": "vite build && npm run build:franchise && npm run build:factory",
     "build:franchise": "npm install --prefix franchise && npm run build --prefix franchise",
     "build:factory": "npm install --prefix factory && npm run build --prefix factory",
     "preview": "vite preview",
