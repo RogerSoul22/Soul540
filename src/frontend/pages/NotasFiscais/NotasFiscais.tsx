@@ -802,7 +802,5 @@ export default function NotasFiscais() {
       )}
     </div>
   );
-};
-
-export default NotasFiscais;
+}
         
