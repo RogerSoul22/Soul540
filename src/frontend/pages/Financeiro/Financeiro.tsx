@@ -120,10 +120,13 @@ export default function Financeiro() {
   const profit = totalRevenue - totalCosts;
   const margin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
 
-  // Monthly chart data
+  // Monthly chart data — filtered by pageMonth when a specific month is selected
   const monthlyData = useMemo(() => {
+    const source = pageMonth === 'all'
+      ? activeFinances
+      : activeFinances.filter((f) => f.date.startsWith(pageMonth));
     const map = new Map<string, { month: string; receita: number; despesa: number }>();
-    for (const f of activeFinances) {
+    for (const f of source) {
       const ym = f.date.substring(0, 7);
       if (!map.has(ym)) map.set(ym, { month: ym, receita: 0, despesa: 0 });
       const entry = map.get(ym)!;
@@ -131,7 +134,7 @@ export default function Financeiro() {
       else entry.despesa += f.amount;
     }
     return [...map.values()].sort((a, b) => a.month.localeCompare(b.month));
-  }, [activeFinances]);
+  }, [activeFinances, pageMonth]);
 
   // Available months for selector
   const availableMonths = useMemo(() => {
@@ -245,10 +248,10 @@ export default function Financeiro() {
     }).sort((a, b) => b.date.localeCompare(a.date));
   }, [activeFinances, filterType, filterMonth, search, activeEvents]);
 
-  // Events with budget joined with their finance entry
+  // Events with budget joined with their finance entry — filtered by pageMonth
   const eventsWithBudget = useMemo(() => {
     return activeEvents
-      .filter((e) => e.budget > 0)
+      .filter((e) => e.budget > 0 && (pageMonth === 'all' || e.date.startsWith(pageMonth)))
       .map((e) => ({
         event: e,
         finance: activeFinances.find(
@@ -256,7 +259,7 @@ export default function Financeiro() {
         ),
       }))
       .sort((a, b) => b.event.date.localeCompare(a.event.date));
-  }, [activeEvents, activeFinances]);
+  }, [activeEvents, activeFinances, pageMonth]);
 
   const totalContracted = useMemo(
     () => eventsWithBudget.reduce((acc, { event }) => acc + event.budget, 0),

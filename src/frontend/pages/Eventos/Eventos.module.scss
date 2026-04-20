@@ -230,6 +230,88 @@
 }
 
 // Grid
+.monthGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.monthCard {
+  @include flex-between;
+  width: 100%;
+  padding: $spacing-md $spacing-lg;
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-base;
+  text-align: left;
+
+  &:hover {
+    border-color: rgba($accent, 0.4);
+    background: rgba($accent, 0.04);
+  }
+}
+
+.monthCardOpen {
+  border-color: rgba($accent, 0.5);
+  background: rgba($accent, 0.06);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.monthCardLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.monthCardName {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  text-transform: capitalize;
+}
+
+.monthCardCount {
+  font-size: $font-size-xs;
+  color: $text-muted;
+}
+
+.monthCardRight {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.monthCardValue {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $accent;
+}
+
+.monthCardChevron {
+  color: $text-muted;
+  transition: transform $transition-base;
+  flex-shrink: 0;
+}
+
+.monthCardChevronOpen {
+  transform: rotate(180deg);
+}
+
+.monthCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  padding: $spacing-sm;
+  background: rgba($accent, 0.02);
+  border: 1px solid rgba($accent, 0.5);
+  border-top: none;
+  border-bottom-left-radius: $radius-md;
+  border-bottom-right-radius: $radius-md;
+}
+
 .grid {
   display: grid;
   grid-template-columns: 1fr;

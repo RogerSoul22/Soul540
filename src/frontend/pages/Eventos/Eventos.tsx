@@ -183,6 +183,22 @@ function EventCard({ ev, employeeMap, onView, onEdit, onDelete }: {
   );
 }
 
+function groupByMonth(evs: PizzaEvent[]) {
+  const map = new Map<string, PizzaEvent[]>();
+  evs.forEach((ev) => {
+    const key = format(parseISO(ev.date), 'yyyy-MM');
+    if (!map.has(key)) map.set(key, []);
+    map.get(key)!.push(ev);
+  });
+  return Array.from(map.entries())
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([key, list]) => ({
+      key,
+      label: format(parseISO(list[0].date), 'MMMM • yyyy', { locale: ptBR }),
+      events: list,
+    }));
+}
+
 const STATIC_MENU_NAMES = ['Menu Eccezionale', 'Menu Superiore', 'Menu Raffinato'];
 
 export default function Eventos() {
@@ -190,6 +206,15 @@ export default function Eventos() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [availableMenus, setAvailableMenus] = useState<string[]>(STATIC_MENU_NAMES);
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
+  const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
+
+  const toggleMonth = (key: string) => {
+    setExpandedMonths((prev) => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  };
 
   useEffect(() => {
     fetch('/api/employees').then(r => r.json()).then(setEmployees).catch(() => {});
@@ -441,9 +466,29 @@ return (
             {filtered.orcamentos.length === 0 ? (
               <p className={styles.sectionEmpty}>Nenhum orçamento.</p>
             ) : (
-              <div className={styles.grid}>
-                {filtered.orcamentos.map((ev) => <EventCard key={ev.id} ev={ev} employeeMap={employeeMap} onView={setViewingEvent} onEdit={openEdit} onDelete={handleDelete} />)}
-              </div>
+              groupByMonth(filtered.orcamentos).map((group) => {
+                const isOpen = expandedMonths.has(group.key);
+                const total = group.events.reduce((acc, ev) => acc + (ev.finalValue && ev.finalValue > 0 ? ev.finalValue : ev.budget), 0);
+                return (
+                  <div key={group.key} className={styles.monthGroup}>
+                    <button className={`${styles.monthCard} ${isOpen ? styles.monthCardOpen : ''}`} onClick={() => toggleMonth(group.key)}>
+                      <div className={styles.monthCardLeft}>
+                        <span className={styles.monthCardName}>{group.label}</span>
+                        <span className={styles.monthCardCount}>{group.events.length} evento{group.events.length !== 1 ? 's' : ''}</span>
+                      </div>
+                      <div className={styles.monthCardRight}>
+                        <span className={styles.monthCardValue}>R$ {total.toLocaleString('pt-BR')}</span>
+                        <svg className={`${styles.monthCardChevron} ${isOpen ? styles.monthCardChevronOpen : ''}`} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                      </div>
+                    </button>
+                    {isOpen && (
+                      <div className={styles.monthCardBody}>
+                        {group.events.map((ev) => <EventCard key={ev.id} ev={ev} employeeMap={employeeMap} onView={setViewingEvent} onEdit={openEdit} onDelete={handleDelete} />)}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
             )}
           </div>
           <div className={styles.section}>
@@ -451,9 +496,29 @@ return (
             {filtered.fechados.length === 0 ? (
               <p className={styles.sectionEmpty}>Nenhum evento fechado.</p>
             ) : (
-              <div className={styles.grid}>
-                {filtered.fechados.map((ev) => <EventCard key={ev.id} ev={ev} employeeMap={employeeMap} onView={setViewingEvent} onEdit={openEdit} onDelete={handleDelete} />)}
-              </div>
+              groupByMonth(filtered.fechados).map((group) => {
+                const isOpen = expandedMonths.has(group.key);
+                const total = group.events.reduce((acc, ev) => acc + (ev.finalValue && ev.finalValue > 0 ? ev.finalValue : ev.budget), 0);
+                return (
+                  <div key={group.key} className={styles.monthGroup}>
+                    <button className={`${styles.monthCard} ${isOpen ? styles.monthCardOpen : ''}`} onClick={() => toggleMonth(group.key)}>
+                      <div className={styles.monthCardLeft}>
+                        <span className={styles.monthCardName}>{group.label}</span>
+                        <span className={styles.monthCardCount}>{group.events.length} evento{group.events.length !== 1 ? 's' : ''}</span>
+                      </div>
+                      <div className={styles.monthCardRight}>
+                        <span className={styles.monthCardValue}>R$ {total.toLocaleString('pt-BR')}</span>
+                        <svg className={`${styles.monthCardChevron} ${isOpen ? styles.monthCardChevronOpen : ''}`} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                      </div>
+                    </button>
+                    {isOpen && (
+                      <div className={styles.monthCardBody}>
+                        {group.events.map((ev) => <EventCard key={ev.id} ev={ev} employeeMap={employeeMap} onView={setViewingEvent} onEdit={openEdit} onDelete={handleDelete} />)}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
             )}
           </div>
         </div>
