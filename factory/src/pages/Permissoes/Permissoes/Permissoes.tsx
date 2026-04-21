@@ -35,7 +35,7 @@ const ALL_PAGES = [
 
 const ALL_KEYS = ALL_PAGES.flatMap(g => g.items.map(i => i.key));
 
-const emptyForm = { name: '', email: '', password: '', isAdmin: false, unit: 'factory' };
+const emptyForm = { name: '', email: '', password: '', isAdmin: false, unit: 'factory' as const };
 
 export default function Permissoes() {
   const [users, setUsers] = useState<AppUser[]>([]);
@@ -51,13 +51,16 @@ export default function Permissoes() {
   const { user: authUser } = useAuth();
 
   useEffect(() => {
-    apiFetch('/api/users').then(r => r.json()).then(setUsers);
+    apiFetch('/api/users')
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data)) setUsers(data); })
+      .catch(() => {});
   }, []);
 
   const selectUser = (u: AppUser) => {
     setSelected(u);
-    setDraftPerms([...u.permissions]);
-    setDraftIsAdmin(u.isAdmin);
+    setDraftPerms([...(u.permissions ?? [])]);
+    setDraftIsAdmin(u.isAdmin ?? false);
   };
 
   const togglePerm = (key: string) => {
@@ -75,17 +78,23 @@ export default function Permissoes() {
   const savePermissions = async () => {
     if (!selected) return;
     setSaving(true);
-    const res = await apiFetch(`/api/users/${selected.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ permissions: draftPerms, isAdmin: draftIsAdmin }),
-    });
-    const updated = await res.json();
-    setUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
-    setSelected(updated);
-    setDraftPerms([...updated.permissions]);
-    setDraftIsAdmin(updated.isAdmin);
-    setSaving(false);
+    try {
+      const res = await apiFetch(`/api/users/${selected.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ permissions: draftPerms, isAdmin: draftIsAdmin }),
+      });
+      if (!res.ok) throw new Error('Erro ao salvar');
+      const updated = await res.json();
+      setUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
+      setSelected(updated);
+      setDraftPerms([...(updated.permissions ?? [])]);
+      setDraftIsAdmin(updated.isAdmin ?? false);
+    } catch {
+      alert('Erro ao salvar permissões. Tente novamente.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const createUser = async () => {
@@ -93,8 +102,13 @@ export default function Permissoes() {
     const res = await apiFetch('/api/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, permissions: form.isAdmin ? ALL_KEYS : [] }),
+      body: JSON.stringify({ ...form, unit: 'factory', permissions: form.isAdmin ? ALL_KEYS : [] }),
     });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      alert(err.error || 'Erro ao criar usuário');
+      return;
+    }
     const created = await res.json();
     setUsers(prev => [...prev, created]);
     setForm(emptyForm);
@@ -109,7 +123,8 @@ export default function Permissoes() {
     setDeleteTarget(null);
   };
 
-  const initials = (name: string) => name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  const initials = (name?: string) =>
+    (name || '??').split(' ').map(w => w[0] || '').join('').toUpperCase().slice(0, 2) || '??';
 
   return (
     <div className={styles.page}>
@@ -270,14 +285,6 @@ export default function Permissoes() {
                 <input type="checkbox" checked={form.isAdmin} onChange={e => setForm({ ...form, isAdmin: e.target.checked })} />
                 <span>Administrador (acesso total)</span>
               </label>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Sistema</label>
-                <select className={styles.input} value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value })}>
-                  <option value="main">Principal</option>
-                  <option value="franchise">Franquia</option>
-                  <option value="factory">Fábrica</option>
-                </select>
-              </div>
             </div>
             <div className={styles.modalFooter}>
               <button className={styles.btnCancel} onClick={() => setShowModal(false)}>Cancelar</button>

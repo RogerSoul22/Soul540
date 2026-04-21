@@ -20,10 +20,15 @@ router.get('/', async (req, res) => {
 router.post('/', validate(createUserSchema), async (req, res) => {
   const { name, email, password, isAdmin, permissions, unit: bodyUnit } = req.body;
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = await UserModel.create({ name, email: email.toLowerCase().trim(), passwordHash, isAdmin, permissions, unit: bodyUnit || getTenantUnit(req) });
-  const { passwordHash: _, ...safe } = user.toJSON();
-  await logAudit({ req, action: 'create', resource: 'users', resourceId: user.id, description: `Criou usuário: ${name} (${email})` });
-  res.status(201).json(safe);
+  try {
+    const user = await UserModel.create({ name, email: email.toLowerCase().trim(), passwordHash, isAdmin, permissions, unit: bodyUnit || getTenantUnit(req) });
+    const { passwordHash: _, ...safe } = user.toJSON();
+    await logAudit({ req, action: 'create', resource: 'users', resourceId: user.id, description: `Criou usuário: ${name} (${email})` });
+    res.status(201).json(safe);
+  } catch (err: any) {
+    if (err.code === 11000) return res.status(409).json({ error: 'Email já cadastrado' });
+    throw err;
+  }
 });
 
 // PUT /api/users/:id
