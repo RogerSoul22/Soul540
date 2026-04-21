@@ -41,6 +41,37 @@
 }
 
 // Tabs
+// Page-level month filter bar
+.pageMonthBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: $spacing-lg;
+}
+
+.pageMonthChip {
+  padding: 5px 14px;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-muted;
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover { color: $text-primary; border-color: $border-accent; }
+}
+
+.pageMonthChipActive {
+  background: $accent;
+  color: #0a0f1e;
+  border-color: $accent;
+  font-weight: $font-weight-semibold;
+
+  &:hover { background: $accent-hover; border-color: $accent-hover; color: #0a0f1e; }
+}
+
 .tabs {
   display: flex;
   gap: 2px;

@@ -33,6 +33,13 @@ function PrivateRoute() {
   return authenticated ? <Outlet /> : <Navigate to={ROUTES.LOGIN} replace />;
 }
 
+function PermissionRoute({ routeKey }: { routeKey: string }) {
+  const { isAdmin, permissions, loading } = useAuth();
+  if (loading) return <AppLoading />;
+  if (isAdmin || permissions.includes(routeKey)) return <Outlet />;
+  return <Navigate to={ROUTES.DASHBOARD} replace />;
+}
+
 function PublicRoute() {
   const { authenticated, loading } = useAuth();
   if (loading) return <AppLoading />;
@@ -52,17 +59,39 @@ export default function App() {
           <Route element={<PrivateRoute />}>
             <Route element={<Layout />}>
               <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
-              <Route path={ROUTES.FUNCIONARIOS} element={<Funcionarios />} />
-              <Route path={ROUTES.CONTRATANTES} element={<Contratantes />} />
-              <Route path={ROUTES.EVENTOS} element={<Eventos />} />
-              <Route path={ROUTES.ESTOQUE_INSUMOS} element={<EstoqueInsumos />} />
-              <Route path={ROUTES.ESTOQUE_UTENSILIOS} element={<EstoqueUtensilios />} />
-              <Route path={ROUTES.PERMISSOES} element={<Permissoes />} />
-              <Route path={ROUTES.FINANCEIRO} element={<Financeiro />} />
-              <Route path={ROUTES.TAREFAS} element={<Tarefas />} />
-              <Route path={ROUTES.CARDAPIOS} element={<Cardapios />} />
-              <Route path={ROUTES.CONTRATOS} element={<Contratos />} />
-              <Route path={ROUTES.USUARIO} element={<MinhaConta />} />
+              <Route element={<PermissionRoute routeKey="eventos" />}>
+                <Route path={ROUTES.EVENTOS} element={<Eventos />} />
+              </Route>
+              <Route element={<PermissionRoute routeKey="tarefas" />}>
+                <Route path={ROUTES.TAREFAS} element={<Tarefas />} />
+              </Route>
+              <Route element={<PermissionRoute routeKey="funcionarios" />}>
+                <Route path={ROUTES.FUNCIONARIOS} element={<Funcionarios />} />
+              </Route>
+              <Route element={<PermissionRoute routeKey="contratantes" />}>
+                <Route path={ROUTES.CONTRATANTES} element={<Contratantes />} />
+              </Route>
+              <Route element={<PermissionRoute routeKey="contratos" />}>
+                <Route path={ROUTES.CONTRATOS} element={<Contratos />} />
+              </Route>
+              <Route element={<PermissionRoute routeKey="cardapios" />}>
+                <Route path={ROUTES.CARDAPIOS} element={<Cardapios />} />
+              </Route>
+              <Route element={<PermissionRoute routeKey="financeiro" />}>
+                <Route path={ROUTES.FINANCEIRO} element={<Financeiro />} />
+              </Route>
+              <Route element={<PermissionRoute routeKey="estoque-insumos" />}>
+                <Route path={ROUTES.ESTOQUE_INSUMOS} element={<EstoqueInsumos />} />
+              </Route>
+              <Route element={<PermissionRoute routeKey="estoque-utensilios" />}>
+                <Route path={ROUTES.ESTOQUE_UTENSILIOS} element={<EstoqueUtensilios />} />
+              </Route>
+              <Route element={<PermissionRoute routeKey="usuario" />}>
+                <Route path={ROUTES.USUARIO} element={<MinhaConta />} />
+              </Route>
+              <Route element={<PermissionRoute routeKey="__admin__" />}>
+                <Route path={ROUTES.PERMISSOES} element={<Permissoes />} />
+              </Route>
             </Route>
           </Route>
           <Route path="*" element={<Navigate to={ROUTES.LOGIN} replace />} />

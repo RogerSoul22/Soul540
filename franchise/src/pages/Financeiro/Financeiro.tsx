@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import GaugeChart from '@/components/GaugeChart/GaugeChart';
@@ -50,7 +50,7 @@ function parseCurrency(value: string): number {
   return Number(value.replace(/[R$\s.]/g, '').replace(',', '.')) || 0;
 }
 
-type TabType = 'geral' | 'despesas' | 'mensal' | 'lancamentos';
+type TabType = 'geral' | 'despesas' | 'mensal' | 'lancamentos' | 'valores';
 type FilterType = 'all' | 'revenue' | 'cost';
 type CostFilter = 'all' | 'fixed' | 'variable';
 
@@ -81,6 +81,9 @@ export default function Financeiro() {
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().substring(0, 7));
   const [costFilter, setCostFilter] = useState<CostFilter>('all');
 
+  // Page-level month filter (shared by geral / despesas / valores tabs)
+  const [pageMonth, setPageMonth] = useState<string>('all');
+
   // Table filters
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [filterMonth, setFilterMonth] = useState<string>('all');
@@ -99,13 +102,19 @@ export default function Financeiro() {
 
   // === DATA COMPUTATIONS ===
 
+  // Finances filtered by the page-level month selector
+  const pageMonthFinances = useMemo(
+    () => pageMonth === 'all' ? finances : finances.filter((f) => f.date && f.date.startsWith(pageMonth)),
+    [finances, pageMonth],
+  );
+
   const totalRevenue = useMemo(
-    () => finances.filter((f) => f.type === 'revenue').reduce((acc, f) => acc + f.amount, 0),
-    [finances],
+    () => pageMonthFinances.filter((f) => f.type === 'revenue').reduce((acc, f) => acc + f.amount, 0),
+    [pageMonthFinances],
   );
   const totalCosts = useMemo(
-    () => finances.filter((f) => f.type === 'cost').reduce((acc, f) => acc + f.amount, 0),
-    [finances],
+    () => pageMonthFinances.filter((f) => f.type === 'cost').reduce((acc, f) => acc + f.amount, 0),
+    [pageMonthFinances],
   );
   const profit = totalRevenue - totalCosts;
   const margin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
@@ -114,6 +123,7 @@ export default function Financeiro() {
   const monthlyData = useMemo(() => {
     const map = new Map<string, { month: string; receita: number; despesa: number }>();
     for (const f of finances) {
+      if (!f.date) continue;
       const ym = f.date.substring(0, 7);
       if (!map.has(ym)) map.set(ym, { month: ym, receita: 0, despesa: 0 });
       const entry = map.get(ym)!;
@@ -126,7 +136,9 @@ export default function Financeiro() {
   // Available months for selector
   const availableMonths = useMemo(() => {
     const set = new Set<string>();
-    for (const f of finances) set.add(f.date.substring(0, 7));
+    for (const f of finances) {
+      if (f.date && /^\d{4}-\d{2}/.test(f.date)) set.add(f.date.substring(0, 7));
+    }
     return [...set].sort();
   }, [finances]);
 
@@ -139,7 +151,7 @@ export default function Financeiro() {
 
   // Monthly detail data
   const monthFinances = useMemo(
-    () => finances.filter((f) => f.date.startsWith(selectedMonth)),
+    () => finances.filter((f) => f.date && f.date.startsWith(selectedMonth)),
     [finances, selectedMonth],
   );
 
@@ -187,24 +199,52 @@ export default function Financeiro() {
       .sort((a, b) => b.value - a.value);
   }, [monthFinances]);
 
-  // Gauge values for selected month
+  // Gauge values for page-level month (used in Visão Geral)
   const insumosRatio = useMemo(() => {
+    const insumos = pageMonthFinances
+      .filter((f) => f.type === 'cost' && f.category === 'insumos')
+      .reduce((acc, f) => acc + f.amount, 0);
+    return totalRevenue > 0 ? (insumos / totalRevenue) * 100 : 0;
+  }, [pageMonthFinances, totalRevenue]);
+
+  const maoObraRatio = useMemo(() => {
+    const mo = pageMonthFinances
+      .filter((f) => f.type === 'cost' && (f.category === 'salario' || f.category === 'pro-labore'))
+      .reduce((acc, f) => acc + f.amount, 0);
+    return totalRevenue > 0 ? (mo / totalRevenue) * 100 : 0;
+  }, [pageMonthFinances, totalRevenue]);
+
+  // Gauge values for selected month (used in Painel Mensal)
+  const insumosRatioMensal = useMemo(() => {
     const insumos = monthFinances
       .filter((f) => f.type === 'cost' && f.category === 'insumos')
       .reduce((acc, f) => acc + f.amount, 0);
     return monthRevenue > 0 ? (insumos / monthRevenue) * 100 : 0;
   }, [monthFinances, monthRevenue]);
 
-  const maoObraRatio = useMemo(() => {
+  const maoObraRatioMensal = useMemo(() => {
     const mo = monthFinances
       .filter((f) => f.type === 'cost' && (f.category === 'salario' || f.category === 'pro-labore'))
       .reduce((acc, f) => acc + f.amount, 0);
     return monthRevenue > 0 ? (mo / monthRevenue) * 100 : 0;
   }, [monthFinances, monthRevenue]);
 
+  // Events with final value — filtered by pageMonth
+  const eventsWithFinalValue = useMemo(
+    () => events
+      .filter((e) => (e.finalValue ?? 0) > 0 && (pageMonth === 'all' || e.date.startsWith(pageMonth)))
+      .sort((a, b) => b.date.localeCompare(a.date)),
+    [events, pageMonth],
+  );
+  const totalFinalValue = useMemo(
+    () => eventsWithFinalValue.reduce((acc, e) => acc + (e.finalValue || 0), 0),
+    [eventsWithFinalValue],
+  );
+
   // Table filter
   const filtered = useMemo(() => {
     return finances.filter((f) => {
+      if (!f.date) return false;
       if (filterMonth !== 'all' && !f.date.startsWith(filterMonth)) return false;
       if (filterType !== 'all' && f.type !== filterType) return false;
       if (search) {
@@ -217,13 +257,13 @@ export default function Financeiro() {
         );
       }
       return true;
-    });
+    }).sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
   }, [finances, filterType, filterMonth, search, events]);
 
-  // Events with budget joined with their finance entry
+  // Events with budget joined with their finance entry — filtered by pageMonth
   const eventsWithBudget = useMemo(() => {
     return events
-      .filter((e) => (e.budget ?? 0) > 0)
+      .filter((e) => (e.budget ?? 0) > 0 && (pageMonth === 'all' || e.date.startsWith(pageMonth)))
       .map((e) => ({
         event: e,
         finance: finances.find(
@@ -303,6 +343,7 @@ export default function Financeiro() {
           ['despesas', 'Painel Despesas'],
           ['mensal', 'Painel Mensal'],
           ['lancamentos', 'Lancamentos'],
+          ['valores', 'Estimado x Final'],
         ] as [TabType, string][]).map(([key, label]) => (
           <button
             key={key}
@@ -313,6 +354,27 @@ export default function Financeiro() {
           </button>
         ))}
       </div>
+
+      {/* ===== MONTH FILTER BAR (Geral / Despesas / Valores) ===== */}
+      {['geral', 'despesas', 'valores'].includes(activeTab) && availableMonths.length > 0 && (
+        <div className={styles.pageMonthBar}>
+          <button
+            className={`${styles.pageMonthChip} ${pageMonth === 'all' ? styles.pageMonthChipActive : ''}`}
+            onClick={() => setPageMonth('all')}
+          >
+            Todos
+          </button>
+          {availableMonths.map((m) => (
+            <button
+              key={m}
+              className={`${styles.pageMonthChip} ${pageMonth === m ? styles.pageMonthChipActive : ''}`}
+              onClick={() => setPageMonth(m)}
+            >
+              {formatMonth(m)}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* ===== TAB: VISAO GERAL ===== */}
       {activeTab === 'geral' && (
@@ -414,52 +476,32 @@ export default function Financeiro() {
             </div>
           </div>
 
-          {/* Events Budget Card */}
+          {/* Events Final Value Card */}
           <div className={styles.agendamentosCard}>
             <div className={styles.agendamentosHeader}>
               <h3 className={styles.sectionTitle} style={{ margin: 0 }}>Valores dos Agendamentos</h3>
               <div className={styles.agendamentosPills}>
                 <div className={styles.agendamentosPill}>
-                  <span className={styles.agendamentosPillLabel}>Contratado</span>
-                  <span className={styles.agendamentosPillValue}>{formatBRL(totalContracted)}</span>
-                </div>
-                <div className={styles.agendamentosPill}>
-                  <span className={styles.agendamentosPillLabel}>Recebido</span>
-                  <span className={`${styles.agendamentosPillValue} ${styles.green}`}>{formatBRL(totalReceived)}</span>
-                </div>
-                <div className={styles.agendamentosPill}>
-                  <span className={styles.agendamentosPillLabel}>Pendente</span>
-                  <span className={`${styles.agendamentosPillValue} ${styles.amber}`}>{formatBRL(totalContracted - totalReceived)}</span>
+                  <span className={styles.agendamentosPillLabel}>Total Final</span>
+                  <span className={`${styles.agendamentosPillValue} ${styles.green}`}>{formatBRL(totalFinalValue)}</span>
                 </div>
               </div>
             </div>
 
-            {eventsWithBudget.length === 0 ? (
-              <p className={styles.agendamentosEmpty}>Nenhum agendamento com valor cadastrado.</p>
+            {eventsWithFinalValue.length === 0 ? (
+              <p className={styles.agendamentosEmpty}>Nenhum agendamento com valor final cadastrado.</p>
             ) : (
               <div className={styles.agendamentosList}>
-                {eventsWithBudget.map(({ event, finance }) => (
+                {eventsWithFinalValue.map((event) => (
                   <div key={event.id} className={styles.agendamentoRow}>
                     <div className={styles.agendamentoInfo}>
                       <span className={styles.agendamentoName}>{event.name}</span>
                       <span className={styles.agendamentoDate}>
-                        {format(parseISO(event.date), "dd 'de' MMM yyyy", { locale: ptBR })}
+                        {safeFormatDate(event.date, "dd 'de' MMM yyyy", { locale: ptBR })}
                       </span>
                     </div>
                     <div className={styles.agendamentoRight}>
-                      <span className={styles.agendamentoValue}>{formatBRL(event.budget ?? 0)}</span>
-                      {finance ? (
-                        <select
-                          className={`${styles.agendamentoStatus} ${finance.status === 'received' ? styles.statusReceived : styles.statusPending}`}
-                          value={finance.status}
-                          onChange={(e) => handleEventFinanceStatus(finance.id, e.target.value as FinanceStatus)}
-                        >
-                          <option value="pending">Pendente</option>
-                          <option value="received">Recebido</option>
-                        </select>
-                      ) : (
-                        <span className={styles.agendamentoNoFinance}>—</span>
-                      )}
+                      <span className={`${styles.agendamentoValue} ${styles.green}`}>{formatBRL(event.finalValue || 0)}</span>
                     </div>
                   </div>
                 ))}
@@ -496,7 +538,7 @@ export default function Financeiro() {
               const totals = cats
                 .map((cat) => ({
                   cat,
-                  total: finances.filter((f) => f.type === 'cost' && f.category === cat).reduce((a, f) => a + f.amount, 0),
+                  total: pageMonthFinances.filter((f) => f.type === 'cost' && f.category === cat).reduce((a, f) => a + f.amount, 0),
                 }))
                 .filter(({ total }) => total > 0)
                 .sort((a, b) => b.total - a.total);
@@ -569,19 +611,19 @@ export default function Financeiro() {
             <div className={styles.gaugeCard}>
               <GaugeChart
                 label="Insumos"
-                value={insumosRatio}
+                value={insumosRatioMensal}
                 max={100}
                 suffix="%"
-                color={insumosRatio <= 30 ? '#4ade80' : insumosRatio <= 45 ? '#fbbf24' : '#f87171'}
+                color={insumosRatioMensal <= 30 ? '#4ade80' : insumosRatioMensal <= 45 ? '#fbbf24' : '#f87171'}
               />
             </div>
             <div className={styles.gaugeCard}>
               <GaugeChart
                 label="Mao de Obra"
-                value={maoObraRatio}
+                value={maoObraRatioMensal}
                 max={100}
                 suffix="%"
-                color={maoObraRatio <= 25 ? '#4ade80' : maoObraRatio <= 40 ? '#fbbf24' : '#f87171'}
+                color={maoObraRatioMensal <= 25 ? '#4ade80' : maoObraRatioMensal <= 40 ? '#fbbf24' : '#f87171'}
               />
             </div>
           </div>
@@ -602,6 +644,47 @@ export default function Financeiro() {
                 formatValue={formatBRL}
               />
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== TAB: ESTIMADO x FINAL ===== */}
+      {activeTab === 'valores' && (
+        <div className={styles.tabContent}>
+          <div className={styles.agendamentosCard}>
+            <div className={styles.agendamentosHeader}>
+              <h3 className={styles.sectionTitle} style={{ margin: 0 }}>Estimado x Final por Agendamento</h3>
+              <div className={styles.agendamentosPills}>
+                <div className={styles.agendamentosPill}>
+                  <span className={styles.agendamentosPillLabel}>Total Final</span>
+                  <span className={`${styles.agendamentosPillValue} ${styles.green}`}>{formatBRL(totalFinalValue)}</span>
+                </div>
+              </div>
+            </div>
+            {eventsWithFinalValue.length === 0 ? (
+              <p className={styles.agendamentosEmpty}>Nenhum agendamento com valor final cadastrado.</p>
+            ) : (
+              <div className={styles.agendamentosList}>
+                {eventsWithFinalValue.map((event) => (
+                  <div key={event.id} className={styles.agendamentoRow}>
+                    <div className={styles.agendamentoInfo}>
+                      <span className={styles.agendamentoName}>{event.name}</span>
+                      <span className={styles.agendamentoDate}>
+                        {safeFormatDate(event.date, "dd 'de' MMM yyyy", { locale: ptBR })}
+                      </span>
+                    </div>
+                    <div className={styles.agendamentoRight}>
+                      <span className={styles.agendamentoValue} style={{ color: 'var(--text-muted)' }}>
+                        Est: {formatBRL(event.budget ?? 0)}
+                      </span>
+                      <span className={`${styles.agendamentoValue} ${styles.green}`}>
+                        Final: {formatBRL(event.finalValue || 0)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -676,7 +759,7 @@ export default function Financeiro() {
                         {CATEGORY_LABELS[entry.category] || entry.category}
                       </span>
                     </td>
-                    <td>{format(parseISO(entry.date), 'dd/MM/yy', { locale: ptBR })}</td>
+                    <td>{safeFormatDate(entry.date, 'dd/MM/yy', { locale: ptBR })}</td>
                     <td>
                       <Badge variant={statusColors[entry.status as FinanceStatus] ?? 'amber'}>
                         {statusLabels[entry.status as FinanceStatus] ?? entry.status}
@@ -867,4 +950,10 @@ export default function Financeiro() {
 function formatMonth(ym: string) {
   const [y, m] = ym.split('-');
   return `${MONTHS_PT[parseInt(m, 10) - 1]} ${y?.substring(2)}`;
+}
+
+function safeFormatDate(date: string | undefined | null, fmt: string, options?: Parameters<typeof format>[2]): string {
+  if (!date) return '-';
+  const d = parseISO(date);
+  return isValid(d) ? format(d, fmt, options) : '-';
 }

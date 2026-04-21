@@ -676,6 +676,45 @@
   margin-bottom: -4px;
 }
 
+// Guest summary bar
+.guestSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: $radius-md;
+  border: 1px solid $border;
+  font-size: $font-size-xs;
+  margin-top: 4px;
+}
+
+.guestSummaryPending {
+  background: rgba(251, 191, 36, 0.08);
+  border-color: rgba(251, 191, 36, 0.25);
+  color: #fbbf24;
+}
+
+.guestSummaryOk {
+  background: rgba(74, 222, 128, 0.08);
+  border-color: rgba(74, 222, 128, 0.25);
+  color: #4ade80;
+}
+
+.guestSummaryOver {
+  background: rgba(248, 113, 113, 0.08);
+  border-color: rgba(248, 113, 113, 0.25);
+  color: #f87171;
+}
+
+.guestSummaryTotal {
+  font-weight: $font-weight-semibold;
+}
+
+.guestSummaryDiff {
+  font-weight: $font-weight-medium;
+  opacity: 0.85;
+}
+
 // Detail modal
 .detailModal {
   background: $bg-secondary;

@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { useApp } from '@frontend/contexts/AppContext';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import type { FinanceType, FinanceStatus } from '@backend/domain/entities/Finance';
@@ -105,7 +105,7 @@ export default function Financeiro() {
 
   // Finances / events filtered by the page-level month selector
   const pageMonthFinances = useMemo(
-    () => pageMonth === 'all' ? activeFinances : activeFinances.filter((f) => f.date.startsWith(pageMonth)),
+    () => pageMonth === 'all' ? activeFinances : activeFinances.filter((f) => f.date && f.date.startsWith(pageMonth)),
     [activeFinances, pageMonth],
   );
 
@@ -124,9 +124,10 @@ export default function Financeiro() {
   const monthlyData = useMemo(() => {
     const source = pageMonth === 'all'
       ? activeFinances
-      : activeFinances.filter((f) => f.date.startsWith(pageMonth));
+      : activeFinances.filter((f) => f.date && f.date.startsWith(pageMonth));
     const map = new Map<string, { month: string; receita: number; despesa: number }>();
     for (const f of source) {
+      if (!f.date) continue;
       const ym = f.date.substring(0, 7);
       if (!map.has(ym)) map.set(ym, { month: ym, receita: 0, despesa: 0 });
       const entry = map.get(ym)!;
@@ -139,7 +140,9 @@ export default function Financeiro() {
   // Available months for selector
   const availableMonths = useMemo(() => {
     const set = new Set<string>();
-    for (const f of activeFinances) set.add(f.date.substring(0, 7));
+    for (const f of activeFinances) {
+      if (f.date && /^\d{4}-\d{2}/.test(f.date)) set.add(f.date.substring(0, 7));
+    }
     return [...set].sort();
   }, [activeFinances]);
 
@@ -152,7 +155,7 @@ export default function Financeiro() {
 
   // Monthly detail data
   const monthFinances = useMemo(
-    () => activeFinances.filter((f) => f.date.startsWith(selectedMonth)),
+    () => activeFinances.filter((f) => f.date && f.date.startsWith(selectedMonth)),
     [activeFinances, selectedMonth],
   );
 
@@ -233,6 +236,7 @@ export default function Financeiro() {
   // Table filter
   const filtered = useMemo(() => {
     return activeFinances.filter((f) => {
+      if (!f.date) return false;
       if (filterMonth !== 'all' && !f.date.startsWith(filterMonth)) return false;
       if (filterType !== 'all' && f.type !== filterType) return false;
       if (search) {
@@ -245,7 +249,7 @@ export default function Financeiro() {
         );
       }
       return true;
-    }).sort((a, b) => b.date.localeCompare(a.date));
+    }).sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
   }, [activeFinances, filterType, filterMonth, search, activeEvents]);
 
   // Events with budget joined with their finance entry — filtered by pageMonth
@@ -542,7 +546,7 @@ export default function Financeiro() {
                     <div className={styles.agendamentoInfo}>
                       <span className={styles.agendamentoName}>{event.name}</span>
                       <span className={styles.agendamentoDate}>
-                        {format(parseISO(event.date), "dd 'de' MMM yyyy", { locale: ptBR })}
+                        {safeFormatDate(event.date, "dd 'de' MMM yyyy", { locale: ptBR })}
                       </span>
                     </div>
                     <div className={styles.agendamentoRight}>
@@ -773,7 +777,7 @@ export default function Financeiro() {
                         {CATEGORY_LABELS[entry.category] || entry.category}
                       </span>
                     </td>
-                    <td>{format(parseISO(entry.date), 'dd/MM/yy', { locale: ptBR })}</td>
+                    <td>{safeFormatDate(entry.date, 'dd/MM/yy', { locale: ptBR })}</td>
                     <td>
                       <select
                         className={`${styles.agendamentoStatus} ${entry.status === 'received' || entry.status === 'paid' ? styles.statusReceived : styles.statusPending}`}
@@ -872,7 +876,7 @@ export default function Financeiro() {
                       return (
                         <tr key={e.id}>
                           <td>{e.name}</td>
-                          <td>{format(parseISO(e.date), "dd/MM/yyyy", { locale: ptBR })}</td>
+                          <td>{safeFormatDate(e.date, "dd/MM/yyyy", { locale: ptBR })}</td>
                           <td>{estimado > 0 ? formatBRL(estimado) : '—'}</td>
                           <td>{final > 0 ? <span className={styles.green}>{formatBRL(final)}</span> : '—'}</td>
                           <td>
@@ -1052,4 +1056,10 @@ export default function Financeiro() {
 function formatMonth(ym: string) {
   const [y, m] = ym.split('-');
   return `${MONTHS_PT[parseInt(m, 10) - 1]} ${y?.substring(2)}`;
+}
+
+function safeFormatDate(date: string | undefined | null, fmt: string, options?: Parameters<typeof format>[2]): string {
+  if (!date) return '-';
+  const d = parseISO(date);
+  return isValid(d) ? format(d, fmt, options) : '-';
 }

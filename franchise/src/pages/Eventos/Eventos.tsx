@@ -17,7 +17,6 @@ type Employee = {
   unit?: string;
 };
 
-
 function formatBudget(value: string): string {
   const digits = value.replace(/\D/g, '');
   if (!digits) return '';
@@ -64,6 +63,24 @@ type FormData = {
   menu: string;
   notes: string;
   status: 'planning' | 'confirmed';
+  celebration: string;
+  teamArrivalTime: string;
+  city: string;
+  guestsAdult: string;
+  guestsTeen: string;
+  guestsChild: string;
+  travelCost: string;
+  teamPizzaiolo: string;
+  teamHelper: string;
+  teamGarcon: string;
+  extrasLoucas: string;
+  extrasBebidas: string;
+  finalValue: string;
+  paymentMethod: string;
+  locationImageName: string;
+  locationImageData: string;
+  paymentProofData: string;
+  contractPdfData: string;
 };
 
 const emptyForm: FormData = {
@@ -86,6 +103,24 @@ const emptyForm: FormData = {
   menu: '',
   notes: '',
   status: 'confirmed',
+  celebration: '',
+  teamArrivalTime: '',
+  city: '',
+  guestsAdult: '',
+  guestsTeen: '',
+  guestsChild: '',
+  travelCost: '',
+  teamPizzaiolo: '',
+  teamHelper: '',
+  teamGarcon: '',
+  extrasLoucas: '',
+  extrasBebidas: '',
+  finalValue: '',
+  paymentMethod: '',
+  locationImageName: '',
+  locationImageData: '',
+  paymentProofData: '',
+  contractPdfData: '',
 };
 
 function buildWhatsAppUrl(ev: PizzaEvent): string {
@@ -98,7 +133,7 @@ function buildWhatsAppUrl(ev: PizzaEvent): string {
     `Data: ${dateStr}${ev.time ? ` às ${ev.time}` : ''}`,
     `Local: ${ev.location}${ev.outOfCity ? ' (fora da cidade)' : ''}`,
     `Convidados: ${ev.guestCount}`,
-    `Valor: R$ ${(ev.budget ?? 0).toLocaleString('pt-BR')}`,
+    `Valor: R$ ${(ev.finalValue && ev.finalValue > 0 ? ev.finalValue : ev.budget).toLocaleString('pt-BR')}`,
     ...(ev.notes ? [`Obs: ${ev.notes}`] : []),
   ];
   return `https://wa.me/55${digits}?text=${encodeURIComponent(lines.join('\n'))}`;
@@ -134,7 +169,7 @@ function EventCard({ ev, employeeMap, onView, onEdit, onDelete }: {
         </div>
         <div className={styles.cardRow}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          R$ {(ev.budget ?? 0).toLocaleString('pt-BR')}
+          R$ {(ev.finalValue && ev.finalValue > 0 ? ev.finalValue : ev.budget).toLocaleString('pt-BR')}
         </div>
         {ev.responsibleEmployeeId && (
           <div className={styles.cardRow}>
@@ -157,6 +192,22 @@ function EventCard({ ev, employeeMap, onView, onEdit, onDelete }: {
   );
 }
 
+function groupByMonth(evs: PizzaEvent[]) {
+  const map = new Map<string, PizzaEvent[]>();
+  evs.forEach((ev) => {
+    const key = format(parseISO(ev.date), 'yyyy-MM');
+    if (!map.has(key)) map.set(key, []);
+    map.get(key)!.push(ev);
+  });
+  return Array.from(map.entries())
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([key, list]) => ({
+      key,
+      label: format(parseISO(list[0].date), 'MMMM • yyyy', { locale: ptBR }),
+      events: list,
+    }));
+}
+
 const STATIC_MENU_NAMES = ['Menu Eccezionale', 'Menu Superiore', 'Menu Raffinato'];
 
 export default function Eventos() {
@@ -164,6 +215,15 @@ export default function Eventos() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [availableMenus, setAvailableMenus] = useState<string[]>(STATIC_MENU_NAMES);
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
+  const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
+
+  const toggleMonth = (key: string) => {
+    setExpandedMonths((prev) => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  };
 
   useEffect(() => {
     apiFetch('/api/employees').then(r => r.json()).then(setEmployees).catch(() => {});
@@ -174,8 +234,9 @@ export default function Eventos() {
       }
     }).catch(() => {});
   }, []);
+
   const [search, setSearch] = useState('');
-const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
@@ -225,6 +286,24 @@ const [showModal, setShowModal] = useState(false);
       menu: (ev.menu ?? []).join(', '),
       notes: ev.notes || '',
       status: ev.status === 'planning' ? 'planning' : 'confirmed',
+      celebration: ev.celebration || '',
+      teamArrivalTime: ev.teamArrivalTime || '',
+      city: ev.city || '',
+      guestsAdult: ev.guestsAdult ? String(ev.guestsAdult) : '',
+      guestsTeen: ev.guestsTeen ? String(ev.guestsTeen) : '',
+      guestsChild: ev.guestsChild ? String(ev.guestsChild) : '',
+      travelCost: ev.travelCost ? formatBudget(String(Math.round(ev.travelCost * 100))) : '',
+      teamPizzaiolo: ev.teamPizzaiolo || '',
+      teamHelper: ev.teamHelper || '',
+      teamGarcon: ev.teamGarcon || '',
+      extrasLoucas: ev.extrasLoucas ? String(ev.extrasLoucas) : '',
+      extrasBebidas: ev.extrasBebidas ? String(ev.extrasBebidas) : '',
+      finalValue: ev.finalValue ? formatBudget(String(Math.round(ev.finalValue * 100))) : '',
+      paymentMethod: ev.paymentMethod || '',
+      locationImageName: ev.locationImageName || '',
+      locationImageData: ev.locationImageData || '',
+      paymentProofData: ev.paymentProofData || '',
+      contractPdfData: ev.contractPdfData || '',
     });
     setEditingId(ev.id);
     setShowModal(true);
@@ -245,15 +324,51 @@ const [showModal, setShowModal] = useState(false);
     }));
   };
 
-  const handlePaymentFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const compressImage = (file: File, maxWidth = 1200, quality = 0.75): Promise<string> =>
+    new Promise((res) => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const img = new Image();
+        img.onload = () => {
+          const scale = Math.min(1, maxWidth / img.width);
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width * scale;
+          canvas.height = img.height * scale;
+          canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
+          res(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.src = ev.target!.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+
+  const readFileAsDataURL = (file: File): Promise<string> =>
+    new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result as string); r.readAsDataURL(file); });
+
+  const handlePaymentFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) setForm((prev) => ({ ...prev, paymentProofName: file.name }));
+    if (file) {
+      const data = file.type.startsWith('image/') ? await compressImage(file) : await readFileAsDataURL(file);
+      setForm((prev) => ({ ...prev, paymentProofName: file.name, paymentProofData: data }));
+    }
     e.target.value = '';
   };
 
-  const handleContractFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleContractFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) setForm((prev) => ({ ...prev, contractPdfName: file.name }));
+    if (file) {
+      const data = await readFileAsDataURL(file);
+      setForm((prev) => ({ ...prev, contractPdfName: file.name, contractPdfData: data }));
+    }
+    e.target.value = '';
+  };
+
+  const handleLocationImageFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const data = await compressImage(file);
+      setForm((prev) => ({ ...prev, locationImageName: file.name, locationImageData: data }));
+    }
     e.target.value = '';
   };
 
@@ -279,6 +394,24 @@ const [showModal, setShowModal] = useState(false);
       paymentProofName: form.paymentProofName || undefined,
       contractPdfName: form.contractPdfName || undefined,
       createdBy: form.createdBy || undefined,
+      celebration: form.celebration || undefined,
+      teamArrivalTime: form.teamArrivalTime || undefined,
+      city: form.city || undefined,
+      guestsAdult: Number(form.guestsAdult) || undefined,
+      guestsTeen: Number(form.guestsTeen) || undefined,
+      guestsChild: Number(form.guestsChild) || undefined,
+      travelCost: Number(form.travelCost.replace(/[R$\s.]/g, '').replace(',', '.')) || undefined,
+      teamPizzaiolo: form.teamPizzaiolo || undefined,
+      teamHelper: form.teamHelper || undefined,
+      teamGarcon: form.teamGarcon || undefined,
+      extrasLoucas: Number(form.extrasLoucas) || undefined,
+      extrasBebidas: Number(form.extrasBebidas) || undefined,
+      finalValue: Number(form.finalValue.replace(/[R$\s.]/g, '').replace(',', '.')) || undefined,
+      paymentMethod: form.paymentMethod || undefined,
+      locationImageName: form.locationImageName || undefined,
+      locationImageData: form.locationImageData || undefined,
+      paymentProofData: form.paymentProofData || undefined,
+      contractPdfData: form.contractPdfData || undefined,
     };
     try {
       if (editingId) {
@@ -298,7 +431,7 @@ const [showModal, setShowModal] = useState(false);
     setDeleteTargetId(null);
   };
 
-return (
+  return (
     <div className={styles.page}>
       <div className={styles.header}>
         <div>
@@ -316,7 +449,7 @@ return (
         </button>
       </div>
 
-<div className={styles.controls}>
+      <div className={styles.controls}>
         <div className={styles.searchWrap}>
           <svg className={styles.searchIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input
@@ -340,9 +473,29 @@ return (
             {filtered.orcamentos.length === 0 ? (
               <p className={styles.sectionEmpty}>Nenhum orçamento.</p>
             ) : (
-              <div className={styles.grid}>
-                {filtered.orcamentos.map((ev) => <EventCard key={ev.id} ev={ev} employeeMap={employeeMap} onView={setViewingEvent} onEdit={openEdit} onDelete={handleDelete} />)}
-              </div>
+              groupByMonth(filtered.orcamentos).map((group) => {
+                const isOpen = expandedMonths.has(group.key);
+                const total = group.events.reduce((acc, ev) => acc + (ev.finalValue && ev.finalValue > 0 ? ev.finalValue : ev.budget), 0);
+                return (
+                  <div key={group.key} className={styles.monthGroup}>
+                    <button className={`${styles.monthCard} ${isOpen ? styles.monthCardOpen : ''}`} onClick={() => toggleMonth(group.key)}>
+                      <div className={styles.monthCardLeft}>
+                        <span className={styles.monthCardName}>{group.label}</span>
+                        <span className={styles.monthCardCount}>{group.events.length} evento{group.events.length !== 1 ? 's' : ''}</span>
+                      </div>
+                      <div className={styles.monthCardRight}>
+                        <span className={styles.monthCardValue}>R$ {total.toLocaleString('pt-BR')}</span>
+                        <svg className={`${styles.monthCardChevron} ${isOpen ? styles.monthCardChevronOpen : ''}`} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                      </div>
+                    </button>
+                    {isOpen && (
+                      <div className={styles.monthCardBody}>
+                        {group.events.map((ev) => <EventCard key={ev.id} ev={ev} employeeMap={employeeMap} onView={setViewingEvent} onEdit={openEdit} onDelete={handleDelete} />)}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
             )}
           </div>
           <div className={styles.section}>
@@ -350,9 +503,29 @@ return (
             {filtered.fechados.length === 0 ? (
               <p className={styles.sectionEmpty}>Nenhum evento fechado.</p>
             ) : (
-              <div className={styles.grid}>
-                {filtered.fechados.map((ev) => <EventCard key={ev.id} ev={ev} employeeMap={employeeMap} onView={setViewingEvent} onEdit={openEdit} onDelete={handleDelete} />)}
-              </div>
+              groupByMonth(filtered.fechados).map((group) => {
+                const isOpen = expandedMonths.has(group.key);
+                const total = group.events.reduce((acc, ev) => acc + (ev.finalValue && ev.finalValue > 0 ? ev.finalValue : ev.budget), 0);
+                return (
+                  <div key={group.key} className={styles.monthGroup}>
+                    <button className={`${styles.monthCard} ${isOpen ? styles.monthCardOpen : ''}`} onClick={() => toggleMonth(group.key)}>
+                      <div className={styles.monthCardLeft}>
+                        <span className={styles.monthCardName}>{group.label}</span>
+                        <span className={styles.monthCardCount}>{group.events.length} evento{group.events.length !== 1 ? 's' : ''}</span>
+                      </div>
+                      <div className={styles.monthCardRight}>
+                        <span className={styles.monthCardValue}>R$ {total.toLocaleString('pt-BR')}</span>
+                        <svg className={`${styles.monthCardChevron} ${isOpen ? styles.monthCardChevronOpen : ''}`} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                      </div>
+                    </button>
+                    {isOpen && (
+                      <div className={styles.monthCardBody}>
+                        {group.events.map((ev) => <EventCard key={ev.id} ev={ev} employeeMap={employeeMap} onView={setViewingEvent} onEdit={openEdit} onDelete={handleDelete} />)}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
             )}
           </div>
         </div>
@@ -373,17 +546,17 @@ return (
               <div className={styles.statusToggle}>
                 <button
                   type="button"
-                  className={`${styles.statusBtn} ${form.status === 'confirmed' ? styles.statusBtnActive : ''}`}
-                  onClick={() => setForm({ ...form, status: 'confirmed' })}
-                >
-                  Evento Fechado
-                </button>
-                <button
-                  type="button"
                   className={`${styles.statusBtn} ${form.status === 'planning' ? styles.statusBtnActive : ''}`}
                   onClick={() => setForm({ ...form, status: 'planning' })}
                 >
                   Orçamento
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.statusBtn} ${form.status === 'confirmed' ? styles.statusBtnActive : ''}`}
+                  onClick={() => setForm({ ...form, status: 'confirmed' })}
+                >
+                  Evento Fechado
                 </button>
               </div>
 
@@ -391,6 +564,11 @@ return (
               <div className={styles.formGroup}>
                 <label className={styles.label}>Nome do Evento *</label>
                 <input className={styles.input} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Ex: Casamento Silva" />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>O que estamos celebrando</label>
+                <input className={styles.input} value={form.celebration} onChange={(e) => setForm({ ...form, celebration: e.target.value })} placeholder="Ex: Casamento, Aniversário, Confraternização..." />
               </div>
 
               <div className={styles.formGrid2}>
@@ -406,41 +584,76 @@ return (
 
               <div className={styles.formGrid2}>
                 <div className={styles.formGroup}>
-                  <label className={styles.label}>Horario</label>
+                  <label className={styles.label}>Horario de Inicio</label>
                   <input className={styles.input} type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} />
                 </div>
                 <div className={styles.formGroup}>
-                  <label className={styles.label}>Duracao</label>
-                  <input className={styles.input} value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} placeholder="Ex: 4 horas" />
+                  <label className={styles.label}>Equipe chega</label>
+                  <input className={styles.input} type="time" value={form.teamArrivalTime} onChange={(e) => setForm({ ...form, teamArrivalTime: e.target.value })} />
                 </div>
               </div>
 
               {/* — Local — */}
               <div className={styles.formSection}>
                 <p className={styles.formSectionTitle}>Local</p>
-                <div className={styles.formGroup}>
-                  <label className={styles.label}>Endereco do Evento *</label>
-                  <input className={styles.input} value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="Ex: Salao Premium - Centro SP" />
-                </div>
                 <div className={styles.formGrid2}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Cidade</label>
+                    <input className={styles.input} value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="Ex: São Paulo" />
+                  </div>
                   <div className={styles.formGroup}>
                     <label className={styles.label}>Telefone de Contato</label>
                     <input className={styles.input} value={form.phone} onChange={(e) => setForm({ ...form, phone: formatPhone(e.target.value) })} placeholder="(11) 99999-0000" />
                   </div>
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>&nbsp;</label>
-                    <div className={styles.checkRow} onClick={() => setForm({ ...form, outOfCity: !form.outOfCity })}>
-                      <input type="checkbox" id="outOfCity" checked={form.outOfCity} readOnly />
-                      <label htmlFor="outOfCity">Evento fora da cidade</label>
-                    </div>
-                  </div>
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Endereco do Evento *</label>
+                  <input className={styles.input} value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="Ex: Salao Premium - Centro SP" />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Imagem do Local</label>
+                  <label className={`${styles.fileUploadBtn} ${form.locationImageName ? styles.fileSelected : ''}`}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    {form.locationImageName || 'Enviar foto do local das pizzas'}
+                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleLocationImageFile} />
+                  </label>
+                  <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Nos ajuda a dimensionar os equipamentos necessários</p>
                 </div>
               </div>
 
               {/* — Equipe — */}
               <div className={styles.formSection}>
-                <p className={styles.formSectionTitle}>Equipe</p>
+                <p className={styles.formSectionTitle}>Equipe Soul540</p>
                 <div className={styles.formGrid2}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Pizzaio(a)</label>
+                    <select className={styles.input} value={form.teamPizzaiolo} onChange={(e) => setForm({ ...form, teamPizzaiolo: e.target.value })}>
+                      <option value="">Selecionar</option>
+                      {employees.filter((e) => e.status === 'ativo').map((e) => (
+                        <option key={e.id} value={e.id}>{e.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Ajudante</label>
+                    <select className={styles.input} value={form.teamHelper} onChange={(e) => setForm({ ...form, teamHelper: e.target.value })}>
+                      <option value="">Selecionar</option>
+                      {employees.filter((e) => e.status === 'ativo').map((e) => (
+                        <option key={e.id} value={e.id}>{e.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className={styles.formGrid2}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Garçon</label>
+                    <select className={styles.input} value={form.teamGarcon} onChange={(e) => setForm({ ...form, teamGarcon: e.target.value })}>
+                      <option value="">Selecionar</option>
+                      {employees.filter((e) => e.status === 'ativo').map((e) => (
+                        <option key={e.id} value={e.id}>{e.name}</option>
+                      ))}
+                    </select>
+                  </div>
                   <div className={styles.formGroup}>
                     <label className={styles.label}>Funcionario Responsavel</label>
                     <select className={styles.input} value={form.responsibleEmployeeId} onChange={(e) => setForm({ ...form, responsibleEmployeeId: e.target.value })}>
@@ -450,15 +663,21 @@ return (
                       ))}
                     </select>
                   </div>
+                </div>
+                <div className={styles.formGrid2}>
                   <div className={styles.formGroup}>
-                    <label className={styles.label}>Qtd. Funcionarios</label>
-                    <input className={styles.input} type="number" value={form.staffCount} onChange={(e) => setForm({ ...form, staffCount: e.target.value })} placeholder="0" min="0" />
+                    <label className={styles.label}>Extras — Louças (pessoas)</label>
+                    <input className={styles.input} type="number" value={form.extrasLoucas} onChange={(e) => setForm({ ...form, extrasLoucas: e.target.value })} placeholder="0" min="0" />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Extras — Bebidas (pessoas)</label>
+                    <input className={styles.input} type="number" value={form.extrasBebidas} onChange={(e) => setForm({ ...form, extrasBebidas: e.target.value })} placeholder="0" min="0" />
                   </div>
                 </div>
                 <div className={styles.formGroup}>
                   <label className={styles.label}>Funcionarios no Evento ({form.selectedEmployeeIds.length} selecionados)</label>
                   <div className={styles.checkList}>
-                    {employees.map((emp) => (
+                    {employees.filter((emp) => emp.status === 'ativo').map((emp) => (
                       <label key={emp.id} className={styles.checkItem} onClick={() => toggleEmployee(emp.id)}>
                         <input type="checkbox" checked={form.selectedEmployeeIds.includes(emp.id)} readOnly />
                         <span className={styles.checkLabel}>
@@ -470,43 +689,100 @@ return (
                 </div>
               </div>
 
+              {/* — Convidados — */}
+              <div className={styles.formSection}>
+                <p className={styles.formSectionTitle}>Convidados</p>
+                <div className={styles.formGrid2}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Total de Convidados</label>
+                    <input className={styles.input} type="number" value={form.guestCount} onChange={(e) => setForm({ ...form, guestCount: e.target.value })} placeholder="0" min="0" />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Acima de 12 anos</label>
+                    <input className={styles.input} type="number" value={form.guestsAdult} onChange={(e) => setForm({ ...form, guestsAdult: e.target.value })} placeholder="0" min="0" />
+                  </div>
+                </div>
+                <div className={styles.formGrid2}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>De 8 até 12 anos</label>
+                    <input className={styles.input} type="number" value={form.guestsTeen} onChange={(e) => setForm({ ...form, guestsTeen: e.target.value })} placeholder="0" min="0" />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Abaixo de 7 anos</label>
+                    <input className={styles.input} type="number" value={form.guestsChild} onChange={(e) => setForm({ ...form, guestsChild: e.target.value })} placeholder="0" min="0" />
+                  </div>
+                </div>
+                {(() => {
+                  const total = Number(form.guestCount) || 0;
+                  const categorized = (Number(form.guestsAdult) || 0) + (Number(form.guestsTeen) || 0) + (Number(form.guestsChild) || 0);
+                  if (total === 0 && categorized === 0) return null;
+                  const diff = total - categorized;
+                  return (
+                    <div className={`${styles.guestSummary} ${diff < 0 ? styles.guestSummaryOver : diff === 0 ? styles.guestSummaryOk : styles.guestSummaryPending}`}>
+                      <span className={styles.guestSummaryTotal}>{categorized} / {total} categorizados</span>
+                      {diff > 0 && <span className={styles.guestSummaryDiff}>faltam {diff}</span>}
+                      {diff < 0 && <span className={styles.guestSummaryDiff}>{Math.abs(diff)} acima do total</span>}
+                      {diff === 0 && <span className={styles.guestSummaryDiff}>✓ completo</span>}
+                    </div>
+                  );
+                })()}
+              </div>
+
               {/* — Financeiro — */}
               <div className={styles.formSection}>
                 <p className={styles.formSectionTitle}>Financeiro</p>
                 <div className={styles.formGrid2}>
                   <div className={styles.formGroup}>
-                    <label className={styles.label}>Valor do Agendamento (R$)</label>
+                    <label className={styles.label}>Valor Estimado (R$)</label>
                     <input className={styles.input} value={form.budget} onChange={(e) => setForm({ ...form, budget: formatBudget(e.target.value) })} placeholder="R$ 0,00" />
                   </div>
                   <div className={styles.formGroup}>
-                    <label className={styles.label}>Convidados</label>
-                    <input className={styles.input} type="number" value={form.guestCount} onChange={(e) => setForm({ ...form, guestCount: e.target.value })} placeholder="0" />
+                    <label className={styles.label}>Deslocamento (R$)</label>
+                    <input className={styles.input} value={form.travelCost} onChange={(e) => setForm({ ...form, travelCost: formatBudget(e.target.value) })} placeholder="R$ 0,00" />
+                  </div>
+                </div>
+                <div className={styles.formGrid2}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Valor Final (R$)</label>
+                    <input className={styles.input} value={form.finalValue} onChange={(e) => setForm({ ...form, finalValue: formatBudget(e.target.value) })} placeholder="R$ 0,00" />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Forma de Pagamento</label>
+                    <select className={styles.input} value={form.paymentMethod} onChange={(e) => setForm({ ...form, paymentMethod: e.target.value })}>
+                      <option value="">Selecionar</option>
+                      <option value="pix_parcelado">Pix — 30% na reserva e restante até o dia</option>
+                      <option value="cartao">Cartão — até 2x sem juros na reserva</option>
+                      <option value="pix_total">Pix — valor total</option>
+                      <option value="outro">Outro</option>
+                    </select>
                   </div>
                 </div>
               </div>
 
               {/* — Documentos — */}
-              <div className={styles.formSection}>
-                <p className={styles.formSectionTitle}>Documentos</p>
-                <div className={styles.formGrid2}>
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>Comprovante de Pagamento</label>
-                    <label className={`${styles.fileUploadBtn} ${form.paymentProofName ? styles.fileSelected : ''}`}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                      {form.paymentProofName || 'Selecionar arquivo'}
-                      <input type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={handlePaymentFile} />
-                    </label>
-                  </div>
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>Contrato (PDF)</label>
-                    <label className={`${styles.fileUploadBtn} ${form.contractPdfName ? styles.fileSelected : ''}`}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                      {form.contractPdfName || 'Selecionar PDF'}
-                      <input type="file" accept=".pdf" style={{ display: 'none' }} onChange={handleContractFile} />
-                    </label>
+              {form.status === 'confirmed' && (
+                <div className={styles.formSection}>
+                  <p className={styles.formSectionTitle}>Documentos</p>
+                  <div className={styles.formGrid2}>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Comprovante de Pagamento</label>
+                      <label className={`${styles.fileUploadBtn} ${form.paymentProofName ? styles.fileSelected : ''}`}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        {form.paymentProofName || 'Selecionar arquivo'}
+                        <input type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={handlePaymentFile} />
+                      </label>
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Contrato (PDF)</label>
+                      <label className={`${styles.fileUploadBtn} ${form.contractPdfName ? styles.fileSelected : ''}`}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        {form.contractPdfName || 'Selecionar PDF'}
+                        <input type="file" accept=".pdf" style={{ display: 'none' }} onChange={handleContractFile} />
+                      </label>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* — Criador — */}
               <div className={styles.formSection}>
@@ -534,22 +810,22 @@ return (
                     </div>
                     {showMenuDropdown && (
                       <>
-                      <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setShowMenuDropdown(false)} />
-                      <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100, background: '#131929', border: '1px solid #2a3352', borderRadius: 8, padding: 8, marginTop: 4, maxHeight: 200, overflowY: 'auto' }}>
-                        {availableMenus.map(name => {
-                          const selected = form.menu.split(',').map(s => s.trim()).includes(name);
-                          return (
-                            <label key={name} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 8px', cursor: 'pointer', borderRadius: 4, background: selected ? 'rgba(255,193,7,0.08)' : 'transparent' }}>
-                              <input type="checkbox" checked={selected} onChange={() => {
-                                const current = form.menu.split(',').map(s => s.trim()).filter(Boolean);
-                                const next = selected ? current.filter(n => n !== name) : [...current, name];
-                                setForm({ ...form, menu: next.join(', ') });
-                              }} />
-                              <span style={{ fontSize: 13, color: '#e2e8f0' }}>{name}</span>
-                            </label>
-                          );
-                        })}
-                      </div>
+                        <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setShowMenuDropdown(false)} />
+                        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100, background: '#131929', border: '1px solid #2a3352', borderRadius: 8, padding: 8, marginTop: 4, maxHeight: 200, overflowY: 'auto' }}>
+                          {availableMenus.map(name => {
+                            const selected = form.menu.split(',').map(s => s.trim()).includes(name);
+                            return (
+                              <label key={name} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 8px', cursor: 'pointer', borderRadius: 4, background: selected ? 'rgba(255,193,7,0.08)' : 'transparent' }}>
+                                <input type="checkbox" checked={selected} onChange={() => {
+                                  const current = form.menu.split(',').map(s => s.trim()).filter(Boolean);
+                                  const next = selected ? current.filter(n => n !== name) : [...current, name];
+                                  setForm({ ...form, menu: next.join(', ') });
+                                }} />
+                                <span style={{ fontSize: 13, color: '#e2e8f0' }}>{name}</span>
+                              </label>
+                            );
+                          })}
+                        </div>
                       </>
                     )}
                   </div>
@@ -570,6 +846,7 @@ return (
           </div>
         </div>
       )}
+
       {viewingEvent && (
         <div className={styles.overlay} onClick={() => setViewingEvent(null)}>
           <div className={styles.detailModal} onClick={(e) => e.stopPropagation()}>
@@ -581,31 +858,51 @@ return (
             </div>
             <div className={styles.detailBody}>
 
+              {/* Informações */}
               <div className={styles.detailSection}>
                 <p className={styles.detailSectionTitle}>Informações</p>
                 <div className={styles.detailGrid}>
                   <div className={styles.detailItem}>
                     <span className={styles.detailLabel}>Data</span>
                     <span className={styles.detailValue}>
-                      {format(parseISO(viewingEvent.date), "dd 'de' MMMM, yyyy", { locale: ptBR })}
+                      {format(parseISO(viewingEvent.date), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
                       {viewingEvent.endDate && ` → ${format(parseISO(viewingEvent.endDate), "dd 'de' MMMM, yyyy", { locale: ptBR })}`}
                     </span>
                   </div>
+                  {viewingEvent.celebration && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>Celebração</span>
+                      <span className={styles.detailValue}>{viewingEvent.celebration}</span>
+                    </div>
+                  )}
                   {viewingEvent.time && (
                     <div className={styles.detailItem}>
-                      <span className={styles.detailLabel}>Horário</span>
+                      <span className={styles.detailLabel}>Horário de Início</span>
                       <span className={styles.detailValue}>{viewingEvent.time}</span>
                     </div>
                   )}
-                  {viewingEvent.duration && (
+                  {viewingEvent.teamArrivalTime && (
                     <div className={styles.detailItem}>
-                      <span className={styles.detailLabel}>Duração</span>
-                      <span className={styles.detailValue}>{viewingEvent.duration}</span>
+                      <span className={styles.detailLabel}>Equipe chega</span>
+                      <span className={styles.detailValue}>{viewingEvent.teamArrivalTime}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Local */}
+              <div className={styles.detailSection}>
+                <p className={styles.detailSectionTitle}>Local</p>
+                <div className={styles.detailGrid}>
+                  {viewingEvent.city && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>Cidade</span>
+                      <span className={styles.detailValue}>{viewingEvent.city}</span>
                     </div>
                   )}
                   <div className={styles.detailItem}>
-                    <span className={styles.detailLabel}>Local</span>
-                    <span className={styles.detailValue}>{viewingEvent.location}{viewingEvent.outOfCity && ' (fora da cidade)'}</span>
+                    <span className={styles.detailLabel}>Endereço</span>
+                    <span className={styles.detailValue}>{viewingEvent.location}</span>
                   </div>
                   {viewingEvent.phone && (
                     <div className={styles.detailItem}>
@@ -614,52 +911,43 @@ return (
                     </div>
                   )}
                 </div>
+                {viewingEvent.locationImageData && (
+                  <div className={styles.detailImageWrap}>
+                    <img src={viewingEvent.locationImageData} alt="Local do evento" className={styles.detailImage} />
+                  </div>
+                )}
               </div>
 
+              {/* Convidados */}
               <div className={styles.detailSection}>
-                <p className={styles.detailSectionTitle}>Financeiro</p>
+                <p className={styles.detailSectionTitle}>Convidados</p>
                 <div className={styles.detailGrid}>
                   <div className={styles.detailItem}>
-                    <span className={styles.detailLabel}>Valor</span>
-                    <span className={styles.detailValue}>R$ {(viewingEvent.budget ?? 0).toLocaleString('pt-BR')}</span>
-                  </div>
-                  <div className={styles.detailItem}>
-                    <span className={styles.detailLabel}>Convidados</span>
+                    <span className={styles.detailLabel}>Total</span>
                     <span className={styles.detailValue}>{viewingEvent.guestCount}</span>
                   </div>
-                </div>
-              </div>
-
-              {(viewingEvent.responsibleEmployeeId || viewingEvent.staffCount || (viewingEvent.selectedEmployeeIds && viewingEvent.selectedEmployeeIds.length > 0)) && (
-                <div className={styles.detailSection}>
-                  <p className={styles.detailSectionTitle}>Equipe</p>
-                  <div className={styles.detailGrid}>
-                    {viewingEvent.responsibleEmployeeId && (
-                      <div className={styles.detailItem}>
-                        <span className={styles.detailLabel}>Responsável</span>
-                        <span className={styles.detailValue}>{employeeMap[viewingEvent.responsibleEmployeeId] || viewingEvent.responsibleEmployeeId}</span>
-                      </div>
-                    )}
-                    {viewingEvent.staffCount && (
-                      <div className={styles.detailItem}>
-                        <span className={styles.detailLabel}>Funcionários</span>
-                        <span className={styles.detailValue}>{viewingEvent.staffCount} pessoas</span>
-                      </div>
-                    )}
-                  </div>
-                  {viewingEvent.selectedEmployeeIds && viewingEvent.selectedEmployeeIds.length > 0 && (
+                  {viewingEvent.guestsAdult != null && viewingEvent.guestsAdult > 0 && (
                     <div className={styles.detailItem}>
-                      <span className={styles.detailLabel}>Equipe escalada</span>
-                      <div className={styles.menuTags}>
-                        {viewingEvent.selectedEmployeeIds.map((id) => (
-                          <span key={id} className={styles.menuTag}>{employeeMap[id] || id}</span>
-                        ))}
-                      </div>
+                      <span className={styles.detailLabel}>Acima de 12 anos</span>
+                      <span className={styles.detailValue}>{viewingEvent.guestsAdult}</span>
+                    </div>
+                  )}
+                  {viewingEvent.guestsTeen != null && viewingEvent.guestsTeen > 0 && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>De 8 até 12 anos</span>
+                      <span className={styles.detailValue}>{viewingEvent.guestsTeen}</span>
+                    </div>
+                  )}
+                  {viewingEvent.guestsChild != null && viewingEvent.guestsChild > 0 && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>Abaixo de 7 anos</span>
+                      <span className={styles.detailValue}>{viewingEvent.guestsChild}</span>
                     </div>
                   )}
                 </div>
-              )}
+              </div>
 
+              {/* Cardápio */}
               {viewingEvent.menu && viewingEvent.menu.length > 0 && (
                 <div className={styles.detailSection}>
                   <p className={styles.detailSectionTitle}>Cardápio</p>
@@ -671,6 +959,96 @@ return (
                 </div>
               )}
 
+              {/* Equipe */}
+              {(viewingEvent.teamPizzaiolo || viewingEvent.teamHelper || viewingEvent.teamGarcon || viewingEvent.responsibleEmployeeId || (viewingEvent.selectedEmployeeIds && viewingEvent.selectedEmployeeIds.length > 0) || viewingEvent.extrasLoucas || viewingEvent.extrasBebidas) && (
+                <div className={styles.detailSection}>
+                  <p className={styles.detailSectionTitle}>Equipe Soul540</p>
+                  <div className={styles.detailGrid}>
+                    {viewingEvent.teamPizzaiolo && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Pizzaio(a)</span>
+                        <span className={styles.detailValue}>{employeeMap[viewingEvent.teamPizzaiolo] || viewingEvent.teamPizzaiolo}</span>
+                      </div>
+                    )}
+                    {viewingEvent.teamHelper && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Ajudante</span>
+                        <span className={styles.detailValue}>{employeeMap[viewingEvent.teamHelper] || viewingEvent.teamHelper}</span>
+                      </div>
+                    )}
+                    {viewingEvent.teamGarcon && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Garçon</span>
+                        <span className={styles.detailValue}>{employeeMap[viewingEvent.teamGarcon] || viewingEvent.teamGarcon}</span>
+                      </div>
+                    )}
+                    {viewingEvent.responsibleEmployeeId && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Responsável</span>
+                        <span className={styles.detailValue}>{employeeMap[viewingEvent.responsibleEmployeeId] || viewingEvent.responsibleEmployeeId}</span>
+                      </div>
+                    )}
+                    {viewingEvent.extrasLoucas != null && viewingEvent.extrasLoucas > 0 && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Extras — Louças</span>
+                        <span className={styles.detailValue}>{viewingEvent.extrasLoucas} pessoa{viewingEvent.extrasLoucas > 1 ? 's' : ''}</span>
+                      </div>
+                    )}
+                    {viewingEvent.extrasBebidas != null && viewingEvent.extrasBebidas > 0 && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Extras — Bebidas</span>
+                        <span className={styles.detailValue}>{viewingEvent.extrasBebidas} pessoa{viewingEvent.extrasBebidas > 1 ? 's' : ''}</span>
+                      </div>
+                    )}
+                  </div>
+                  {viewingEvent.selectedEmployeeIds && viewingEvent.selectedEmployeeIds.length > 0 && (
+                    <div className={styles.detailItem} style={{ marginTop: 8 }}>
+                      <span className={styles.detailLabel}>Equipe escalada</span>
+                      <div className={styles.menuTags}>
+                        {viewingEvent.selectedEmployeeIds.map((id) => (
+                          <span key={id} className={styles.menuTag}>{employeeMap[id] || id}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Financeiro */}
+              <div className={styles.detailSection}>
+                <p className={styles.detailSectionTitle}>Financeiro</p>
+                <div className={styles.detailGrid}>
+                  <div className={styles.detailItem}>
+                    <span className={styles.detailLabel}>Valor Estimado</span>
+                    <span className={styles.detailValue}>R$ {viewingEvent.budget.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  {viewingEvent.travelCost != null && viewingEvent.travelCost > 0 && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>Deslocamento</span>
+                      <span className={styles.detailValue}>R$ {viewingEvent.travelCost.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                  )}
+                  {viewingEvent.finalValue != null && viewingEvent.finalValue > 0 && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>Valor Final</span>
+                      <span className={styles.detailValue} style={{ color: 'var(--accent)' }}>R$ {viewingEvent.finalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                  )}
+                  {viewingEvent.paymentMethod && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>Forma de Pagamento</span>
+                      <span className={styles.detailValue}>
+                        {viewingEvent.paymentMethod === 'pix_parcelado' ? 'Pix — 30% na reserva e restante até o dia'
+                          : viewingEvent.paymentMethod === 'cartao' ? 'Cartão — até 2x sem juros na reserva'
+                          : viewingEvent.paymentMethod === 'pix_total' ? 'Pix — valor total'
+                          : viewingEvent.paymentMethod}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Observações */}
               {viewingEvent.notes && (
                 <div className={styles.detailSection}>
                   <p className={styles.detailSectionTitle}>Observações</p>
@@ -678,20 +1056,53 @@ return (
                 </div>
               )}
 
+              {/* Documentos */}
               {(viewingEvent.paymentProofName || viewingEvent.contractPdfName) && (
                 <div className={styles.detailSection}>
                   <p className={styles.detailSectionTitle}>Documentos</p>
-                  <div className={styles.detailGrid}>
+                  <div className={styles.docGrid}>
                     {viewingEvent.paymentProofName && (
-                      <div className={styles.detailItem}>
-                        <span className={styles.detailLabel}>Comprovante</span>
-                        <span className={styles.detailValue}>{viewingEvent.paymentProofName}</span>
+                      <div className={styles.docCard}>
+                        <div className={styles.docCardHeader}>
+                          <span className={styles.detailLabel}>Comprovante de Pagamento</span>
+                          {viewingEvent.paymentProofData && (
+                            <a href={viewingEvent.paymentProofData} download={viewingEvent.paymentProofName} className={styles.docDownloadBtn} title="Baixar">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            </a>
+                          )}
+                        </div>
+                        {viewingEvent.paymentProofData ? (
+                          viewingEvent.paymentProofData.startsWith('data:image') ? (
+                            <img src={viewingEvent.paymentProofData} alt="Comprovante" className={styles.docPreviewImage} />
+                          ) : (
+                            <iframe src={viewingEvent.paymentProofData} className={styles.docPreviewPdf} title="Comprovante" />
+                          )
+                        ) : (
+                          <div className={styles.docNoPreview}>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            <span>{viewingEvent.paymentProofName}</span>
+                          </div>
+                        )}
                       </div>
                     )}
                     {viewingEvent.contractPdfName && (
-                      <div className={styles.detailItem}>
-                        <span className={styles.detailLabel}>Contrato</span>
-                        <span className={styles.detailValue}>{viewingEvent.contractPdfName}</span>
+                      <div className={styles.docCard}>
+                        <div className={styles.docCardHeader}>
+                          <span className={styles.detailLabel}>Contrato</span>
+                          {viewingEvent.contractPdfData && (
+                            <a href={viewingEvent.contractPdfData} download={viewingEvent.contractPdfName} className={styles.docDownloadBtn} title="Baixar">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            </a>
+                          )}
+                        </div>
+                        {viewingEvent.contractPdfData ? (
+                          <iframe src={viewingEvent.contractPdfData} className={styles.docPreviewPdf} title="Contrato" />
+                        ) : (
+                          <div className={styles.docNoPreview}>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            <span>{viewingEvent.contractPdfName}</span>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -716,6 +1127,7 @@ return (
           </div>
         </div>
       )}
+
       {showInfo && (
         <div className={styles.overlay} onClick={() => setShowInfo(false)}>
           <div className={styles.modal} style={{ maxWidth: 480 }} onClick={(e) => e.stopPropagation()}>
@@ -750,6 +1162,7 @@ return (
           </div>
         </div>
       )}
+
       {deleteTargetId && (
         <ConfirmModal
           title="Excluir Evento"

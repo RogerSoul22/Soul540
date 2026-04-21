@@ -105,6 +105,21 @@
 .label { font-size: $font-size-xs; font-weight: $font-weight-medium; color: $text-secondary; text-transform: uppercase; letter-spacing: 0.5px; }
 .input { background: $bg-input; border: 1px solid $border; border-radius: $radius-sm; padding: 10px 12px; font-size: $font-size-sm; color: $text-primary; transition: border-color $transition-fast; font-family: inherit; &::placeholder { color: $text-muted; } &:focus { outline: none; border-color: $border-accent; } }
 
+// XML import
+.btnSecondary { display: flex; align-items: center; gap: $spacing-sm; padding: 10px $spacing-md; background: rgba(255,255,255,0.05); color: $text-primary; font-size: $font-size-sm; font-weight: $font-weight-medium; border: 1px solid $border; border-radius: $radius-sm; cursor: pointer; transition: all $transition-fast; &:hover { background: rgba(255,255,255,0.09); border-color: $border-accent; } }
+.xmlModal { background: $bg-secondary; border: 1px solid $border; border-radius: $radius-lg; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; box-shadow: $shadow-lg; display: flex; flex-direction: column; }
+.xmlSupplier { font-size: $font-size-xs; color: $text-muted; margin-top: 4px; strong { color: $text-secondary; } }
+.xmlMeta { display: flex; align-items: center; justify-content: space-between; padding: $spacing-xs 0; }
+.xmlCount { font-size: $font-size-xs; color: $text-muted; }
+.xmlToggleAll { background: none; border: none; font-size: $font-size-xs; color: $accent; cursor: pointer; padding: 0; &:hover { text-decoration: underline; } }
+.xmlList { display: flex; flex-direction: column; gap: 6px; }
+.xmlRow { display: flex; align-items: center; gap: $spacing-sm; padding: 10px $spacing-md; background: $bg-tertiary; border: 1px solid $border; border-radius: $radius-sm; transition: opacity $transition-fast; }
+.xmlRowDisabled { opacity: 0.45; }
+.xmlInfo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.xmlName { font-size: $font-size-sm; font-weight: $font-weight-medium; color: $text-primary; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.xmlDetails { font-size: $font-size-xs; color: $text-muted; }
+.xmlCatSelect { background: $bg-input; border: 1px solid $border; border-radius: $radius-xs; padding: 5px 8px; font-size: $font-size-xs; color: $text-secondary; cursor: pointer; flex-shrink: 0; max-width: 140px; &:focus { outline: none; border-color: $border-accent; } }
+
 // Mobile: bottom-sheet modals
 @include mobile {
   .overlay {

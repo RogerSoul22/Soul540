@@ -201,9 +201,16 @@
 
 .calendarHeader {
   display: flex;
-  align-items: baseline;
+  align-items: center;
+  justify-content: space-between;
   gap: $spacing-sm;
   margin-bottom: $spacing-md;
+}
+
+.calendarHeaderLeft {
+  display: flex;
+  align-items: baseline;
+  gap: $spacing-sm;
 }
 
 .calendarMonth {

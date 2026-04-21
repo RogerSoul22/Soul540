@@ -669,3 +669,176 @@
   .modalBody { padding: $spacing-md; }
   .modalFooter { padding: $spacing-sm $spacing-md; }
 }
+
+// Month group collapsible cards
+.monthGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.monthCard {
+  @include flex-between;
+  width: 100%;
+  padding: $spacing-md $spacing-lg;
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-base;
+  text-align: left;
+
+  &:hover {
+    border-color: rgba($accent, 0.4);
+    background: rgba($accent, 0.04);
+  }
+}
+
+.monthCardOpen {
+  border-color: rgba($accent, 0.5);
+  background: rgba($accent, 0.06);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.monthCardLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.monthCardName {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  text-transform: capitalize;
+}
+
+.monthCardCount {
+  font-size: $font-size-xs;
+  color: $text-muted;
+}
+
+.monthCardRight {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.monthCardValue {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $accent;
+}
+
+.monthCardChevron {
+  color: $text-muted;
+  transition: transform $transition-base;
+  flex-shrink: 0;
+}
+
+.monthCardChevronOpen {
+  transform: rotate(180deg);
+}
+
+.monthCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  padding: $spacing-sm;
+  background: rgba($accent, 0.02);
+  border: 1px solid rgba($accent, 0.5);
+  border-top: none;
+  border-bottom-left-radius: $radius-md;
+  border-bottom-right-radius: $radius-md;
+}
+
+// Location image preview
+.detailImageWrap {
+  margin-top: $spacing-sm;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  border: 1px solid $border;
+}
+
+.detailImage {
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+  display: block;
+}
+
+// Document cards
+.docGrid {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  margin-top: $spacing-xs;
+}
+
+.docCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: $spacing-sm;
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  overflow: hidden;
+}
+
+.docCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.docDownloadBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: $radius-xs;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid $border;
+  color: $text-muted;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: all $transition-fast;
+
+  &:hover { color: $accent; background: rgba(255,255,255,0.1); }
+}
+
+.docPreviewImage {
+  width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  border-radius: $radius-xs;
+  background: #000;
+  display: block;
+}
+
+.docPreviewPdf {
+  width: 100%;
+  height: 520px;
+  border-radius: $radius-xs;
+  border: none;
+  display: block;
+}
+
+.docNoPreview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: $spacing-md;
+  background: rgba(255,255,255,0.02);
+  border: 1px dashed $border;
+  border-radius: $radius-xs;
+  color: $text-muted;
+  font-size: $font-size-sm;
+  text-align: center;
+  word-break: break-all;
+}

@@ -7,6 +7,8 @@ interface AuthCtx {
   user: User | null;
   loading: boolean;
   authenticated: boolean;
+  isAdmin: boolean;
+  permissions: string[];
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
 }
@@ -52,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, authenticated: !!user, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, authenticated: !!user, isAdmin: user?.isAdmin ?? false, permissions: user?.permissions ?? [], login, logout }}>
       {children}
     </AuthContext.Provider>
   );

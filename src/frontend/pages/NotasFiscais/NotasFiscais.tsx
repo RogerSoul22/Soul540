@@ -163,7 +163,7 @@ export default function NotasFiscais() {
       subtotal: formSubtotal,
       taxRate: parseFloat(formTaxRate || '0'),
       taxAmount: formTaxAmount,
-      totalValue: formSubtotal,
+      totalValue: formSubtotal + formTaxAmount,
       issueDate: formIssueDate,
       notes: formNotes,
       status: formStatus,
@@ -696,7 +696,7 @@ export default function NotasFiscais() {
             </div>
 
             <div className={styles.formTotal}>
-              Subtotal: R$ {formSubtotal.toLocaleString('pt-BR')} | ISS: R$ {formTaxAmount.toLocaleString('pt-BR')} | Total: R$ {formSubtotal.toLocaleString('pt-BR')}
+              Subtotal: R$ {formSubtotal.toLocaleString('pt-BR')} | ISS: R$ {formTaxAmount.toLocaleString('pt-BR')} | Total: R$ {(formSubtotal + formTaxAmount).toLocaleString('pt-BR')}
             </div>
 
             <div className={styles.formField}>
@@ -717,7 +717,7 @@ export default function NotasFiscais() {
                   onChange={(e) => setFormStatus(e.target.value as InvoiceStatus)}
                 >
                   <option value="rascunho">Rascunho</option>
-                  <option value="emitida">Emitida</option>
+                  {editingInvoice && <option value="emitida">Emitida</option>}
                 </select>
               </div>
               <div />

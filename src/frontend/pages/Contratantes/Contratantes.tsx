@@ -98,6 +98,74 @@ export default function Contratantes() {
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [viewContractor, setViewContractor] = useState<Contractor | null>(null);
   const [showInfo, setShowInfo] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportCols, setExportCols] = useState<Set<string>>(new Set([
+    'name', 'type', 'phone', 'email', 'city', 'status', 'category',
+  ]));
+
+  const EXPORT_COLS = [
+    { key: 'name',         label: 'Nome' },
+    { key: 'type',         label: 'Tipo' },
+    { key: 'phone',        label: 'Telefone' },
+    { key: 'email',        label: 'Email' },
+    { key: 'city',         label: 'Cidade' },
+    { key: 'address',      label: 'Endereço' },
+    { key: 'documentType', label: 'Tipo Documento' },
+    { key: 'document',     label: 'Documento' },
+    { key: 'category',     label: 'Categoria' },
+    { key: 'status',       label: 'Status' },
+    { key: 'profession',   label: 'Profissão' },
+    { key: 'maritalStatus',label: 'Estado Civil' },
+    { key: 'totalRevenue', label: 'Receita Total (R$)' },
+  ];
+
+  const maritalLabels: Record<string, string> = {
+    solteiro: 'Solteiro(a)', casado: 'Casado(a)', divorciado: 'Divorciado(a)',
+    viuvo: 'Viúvo(a)', uniao_estavel: 'União Estável',
+  };
+
+  const toggleExportCol = (key: string) => {
+    setExportCols((prev) => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  };
+
+  const doExport = () => {
+    const cols = EXPORT_COLS.filter((c) => exportCols.has(c.key));
+    const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
+    const header = cols.map((c) => escape(c.label)).join(';');
+    const rows = filtered.map((c) =>
+      cols.map(({ key }) => {
+        let val = '';
+        if (key === 'name')         val = c.name;
+        else if (key === 'type')    val = c.type === 'pessoa_fisica' ? 'Pessoa Física' : 'Pessoa Jurídica';
+        else if (key === 'phone')   val = c.phone;
+        else if (key === 'email')   val = c.email;
+        else if (key === 'city')    val = c.city ?? '';
+        else if (key === 'address') val = c.address ?? '';
+        else if (key === 'documentType') val = c.documentType ?? '';
+        else if (key === 'document')     val = c.document;
+        else if (key === 'category')     val = displayCategory(c.category ?? '');
+        else if (key === 'status')       val = statusConfig[c.status].label;
+        else if (key === 'profession')   val = c.profession ?? '';
+        else if (key === 'maritalStatus') val = maritalLabels[c.maritalStatus ?? ''] ?? '';
+        else if (key === 'totalRevenue') val = (c.totalRevenue ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        return escape(val);
+      }).join(';')
+    );
+    const csv = [header, ...rows].join('\r\n');
+    const bom = '\uFEFF';
+    const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `contratantes-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setShowExportModal(false);
+  };
 
   useEffect(() => {
     fetch('/api/contractors')
@@ -225,10 +293,16 @@ export default function Contratantes() {
           </div>
           <p className={styles.subtitle}>Gerencie clientes e contratantes</p>
         </div>
-        <button className={styles.btnPrimary} onClick={openCreate}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Novo Contratante
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className={styles.btnExport} onClick={() => setShowExportModal(true)} title="Exportar planilha">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar
+          </button>
+          <button className={styles.btnPrimary} onClick={openCreate}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Novo Contratante
+          </button>
+        </div>
       </div>
 
       {/* KPIs */}
@@ -607,6 +681,54 @@ export default function Contratantes() {
           onClose={() => setDeleteCatTarget(null)}
         />
       )}
+      {/* Modal de exportação */}
+      {showExportModal && (
+        <div className={styles.overlay} onClick={() => setShowExportModal(false)}>
+          <div className={styles.modal} style={{ maxWidth: 480 }} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Exportar Planilha</h2>
+              <button className={styles.modalClose} onClick={() => setShowExportModal(false)}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <p className={styles.exportInfo}>
+                Serão exportados <strong>{filtered.length}</strong> contratante{filtered.length !== 1 ? 's' : ''} com os filtros ativos. Selecione as colunas:
+              </p>
+              <div className={styles.exportColsGrid}>
+                {EXPORT_COLS.map(({ key, label }) => (
+                  <label key={key} className={styles.exportColItem}>
+                    <input
+                      type="checkbox"
+                      checked={exportCols.has(key)}
+                      onChange={() => toggleExportCol(key)}
+                    />
+                    <span>{label}</span>
+                  </label>
+                ))}
+              </div>
+              <div className={styles.exportSelectAll}>
+                <button
+                  className={styles.btnSelectAll}
+                  onClick={() => setExportCols(new Set(EXPORT_COLS.map(c => c.key)))}
+                >Marcar todas</button>
+                <button
+                  className={styles.btnSelectAll}
+                  onClick={() => setExportCols(new Set())}
+                >Desmarcar todas</button>
+              </div>
+            </div>
+            <div className={styles.modalFooter}>
+              <button className={styles.btnCancel} onClick={() => setShowExportModal(false)}>Cancelar</button>
+              <button className={styles.btnPrimary} onClick={doExport} disabled={exportCols.size === 0}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Baixar CSV
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Modal de informações */}
       {showInfo && (
         <div className={styles.overlay} onClick={() => setShowInfo(false)}>

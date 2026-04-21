@@ -1,6 +1,48 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { apiFetch } from '@/lib/api';
 
+type XmlImportItem = {
+  id: string;
+  name: string;
+  quantity: number;
+  measureUnit: string;
+  costPerUnit: number;
+  supplier: string;
+  expirationDate: string;
+  category: string;
+  selected: boolean;
+};
+
+function normalizeUnit(unit: string): string {
+  const map: Record<string, string> = {
+    KG: 'kg', G: 'g', L: 'L', LT: 'L', ML: 'ml', UN: 'un', UNID: 'un', CX: 'cx', PCT: 'un', FD: 'un', SC: 'un',
+  };
+  return map[unit.toUpperCase()] ?? 'un';
+}
+
+function formatNFeDate(raw: string): string {
+  if (!raw) return '';
+  const s = raw.replace(/-/g, '');
+  if (s.length === 8) return `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}`;
+  return raw;
+}
+
+function parseNFeXml(xmlText: string): { supplier: string; items: Omit<XmlImportItem, 'id' | 'selected' | 'category'>[] } {
+  const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+  const get = (el: Element | Document, tag: string) =>
+    el.querySelector(tag)?.textContent?.trim() ?? '';
+  const supplier = get(doc, 'xNome');
+  const items = Array.from(doc.querySelectorAll('det prod')).map((prod) => ({
+    name: get(prod, 'xProd'),
+    quantity: parseFloat(get(prod, 'qCom')) || 0,
+    measureUnit: normalizeUnit(get(prod, 'uCom')),
+    costPerUnit: parseFloat(get(prod, 'vUnCom')) || 0,
+    supplier,
+    expirationDate: formatNFeDate(get(prod, 'dVal')),
+  })).filter((it) => it.name);
+  return { supplier, items };
+}
+
 type Supply = {
   id: string;
   name: string;
@@ -85,8 +127,49 @@ export default function EstoqueInsumos() {
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [viewingItem, setViewingItem] = useState<Supply | null>(null);
   const [showInfo, setShowInfo] = useState(false);
+  const [showXmlModal, setShowXmlModal] = useState(false);
+  const [xmlItems, setXmlItems] = useState<XmlImportItem[]>([]);
+  const [xmlSupplier, setXmlSupplier] = useState('');
+  const [xmlImporting, setXmlImporting] = useState(false);
+  const xmlInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { if (showCatModal) catInputRef.current?.focus(); }, [showCatModal]);
+
+  const handleXmlFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string;
+      try {
+        const { supplier, items } = parseNFeXml(text);
+        setXmlSupplier(supplier);
+        setXmlItems(items.map((it, i) => ({ ...it, id: String(i), category: '', selected: true })));
+        setShowXmlModal(true);
+      } catch {
+        alert('Não foi possível ler o XML. Verifique se é uma NF-e válida.');
+      }
+    };
+    reader.readAsText(file, 'ISO-8859-1');
+    e.target.value = '';
+  };
+
+  const handleXmlImport = async () => {
+    const selected = xmlItems.filter((it) => it.selected);
+    if (!selected.length) return;
+    setXmlImporting(true);
+    for (const it of selected) {
+      const qty = it.quantity;
+      const status = calcStatus(qty, 0, it.expirationDate || undefined);
+      const data = { name: it.name, category: it.category, measureUnit: it.measureUnit, quantity: qty, minStock: 0, costPerUnit: it.costPerUnit, supplier: it.supplier, expirationDate: it.expirationDate || undefined, status };
+      const res = await apiFetch('/api/supplies', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const created = await res.json();
+      setSupplies((prev) => [...prev, created]);
+    }
+    setXmlImporting(false);
+    setShowXmlModal(false);
+    setXmlItems([]);
+  };
 
   const filtered = useMemo(
     () =>
@@ -169,10 +252,17 @@ export default function EstoqueInsumos() {
           </div>
           <p className={styles.subtitle}>Controle ingredientes, embalagens e materiais</p>
         </div>
-        <button className={styles.btnPrimary} onClick={openCreate}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Novo Insumo
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input ref={xmlInputRef} type="file" accept=".xml" style={{ display: 'none' }} onChange={handleXmlFile} />
+          <button className={styles.btnSecondary} onClick={() => xmlInputRef.current?.click()}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="12" y2="12"/><line x1="15" y1="15" x2="12" y2="12"/></svg>
+            Importar XML
+          </button>
+          <button className={styles.btnPrimary} onClick={openCreate}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Novo Insumo
+          </button>
+        </div>
       </div>
 
       <div className={styles.kpiGrid}>
@@ -445,6 +535,61 @@ export default function EstoqueInsumos() {
           onClose={() => setDeleteTargetId(null)}
         />
       )}
+      {showXmlModal && (
+        <div className={styles.overlay} onClick={() => setShowXmlModal(false)}>
+          <div className={styles.xmlModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <div>
+                <h2 className={styles.modalTitle}>Importar NF-e XML</h2>
+                {xmlSupplier && <p className={styles.xmlSupplier}>Fornecedor: <strong>{xmlSupplier}</strong></p>}
+              </div>
+              <button className={styles.modalClose} onClick={() => setShowXmlModal(false)}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.xmlMeta}>
+                <span className={styles.xmlCount}>{xmlItems.filter(i => i.selected).length} de {xmlItems.length} itens selecionados</span>
+                <button className={styles.xmlToggleAll} onClick={() => {
+                  const allSelected = xmlItems.every(i => i.selected);
+                  setXmlItems(prev => prev.map(i => ({ ...i, selected: !allSelected })));
+                }}>
+                  {xmlItems.every(i => i.selected) ? 'Desmarcar todos' : 'Selecionar todos'}
+                </button>
+              </div>
+              <div className={styles.xmlList}>
+                {xmlItems.map((item) => (
+                  <div key={item.id} className={`${styles.xmlRow} ${!item.selected ? styles.xmlRowDisabled : ''}`}>
+                    <input type="checkbox" checked={item.selected} onChange={(e) => setXmlItems(prev => prev.map(i => i.id === item.id ? { ...i, selected: e.target.checked } : i))} style={{ accentColor: 'var(--accent)', flexShrink: 0 }} />
+                    <div className={styles.xmlInfo}>
+                      <span className={styles.xmlName}>{item.name}</span>
+                      <span className={styles.xmlDetails}>
+                        {item.quantity} {item.measureUnit} · R$ {item.costPerUnit.toFixed(2)}/{item.measureUnit}
+                        {item.expirationDate && ` · Val: ${new Date(item.expirationDate).toLocaleDateString('pt-BR')}`}
+                      </span>
+                    </div>
+                    <select
+                      className={styles.xmlCatSelect}
+                      value={item.category}
+                      onChange={(e) => setXmlItems(prev => prev.map(i => i.id === item.id ? { ...i, category: e.target.value } : i))}
+                    >
+                      <option value="">Sem categoria</option>
+                      {categories.map((cat) => <option key={cat} value={cat}>{cat}</option>)}
+                    </select>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className={styles.modalFooter}>
+              <button className={styles.btnCancel} onClick={() => setShowXmlModal(false)}>Cancelar</button>
+              <button className={styles.btnPrimary} onClick={handleXmlImport} disabled={xmlImporting || xmlItems.every(i => !i.selected)}>
+                {xmlImporting ? 'Importando...' : `Importar ${xmlItems.filter(i => i.selected).length} ite${xmlItems.filter(i => i.selected).length !== 1 ? 'ns' : 'm'}`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showInfo && (
         <div className={styles.overlay} onClick={() => setShowInfo(false)}>
           <div className={styles.modal} style={{ maxWidth: 480 }} onClick={(e) => e.stopPropagation()}>

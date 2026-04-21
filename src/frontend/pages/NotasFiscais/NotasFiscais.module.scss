@@ -224,6 +224,7 @@
 .formField {
   @include flex-column;
   gap: 6px;
+  min-width: 0;
 }
 
 .formLabel {
@@ -235,6 +236,8 @@
 .formSelect,
 .formInput,
 .formTextarea {
+  width: 100%;
+  box-sizing: border-box;
   padding: 10px $spacing-md;
   background: $bg-input;
   border: 1px solid $border;

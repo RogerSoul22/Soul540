@@ -38,7 +38,7 @@ const ALL_PAGES = [
 
 const ALL_KEYS = ALL_PAGES.flatMap(g => g.items.map(i => i.key));
 
-const emptyForm = { name: '', email: '', password: '', isAdmin: false, unit: 'franchise' };
+const emptyForm = { name: '', email: '', password: '', isAdmin: false };
 
 export default function Permissoes() {
   const [users, setUsers] = useState<AppUser[]>([]);
@@ -48,13 +48,14 @@ export default function Permissoes() {
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<AppUser | null>(null);
   const [showInfo, setShowInfo] = useState(false);
   const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({});
   const { user: authUser } = useAuth();
 
   useEffect(() => {
-    apiFetch('/api/users').then(r => r.json()).then(setUsers);
+    apiFetch('/api/users').then(r => r.json()).then(setUsers).catch(() => {});
   }, []);
 
   const selectUser = (u: AppUser) => {
@@ -93,15 +94,20 @@ export default function Permissoes() {
 
   const createUser = async () => {
     if (!form.name.trim() || !form.email.trim() || !form.password) return;
-    const res = await apiFetch('/api/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, permissions: form.isAdmin ? ALL_KEYS : [] }),
-    });
-    const created = await res.json();
-    setUsers(prev => [...prev, created]);
-    setForm(emptyForm);
-    setShowModal(false);
+    setCreating(true);
+    try {
+      const res = await apiFetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, unit: 'franchise', permissions: form.isAdmin ? ALL_KEYS : [] }),
+      });
+      const created = await res.json();
+      setUsers(prev => [...prev, created]);
+      setForm(emptyForm);
+      setShowModal(false);
+    } finally {
+      setCreating(false);
+    }
   };
 
   const deleteUser = async (u: AppUser) => {
@@ -274,22 +280,18 @@ export default function Permissoes() {
               </label>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Sistema</label>
-                <select className={styles.input} value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value })}>
-                  <option value="main">Principal</option>
-                  <option value="franchise">Franquia</option>
-                  <option value="factory">Fábrica</option>
-                </select>
+                <input className={styles.input} value="Franquia" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }} />
               </div>
             </div>
             <div className={styles.modalFooter}>
               <button className={styles.btnCancel} onClick={() => setShowModal(false)}>Cancelar</button>
-              <button className={styles.btnPrimary} onClick={createUser} disabled={!form.name.trim() || !form.email.trim() || !form.password}>Cadastrar</button>
+              <button className={styles.btnPrimary} onClick={createUser} disabled={creating || !form.name.trim() || !form.email.trim() || !form.password}>{creating ? 'Cadastrando...' : 'Cadastrar'}</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Delete confirm */}
+      {/* Info modal */}
       {showInfo && (
         <div className={styles.overlay} onClick={() => setShowInfo(false)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>

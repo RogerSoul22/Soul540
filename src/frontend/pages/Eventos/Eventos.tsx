@@ -705,6 +705,20 @@ return (
                     <input className={styles.input} type="number" value={form.guestsChild} onChange={(e) => setForm({ ...form, guestsChild: e.target.value })} placeholder="0" min="0" />
                   </div>
                 </div>
+                {(() => {
+                  const total = Number(form.guestCount) || 0;
+                  const categorized = (Number(form.guestsAdult) || 0) + (Number(form.guestsTeen) || 0) + (Number(form.guestsChild) || 0);
+                  if (total === 0 && categorized === 0) return null;
+                  const diff = total - categorized;
+                  return (
+                    <div className={`${styles.guestSummary} ${diff < 0 ? styles.guestSummaryOver : diff === 0 ? styles.guestSummaryOk : styles.guestSummaryPending}`}>
+                      <span className={styles.guestSummaryTotal}>{categorized} / {total} categorizados</span>
+                      {diff > 0 && <span className={styles.guestSummaryDiff}>faltam {diff}</span>}
+                      {diff < 0 && <span className={styles.guestSummaryDiff}>{Math.abs(diff)} acima do total</span>}
+                      {diff === 0 && <span className={styles.guestSummaryDiff}>✓ completo</span>}
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* — Financeiro — */}

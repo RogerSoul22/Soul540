@@ -19,19 +19,20 @@ export default function Dashboard() {
   const { events, tasks } = useApp();
   const { user } = useAuth();
   const [showInfo, setShowInfo] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState(new Date());
 
   const urgentTasks = useMemo(() => tasks.filter((t) => t.priority === 'urgent' && t.status !== 'done'), [tasks]);
 
-  const now = new Date();
   const monthEventCount = useMemo(() => {
     return events.filter((e) => {
       const d = parseISO(e.date);
-      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      return d.getMonth() === calendarMonth.getMonth() && d.getFullYear() === calendarMonth.getFullYear();
     }).length;
-  }, [events]);
+  }, [events, calendarMonth]);
 
+  const now = new Date();
   const today = format(now, "EEEE, d 'de' MMMM", { locale: ptBR });
-  const currentMonth = format(now, 'MMMM', { locale: ptBR });
+  const currentMonth = format(calendarMonth, 'MMMM', { locale: ptBR });
 
   return (
     <div className={styles.page}>
@@ -58,12 +59,14 @@ export default function Dashboard() {
 {/* Calendar */}
       <div className={styles.calendarSection}>
         <div className={styles.calendarHeader}>
-          <span className={styles.calendarMonth}>{currentMonth}</span>
-          <span className={styles.calendarCount}>
-            {monthEventCount} evento{monthEventCount !== 1 ? 's' : ''}
-          </span>
+          <div className={styles.calendarHeaderLeft}>
+            <span className={styles.calendarMonth}>{currentMonth}</span>
+            <span className={styles.calendarCount}>
+              {monthEventCount} evento{monthEventCount !== 1 ? 's' : ''}
+            </span>
+          </div>
         </div>
-        <CalendarView events={events} />
+        <CalendarView events={events} month={calendarMonth} onMonthChange={setCalendarMonth} />
       </div>
 
       {showInfo && (

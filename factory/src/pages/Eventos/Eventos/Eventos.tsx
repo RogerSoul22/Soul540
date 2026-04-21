@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { apiFetch } from '@/lib/api';
 import { useApp } from '@/contexts/AppContext';
 import type { PizzaEvent } from '@/types/Event';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import styles from './Eventos.module.scss';
 
@@ -15,26 +15,42 @@ type Employee = {
   createdAt: string;
 };
 
-const roleLabels: Record<string, string> = {
-  pizzaiolo: 'Pizzaiolo',
-  auxiliar: 'Auxiliar',
-  garcom: 'Garcom',
-  gerente: 'Gerente',
-  entregador: 'Entregador',
-  administrativo: 'Administrativo',
-};
+function safeFormatDate(date: string | undefined | null, fmt: string, options?: Parameters<typeof format>[2]): string {
+  if (!date) return '-';
+  const d = parseISO(date);
+  return isValid(d) ? format(d, fmt, options) : '-';
+}
+
+function groupByMonth(evs: PizzaEvent[]): { key: string; label: string; events: PizzaEvent[] }[] {
+  const map = new Map<string, PizzaEvent[]>();
+  for (const ev of evs) {
+    const d = parseISO(ev.date);
+    if (!isValid(d)) continue;
+    const key = format(d, 'yyyy-MM');
+    if (!map.has(key)) map.set(key, []);
+    map.get(key)!.push(ev);
+  }
+  return Array.from(map.entries())
+    .sort((a, b) => b[0].localeCompare(a[0]))
+    .map(([key, events]) => ({
+      key,
+      label: format(parseISO(`${key}-01`), 'MMMM yyyy', { locale: ptBR }),
+      events,
+    }));
+}
 
 function buildWhatsAppUrl(ev: PizzaEvent): string {
   const digits = ev.phone?.replace(/\D/g, '') || '';
   if (!digits) return '';
-  const dateStr = format(parseISO(ev.date), "d 'de' MMMM 'de' yyyy", { locale: ptBR });
+  const dateStr = safeFormatDate(ev.date, "d 'de' MMMM 'de' yyyy", { locale: ptBR });
+  const value = ev.finalValue ?? ev.budget ?? 0;
   const lines = [
     `Olá! Segue o resumo do evento *${ev.name}*:`,
     '',
     `Data: ${dateStr}${ev.time ? ` às ${ev.time}` : ''}`,
     `Local: ${ev.location}${ev.outOfCity ? ' (fora da cidade)' : ''}`,
     `Convidados: ${ev.guestCount}`,
-    `Valor: R$ ${(ev.budget ?? 0).toLocaleString('pt-BR')}`,
+    `Valor: R$ ${value.toLocaleString('pt-BR')}`,
     ...(ev.notes ? [`Obs: ${ev.notes}`] : []),
   ];
   return `https://wa.me/55${digits}?text=${encodeURIComponent(lines.join('\n'))}`;
@@ -62,8 +78,8 @@ function EventCard({ ev, employeeMap, onView }: {
             </span>
           </div>
           <p className={styles.cardSub}>
-            {format(parseISO(ev.date), "dd 'de' MMM, yyyy", { locale: ptBR })}
-            {ev.endDate && ` → ${format(parseISO(ev.endDate), "dd 'de' MMM", { locale: ptBR })}`}
+            {safeFormatDate(ev.date, "dd 'de' MMM, yyyy", { locale: ptBR })}
+            {ev.endDate && ` → ${safeFormatDate(ev.endDate, "dd 'de' MMM", { locale: ptBR })}`}
             {ev.time && ` · ${ev.time}`}
           </p>
         </div>
@@ -75,11 +91,11 @@ function EventCard({ ev, employeeMap, onView }: {
         </div>
         <div className={styles.cardRow}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          {ev.guestCount} convidados{ev.staffCount ? ` · ${ev.staffCount} funcionarios` : ''}
+          {ev.guestCount} convidados{ev.staffCount ? ` · ${ev.staffCount} funcionários` : ''}
         </div>
         <div className={styles.cardRow}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          R$ {(ev.budget ?? 0).toLocaleString('pt-BR')}
+          R$ {((ev.finalValue ?? ev.budget) ?? 0).toLocaleString('pt-BR')}
         </div>
         {ev.responsibleEmployeeId && (
           <div className={styles.cardRow}>
@@ -111,6 +127,7 @@ export default function Eventos() {
   const [search, setSearch] = useState('');
   const [viewingEvent, setViewingEvent] = useState<PizzaEvent | null>(null);
   const [showInfo, setShowInfo] = useState(false);
+  const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
 
   const employeeMap = useMemo(() => {
     const m: Record<string, string> = {};
@@ -127,6 +144,22 @@ export default function Eventos() {
       orcamentos: all.filter((e) => e.status === 'planning'),
     };
   }, [events, search]);
+
+  const monthGroupsFechados = useMemo(() => groupByMonth(filtered.fechados), [filtered.fechados]);
+
+  function toggleMonth(key: string) {
+    setExpandedMonths((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }
+
+  const ev = viewingEvent;
+  const totalGuests = ev
+    ? ((ev.guestsAdult ?? 0) + (ev.guestsTeen ?? 0) + (ev.guestsChild ?? 0)) || ev.guestCount || 0
+    : 0;
 
   return (
     <div className={styles.page}>
@@ -160,34 +193,70 @@ export default function Eventos() {
         </div>
       ) : (
         <div className={styles.sections}>
-          <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Orçamentos</h2>
-            {filtered.orcamentos.length === 0 ? (
-              <p className={styles.sectionEmpty}>Nenhum orçamento.</p>
-            ) : (
+          {/* Orçamentos — flat list */}
+          {filtered.orcamentos.length > 0 && (
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>Orçamentos</h2>
               <div className={styles.grid}>
-                {filtered.orcamentos.map((ev) => <EventCard key={ev.id} ev={ev} employeeMap={employeeMap} onView={setViewingEvent} />)}
+                {filtered.orcamentos.map((e) => <EventCard key={e.id} ev={e} employeeMap={employeeMap} onView={setViewingEvent} />)}
               </div>
-            )}
-          </div>
-          <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Eventos Fechados</h2>
-            {filtered.fechados.length === 0 ? (
-              <p className={styles.sectionEmpty}>Nenhum evento fechado.</p>
-            ) : (
-              <div className={styles.grid}>
-                {filtered.fechados.map((ev) => <EventCard key={ev.id} ev={ev} employeeMap={employeeMap} onView={setViewingEvent} />)}
+            </div>
+          )}
+
+          {/* Eventos Fechados — grouped by month */}
+          {monthGroupsFechados.length > 0 && (
+            <div className={styles.section}>
+              <h2 className={styles.sectionTitle}>Eventos Fechados</h2>
+              <div className={styles.monthGroup}>
+                {monthGroupsFechados.map(({ key, label, events: evs }) => {
+                  const isOpen = expandedMonths.has(key);
+                  const total = evs.reduce((s, e) => s + ((e.finalValue ?? e.budget) ?? 0), 0);
+                  return (
+                    <div key={key}>
+                      <button
+                        className={`${styles.monthCard} ${isOpen ? styles.monthCardOpen : ''}`}
+                        onClick={() => toggleMonth(key)}
+                      >
+                        <div className={styles.monthCardLeft}>
+                          <span className={styles.monthCardName}>{label}</span>
+                          <span className={styles.monthCardCount}>{evs.length} evento{evs.length !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div className={styles.monthCardRight}>
+                          {total > 0 && (
+                            <span className={styles.monthCardValue}>
+                              R$ {total.toLocaleString('pt-BR')}
+                            </span>
+                          )}
+                          <svg
+                            className={`${styles.monthCardChevron} ${isOpen ? styles.monthCardChevronOpen : ''}`}
+                            width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                          >
+                            <polyline points="6 9 12 15 18 9"/>
+                          </svg>
+                        </div>
+                      </button>
+                      {isOpen && (
+                        <div className={styles.monthCardBody}>
+                          <div className={styles.grid}>
+                            {evs.map((e) => <EventCard key={e.id} ev={e} employeeMap={employeeMap} onView={setViewingEvent} />)}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
 
-      {viewingEvent && (
+      {/* Detail modal */}
+      {ev && (
         <div className={styles.overlay} onClick={() => setViewingEvent(null)}>
           <div className={styles.detailModal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h2 className={styles.modalTitle}>{viewingEvent.name}</h2>
+              <h2 className={styles.modalTitle}>{ev.name}</h2>
               <button className={styles.modalClose} onClick={() => setViewingEvent(null)}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
@@ -200,37 +269,92 @@ export default function Eventos() {
                   <div className={styles.detailItem}>
                     <span className={styles.detailLabel}>Origem</span>
                     <span className={styles.detailValue}>
-                      {(viewingEvent as any).source === 'franchise' ? 'Franquia' : 'Principal'}
+                      {(ev as any).source === 'franchise' ? 'Franquia' : 'Principal'}
                     </span>
                   </div>
                   <div className={styles.detailItem}>
                     <span className={styles.detailLabel}>Data</span>
                     <span className={styles.detailValue}>
-                      {format(parseISO(viewingEvent.date), "dd 'de' MMMM, yyyy", { locale: ptBR })}
-                      {viewingEvent.endDate && ` → ${format(parseISO(viewingEvent.endDate), "dd 'de' MMMM, yyyy", { locale: ptBR })}`}
+                      {safeFormatDate(ev.date, "dd 'de' MMMM, yyyy", { locale: ptBR })}
+                      {ev.endDate && ` → ${safeFormatDate(ev.endDate, "dd 'de' MMMM, yyyy", { locale: ptBR })}`}
                     </span>
                   </div>
-                  {viewingEvent.time && (
+                  {ev.time && (
                     <div className={styles.detailItem}>
                       <span className={styles.detailLabel}>Horário</span>
-                      <span className={styles.detailValue}>{viewingEvent.time}</span>
+                      <span className={styles.detailValue}>{ev.time}</span>
                     </div>
                   )}
-                  {viewingEvent.duration && (
+                  {ev.teamArrivalTime && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>Chegada da equipe</span>
+                      <span className={styles.detailValue}>{ev.teamArrivalTime}</span>
+                    </div>
+                  )}
+                  {ev.duration && (
                     <div className={styles.detailItem}>
                       <span className={styles.detailLabel}>Duração</span>
-                      <span className={styles.detailValue}>{viewingEvent.duration}</span>
+                      <span className={styles.detailValue}>{ev.duration}</span>
+                    </div>
+                  )}
+                  {ev.celebration && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>Comemoração</span>
+                      <span className={styles.detailValue}>{ev.celebration}</span>
                     </div>
                   )}
                   <div className={styles.detailItem}>
                     <span className={styles.detailLabel}>Local</span>
-                    <span className={styles.detailValue}>{viewingEvent.location}{viewingEvent.outOfCity && ' (fora da cidade)'}</span>
+                    <span className={styles.detailValue}>{ev.location}{ev.outOfCity && ' (fora da cidade)'}</span>
                   </div>
-                  {viewingEvent.phone && (
+                  {ev.city && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>Cidade</span>
+                      <span className={styles.detailValue}>{ev.city}</span>
+                    </div>
+                  )}
+                  {ev.phone && (
                     <div className={styles.detailItem}>
                       <span className={styles.detailLabel}>Telefone</span>
-                      <span className={styles.detailValue}>{viewingEvent.phone}</span>
+                      <span className={styles.detailValue}>{ev.phone}</span>
                     </div>
+                  )}
+                </div>
+                {ev.locationImageData && (
+                  <div className={styles.detailImageWrap}>
+                    <img src={ev.locationImageData} alt="Local do evento" className={styles.detailImage} />
+                  </div>
+                )}
+              </div>
+
+              <div className={styles.detailSection}>
+                <p className={styles.detailSectionTitle}>Convidados</p>
+                <div className={styles.detailGrid}>
+                  <div className={styles.detailItem}>
+                    <span className={styles.detailLabel}>Total</span>
+                    <span className={styles.detailValue}>{totalGuests}</span>
+                  </div>
+                  {(ev.guestsAdult != null || ev.guestsTeen != null || ev.guestsChild != null) && (
+                    <>
+                      {ev.guestsAdult != null && (
+                        <div className={styles.detailItem}>
+                          <span className={styles.detailLabel}>Adultos</span>
+                          <span className={styles.detailValue}>{ev.guestsAdult}</span>
+                        </div>
+                      )}
+                      {ev.guestsTeen != null && (
+                        <div className={styles.detailItem}>
+                          <span className={styles.detailLabel}>Adolescentes (12-17)</span>
+                          <span className={styles.detailValue}>{ev.guestsTeen}</span>
+                        </div>
+                      )}
+                      {ev.guestsChild != null && (
+                        <div className={styles.detailItem}>
+                          <span className={styles.detailLabel}>Crianças (até 11)</span>
+                          <span className={styles.detailValue}>{ev.guestsChild}</span>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -238,39 +362,73 @@ export default function Eventos() {
               <div className={styles.detailSection}>
                 <p className={styles.detailSectionTitle}>Financeiro</p>
                 <div className={styles.detailGrid}>
-                  <div className={styles.detailItem}>
-                    <span className={styles.detailLabel}>Valor</span>
-                    <span className={styles.detailValue}>R$ {(viewingEvent.budget ?? 0).toLocaleString('pt-BR')}</span>
-                  </div>
-                  <div className={styles.detailItem}>
-                    <span className={styles.detailLabel}>Convidados</span>
-                    <span className={styles.detailValue}>{viewingEvent.guestCount}</span>
-                  </div>
+                  {ev.finalValue != null && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>Valor Final</span>
+                      <span className={styles.detailValue}>R$ {ev.finalValue.toLocaleString('pt-BR')}</span>
+                    </div>
+                  )}
+                  {ev.budget != null && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>Orçamento</span>
+                      <span className={styles.detailValue}>R$ {ev.budget.toLocaleString('pt-BR')}</span>
+                    </div>
+                  )}
+                  {ev.travelCost != null && ev.travelCost > 0 && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>Deslocamento</span>
+                      <span className={styles.detailValue}>R$ {ev.travelCost.toLocaleString('pt-BR')}</span>
+                    </div>
+                  )}
+                  {ev.paymentMethod && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>Forma de Pagamento</span>
+                      <span className={styles.detailValue}>{ev.paymentMethod}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {(viewingEvent.responsibleEmployeeId || viewingEvent.staffCount || (viewingEvent.selectedEmployeeIds && viewingEvent.selectedEmployeeIds.length > 0)) && (
+              {(ev.responsibleEmployeeId || ev.staffCount || (ev.selectedEmployeeIds && ev.selectedEmployeeIds.length > 0) || ev.teamPizzaiolo || ev.teamHelper || ev.teamGarcon) && (
                 <div className={styles.detailSection}>
-                  <p className={styles.detailSectionTitle}>Equipe</p>
+                  <p className={styles.detailSectionTitle}>Equipe Soul540</p>
                   <div className={styles.detailGrid}>
-                    {viewingEvent.responsibleEmployeeId && (
+                    {ev.teamPizzaiolo && (
                       <div className={styles.detailItem}>
-                        <span className={styles.detailLabel}>Responsável</span>
-                        <span className={styles.detailValue}>{employeeMap[viewingEvent.responsibleEmployeeId] || viewingEvent.responsibleEmployeeId}</span>
+                        <span className={styles.detailLabel}>Pizzaio</span>
+                        <span className={styles.detailValue}>{employeeMap[ev.teamPizzaiolo] || ev.teamPizzaiolo}</span>
                       </div>
                     )}
-                    {viewingEvent.staffCount && (
+                    {ev.teamHelper && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Ajudante</span>
+                        <span className={styles.detailValue}>{employeeMap[ev.teamHelper] || ev.teamHelper}</span>
+                      </div>
+                    )}
+                    {ev.teamGarcon && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Garçon</span>
+                        <span className={styles.detailValue}>{employeeMap[ev.teamGarcon] || ev.teamGarcon}</span>
+                      </div>
+                    )}
+                    {ev.responsibleEmployeeId && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Responsável</span>
+                        <span className={styles.detailValue}>{employeeMap[ev.responsibleEmployeeId] || ev.responsibleEmployeeId}</span>
+                      </div>
+                    )}
+                    {ev.staffCount && (
                       <div className={styles.detailItem}>
                         <span className={styles.detailLabel}>Funcionários</span>
-                        <span className={styles.detailValue}>{viewingEvent.staffCount} pessoas</span>
+                        <span className={styles.detailValue}>{ev.staffCount} pessoas</span>
                       </div>
                     )}
                   </div>
-                  {viewingEvent.selectedEmployeeIds && viewingEvent.selectedEmployeeIds.length > 0 && (
+                  {ev.selectedEmployeeIds && ev.selectedEmployeeIds.length > 0 && (
                     <div className={styles.detailItem}>
                       <span className={styles.detailLabel}>Equipe escalada</span>
                       <div className={styles.menuTags}>
-                        {viewingEvent.selectedEmployeeIds.map((id) => (
+                        {ev.selectedEmployeeIds.map((id) => (
                           <span key={id} className={styles.menuTag}>{employeeMap[id] || id}</span>
                         ))}
                       </div>
@@ -279,53 +437,94 @@ export default function Eventos() {
                 </div>
               )}
 
-              {viewingEvent.menu && viewingEvent.menu.length > 0 && (
+              {ev.menu && ev.menu.length > 0 && (
                 <div className={styles.detailSection}>
                   <p className={styles.detailSectionTitle}>Cardápio</p>
                   <div className={styles.menuTags}>
-                    {viewingEvent.menu.map((item, i) => (
+                    {ev.menu.map((item, i) => (
                       <span key={i} className={styles.menuTag}>{item}</span>
                     ))}
                   </div>
                 </div>
               )}
 
-              {viewingEvent.notes && (
+              {ev.notes && (
                 <div className={styles.detailSection}>
                   <p className={styles.detailSectionTitle}>Observações</p>
-                  <p className={styles.detailValue}>{viewingEvent.notes}</p>
+                  <p className={styles.detailValue}>{ev.notes}</p>
                 </div>
               )}
 
-              {(viewingEvent.paymentProofName || viewingEvent.contractPdfName) && (
+              {(ev.paymentProofData || ev.contractPdfData) && (
                 <div className={styles.detailSection}>
                   <p className={styles.detailSectionTitle}>Documentos</p>
-                  <div className={styles.detailGrid}>
-                    {viewingEvent.paymentProofName && (
-                      <div className={styles.detailItem}>
-                        <span className={styles.detailLabel}>Comprovante</span>
-                        <span className={styles.detailValue}>{viewingEvent.paymentProofName}</span>
+                  <div className={styles.docGrid}>
+                    {ev.paymentProofData && (
+                      <div className={styles.docCard}>
+                        <div className={styles.docCardHeader}>
+                          <span className={styles.detailLabel}>Comprovante de Pagamento</span>
+                          <a
+                            className={styles.docDownloadBtn}
+                            href={ev.paymentProofData}
+                            download={ev.paymentProofName || 'comprovante'}
+                            onClick={(e) => e.stopPropagation()}
+                            title="Baixar"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                          </a>
+                        </div>
+                        {ev.paymentProofData.startsWith('data:image') ? (
+                          <img src={ev.paymentProofData} alt="Comprovante" className={styles.docPreviewImage} />
+                        ) : ev.paymentProofData.startsWith('data:application/pdf') ? (
+                          <iframe src={ev.paymentProofData} className={styles.docPreviewPdf} title="Comprovante PDF" />
+                        ) : (
+                          <div className={styles.docNoPreview}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            <span>{ev.paymentProofName || 'Arquivo'}</span>
+                          </div>
+                        )}
                       </div>
                     )}
-                    {viewingEvent.contractPdfName && (
-                      <div className={styles.detailItem}>
-                        <span className={styles.detailLabel}>Contrato</span>
-                        <span className={styles.detailValue}>{viewingEvent.contractPdfName}</span>
+                    {ev.contractPdfData && (
+                      <div className={styles.docCard}>
+                        <div className={styles.docCardHeader}>
+                          <span className={styles.detailLabel}>Contrato</span>
+                          <a
+                            className={styles.docDownloadBtn}
+                            href={ev.contractPdfData}
+                            download={ev.contractPdfName || 'contrato'}
+                            onClick={(e) => e.stopPropagation()}
+                            title="Baixar"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                          </a>
+                        </div>
+                        {ev.contractPdfData.startsWith('data:image') ? (
+                          <img src={ev.contractPdfData} alt="Contrato" className={styles.docPreviewImage} />
+                        ) : ev.contractPdfData.startsWith('data:application/pdf') ? (
+                          <iframe src={ev.contractPdfData} className={styles.docPreviewPdf} title="Contrato PDF" />
+                        ) : (
+                          <div className={styles.docNoPreview}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            <span>{ev.contractPdfName || 'Arquivo'}</span>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
                 </div>
               )}
 
-              {viewingEvent.createdBy && (
+              {ev.createdBy && (
                 <div className={styles.detailSection}>
                   <p className={styles.detailSectionTitle}>Criado por</p>
-                  <p className={styles.detailValue}>{viewingEvent.createdBy}</p>
+                  <p className={styles.detailValue}>{ev.createdBy}</p>
                 </div>
               )}
 
             </div>
             <div className={styles.modalFooter}>
+              <span />
               <button className={styles.btnCancel} onClick={() => setViewingEvent(null)}>Fechar</button>
             </div>
           </div>
@@ -353,7 +552,7 @@ export default function Eventos() {
                 <ol className={styles.infoList}>
                   <li>Clique em qualquer card de evento para ver os detalhes completos.</li>
                   <li>Use a barra de busca para filtrar eventos por nome.</li>
-                  <li>Os eventos são divididos em <strong>Orçamentos</strong> e <strong>Eventos Fechados</strong>.</li>
+                  <li>Os eventos fechados são agrupados por mês — clique no mês para expandir.</li>
                 </ol>
               </div>
             </div>
