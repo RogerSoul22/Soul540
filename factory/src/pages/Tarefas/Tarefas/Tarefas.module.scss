@@ -8,6 +8,7 @@
   @include mobile { padding: $spacing-md; }
 }
 
+// ── Header ────────────────────────────────────────────
 .header {
   @include flex-between;
   margin-bottom: $spacing-xl;
@@ -28,333 +29,393 @@
   margin-top: 6px;
 }
 
-.headerActions {
+.saveStatus {
   display: flex;
   align-items: center;
-  gap: $spacing-md;
+  min-width: 90px;
+  justify-content: flex-end;
 }
 
-.viewToggle {
-  display: flex;
+.saveLabel {
+  font-size: $font-size-xs;
+  color: $text-muted;
+}
+
+.saveLabelOk {
+  font-size: $font-size-xs;
+  color: #4ade80;
+  font-weight: $font-weight-medium;
+}
+
+// ── Receitas grid ────────────────────────────────────
+.receitasGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-xl;
+  margin-bottom: $spacing-xl;
+
+  @include tablet { grid-template-columns: 1fr; }
+}
+
+.recipeBlock {
   background: $bg-secondary;
   border: 1px solid $border;
-  border-radius: $radius-sm;
-  padding: 4px;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-.viewBtn {
+.blockHeader {
+  @include flex-between;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1px solid $border;
+  background: rgba(255,255,255,0.02);
+}
+
+.blockTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.blockSub {
+  font-size: $font-size-xs;
+  color: $text-muted;
+}
+
+// ── Table inside recipe block ────────────────────────
+.tableWrap {
+  overflow-x: auto;
+  flex: 1;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: $font-size-sm;
+
+  thead tr {
+    border-bottom: 1px solid $border;
+  }
+
+  th {
+    padding: 8px 10px;
+    text-align: left;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 4px 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+}
+
+.cellInput {
+  width: 100%;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: $radius-xs;
+  padding: 5px 7px;
+  font-size: $font-size-sm;
+  color: $text-primary;
+  font-family: inherit;
+  transition: border-color $transition-fast, background $transition-fast;
+
+  &::placeholder { color: $text-muted; }
+  &:hover { border-color: $border; }
+  &:focus { outline: none; border-color: $border-accent; background: $bg-input; }
+}
+
+.cellSelect {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: $radius-xs;
+  padding: 5px 6px;
+  font-size: $font-size-sm;
+  color: $text-primary;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color $transition-fast;
+
+  &:hover { border-color: $border; }
+  &:focus { outline: none; border-color: $border-accent; }
+
+  option { background: $bg-secondary; }
+}
+
+.cellNumber {
+  width: 90px;
+  text-align: right;
+}
+
+.cellCalc {
+  font-size: $font-size-xs;
+  color: $text-muted;
+  white-space: nowrap;
+  padding: 4px 10px !important;
+}
+
+.btnRemove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: none;
+  border: none;
+  color: $text-muted;
+  border-radius: $radius-xs;
+  cursor: pointer;
+  transition: color $transition-fast, background $transition-fast;
+
+  &:hover { color: #f87171; background: rgba(239,68,68,0.1); }
+}
+
+.totalRow {
+  @include flex-between;
+  padding: $spacing-sm $spacing-lg;
+  border-top: 1px solid $border;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  background: rgba(255,255,255,0.02);
+
+  strong { color: $text-primary; font-weight: $font-weight-semibold; }
+}
+
+.btnAdd {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  border: none;
-  border-radius: $radius-xs;
+  margin: $spacing-sm $spacing-md $spacing-md;
+  padding: 7px $spacing-md;
   background: none;
-  color: $text-muted;
+  border: 1px dashed $border;
+  border-radius: $radius-sm;
   font-size: $font-size-xs;
-  font-weight: $font-weight-medium;
+  color: $text-muted;
   cursor: pointer;
   transition: all $transition-fast;
+  width: calc(100% - #{$spacing-md * 2});
 
-  &:hover { color: $text-primary; }
+  &:hover { border-color: $accent; color: $accent; }
 }
 
-.viewBtnActive {
-  background: $accent;
-  color: #0a0f1e;
-}
-
-.stats {
-  display: flex;
-  gap: $spacing-xl;
-  margin-bottom: $spacing-xl;
-}
-
-.stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.statVal {
-  font-size: $font-size-2xl;
-  font-weight: $font-weight-bold;
-  color: $text-primary;
-}
-
-.statLbl {
-  font-size: $font-size-xs;
-  color: $text-muted;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.statDanger .statVal { color: #f87171; }
-
-.controls {
-  display: flex;
-  align-items: center;
-  gap: $spacing-md;
-  margin-bottom: $spacing-xl;
-  flex-wrap: wrap;
-}
-
-.searchWrap {
-  position: relative;
-  flex: 1;
-  max-width: 400px;
-}
-
-.searchIcon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: $text-muted;
-  pointer-events: none;
-}
-
-.searchInput {
-  width: 100%;
-  background: $bg-secondary;
-  border: 1px solid $border;
-  border-radius: $radius-sm;
-  padding: 9px 12px 9px 36px;
-  font-size: $font-size-sm;
-  color: $text-primary;
-
-  &::placeholder { color: $text-muted; }
-  &:focus { outline: none; border-color: $border-accent; }
-}
-
-.select {
-  background: $bg-secondary;
-  border: 1px solid $border;
-  border-radius: $radius-sm;
-  padding: 9px 12px;
-  font-size: $font-size-sm;
-  color: $text-primary;
-  cursor: pointer;
-
-  &:focus { outline: none; border-color: $border-accent; }
-}
-
-// Kanban
-.kanban {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: $spacing-md;
-  align-items: start;
-
-  @include tablet { grid-template-columns: repeat(2, 1fr); }
-  @include mobile { grid-template-columns: 1fr; }
-}
-
-.column {
+// ── Calculadora ───────────────────────────────────────
+.calcSection {
   background: $bg-secondary;
   border: 1px solid $border;
   border-radius: $radius-lg;
   overflow: hidden;
 }
 
-.columnHeader {
-  @include flex-between;
-  padding: $spacing-md $spacing-md;
+.calcHeader {
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1px solid $border;
+  background: rgba(255,255,255,0.02);
+}
+
+.calcInputs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  padding: $spacing-lg;
   border-bottom: 1px solid $border;
 }
 
-.columnTitle {
+.calcGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 160px;
+}
+
+.calcLabel {
   font-size: $font-size-xs;
-  font-weight: $font-weight-semibold;
-  color: $text-secondary;
+  font-weight: $font-weight-medium;
+  color: $text-muted;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 
-.columnCount {
-  font-size: $font-size-xs;
-  background: rgba(255,255,255,0.06);
-  border-radius: $radius-full;
-  padding: 2px 8px;
-  color: $text-muted;
-}
-
-.columnBody {
-  padding: $spacing-sm;
-  min-height: 200px;
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-  transition: background $transition-fast, outline $transition-fast;
-  border-radius: $radius-sm;
-}
-
-.columnBodyOver {
-  background: rgba(245, 158, 11, 0.06);
-  outline: 2px dashed rgba(245, 158, 11, 0.35);
-  outline-offset: -4px;
-}
-
-.colEmpty {
-  text-align: center;
-  padding: $spacing-xl $spacing-md;
-  font-size: $font-size-xs;
-  color: $text-muted;
-}
-
-.taskCard {
-  background: $bg-card;
+.calcSelect, .calcInput {
+  background: $bg-input;
   border: 1px solid $border;
   border-radius: $radius-sm;
-  padding: $spacing-md;
+  padding: 9px 12px;
+  font-size: $font-size-sm;
+  color: $text-primary;
+  font-family: inherit;
+  transition: border-color $transition-fast;
+
+  &::placeholder { color: $text-muted; }
+  &:focus { outline: none; border-color: $border-accent; }
+
+  option { background: $bg-secondary; }
+}
+
+.modeToggle {
   display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-  transition: border-color $transition-fast, opacity $transition-fast, box-shadow $transition-fast;
-  cursor: grab;
-  user-select: none;
-
-  &:hover { border-color: $border-accent; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-  &:active { cursor: grabbing; }
+  background: $bg-input;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 3px;
+  gap: 2px;
 }
 
-.taskCardDragging {
-  opacity: 0.35;
-  cursor: grabbing;
-}
-
-.taskTop {
-  @include flex-between;
-}
-
-.taskDelete {
+.modeBtn {
+  flex: 1;
+  padding: 6px 12px;
   background: none;
-  border: none;
-  color: $text-muted;
-  cursor: pointer;
-  padding: 2px;
-  display: flex;
-
-  &:hover { color: #f87171; }
-}
-
-.taskTitle {
-  font-size: $font-size-sm;
-  font-weight: $font-weight-medium;
-  color: $text-primary;
-  line-height: 1.4;
-}
-
-.taskDesc {
-  font-size: $font-size-xs;
-  color: $text-muted;
-  line-height: 1.4;
-}
-
-.taskMeta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  font-size: $font-size-xs;
-  color: $text-muted;
-}
-
-.taskEvent {
-  color: $accent;
-  @include text-ellipsis;
-  max-width: 100%;
-}
-
-
-// List view
-.listView {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.listItem {
-  @include flex-between;
-  padding: $spacing-md;
-  background: $bg-card;
-  border: 1px solid $border;
-  border-radius: $radius-sm;
-  gap: $spacing-md;
-
-  &:hover { border-color: $border-accent; }
-}
-
-.listItemInfo { flex: 1; min-width: 0; }
-
-.listItemTitle {
-  font-size: $font-size-sm;
-  font-weight: $font-weight-medium;
-  color: $text-primary;
-}
-
-.listItemSub {
-  font-size: $font-size-xs;
-  color: $text-muted;
-  margin-top: 4px;
-}
-
-.listItemBadges {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  flex-shrink: 0;
-}
-
-.empty {
-  text-align: center;
-  padding: $spacing-3xl;
-  color: $text-muted;
-  font-size: $font-size-sm;
-}
-
-// Buttons
-.btnPrimary {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  padding: 10px $spacing-md;
-  background: $accent;
-  color: #0a0f1e;
-  font-size: $font-size-sm;
-  font-weight: $font-weight-semibold;
-  border: none;
-  border-radius: $radius-sm;
-  cursor: pointer;
-  transition: background $transition-fast;
-
-  &:hover { background: $accent-hover; }
-  &:disabled { opacity: 0.5; cursor: not-allowed; }
-}
-
-.btnDelete {
-  padding: 6px 10px;
-  background: rgba(239,68,68,0.08);
   border: none;
   border-radius: $radius-xs;
-  color: #f87171;
   font-size: $font-size-xs;
-  cursor: pointer;
-
-  &:hover { background: rgba(239,68,68,0.15); }
-}
-
-.btnCancel {
-  padding: 10px $spacing-md;
-  background: none;
-  border: none;
+  font-weight: $font-weight-medium;
   color: $text-muted;
-  font-size: $font-size-sm;
   cursor: pointer;
+  transition: all $transition-fast;
+  white-space: nowrap;
 
   &:hover { color: $text-primary; }
 }
 
-// Modal
+.modeBtnActive {
+  background: $accent;
+  color: #0a0f1e;
+}
+
+// ── Calc result ───────────────────────────────────────
+.calcResult {
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.resultSummary {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.resultEvent {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $accent;
+}
+
+.resultKpis {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xl;
+}
+
+.resultKpi {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.resultKpiVal {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  line-height: 1;
+}
+
+.resultKpiLbl {
+  font-size: $font-size-xs;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+// Result table (ingredient breakdown)
+.resultTable {
+  display: flex;
+  flex-direction: column;
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  overflow: hidden;
+}
+
+.resultTableHeader {
+  display: grid;
+  grid-template-columns: 1fr 120px 100px;
+  padding: 8px 12px;
+  border-bottom: 1px solid $border;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  background: rgba(255,255,255,0.02);
+
+  span:not(:first-child) { text-align: right; }
+}
+
+.resultRow {
+  display: grid;
+  grid-template-columns: 1fr 120px 100px;
+  padding: 8px 12px;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+
+  &:last-child { border-bottom: none; }
+}
+
+.resultName { color: $text-primary; }
+.resultQty, .resultCost { text-align: right; font-variant-numeric: tabular-nums; }
+
+.resultTotal {
+  display: grid;
+  grid-template-columns: 1fr 120px 100px;
+  padding: 9px 12px;
+  border-top: 1px solid $border;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  background: rgba(255,255,255,0.03);
+
+  span:last-child { text-align: right; }
+}
+
+.btnPrint {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-sm;
+  align-self: flex-start;
+  padding: 9px $spacing-lg;
+  background: $accent;
+  color: #0a0f1e;
+  border: none;
+  border-radius: $radius-sm;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover { background: $accent-hover; }
+}
+
+.calcEmpty {
+  padding: $spacing-xl;
+  text-align: center;
+  font-size: $font-size-sm;
+  color: $text-muted;
+}
+
+// ── Print modal ──────────────────────────────────────
 .overlay {
   position: fixed;
   inset: 0;
@@ -367,25 +428,48 @@
   backdrop-filter: blur(4px);
 }
 
-.modal {
+.printModal {
   background: $bg-secondary;
   border: 1px solid $border;
   border-radius: $radius-lg;
   width: 100%;
-  max-width: 500px;
+  max-width: 520px;
   box-shadow: $shadow-lg;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
-.modalHeader {
+.printHeader {
   @include flex-between;
-  padding: $spacing-lg $spacing-xl;
+  padding: $spacing-md $spacing-xl;
   border-bottom: 1px solid $border;
+  position: sticky;
+  top: 0;
+  background: $bg-secondary;
+  z-index: 1;
 }
 
-.modalTitle {
+.printTitle {
   font-size: $font-size-lg;
   font-weight: $font-weight-semibold;
   color: $text-primary;
+}
+
+.btnPrintNow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px $spacing-md;
+  background: $accent;
+  color: #0a0f1e;
+  border: none;
+  border-radius: $radius-sm;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: background $transition-fast;
+
+  &:hover { background: $accent-hover; }
 }
 
 .modalClose {
@@ -397,85 +481,109 @@
   color: $text-muted;
   border-radius: $radius-xs;
   cursor: pointer;
+  transition: all $transition-fast;
 
   &:hover { background: rgba(255,255,255,0.06); color: $text-primary; }
 }
 
-.modalBody {
+.printBody {
   padding: $spacing-xl;
   display: flex;
   flex-direction: column;
-  gap: $spacing-md;
+  gap: $spacing-lg;
 }
 
-.modalFooter {
-  @include flex-between;
-  padding: $spacing-md $spacing-xl;
-  border-top: 1px solid $border;
-}
-
-.formGrid2 {
+.printMeta {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: $spacing-md;
-
-  @include mobile { grid-template-columns: 1fr; }
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-sm;
 }
 
-.formGroup {
+.printMetaItem {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
-
-.label {
-  font-size: $font-size-xs;
-  font-weight: $font-weight-medium;
-  color: $text-secondary;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.input, .textarea {
-  background: $bg-input;
+  gap: 2px;
+  background: $bg-card;
   border: 1px solid $border;
   border-radius: $radius-sm;
-  padding: 10px 12px;
+  padding: $spacing-sm $spacing-md;
+
+  span {
+    font-size: $font-size-xs;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  strong {
+    font-size: $font-size-sm;
+    color: $text-primary;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.printTable {
+  width: 100%;
+  border-collapse: collapse;
   font-size: $font-size-sm;
-  color: $text-primary;
-  transition: border-color $transition-fast;
-  font-family: inherit;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  overflow: hidden;
 
-  &::placeholder { color: $text-muted; }
-  &:focus { outline: none; border-color: $border-accent; }
+  th {
+    padding: 8px 12px;
+    text-align: left;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid $border;
+  }
+
+  td {
+    padding: 8px 12px;
+    color: $text-secondary;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  tfoot td {
+    border-top: 1px solid $border;
+    border-bottom: none;
+    color: $text-primary;
+    background: rgba(255,255,255,0.02);
+    padding-top: 10px;
+  }
+
+  th:not(:first-child), td:not(:first-child) { text-align: right; }
 }
 
-.textarea { resize: vertical; }
+.printFooter {
+  font-size: $font-size-sm;
+  color: $text-muted;
+  text-align: right;
+  padding-top: $spacing-sm;
+  border-top: 1px solid $border;
 
-// Info button
-.titleRow { display: flex; align-items: center; gap: $spacing-sm; }
-.btnInfo {
-  display: flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px; background: none; border: none;
-  color: $text-muted; cursor: pointer; border-radius: 50%;
-  transition: all $transition-fast; flex-shrink: 0;
-  &:hover { color: $text-primary; background: rgba(255,255,255,0.07); }
+  strong { color: $text-primary; }
 }
-.infoSection { display: flex; flex-direction: column; gap: 8px; padding-bottom: $spacing-md; border-bottom: 1px solid $border; &:last-child { border-bottom: none; padding-bottom: 0; } }
-.infoSectionTitle { font-size: $font-size-sm; font-weight: $font-weight-semibold; color: $text-primary; }
-.infoText { font-size: $font-size-sm; color: $text-secondary; line-height: 1.6; strong { color: $text-primary; } }
-.infoList { font-size: $font-size-sm; color: $text-secondary; line-height: 1.8; padding-left: $spacing-lg; margin: 0; strong { color: $text-primary; } }
 
-// Mobile: bottom-sheet modals
+// Mobile bottom-sheet
 @include mobile {
   .overlay {
     padding: $spacing-xs;
     align-items: flex-end;
   }
-  .modal {
+  .printModal {
     border-radius: $radius-lg $radius-lg 0 0;
     max-height: 88vh;
   }
-  .modalBody { padding: $spacing-md; }
-  .modalFooter { padding: $spacing-sm $spacing-md; }
+  .printBody { padding: $spacing-md; }
+  .printMeta { grid-template-columns: 1fr; }
+  .resultTableHeader,
+  .resultRow,
+  .resultTotal {
+    grid-template-columns: 1fr 100px 90px;
+  }
 }
