@@ -50,9 +50,19 @@ export default function Permissoes() {
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<AppUser | null>(null);
+  const [changePwTarget, setChangePwTarget] = useState<AppUser | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [changePwSaving, setChangePwSaving] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
-  const [revealedPasswords, setRevealedPasswords] = useState<Record<string, boolean>>({});
   const { user: authUser } = useAuth();
+  const revealedPasswords: Record<string, boolean> = {};
+
+  const canChangePassword = (target: AppUser) => {
+    if (!authUser?.isAdmin) return false;
+    const myUnit = authUser.unit || 'franchise';
+    if (myUnit === 'main') return true;
+    return target.unit === myUnit;
+  };
 
   useEffect(() => {
     apiFetch('/api/users').then(r => r.json()).then(setUsers).catch(() => {});
@@ -117,6 +127,28 @@ export default function Permissoes() {
     setDeleteTarget(null);
   };
 
+  const handleChangePassword = async () => {
+    if (!changePwTarget || newPassword.trim().length < 6) return;
+    setChangePwSaving(true);
+    try {
+      const res = await apiFetch(`/api/users/${changePwTarget.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: newPassword }),
+      });
+      if (!res.ok) throw new Error('Erro ao alterar senha');
+      const updated = await res.json();
+      setUsers(prev => prev.map(u => u.id === updated.id ? { ...u, ...updated } : u));
+      if (selected?.id === updated.id) setSelected(prev => prev ? { ...prev, ...updated } : prev);
+      setChangePwTarget(null);
+      setNewPassword('');
+    } catch {
+      alert('Erro ao alterar senha. Tente novamente.');
+    } finally {
+      setChangePwSaving(false);
+    }
+  };
+
   const initials = (name: string) => name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 
   return (
@@ -151,7 +183,7 @@ export default function Permissoes() {
               <div className={styles.userInfo}>
                 <p className={styles.userName}>{u.name}</p>
                 <p className={styles.userEmail}>{u.email}</p>
-                {authUser?.isAdmin && u.passwordPlain && (
+                {false && (
                   <p className={styles.userPassword}>
                     {revealedPasswords[u.id] ? u.passwordPlain : '••••••••'}
                   </p>
@@ -159,17 +191,13 @@ export default function Permissoes() {
               </div>
               <div className={styles.userMeta}>
                 {u.isAdmin && <span className={styles.badgeAdmin}>Admin</span>}
-                {authUser?.isAdmin && u.passwordPlain && (
+                {canChangePassword(u) && (
                   <button
                     className={styles.btnEye}
-                    onClick={(e) => { e.stopPropagation(); setRevealedPasswords(prev => ({ ...prev, [u.id]: !prev[u.id] })); }}
-                    title={revealedPasswords[u.id] ? 'Ocultar senha' : 'Ver senha'}
+                    onClick={(e) => { e.stopPropagation(); setChangePwTarget(u); setNewPassword(''); }}
+                    title="Alterar senha"
                   >
-                    {revealedPasswords[u.id] ? (
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                    ) : (
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    )}
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
                   </button>
                 )}
                 <button
@@ -321,6 +349,45 @@ export default function Permissoes() {
                   <li>Administradores têm acesso automático a todas as páginas</li>
                 </ul>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {changePwTarget && (
+        <div className={styles.overlay} onClick={() => setChangePwTarget(null)}>
+          <div className={styles.modal} style={{ maxWidth: 400 }} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Alterar Senha</h2>
+              <button className={styles.modalClose} onClick={() => setChangePwTarget(null)}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <p className={styles.deleteMsg} style={{ marginBottom: 16 }}>
+                Alterar senha de <strong>{changePwTarget.name}</strong>
+              </p>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Nova Senha *</label>
+                <input
+                  className={styles.input}
+                  type="password"
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                  placeholder="Mínimo 6 caracteres"
+                  autoFocus
+                />
+              </div>
+            </div>
+            <div className={styles.modalFooter}>
+              <button className={styles.btnCancel} onClick={() => setChangePwTarget(null)}>Cancelar</button>
+              <button
+                className={styles.btnPrimary}
+                onClick={handleChangePassword}
+                disabled={newPassword.length < 6 || changePwSaving}
+              >
+                {changePwSaving ? 'Salvando...' : 'Salvar Senha'}
+              </button>
             </div>
           </div>
         </div>

@@ -24,6 +24,7 @@ import invoicesRouter from './routes/invoices';
 import chatRouter from './routes/chat';
 import auditLogRouter from './routes/auditlog';
 import productionRecipesRouter from './routes/production-recipes';
+import productionOrdersRouter from './routes/production-orders';
 import { optionalAuth } from './middleware/auth';
 
 const app = express();
@@ -53,6 +54,7 @@ app.use('/api/invoices', invoicesRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/audit-log', auditLogRouter);
 app.use('/api/production-recipes', productionRecipesRouter);
+app.use('/api/production-orders', productionOrdersRouter);
 
 // Serve franchise app at /franquia
 const franchiseDist = path.join(process.cwd(), 'franchise/dist');

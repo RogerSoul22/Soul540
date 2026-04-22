@@ -17,6 +17,14 @@ type PizzaSize = {
   gramsPerPizza: number;
 };
 
+type PedidoIngredient = {
+  id: string;
+  name: string;
+  measure: string;
+  neededQty: number;
+  neededCost: number;
+};
+
 type Recipe = {
   ingredients: Ingredient[];
   sizes: PizzaSize[];
@@ -30,6 +38,174 @@ function uid() {
 
 function formatR$(n: number) {
   return n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function formatQty(n: number) {
+  return n.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+}
+
+type PedidoStatus = 'a_preparar' | 'a_enviar' | 'entregue';
+type Pedido = {
+  id: string;
+  filial: string;
+  itens: Array<{ id: string; nome: string; measure: string; quantidade: number }>;
+  pizzaSize: PizzaSize;
+  ingredients: PedidoIngredient[];
+  totalCost: number;
+  status: PedidoStatus;
+};
+
+// Formulário para criar novo pedido
+function NovoPedidoForm({
+  onSave,
+  sizes,
+  ingredients,
+}: {
+  onSave: (pedido: Pedido) => Promise<void> | void;
+  sizes: PizzaSize[];
+  ingredients: Ingredient[];
+}) {
+  const [filial, setFilial] = useState('');
+  const [itens, setItens] = useState<Array<{ id: string; nome: string; measure: string; quantidade: number }>>([]);
+  const [itemIngredientId, setItemIngredientId] = useState('');
+  const [itemQtd, setItemQtd] = useState(1);
+  const [sizeId, setSizeId] = useState(sizes[0]?.id || '');
+  const availableIngredients = ingredients.filter(ingredient => ingredient.name.trim());
+
+  useEffect(() => {
+    if (!sizes.length) {
+      setSizeId('');
+      return;
+    }
+    setSizeId(current => (sizes.some(size => size.id === current) ? current : sizes[0].id));
+  }, [sizes]);
+
+  useEffect(() => {
+    if (!availableIngredients.length) {
+      setItemIngredientId('');
+      return;
+    }
+    setItemIngredientId(current => (availableIngredients.some(ingredient => ingredient.id === current) ? current : availableIngredients[0].id));
+  }, [availableIngredients]);
+
+  const addItem = () => {
+    const selectedIngredient = availableIngredients.find(ingredient => ingredient.id === itemIngredientId);
+    if (!selectedIngredient || itemQtd <= 0) return;
+
+    setItens(prev => {
+      const existing = prev.find(item => item.id === selectedIngredient.id);
+      if (existing) {
+        return prev.map(item =>
+          item.id === selectedIngredient.id
+            ? { ...item, quantidade: item.quantidade + itemQtd }
+            : item,
+        );
+      }
+
+      return [
+        ...prev,
+        {
+          id: selectedIngredient.id,
+          nome: selectedIngredient.name,
+          measure: selectedIngredient.measure,
+          quantidade: itemQtd,
+        },
+      ];
+    });
+    setItemQtd(1);
+  };
+  const removeItem = (idx: number) => setItens(prev => prev.filter((_, i) => i !== idx));
+  const selectedSize = sizes.find(size => size.id === sizeId);
+
+  return (
+    <form
+      onSubmit={async e => {
+        e.preventDefault();
+        if (!filial.trim() || itens.length === 0 || !selectedSize) return;
+
+        const pedidoIngredients = itens.map(item => {
+          const ingredient = ingredients.find(recipeIngredient => recipeIngredient.id === item.id);
+          const unitCost = ingredient?.cost || 0;
+          return {
+            id: item.id,
+            name: item.nome,
+            measure: item.measure,
+            neededQty: item.quantidade,
+            neededCost: item.quantidade * unitCost,
+          };
+        });
+        const totalCost = pedidoIngredients.reduce((sum, ingredient) => sum + ingredient.neededCost, 0);
+
+        await onSave({
+          id: uid(),
+          filial: filial.trim(),
+          itens,
+          pizzaSize: { ...selectedSize },
+          ingredients: pedidoIngredients,
+          totalCost,
+          status: 'a_preparar',
+        });
+      }}
+    >
+      <div className={styles.formGroup}>
+        <label className={styles.label}>Filial</label>
+        <input className={styles.input} value={filial} onChange={e => setFilial(e.target.value)} placeholder="Nome da filial" required />
+      </div>
+
+      <div className={styles.formGroup}>
+        <label className={styles.label}>Tamanho da pizza</label>
+        <select className={styles.input} value={sizeId} onChange={e => setSizeId(e.target.value)} required>
+          {sizes.length === 0 ? (
+            <option value="">Cadastre um tamanho antes de criar o pedido</option>
+          ) : (
+            sizes.map(size => (
+              <option key={size.id} value={size.id}>
+                {size.diameter}cm ({size.gramsPerPizza}g)
+              </option>
+            ))
+          )}
+        </select>
+      </div>
+
+      <div className={styles.formGroup}>
+        <div className={styles.label}>Itens do pedido</div>
+        <div className={styles.formGrid2}>
+          <div>
+            <select className={styles.input} value={itemIngredientId} onChange={e => setItemIngredientId(e.target.value)} disabled={availableIngredients.length === 0}>
+              {availableIngredients.length === 0 ? (
+                <option value="">Cadastre ingredientes antes de criar o pedido</option>
+              ) : (
+                availableIngredients.map(ingredient => (
+                  <option key={ingredient.id} value={ingredient.id}>
+                    {ingredient.name} ({ingredient.measure})
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
+          <div>
+            <input className={styles.input} type="number" min={1} value={itemQtd} onChange={e => setItemQtd(Number(e.target.value) || 1)} />
+          </div>
+          <div>
+            <button type="button" className={styles.btnPrimary} onClick={addItem} disabled={!itemIngredientId || availableIngredients.length === 0}>Adicionar</button>
+          </div>
+        </div>
+
+        <ul style={{ margin: 0, paddingLeft: 18 }}>
+          {itens.map((item, idx) => (
+            <li key={idx} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+              <span style={{ color: 'var(--text-primary, #fff)' }}>{item.nome} <small style={{ color: 'var(--accent, #7dd3fc)' }}>{formatQty(item.quantidade)} {item.measure}</small></span>
+              <button type="button" className={styles.btnDelete} onClick={() => removeItem(idx)}>Remover</button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
+        <button type="submit" className={styles.btnPrimary} disabled={!filial.trim() || itens.length === 0 || !selectedSize || availableIngredients.length === 0}>Criar Pedido</button>
+      </div>
+    </form>
+  );
 }
 
 export default function Producao() {
@@ -47,12 +223,19 @@ export default function Producao() {
   const [calcEventId, setCalcEventId] = useState('');
   const [showPrint, setShowPrint] = useState(false);
 
+  // Pedidos (Kanban)
+  const [pedidos, setPedidos] = useState<Pedido[]>([]);
+  const [showNovoPedido, setShowNovoPedido] = useState(false);
+
   useEffect(() => {
-    apiFetch('/api/production-recipes')
-      .then(r => r.json())
-      .then((data: Recipe) => {
-        setRecipe(data);
-        if (data.sizes?.length) setCalcSizeId(data.sizes[0].id);
+    Promise.all([
+      apiFetch('/api/production-recipes').then(r => r.json() as Promise<Recipe>),
+      apiFetch('/api/production-orders').then(r => r.json() as Promise<Pedido[]>),
+    ])
+      .then(([recipeData, pedidosData]) => {
+        setRecipe(recipeData);
+        setPedidos(pedidosData);
+        if (recipeData.sizes?.length) setCalcSizeId(recipeData.sizes[0].id);
       })
       .catch(() => {});
   }, []);
@@ -133,6 +316,48 @@ export default function Producao() {
 
   const selectedEvent = events.find(e => e.id === calcEventId);
 
+  // Drag & drop (kanban)
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dragOverCol, setDragOverCol] = useState<PedidoStatus | null>(null);
+
+  const PEDIDO_COLUMNS: { id: PedidoStatus; label: string }[] = [
+    { id: 'a_preparar', label: 'A preparar' },
+    { id: 'a_enviar', label: 'A enviar' },
+    { id: 'entregue', label: 'Entregue' },
+  ];
+
+  const pedidosByStatus = useMemo(() => {
+    const map: Record<PedidoStatus, Pedido[]> = { a_preparar: [], a_enviar: [], entregue: [] };
+    pedidos.forEach(p => map[p.status].push(p));
+    return map;
+  }, [pedidos]);
+
+  const handleCreatePedido = async (pedido: Pedido) => {
+    const res = await apiFetch('/api/production-orders', {
+      method: 'POST',
+      body: JSON.stringify(pedido),
+    });
+    const savedPedido: Pedido = await res.json();
+    setPedidos(ps => [savedPedido, ...ps]);
+  };
+
+  const handleMove = async (pedidoId: string, newStatus: PedidoStatus) => {
+    const pedido = pedidos.find(currentPedido => currentPedido.id === pedidoId);
+    if (!pedido || pedido.status === newStatus) return;
+
+    const res = await apiFetch(`/api/production-orders/${pedidoId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ ...pedido, status: newStatus }),
+    });
+    const updatedPedido: Pedido = await res.json();
+    setPedidos(ps => ps.map(currentPedido => currentPedido.id === pedidoId ? updatedPedido : currentPedido));
+  };
+
+  const handleDeletePedido = async (pedidoId: string) => {
+    await apiFetch(`/api/production-orders/${pedidoId}`, { method: 'DELETE' });
+    setPedidos(ps => ps.filter(p => p.id !== pedidoId));
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -140,11 +365,133 @@ export default function Producao() {
           <h1 className={styles.title}>Produção</h1>
           <p className={styles.subtitle}>Receitas e calculadora de insumos por evento</p>
         </div>
-        <div className={styles.saveStatus}>
-          {saving && <span className={styles.saveLabel}>Salvando...</span>}
-          {saved && <span className={styles.saveLabelOk}>✓ Salvo</span>}
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+          <button className={styles.btnAdd} style={{ margin: 0 }} onClick={() => setShowNovoPedido(true)}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Novo Pedido
+          </button>
+          <div className={styles.saveStatus}>
+            {saving && <span className={styles.saveLabel}>Salvando...</span>}
+            {saved && <span className={styles.saveLabelOk}>✓ Salvo</span>}
+          </div>
         </div>
       </div>
+      {/* Kanban de Pedidos */}
+      <div className={styles.kanban}>
+        {PEDIDO_COLUMNS.map((col) => (
+          <div key={col.id} className={styles.column}>
+            <div className={styles.columnHeader}>
+              <span className={styles.columnTitle}>{col.label}</span>
+              <span className={styles.columnCount}>{pedidosByStatus[col.id].length}</span>
+            </div>
+            <div
+              className={`${styles.columnBody} ${dragOverCol === col.id ? styles.columnBodyOver : ''}`}
+              onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; setDragOverCol(col.id); }}
+              onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragOverCol(null); }}
+              onDrop={(e) => { e.preventDefault(); if (draggedId) void handleMove(draggedId, col.id); setDraggedId(null); setDragOverCol(null); }}
+            >
+              {pedidosByStatus[col.id].length === 0 ? (
+                <div className={styles.colEmpty}>Nenhum pedido</div>
+              ) : (
+                pedidosByStatus[col.id].map((pedido) => (
+                  <div
+                    key={pedido.id}
+                    className={`${styles.taskCard} ${draggedId === pedido.id ? styles.taskCardDragging : ''}`}
+                    draggable
+                    onDragStart={(e) => { setDraggedId(pedido.id); e.dataTransfer.effectAllowed = 'move'; }}
+                    onDragEnd={() => { setDraggedId(null); setDragOverCol(null); }}
+                  >
+                    <div className={styles.taskTop}>
+                      <div>
+                        <div className={styles.taskTitle}>Filial: {pedido.filial}</div>
+                        <div className={styles.taskMeta}>
+                          <span>{pedido.itens.length} ingredientes</span>
+                          <span>{pedido.pizzaSize.diameter}cm</span>
+                          <span>R$ {formatR$(pedido.totalCost)}</span>
+                        </div>
+                      </div>
+                      <button className={styles.taskDelete} onClick={() => void handleDeletePedido(pedido.id)}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      </button>
+                    </div>
+                    <div className={styles.taskDesc}>
+                      Itens: {pedido.itens.map(i => `${i.nome} ${formatQty(i.quantidade)} ${i.measure}`).join(', ')}
+                    </div>
+                    <div className={styles.taskRecipe}>
+                      <div className={styles.taskRecipeTitle}>Ingredientes selecionados</div>
+                      {pedido.ingredients.length > 0 ? (
+                        <div className={styles.taskRecipeList}>
+                          {pedido.ingredients.map(ingredient => (
+                            <span key={`${pedido.id}-${ingredient.id}`}>
+                              {ingredient.name}: {formatQty(ingredient.neededQty)} {ingredient.measure}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className={styles.taskRecipeEmpty}>Nenhum ingrediente cadastrado</div>
+                      )}
+                      <div className={styles.taskRecipeFooter}>Custo estimado: R$ {formatR$(pedido.totalCost)}</div>
+                    </div>
+                    <div className={styles.taskMoveRow}>
+                      {(() => {
+                        const idx = PEDIDO_COLUMNS.findIndex((c) => c.id === pedido.status);
+                        const prev = PEDIDO_COLUMNS[idx - 1];
+                        const next = PEDIDO_COLUMNS[idx + 1];
+                        return (
+                          <>
+                            <button
+                              className={styles.taskMoveBtn}
+                              disabled={!prev}
+                              onClick={() => prev && void handleMove(pedido.id, prev.id)}
+                              title={prev ? `← ${prev.label}` : undefined}
+                            >
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                            </button>
+                            <span className={styles.taskMoveLabel}>{pedido.status === 'a_preparar' ? 'A preparar' : pedido.status === 'a_enviar' ? 'A enviar' : 'Entregue'}</span>
+                            <button
+                              className={styles.taskMoveBtn}
+                              disabled={!next}
+                              onClick={() => next && void handleMove(pedido.id, next.id)}
+                              title={next ? `${next.label} →` : undefined}
+                            >
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                            </button>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Modal Novo Pedido */}
+      {showNovoPedido && (
+        <div className={styles.overlay} onClick={() => setShowNovoPedido(false)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()} style={{ maxWidth: 420 }}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Novo Pedido</h2>
+              <button className={styles.modalClose} onClick={() => setShowNovoPedido(false)}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <NovoPedidoForm
+                sizes={recipe.sizes}
+                ingredients={recipe.ingredients}
+                onSave={async pedido => {
+                  await handleCreatePedido(pedido);
+                  setShowNovoPedido(false);
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+      
 
       {/* ── RECEITAS ────────────────────────────────── */}
       <div className={styles.receitasGrid}>

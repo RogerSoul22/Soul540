@@ -30,6 +30,13 @@ function PrivateRoute() {
   return authenticated ? <Outlet /> : <Navigate to={ROUTES.LOGIN} replace />;
 }
 
+function PermissionRoute({ routeKey }: { routeKey: string }) {
+  const { user, loading } = useAuth();
+  if (loading) return <AppLoading />;
+  if (user?.isAdmin || user?.permissions?.includes(routeKey)) return <Outlet />;
+  return <Navigate to={ROUTES.USUARIO} replace />;
+}
+
 function PublicRoute() {
   const { authenticated, loading } = useAuth();
   if (loading) return <AppLoading />;
@@ -48,14 +55,30 @@ export default function App() {
           </Route>
           <Route element={<PrivateRoute />}>
             <Route element={<Layout />}>
-              <Route path={ROUTES.FUNCIONARIOS} element={<Funcionarios />} />
-              <Route path={ROUTES.CONTRATANTES} element={<Contratantes />} />
-              <Route path={ROUTES.EVENTOS} element={<Eventos />} />
-              <Route path={ROUTES.ESTOQUE_INSUMOS} element={<EstoqueInsumos />} />
-              <Route path={ROUTES.ESTOQUE_UTENSILIOS} element={<EstoqueUtensilios />} />
-              <Route path={ROUTES.PERMISSOES} element={<Permissoes />} />
-              <Route path={ROUTES.FINANCEIRO} element={<Financeiro />} />
-<Route path={ROUTES.TAREFAS} element={<Tarefas />} />
+              <Route element={<PermissionRoute routeKey="funcionarios" />}>
+                <Route path={ROUTES.FUNCIONARIOS} element={<Funcionarios />} />
+              </Route>
+              <Route element={<PermissionRoute routeKey="contratantes" />}>
+                <Route path={ROUTES.CONTRATANTES} element={<Contratantes />} />
+              </Route>
+              <Route element={<PermissionRoute routeKey="eventos" />}>
+                <Route path={ROUTES.EVENTOS} element={<Eventos />} />
+              </Route>
+              <Route element={<PermissionRoute routeKey="estoque-insumos" />}>
+                <Route path={ROUTES.ESTOQUE_INSUMOS} element={<EstoqueInsumos />} />
+              </Route>
+              <Route element={<PermissionRoute routeKey="estoque-utensilios" />}>
+                <Route path={ROUTES.ESTOQUE_UTENSILIOS} element={<EstoqueUtensilios />} />
+              </Route>
+              <Route element={<PermissionRoute routeKey="__admin__" />}>
+                <Route path={ROUTES.PERMISSOES} element={<Permissoes />} />
+              </Route>
+              <Route element={<PermissionRoute routeKey="financeiro" />}>
+                <Route path={ROUTES.FINANCEIRO} element={<Financeiro />} />
+              </Route>
+              <Route element={<PermissionRoute routeKey="tarefas" />}>
+                <Route path={ROUTES.TAREFAS} element={<Tarefas />} />
+              </Route>
               <Route path={ROUTES.USUARIO} element={<MinhaConta />} />
             </Route>
           </Route>

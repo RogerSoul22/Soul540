@@ -5,6 +5,7 @@
 .header { @include flex-between; margin-bottom: $spacing-2xl; flex-wrap: wrap; gap: $spacing-md; }
 .title { font-size: $font-size-3xl; font-weight: $font-weight-bold; color: $text-primary; letter-spacing: -0.5px; }
 .subtitle { font-size: $font-size-sm; color: $text-muted; margin-top: 6px; }
+.systemNotice { margin-top: $spacing-sm; max-width: 720px; padding: $spacing-sm $spacing-md; border: 1px solid rgba($accent, 0.22); border-radius: $radius-sm; background: rgba($accent, 0.08); font-size: $font-size-xs; color: $text-secondary; line-height: 1.6; }
 
 .layout { display: grid; grid-template-columns: 320px 1fr; gap: $spacing-xl; align-items: start; @include tablet { grid-template-columns: 1fr; } }
 
