@@ -69,6 +69,7 @@ export default function Financeiro() {
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [filterMonth, setFilterMonth] = useState<string>('all');
   const [search, setSearch] = useState('');
+  const [lancamentosPage, setLancamentosPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
 
@@ -713,7 +714,7 @@ export default function Financeiro() {
                 <button
                   key={type}
                   className={`${styles.filterBtn} ${filterType === type ? styles.filterBtnActive : ''}`}
-                  onClick={() => setFilterType(type)}
+                  onClick={() => { setFilterType(type); setLancamentosPage(1); }}
                 >
                   {type === 'all' ? 'Todos' : type === 'revenue' ? 'Receitas' : 'Custos'}
                 </button>
@@ -722,7 +723,7 @@ export default function Financeiro() {
             <select
               className={styles.searchInput}
               value={filterMonth}
-              onChange={(e) => setFilterMonth(e.target.value)}
+              onChange={(e) => { setFilterMonth(e.target.value); setLancamentosPage(1); }}
             >
               <option value="all">Todos os meses</option>
               {availableMonths.map((m) => (
@@ -734,7 +735,7 @@ export default function Financeiro() {
               className={styles.searchInput}
               placeholder="Buscar por descricao, categoria..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setLancamentosPage(1); }}
             />
             <button className={styles.btnExport} onClick={exportCSV} title="Exportar lançamentos filtrados para CSV">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -760,7 +761,7 @@ export default function Financeiro() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.slice(0, 50).map((entry) => (
+                {filtered.slice((lancamentosPage - 1) * 50, lancamentosPage * 50).map((entry) => (
                   <tr key={entry.id}>
                     <td>
                       <span className={entry.type === 'revenue' ? styles.typeRevenue : styles.typeCost}>
@@ -810,7 +811,28 @@ export default function Financeiro() {
             </div>
           )}
           {filtered.length > 50 && (
-            <p className={styles.tableNote}>Mostrando 50 de {filtered.length} lancamentos</p>
+            <div className={styles.pagination}>
+              <button
+                className={styles.pageBtn}
+                onClick={() => setLancamentosPage(p => p - 1)}
+                disabled={lancamentosPage <= 1}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                Anterior
+              </button>
+              <span className={styles.pageInfo}>
+                Página {lancamentosPage} de {Math.ceil(filtered.length / 50)}
+                <span className={styles.pageTotal}> · {filtered.length} lançamentos</span>
+              </span>
+              <button
+                className={styles.pageBtn}
+                onClick={() => setLancamentosPage(p => p + 1)}
+                disabled={lancamentosPage >= Math.ceil(filtered.length / 50)}
+              >
+                Próxima
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
           )}
         </div>
       )}

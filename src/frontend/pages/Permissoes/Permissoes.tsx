@@ -13,7 +13,7 @@ type AppUser = {
 
 const SYSTEM_LABELS: Record<string, string> = {
   main: 'Principal',
-  franchise: 'Franquia',
+  franchise: 'Campinas',
   factory: 'Fábrica',
 };
 
@@ -102,8 +102,8 @@ export default function Permissoes() {
 
   const selectUser = (u: AppUser) => {
     setSelected(u);
-    setDraftPerms([...u.permissions]);
-    setDraftIsAdmin(u.isAdmin);
+    setDraftPerms([...(u.permissions ?? [])]);
+    setDraftIsAdmin(u.isAdmin ?? false);
   };
 
   const togglePerm = (key: string) => {
@@ -121,17 +121,23 @@ export default function Permissoes() {
   const savePermissions = async () => {
     if (!selected) return;
     setSaving(true);
-    const res = await fetch(`/api/users/${selected.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ permissions: draftPerms, isAdmin: draftIsAdmin }),
-    });
-    const updated = await res.json();
-    setUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
-    setSelected(updated);
-    setDraftPerms([...updated.permissions]);
-    setDraftIsAdmin(updated.isAdmin);
-    setSaving(false);
+    try {
+      const res = await fetch(`/api/users/${selected.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ permissions: draftPerms, isAdmin: draftIsAdmin }),
+      });
+      if (!res.ok) throw new Error('Erro ao salvar');
+      const updated = await res.json();
+      setUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
+      setSelected(updated);
+      setDraftPerms([...(updated.permissions ?? [])]);
+      setDraftIsAdmin(updated.isAdmin ?? false);
+    } catch {
+      alert('Erro ao salvar permissões. Tente novamente.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const createUser = async () => {
@@ -141,6 +147,11 @@ export default function Permissoes() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...form, unit: form.unit, permissions: form.isAdmin ? ALL_KEYS : [] }),
     });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      alert(err.error || 'Erro ao criar usuário');
+      return;
+    }
     const created = await res.json();
     setUsers(prev => [...prev, created]);
     setForm(emptyForm);
@@ -154,7 +165,8 @@ export default function Permissoes() {
     setDeleteTarget(null);
   };
 
-  const initials = (name: string) => name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  const initials = (name?: string) =>
+    (name || '??').split(' ').map(w => w[0] || '').join('').toUpperCase().slice(0, 2) || '??';
 
   return (
     <div className={styles.page}>
@@ -311,7 +323,7 @@ export default function Permissoes() {
                 <label className={styles.label}>Sistema</label>
                 <select className={styles.input} value={form.unit} onChange={e => setForm({ ...form, unit: e.target.value })}>
                   <option value="main">Principal</option>
-                  <option value="franchise">Franquia</option>
+                  <option value="franchise">Campinas</option>
                   <option value="factory">Fábrica</option>
                 </select>
               </div>

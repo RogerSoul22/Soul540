@@ -68,7 +68,7 @@ export default function ContractDocument({ contract, event, eventName: _eventNam
   const [companyName, setCompanyName] = useState('Soul Negócios Eventos e Consultoria Ltda');
   const [companyCnpj, setCompanyCnpj] = useState('37.763.790/0001-77');
   const [companyIe, setCompanyIe] = useState('798.871.206.119');
-  const [companyAddress, setCompanyAddress] = useState('Rua Alameda dos Lírios 515 / Jardim Simus / Sorocaba – SP / CEP 18055141');
+  const [companyAddress, setCompanyAddress] = useState('Rua Alameda dos Lírios 515 / Jardim Simus / Campinas – SP / CEP 18055141');
   const [companyFantasy, setCompanyFantasy] = useState('Soul 540 Pizzas');
   const [signerName, setSignerName] = useState('Rogério Narciso Gomes');
   const [signerCpf, setSignerCpf] = useState('148.778.078-88');
@@ -120,7 +120,7 @@ export default function ContractDocument({ contract, event, eventName: _eventNam
   const [drinksTeam, setDrinksTeam] = useState(contract.drinksTeam || '');
 
   // Signature location
-  const [contractCity, setContractCity] = useState('Sorocaba/SP');
+  const [contractCity, setContractCity] = useState('Campinas/SP');
   const today = format(new Date(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
   const createdDate = format(parseISO(contract.createdAt), 'dd/MM/yyyy', { locale: ptBR });
 

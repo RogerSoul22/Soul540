@@ -65,13 +65,16 @@ export default function Permissoes() {
   };
 
   useEffect(() => {
-    apiFetch('/api/users').then(r => r.json()).then(setUsers).catch(() => {});
+    apiFetch('/api/users')
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data)) setUsers(data); })
+      .catch(() => {});
   }, []);
 
   const selectUser = (u: AppUser) => {
     setSelected(u);
-    setDraftPerms([...u.permissions]);
-    setDraftIsAdmin(u.isAdmin);
+    setDraftPerms([...(u.permissions ?? [])]);
+    setDraftIsAdmin(u.isAdmin ?? false);
   };
 
   const togglePerm = (key: string) => {
@@ -89,17 +92,23 @@ export default function Permissoes() {
   const savePermissions = async () => {
     if (!selected) return;
     setSaving(true);
-    const res = await apiFetch(`/api/users/${selected.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ permissions: draftPerms, isAdmin: draftIsAdmin }),
-    });
-    const updated = await res.json();
-    setUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
-    setSelected(updated);
-    setDraftPerms([...updated.permissions]);
-    setDraftIsAdmin(updated.isAdmin);
-    setSaving(false);
+    try {
+      const res = await apiFetch(`/api/users/${selected.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ permissions: draftPerms, isAdmin: draftIsAdmin }),
+      });
+      if (!res.ok) throw new Error('Erro ao salvar');
+      const updated = await res.json();
+      setUsers(prev => prev.map(u => u.id === updated.id ? updated : u));
+      setSelected(updated);
+      setDraftPerms([...(updated.permissions ?? [])]);
+      setDraftIsAdmin(updated.isAdmin ?? false);
+    } catch {
+      alert('Erro ao salvar permissões. Tente novamente.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const createUser = async () => {
@@ -149,7 +158,8 @@ export default function Permissoes() {
     }
   };
 
-  const initials = (name: string) => name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  const initials = (name?: string) =>
+    (name || '??').split(' ').map(w => w[0] || '').join('').toUpperCase().slice(0, 2) || '??';
 
   return (
     <div className={styles.page}>
@@ -308,7 +318,7 @@ export default function Permissoes() {
               </label>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Sistema</label>
-                <input className={styles.input} value="Franquia" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }} />
+                <input className={styles.input} value="Campinas" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }} />
               </div>
             </div>
             <div className={styles.modalFooter}>

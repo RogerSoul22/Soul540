@@ -29,7 +29,7 @@ export default function Login() {
           <img src="/logo.jpeg" alt="Soul540" className={styles.brandingLogo} />
           <h1 className={styles.brandingTitle}>
             Soul<span className={styles.brandingHighlight}>540</span>
-            <br />Franquia
+            <br />Campinas
           </h1>
           <p className={styles.brandingDescription}>
             Gerencie sua unidade com controle total sobre eventos, equipe e finanças.
