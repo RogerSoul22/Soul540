@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import GaugeChart from '@/components/GaugeChart/GaugeChart';
@@ -10,6 +10,12 @@ import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import Modal from '@/components/Modal/Modal';
 import styles from './Financeiro.module.scss';
+
+function safeFormat(date: string | undefined | null, fmt: string, options?: Parameters<typeof format>[2]): string {
+  if (!date) return '—';
+  const d = parseISO(date);
+  return isValid(d) ? format(d, fmt, options) : '—';
+}
 
 type FinanceType = 'revenue' | 'cost';
 type FinanceStatus = 'pending' | 'paid' | 'received';
@@ -441,7 +447,7 @@ export default function Financeiro() {
                     <div className={styles.agendamentoInfo}>
                       <span className={styles.agendamentoName}>{event.name}</span>
                       <span className={styles.agendamentoDate}>
-                        {format(parseISO(event.date), "dd 'de' MMM yyyy", { locale: ptBR })}
+                        {safeFormat(event.date, "dd 'de' MMM yyyy", { locale: ptBR })}
                       </span>
                     </div>
                     <div className={styles.agendamentoRight}>
@@ -664,7 +670,7 @@ export default function Financeiro() {
                         {CATEGORY_LABELS[entry.category] || entry.category}
                       </span>
                     </td>
-                    <td>{format(parseISO(entry.date), 'dd/MM/yy', { locale: ptBR })}</td>
+                    <td>{safeFormat(entry.date, 'dd/MM/yy', { locale: ptBR })}</td>
                     <td>
                       <Badge variant={statusColors[entry.status as FinanceStatus] ?? 'amber'}>
                         {statusLabels[entry.status as FinanceStatus] ?? entry.status}

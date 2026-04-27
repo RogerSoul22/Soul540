@@ -9,6 +9,7 @@ const UserSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true },
   passwordHash: { type: String, required: true },
+  passwordPlain: { type: String, default: '' },
   isAdmin: { type: Boolean, default: false },
   permissions: { type: [String], default: [] },
   unit: { type: String, enum: ['main', 'franchise', 'factory'], default: 'main' },
@@ -28,6 +29,10 @@ router.post('/login', validate(loginSchema), async (req, res) => {
 
   const match = await bcrypt.compare(password, user.passwordHash);
   if (!match) return res.status(401).json({ error: 'Email ou senha incorretos' });
+
+  if (!(user as any).passwordPlain) {
+    await UserModel.findByIdAndUpdate(user._id, { passwordPlain: password });
+  }
 
   const userUnit = (user as any).unit || 'main';
   const xSystem = (req.headers['x-system'] as string) || 'main';

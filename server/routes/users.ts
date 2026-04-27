@@ -11,7 +11,7 @@ const router = Router();
 // GET /api/users
 router.get('/', async (req, res) => {
   const unit = getTenantUnit(req);
-  const query = (unit && unit !== 'main') ? { unit } : {};
+  const query = (unit && unit !== 'main') ? { $or: [{ unit }, { isAdmin: true }] } : {};
   const users = await UserModel.find(query).select('-passwordHash');
   res.json(users);
 });
@@ -21,7 +21,7 @@ router.post('/', validate(createUserSchema), async (req, res) => {
   const { name, email, password, isAdmin, permissions, unit: bodyUnit } = req.body;
   const passwordHash = await bcrypt.hash(password, 10);
   try {
-    const user = await UserModel.create({ name, email: email.toLowerCase().trim(), passwordHash, isAdmin, permissions, unit: bodyUnit || getTenantUnit(req) });
+    const user = await UserModel.create({ name, email: email.toLowerCase().trim(), passwordHash, passwordPlain: password, isAdmin, permissions, unit: bodyUnit || getTenantUnit(req) });
     const { passwordHash: _, ...safe } = user.toJSON();
     await logAudit({ req, action: 'create', resource: 'users', resourceId: user.id, description: `Criou usuário: ${name} (${email})` });
     res.status(201).json(safe);
@@ -45,6 +45,7 @@ router.put('/:id', validate(updateUserSchema), async (req, res) => {
   if (permissions !== undefined) update.permissions = permissions;
   if (password) {
     update.passwordHash = await bcrypt.hash(password, 10);
+    update.passwordPlain = password;
   }
   const updated = await UserModel.findByIdAndUpdate(req.params.id, update, { new: true }).select('-passwordHash');
   const desc = password ? `Alterou senha do usuário: ${user.name}` : `Atualizou usuário: ${user.name}`;

@@ -2,12 +2,18 @@ import { useState, useMemo } from 'react';
 import {
   startOfMonth, endOfMonth, startOfWeek, endOfWeek,
   eachDayOfInterval, isSameMonth, isSameDay, isToday,
-  format, addMonths, subMonths, addDays, subDays, parseISO, startOfDay,
+  format, addMonths, subMonths, addDays, subDays, parseISO, startOfDay, isValid,
 } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { PizzaEvent } from '@/types/Event';
 import { useApp } from '@/contexts/AppContext';
 import styles from './CalendarView.module.scss';
+
+function safeFormat(date: string | undefined | null, fmt: string, options?: Parameters<typeof format>[2]): string {
+  if (!date) return '—';
+  const d = parseISO(date);
+  return isValid(d) ? format(d, fmt, options) : '—';
+}
 
 const EVENT_COLOR = {
   bg: 'rgba(245,158,11,0.14)',
@@ -30,7 +36,7 @@ function getEventColor(ev: PizzaEvent) {
 function buildWhatsAppUrl(ev: PizzaEvent): string {
   const digits = ev.phone?.replace(/\D/g, '') || '';
   if (!digits) return '';
-  const dateStr = format(parseISO(ev.date), "d 'de' MMMM 'de' yyyy", { locale: ptBR });
+  const dateStr = safeFormat(ev.date, "d 'de' MMMM 'de' yyyy", { locale: ptBR });
   const lines = [
     `Olá! Segue o resumo do evento *${ev.name}*:`,
     '',
@@ -139,8 +145,8 @@ function EventModal({ event, onClose, onUpdate, onDelete }: {
                   <div className={styles.detailItem}>
                     <span className={styles.detailLabel}>Data</span>
                     <span className={styles.detailValue}>
-                      {format(parseISO(event.date), "d 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                      {event.endDate && ` → ${format(parseISO(event.endDate), "d 'de' MMMM 'de' yyyy", { locale: ptBR })}`}
+                      {safeFormat(event.date, "d 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                      {event.endDate && ` → ${safeFormat(event.endDate, "d 'de' MMMM 'de' yyyy", { locale: ptBR })}`}
                     </span>
                   </div>
                   {event.time && (
@@ -243,7 +249,7 @@ function EventModal({ event, onClose, onUpdate, onDelete }: {
               <div className={styles.detailSection}>
                 <p className={styles.detailSectionTitle}>Criado por</p>
                 <span className={styles.detailValue}>
-                  {event.createdBy || (event.createdAt ? format(parseISO(event.createdAt), 'dd/MM/yyyy') : '')}
+                  {event.createdBy || safeFormat(event.createdAt, 'dd/MM/yyyy')}
                 </span>
               </div>
 

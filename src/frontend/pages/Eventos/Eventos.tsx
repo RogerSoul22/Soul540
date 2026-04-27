@@ -1,12 +1,18 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useApp } from '@frontend/contexts/AppContext';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { PizzaEvent } from '@backend/domain/entities/Event';
 import type { Employee } from '@backend/infra/data/mockData';
 import styles from './Eventos.module.scss';
 import ConfirmModal from '@frontend/components/ConfirmModal/ConfirmModal';
 
+
+function safeFormat(date: string | undefined | null, fmt: string, options?: Parameters<typeof format>[2]): string {
+  if (!date) return '—';
+  const d = parseISO(date);
+  return isValid(d) ? format(d, fmt, options) : '—';
+}
 
 function formatBudget(value: string): string {
   const digits = value.replace(/\D/g, '');
@@ -117,7 +123,7 @@ const emptyForm: FormData = {
 function buildWhatsAppUrl(ev: PizzaEvent): string {
   const digits = ev.phone?.replace(/\D/g, '') || '';
   if (!digits) return '';
-  const dateStr = format(parseISO(ev.date), "d 'de' MMMM 'de' yyyy", { locale: ptBR });
+  const dateStr = safeFormat(ev.date, "d 'de' MMMM 'de' yyyy", { locale: ptBR });
   const lines = [
     `Olá! Segue o resumo do evento *${ev.name}*:`,
     '',
@@ -143,8 +149,8 @@ function EventCard({ ev, employeeMap, onView, onEdit, onDelete }: {
         <div>
           <h3 className={styles.cardTitle}>{ev.name}</h3>
           <p className={styles.cardSub}>
-            {format(parseISO(ev.date), "dd 'de' MMM, yyyy", { locale: ptBR })}
-            {ev.endDate && ` → ${format(parseISO(ev.endDate), "dd 'de' MMM", { locale: ptBR })}`}
+            {safeFormat(ev.date, "dd 'de' MMM, yyyy", { locale: ptBR })}
+            {ev.endDate && ` → ${safeFormat(ev.endDate, "dd 'de' MMM", { locale: ptBR })}`}
             {ev.time && ` · ${ev.time}`}
           </p>
         </div>
@@ -186,7 +192,7 @@ function EventCard({ ev, employeeMap, onView, onEdit, onDelete }: {
 function groupByMonth(evs: PizzaEvent[]) {
   const map = new Map<string, PizzaEvent[]>();
   evs.forEach((ev) => {
-    const key = format(parseISO(ev.date), 'yyyy-MM');
+    const key = safeFormat(ev.date, 'yyyy-MM');
     if (!map.has(key)) map.set(key, []);
     map.get(key)!.push(ev);
   });
@@ -194,7 +200,7 @@ function groupByMonth(evs: PizzaEvent[]) {
     .sort((a, b) => b[0].localeCompare(a[0]))
     .map(([key, list]) => ({
       key,
-      label: format(parseISO(list[0].date), 'MMMM • yyyy', { locale: ptBR }),
+      label: safeFormat(list[0].date, 'MMMM • yyyy', { locale: ptBR }),
       events: list,
     }));
 }
@@ -855,8 +861,8 @@ return (
                   <div className={styles.detailItem}>
                     <span className={styles.detailLabel}>Data</span>
                     <span className={styles.detailValue}>
-                      {format(parseISO(viewingEvent.date), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                      {viewingEvent.endDate && ` → ${format(parseISO(viewingEvent.endDate), "dd 'de' MMMM, yyyy", { locale: ptBR })}`}
+                      {safeFormat(viewingEvent.date, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                      {viewingEvent.endDate && ` → ${safeFormat(viewingEvent.endDate, "dd 'de' MMMM, yyyy", { locale: ptBR })}`}
                     </span>
                   </div>
                   {viewingEvent.celebration && (
