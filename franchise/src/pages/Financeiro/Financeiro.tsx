@@ -302,7 +302,7 @@ export default function Financeiro() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!formCategory || !formDescription || !formAmount) return;
+    if (!formCategory || !formAmount) return;
     await addFinance({
       eventId: formEventId,
       type: formType,
@@ -818,7 +818,7 @@ export default function Financeiro() {
                   onChange={(e) => setFormEventId(e.target.value)}
                 >
                   <option value="">Selecione...</option>
-                  {events.map((evt) => (
+                  {[...events].filter(evt => evt?.name).sort((a, b) => a.name.localeCompare(b.name, 'pt')).map((evt) => (
                     <option key={evt.id} value={evt.id}>{evt.name}</option>
                   ))}
                 </select>
@@ -861,7 +861,6 @@ export default function Financeiro() {
                 value={formDescription}
                 onChange={(e) => setFormDescription(e.target.value)}
                 placeholder="Descreva o lancamento"
-                required
               />
             </div>
 

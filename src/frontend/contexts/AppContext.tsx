@@ -40,10 +40,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const headers: HeadersInit = { 'X-System': 'main' };
 
   const loadData = useCallback(() => {
-    apiFetch('/api/events', { headers }).then(r => r.json()).then(setEvents).catch((err) => console.error('Falha ao carregar dados:', err));
-    apiFetch('/api/tasks', { headers }).then(r => r.json()).then(setTasks).catch((err) => console.error('Falha ao carregar dados:', err));
-    apiFetch('/api/finances', { headers }).then(r => r.json()).then(setFinances).catch((err) => console.error('Falha ao carregar dados:', err));
-    apiFetch('/api/invoices', { headers }).then(r => r.json()).then(setInvoices).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/events', { headers }).then(r => r.json()).then(d => Array.isArray(d) && setEvents(d)).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/tasks', { headers }).then(r => r.json()).then(d => Array.isArray(d) && setTasks(d)).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/finances', { headers }).then(r => r.json()).then(d => Array.isArray(d) && setFinances(d)).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/invoices', { headers }).then(r => r.json()).then(d => Array.isArray(d) && setInvoices(d)).catch((err) => console.error('Falha ao carregar dados:', err));
   }, []);
 
   useEffect(() => {

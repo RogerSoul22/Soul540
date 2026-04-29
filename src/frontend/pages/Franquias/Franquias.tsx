@@ -108,7 +108,7 @@ function PortalCard({ system, defaultUrl }: { system: PortalSystem; defaultUrl: 
           )}
         </div>
         <div>
-          <div className={styles.portalLabel}>Portal {label}</div>
+          <div className={styles.portalLabel}>{system === 'franchise' ? 'Franquia Campinas' : `Portal ${label}`}</div>
           <div className={styles.portalSub}>Sistema {system}</div>
         </div>
         <div className={styles.portalStatus}>

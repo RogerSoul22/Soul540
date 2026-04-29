@@ -61,6 +61,7 @@ export default function Financeiro() {
   const [dataScope, setDataScope] = useState<DataScope>('main');
   const [franchiseFinances, setFranchiseFinances] = useState<typeof finances>([]);
   const [franchiseEvents, setFranchiseEvents] = useState<typeof events>([]);
+  const [directEvents, setDirectEvents] = useState<typeof events>([]);
 
   // Page-level month filter (shared by geral / despesas / valores tabs)
   const [pageMonth, setPageMonth] = useState<string>('all');
@@ -90,6 +91,15 @@ export default function Financeiro() {
     fetch('/api/events',   { headers, credentials: 'include' }).then((r) => r.json()).then(setFranchiseEvents).catch(() => {});
   }, [dataScope]);
 
+  // Ensure events are available for the form regardless of AppContext state
+  useEffect(() => {
+    if (!showForm) return;
+    fetch('/api/events', { credentials: 'include', headers: { 'Content-Type': 'application/json', 'X-System': 'main' } })
+      .then(r => r.json())
+      .then(d => { if (Array.isArray(d)) setDirectEvents(d); })
+      .catch(() => {});
+  }, [showForm]);
+
   const activeFinances = useMemo(() => {
     if (dataScope === 'franchise') return franchiseFinances;
     if (dataScope === 'combined') return [...finances, ...franchiseFinances];
@@ -99,8 +109,8 @@ export default function Financeiro() {
   const activeEvents = useMemo(() => {
     if (dataScope === 'franchise') return franchiseEvents;
     if (dataScope === 'combined') return [...events, ...franchiseEvents];
-    return events;
-  }, [events, franchiseEvents, dataScope]);
+    return events.length > 0 ? events : directEvents;
+  }, [events, franchiseEvents, dataScope, directEvents]);
 
   // === DATA COMPUTATIONS ===
 
@@ -329,7 +339,7 @@ export default function Financeiro() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!formCategory || !formDescription || !formAmount) return;
+    if (!formCategory || !formAmount) return;
     await addFinance({
       eventId: formEventId,
       type: formType,
@@ -946,7 +956,7 @@ export default function Financeiro() {
                   onChange={(e) => setFormEventId(e.target.value)}
                 >
                   <option value="">Selecione...</option>
-                  {activeEvents.map((evt) => (
+                  {[...activeEvents].filter(evt => evt?.name).sort((a, b) => a.name.localeCompare(b.name, 'pt')).map((evt) => (
                     <option key={evt.id} value={evt.id}>{evt.name}</option>
                   ))}
                 </select>
@@ -989,7 +999,6 @@ export default function Financeiro() {
                 value={formDescription}
                 onChange={(e) => setFormDescription(e.target.value)}
                 placeholder="Descreva o lancamento"
-                required
               />
             </div>
 

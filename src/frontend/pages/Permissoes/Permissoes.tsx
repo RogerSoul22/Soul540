@@ -74,6 +74,10 @@ export default function Permissoes() {
   const [changePwSaving, setChangePwSaving] = useState(false);
   const { user: authUser } = useAuth();
 
+  const currentUnit = (authUser as any)?.unit || 'main';
+  const isFromOtherUnit = (u: AppUser) => !!u.unit && u.unit !== currentUnit;
+  const isReadOnly = (u: AppUser) => isFromOtherUnit(u) && u.isAdmin;
+
   const canChangePassword = (target: AppUser) => {
     if (!authUser?.isAdmin) return false;
     const myUnit = (authUser as any).unit || 'main';
@@ -174,7 +178,7 @@ export default function Permissoes() {
         <div>
           <h1 className={styles.title}>Permissões</h1>
           <p className={styles.subtitle}>Gerencie usuários e controle o acesso às páginas</p>
-          <p className={styles.systemNotice}>Para alterar a permissão de um usuário de outro sistema, garanta que você esteja no sistema correto. Não é possível alterar permissões de um usuário de outro sistema a partir desta tela.</p>
+          <p className={styles.systemNotice}>Administradores de outros sistemas têm permissões somente leitura nesta tela. Usuários comuns de qualquer sistema podem ser editados livremente.</p>
         </div>
         <button className={styles.btnPrimary} onClick={() => setShowModal(true)}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -211,13 +215,15 @@ export default function Permissoes() {
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
                   </button>
                 )}
-                <button
-                  className={styles.btnDeleteUser}
-                  onClick={(e) => { e.stopPropagation(); setDeleteTarget(u); }}
-                  title="Remover usuário"
-                >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
-                </button>
+                {!isReadOnly(u) && (
+                  <button
+                    className={styles.btnDeleteUser}
+                    onClick={(e) => { e.stopPropagation(); setDeleteTarget(u); }}
+                    title="Remover usuário"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                  </button>
+                )}
               </div>
             </div>
               ))}
@@ -235,10 +241,17 @@ export default function Permissoes() {
             </div>
           ) : (
             <>
+              {isReadOnly(selected) && (
+                <div className={styles.crossUnitBanner}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                  Administrador do sistema <strong>{SYSTEM_LABELS[selected.unit!] || selected.unit}</strong> — permissões somente leitura
+                </div>
+              )}
               <label className={styles.adminToggleRow}>
                 <input
                   type="checkbox"
                   checked={draftIsAdmin}
+                  disabled={isReadOnly(selected)}
                   onChange={(e) => {
                     setDraftIsAdmin(e.target.checked);
                     if (e.target.checked) {
@@ -258,9 +271,11 @@ export default function Permissoes() {
                   <p className={styles.permTitle}>Permissões de {selected.name}</p>
                   <p className={styles.permSub}>{draftPerms.length} de {ALL_KEYS.length} páginas liberadas</p>
                 </div>
-                <button className={styles.btnToggleAll} onClick={toggleAll}>
-                  {draftPerms.length === ALL_KEYS.length ? 'Desmarcar tudo' : 'Marcar tudo'}
-                </button>
+                {!isReadOnly(selected) && (
+                  <button className={styles.btnToggleAll} onClick={toggleAll}>
+                    {draftPerms.length === ALL_KEYS.length ? 'Desmarcar tudo' : 'Marcar tudo'}
+                  </button>
+                )}
               </div>
 
               <div className={styles.permGroups}>
@@ -273,7 +288,8 @@ export default function Permissoes() {
                           type="checkbox"
                           className={styles.checkbox}
                           checked={draftPerms.includes(item.key)}
-                          onChange={() => togglePerm(item.key)}
+                          disabled={isReadOnly(selected)}
+                          onChange={() => !isReadOnly(selected) && togglePerm(item.key)}
                         />
                         <span>{item.label}</span>
                       </label>
@@ -282,11 +298,13 @@ export default function Permissoes() {
                 ))}
               </div>
 
-              <div className={styles.permFooter}>
-                <button className={styles.btnSave} onClick={savePermissions} disabled={saving}>
-                  {saving ? 'Salvando...' : 'Salvar Permissões'}
-                </button>
-              </div>
+              {!isReadOnly(selected) && (
+                <div className={styles.permFooter}>
+                  <button className={styles.btnSave} onClick={savePermissions} disabled={saving}>
+                    {saving ? 'Salvando...' : 'Salvar Permissões'}
+                  </button>
+                </div>
+              )}
             </>
           )}
         </div>

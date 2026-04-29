@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { apiFetch } from '@/lib/api';
 import { useApp } from '@/contexts/AppContext';
+import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 import styles from './Tarefas.module.scss';
 
 type Ingredient = {
@@ -226,6 +227,7 @@ export default function Producao() {
   // Pedidos (Kanban)
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [showNovoPedido, setShowNovoPedido] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -410,7 +412,7 @@ export default function Producao() {
                           <span>R$ {formatR$(pedido.totalCost)}</span>
                         </div>
                       </div>
-                      <button className={styles.taskDelete} onClick={() => void handleDeletePedido(pedido.id)}>
+                      <button className={styles.taskDelete} onClick={() => setDeleteConfirmId(pedido.id)}>
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                       </button>
                     </div>
@@ -643,9 +645,25 @@ export default function Producao() {
         <div className={styles.calcInputs}>
           <div className={styles.calcGroup}>
             <label className={styles.calcLabel}>Evento (opcional)</label>
-            <select className={styles.calcSelect} value={calcEventId} onChange={e => setCalcEventId(e.target.value)}>
+            <select
+              className={styles.calcSelect}
+              value={calcEventId}
+              onChange={e => {
+                const id = e.target.value;
+                setCalcEventId(id);
+                if (id) {
+                  const ev = events.find(ev => ev.id === id);
+                  if (ev?.guestCount) {
+                    setCalcMode('pessoas');
+                    setCalcQty(String(ev.guestCount));
+                  }
+                } else {
+                  setCalcQty('');
+                }
+              }}
+            >
               <option value="">— Sem evento —</option>
-              {events.map(ev => <option key={ev.id} value={ev.id}>{ev.name}</option>)}
+              {events.map(ev => <option key={ev.id} value={ev.id}>{ev.name} ({ev.guestCount} conv.)</option>)}
             </select>
           </div>
 
@@ -824,6 +842,17 @@ export default function Producao() {
             </div>
           </div>
         </div>
+      )}
+
+      {deleteConfirmId && (
+        <ConfirmModal
+          title="Excluir Pedido"
+          message={<>Tem certeza que deseja excluir o pedido de <strong>{pedidos.find(p => p.id === deleteConfirmId)?.filial || 'esta filial'}</strong>? Esta ação não pode ser desfeita.</>}
+          confirmLabel="Excluir"
+          variant="danger"
+          onConfirm={async () => { await handleDeletePedido(deleteConfirmId); setDeleteConfirmId(null); }}
+          onClose={() => setDeleteConfirmId(null)}
+        />
       )}
     </div>
   );

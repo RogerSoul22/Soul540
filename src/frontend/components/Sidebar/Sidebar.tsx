@@ -5,6 +5,7 @@ import styles from './Sidebar.module.scss';
 
 type NavItem = {
   path: string;
+  permKey: string;
   label: string;
   icon: React.ReactNode;
 };
@@ -20,6 +21,7 @@ const navGroups: NavGroup[] = [
     items: [
       {
         path: ROUTES.DASHBOARD,
+        permKey: 'dashboard',
         label: 'Dashboard',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -37,6 +39,7 @@ const navGroups: NavGroup[] = [
     items: [
       {
         path: ROUTES.EVENTOS,
+        permKey: 'eventos',
         label: 'Eventos',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -49,6 +52,7 @@ const navGroups: NavGroup[] = [
       },
       {
         path: ROUTES.TAREFAS,
+        permKey: 'tarefas',
         label: 'Tarefas',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -59,6 +63,7 @@ const navGroups: NavGroup[] = [
       },
       {
         path: ROUTES.FUNCIONARIOS,
+        permKey: 'funcionarios',
         label: 'Funcionários',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -69,6 +74,7 @@ const navGroups: NavGroup[] = [
       },
       {
         path: ROUTES.CONTRATANTES,
+        permKey: 'contratantes',
         label: 'Contratantes',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -86,6 +92,7 @@ const navGroups: NavGroup[] = [
     items: [
       {
         path: ROUTES.FINANCEIRO,
+        permKey: 'financeiro',
         label: 'Financeiro',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -96,6 +103,7 @@ const navGroups: NavGroup[] = [
       },
       {
         path: ROUTES.NOTAS_FISCAIS,
+        permKey: 'notas-fiscais',
         label: 'Notas Fiscais',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -108,6 +116,7 @@ const navGroups: NavGroup[] = [
       },
       {
         path: ROUTES.CONTRATOS,
+        permKey: 'contratos',
         label: 'Contratos',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -126,6 +135,7 @@ const navGroups: NavGroup[] = [
     items: [
       {
         path: ROUTES.CARDAPIOS,
+        permKey: 'cardapios',
         label: 'Cardápios',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -135,6 +145,7 @@ const navGroups: NavGroup[] = [
       },
       {
         path: ROUTES.ESTOQUE_INSUMOS,
+        permKey: 'estoque-insumos',
         label: 'Est. Insumos',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -146,6 +157,7 @@ const navGroups: NavGroup[] = [
       },
       {
         path: ROUTES.ESTOQUE_UTENSILIOS,
+        permKey: 'estoque-utensilios',
         label: 'Est. Utensílios',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -160,6 +172,7 @@ const navGroups: NavGroup[] = [
     items: [
       {
         path: ROUTES.FRANQUIAS,
+        permKey: 'franquias',
         label: 'Franquias',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -175,6 +188,7 @@ const navGroups: NavGroup[] = [
     items: [
       {
         path: ROUTES.CHAT,
+        permKey: 'chat',
         label: 'Chat IA',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -186,6 +200,7 @@ const navGroups: NavGroup[] = [
       },
       {
         path: ROUTES.USUARIO,
+        permKey: 'usuario',
         label: 'Minha Conta',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -196,6 +211,7 @@ const navGroups: NavGroup[] = [
       },
       {
         path: ROUTES.PERMISSOES,
+        permKey: '__admin__',
         label: 'Permissões',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -206,6 +222,7 @@ const navGroups: NavGroup[] = [
       },
       {
         path: ROUTES.AUDITORIA,
+        permKey: '__admin__',
         label: 'Auditoria',
         icon: (
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -239,10 +256,9 @@ export default function Sidebar() {
       <nav className={styles.nav}>
         {navGroups.map((group) => {
           const visibleItems = group.items.filter(item => {
-            if (item.path === ROUTES.PERMISSOES || item.path === ROUTES.AUDITORIA) return isAdmin;
+            if (item.permKey === '__admin__') return isAdmin;
             if (isAdmin) return true;
-            const key = item.path.replace('/', '') || 'dashboard';
-            return permissions.includes(key);
+            return permissions.includes(item.permKey);
           });
           if (visibleItems.length === 0) return null;
           return (

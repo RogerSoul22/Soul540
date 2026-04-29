@@ -28,6 +28,21 @@
 
 // Permission panel
 .permPanel { @include card; padding: $spacing-xl; min-height: 400px; }
+.crossUnitBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(129, 140, 248, 0.08);
+  border: 1px solid rgba(129, 140, 248, 0.25);
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  color: #a5b4fc;
+  margin-bottom: $spacing-md;
+  line-height: 1.5;
+  strong { color: #c7d2fe; }
+  svg { flex-shrink: 0; opacity: 0.8; }
+}
 .permEmpty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: $spacing-md; height: 300px; color: $text-muted; text-align: center; font-size: $font-size-sm; svg { opacity: 0.3; } }
 .permHeader { @include flex-between; margin-bottom: $spacing-xl; flex-wrap: wrap; gap: $spacing-md; }
 .permTitle { font-size: $font-size-lg; font-weight: $font-weight-semibold; color: $text-primary; }
