@@ -45,8 +45,8 @@ const statusColors: Record<FinanceStatus, 'amber' | 'green'> = {
 };
 
 const formCategories: Record<FinanceType, string[]> = {
-  revenue: ['contrato', 'adicional', 'taxa', 'outro'],
-  cost: [...FIXED_CATEGORIES, ...VARIABLE_CATEGORIES],
+  revenue: ['adicional', 'contrato', 'outro', 'taxa'],
+  cost: [...FIXED_CATEGORIES, ...VARIABLE_CATEGORIES].sort((a, b) => a.localeCompare(b, 'pt')),
 };
 
 const formatBRL = (v: number) => `R$ ${v.toLocaleString('pt-BR')}`;
@@ -75,7 +75,7 @@ export default function Financeiro() {
   const [showInfo, setShowInfo] = useState(false);
 
   // Form state
-  const [formType, setFormType] = useState<FinanceType>('revenue');
+  const [formType, setFormType] = useState<FinanceType>('cost');
   const [formEventId, setFormEventId] = useState('');
   const [formCategory, setFormCategory] = useState('');
   const [formDescription, setFormDescription] = useState('');
@@ -380,16 +380,16 @@ export default function Financeiro() {
             <button
               className={`${styles.scopeBtn} ${dataScope === 'franchise' ? styles.scopeBtnActive : ''}`}
               onClick={() => setDataScope('franchise')}
-              title="Exibir apenas dados da franquia"
+              title="Exibir apenas dados de Campinas"
             >
-              Franquia
+              Campinas
             </button>
             <button
               className={`${styles.scopeBtn} ${dataScope === 'combined' ? styles.scopeBtnActive : ''}`}
               onClick={() => setDataScope('combined')}
-              title="Exibir dados do principal + franquia"
+              title="Exibir dados consolidados (principal + campinas + fábrica)"
             >
-              Combinado
+              Consolidado
             </button>
           </div>
           <Button onClick={() => setShowForm(true)}>+ Novo Lancamento</Button>
