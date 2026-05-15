@@ -251,7 +251,7 @@ const [showModal, setShowModal] = useState(false);
     const all = events
       .filter((e) => sourceFilter === 'all' || (sourceFilter === 'main' ? (!e.source || e.source === 'main') : e.source === 'franchise'))
       .filter((e) => !search || e.name.toLowerCase().includes(search.toLowerCase()))
-      .filter((e) => !dateFilter || (e.startDate && e.startDate.startsWith(dateFilter)))
+      .filter((e) => !dateFilter || (e.date && e.date.startsWith(dateFilter)))
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     return {
       fechados: all.filter((e) => e.status !== 'planning'),
