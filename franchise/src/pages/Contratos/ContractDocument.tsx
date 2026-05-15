@@ -30,9 +30,16 @@ export type Contract = {
   serviceType?: string;
   drinksDescription?: string;
   cancellationDays?: number;
-  pizzaTeam?: string;
-  drinksTeam?: string;
+  pizzaTeam?: number;
+  drinksTeam?: number;
   menuId?: string;
+  paid?: boolean;
+  noticeHours?: number;
+  serviceObservation?: string;
+  paymentObservation?: string;
+  lateFeePercent?: number;
+  lateFeeHours?: number;
+  additionalServicesObservation?: string;
 };
 
 type PizzaEvent = { date?: string; location?: string };
