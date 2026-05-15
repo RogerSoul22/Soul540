@@ -257,7 +257,7 @@ const [showModal, setShowModal] = useState(false);
       fechados: all.filter((e) => e.status !== 'planning'),
       orcamentos: all.filter((e) => e.status === 'planning'),
     };
-  }, [events, search, sourceFilter]);
+  }, [events, search, sourceFilter, dateFilter]);
 
   const openCreate = () => {
     setForm(emptyForm);
