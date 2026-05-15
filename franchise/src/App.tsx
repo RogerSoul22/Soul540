@@ -48,7 +48,7 @@ function PublicRoute() {
 
 export default function App() {
   return (
-    <BrowserRouter basename="/franquia">
+    <BrowserRouter basename="/campinas">
       <ThemeProvider>
       <AuthProvider>
         <AppProvider>
