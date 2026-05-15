@@ -162,6 +162,41 @@
   &:focus { outline: none; border-color: $border-accent; }
 }
 
+.dateFilterWrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dateFilterToggle {
+  display: flex;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 2px;
+  gap: 2px;
+}
+
+.dateFilterModeBtn {
+  padding: 4px 10px;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-muted;
+  background: none;
+  border: none;
+  border-radius: calc(#{$radius-sm} - 2px);
+  cursor: pointer;
+  transition: all $transition-fast;
+  &:hover { color: $text-primary; background: rgba(255, 255, 255, 0.05); }
+}
+
+.dateFilterModeBtnActive {
+  background: $accent;
+  color: #0a0f1e;
+  font-weight: $font-weight-semibold;
+  &:hover { background: $accent-hover; color: #0a0f1e; }
+}
+
 .filterDate {
   background: $bg-secondary;
   border: 1px solid $border;

@@ -234,6 +234,7 @@ export default function Eventos() {
   const [search, setSearch] = useState('');
   const [sourceFilter, setSourceFilter] = useState<'all' | 'main' | 'franchise'>('all');
   const [dateFilter, setDateFilter] = useState('');
+  const [dateFilterMode, setDateFilterMode] = useState<'date' | 'month'>('date');
 const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
@@ -460,22 +461,38 @@ return (
           <button className={`${styles.unitFilterBtn} ${sourceFilter === 'main' ? styles.unitFilterBtnActive : ''}`} onClick={() => setSourceFilter('main')}>Principal</button>
           <button className={`${styles.unitFilterBtn} ${sourceFilter === 'franchise' ? styles.unitFilterBtnActive : ''}`} onClick={() => setSourceFilter('franchise')}>Franquia</button>
         </div>
-        <input
-          type="date"
-          className={styles.filterDate}
-          value={dateFilter}
-          onChange={(e) => setDateFilter(e.target.value)}
-          title="Filtrar por data"
-        />
-        {dateFilter && (
-          <button
-            className={styles.clearDateBtn}
-            onClick={() => setDateFilter('')}
-            title="Limpar filtro de data"
-          >
-            ✕
-          </button>
-        )}
+        <div className={styles.dateFilterWrap}>
+          <div className={styles.dateFilterToggle}>
+            <button
+              className={`${styles.dateFilterModeBtn} ${dateFilterMode === 'month' ? styles.dateFilterModeBtnActive : ''}`}
+              onClick={() => { setDateFilterMode('month'); setDateFilter(''); }}
+            >
+              Mês
+            </button>
+            <button
+              className={`${styles.dateFilterModeBtn} ${dateFilterMode === 'date' ? styles.dateFilterModeBtnActive : ''}`}
+              onClick={() => { setDateFilterMode('date'); setDateFilter(''); }}
+            >
+              Data
+            </button>
+          </div>
+          <input
+            type={dateFilterMode}
+            className={styles.filterDate}
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            title={dateFilterMode === 'month' ? 'Filtrar por mês' : 'Filtrar por data'}
+          />
+          {dateFilter && (
+            <button
+              className={styles.clearDateBtn}
+              onClick={() => setDateFilter('')}
+              title="Limpar filtro"
+            >
+              ✕
+            </button>
+          )}
+        </div>
       </div>
 
       {filtered.fechados.length === 0 && filtered.orcamentos.length === 0 ? (
