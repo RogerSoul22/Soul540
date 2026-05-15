@@ -233,6 +233,7 @@ export default function Eventos() {
   }, []);
   const [search, setSearch] = useState('');
   const [sourceFilter, setSourceFilter] = useState<'all' | 'main' | 'franchise'>('all');
+  const [dateFilter, setDateFilter] = useState('');
 const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
@@ -250,6 +251,7 @@ const [showModal, setShowModal] = useState(false);
     const all = events
       .filter((e) => sourceFilter === 'all' || (sourceFilter === 'main' ? (!e.source || e.source === 'main') : e.source === 'franchise'))
       .filter((e) => !search || e.name.toLowerCase().includes(search.toLowerCase()))
+      .filter((e) => !dateFilter || (e.startDate && e.startDate.startsWith(dateFilter)))
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     return {
       fechados: all.filter((e) => e.status !== 'planning'),
@@ -458,6 +460,22 @@ return (
           <button className={`${styles.unitFilterBtn} ${sourceFilter === 'main' ? styles.unitFilterBtnActive : ''}`} onClick={() => setSourceFilter('main')}>Principal</button>
           <button className={`${styles.unitFilterBtn} ${sourceFilter === 'franchise' ? styles.unitFilterBtnActive : ''}`} onClick={() => setSourceFilter('franchise')}>Franquia</button>
         </div>
+        <input
+          type="date"
+          className={styles.filterDate}
+          value={dateFilter}
+          onChange={(e) => setDateFilter(e.target.value)}
+          title="Filtrar por data"
+        />
+        {dateFilter && (
+          <button
+            className={styles.clearDateBtn}
+            onClick={() => setDateFilter('')}
+            title="Limpar filtro de data"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       {filtered.fechados.length === 0 && filtered.orcamentos.length === 0 ? (

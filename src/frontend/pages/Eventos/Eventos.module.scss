@@ -162,6 +162,28 @@
   &:focus { outline: none; border-color: $border-accent; }
 }
 
+.filterDate {
+  background: $bg-secondary;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  color: $text-primary;
+  padding: 7px 10px;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  &:focus { outline: none; border-color: $border-accent; }
+}
+
+.clearDateBtn {
+  background: transparent;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  padding: 4px 6px;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  &:hover { color: $text-primary; background: $bg-secondary; }
+}
+
 // Sections
 .sections {
   display: grid;
