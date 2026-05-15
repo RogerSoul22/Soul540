@@ -283,7 +283,7 @@ export default function Franquias() {
       {/* Portais Conectados */}
       <div className={styles.sectionLabel}>Portais Conectados</div>
       <div className={styles.portalsGrid}>
-        <PortalCard system="franchise" defaultUrl={import.meta.env.VITE_FRANCHISE_URL || `${window.location.origin}/franquia`} />
+        <PortalCard system="franchise" defaultUrl={import.meta.env.VITE_FRANCHISE_URL || `${window.location.origin}/campinas`} />
         <PortalCard system="factory" defaultUrl={import.meta.env.VITE_FACTORY_URL || `${window.location.origin}/fabrica`} />
       </div>
 

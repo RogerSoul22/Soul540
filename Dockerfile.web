@@ -31,6 +31,6 @@ RUN npm run build
 FROM nginx:alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build-main     /app/dist /usr/share/nginx/html
-COPY --from=build-franchise /app/dist /usr/share/nginx/html/franquia
+COPY --from=build-franchise /app/dist /usr/share/nginx/html/campinas
 COPY --from=build-factory   /app/dist /usr/share/nginx/html/fabrica
 EXPOSE 80
