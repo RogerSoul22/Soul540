@@ -1,12 +1,15 @@
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
-import type { PizzaEvent, FinanceEntry, Task } from '@shared/types';
+import type { PizzaEvent, FinanceEntry, Task, TaskHistoryEntry } from '@shared/types';
 
 interface AppContextData {
   events: PizzaEvent[];
   finances: FinanceEntry[];
   tasks: Task[];
+  taskHistory: TaskHistoryEntry[];
+  addTaskHistory: (entry: Omit<TaskHistoryEntry, 'id'>) => Promise<void>;
+  deleteTaskHistory: (id: string) => Promise<void>;
   addFinance: (entry: Omit<FinanceEntry, 'id'>) => Promise<FinanceEntry>;
   updateFinance: (id: string, data: Partial<FinanceEntry>) => Promise<void>;
   deleteFinance: (id: string) => Promise<void>;
@@ -24,10 +27,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<PizzaEvent[]>([]);
   const [finances, setFinances] = useState<FinanceEntry[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [taskHistory, setTaskHistory] = useState<TaskHistoryEntry[]>([]);
 
   useEffect(() => {
     apiFetch('/api/events').then(r => r.json()).then(setEvents).catch((err) => console.error('Falha ao carregar dados:', err));
     apiFetch('/api/tasks').then(r => r.json()).then(setTasks).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/task-history').then(r => r.json()).then(d => Array.isArray(d) && setTaskHistory(d)).catch(() => {});
     apiFetch('/api/finances').then(r => r.json()).then(setFinances).catch((err) => console.error('Falha ao carregar dados:', err));
   }, []);
 
@@ -93,6 +98,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (!res.ok) throw new Error('Falha ao atualizar tarefa');
     const updated: Task = await res.json();
     setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
+    if (data.status === 'done') {
+      apiFetch('/api/task-history').then(r => r.json()).then(d => Array.isArray(d) && setTaskHistory(d)).catch(() => {});
+    }
+  }, []);
+
+  const addTaskHistory = useCallback(async (data: Omit<TaskHistoryEntry, 'id'>) => {
+    const res = await apiFetch('/api/task-history', { method: 'POST', body: JSON.stringify(data) });
+    if (!res.ok) throw new Error('Falha ao criar histórico');
+    const created: TaskHistoryEntry = await res.json();
+    setTaskHistory((prev) => [created, ...prev]);
+  }, []);
+
+  const deleteTaskHistory = useCallback(async (id: string) => {
+    const res = await apiFetch(`/api/task-history/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Falha ao excluir histórico');
+    setTaskHistory((prev) => prev.filter((h) => h.id !== id));
   }, []);
 
   const deleteTask = useCallback(async (id: string) => {
@@ -102,7 +123,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AppContext.Provider value={{ events, finances, tasks, addFinance, updateFinance, deleteFinance, addEvent, updateEvent, deleteEvent, addTask, updateTask, deleteTask }}>
+    <AppContext.Provider value={{ events, finances, tasks, taskHistory, addFinance, updateFinance, deleteFinance, addEvent, updateEvent, deleteEvent, addTask, updateTask, deleteTask, addTaskHistory, deleteTaskHistory }}>
       {children}
     </AppContext.Provider>
   );

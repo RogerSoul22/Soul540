@@ -1,5 +1,46 @@
 import type { FormEvent } from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+
+// ── NF-e XML helpers ──────────────────────────────────────────────────────────
+type XmlFinanceItem = {
+  id: string;
+  name: string;
+  totalValue: number;
+  quantity: number;
+  measureUnit: string;
+  unitValue: number;
+  category: string;
+  selected: boolean;
+};
+
+function formatNFeDate(raw: string): string {
+  if (!raw) return new Date().toISOString().split('T')[0];
+  const s = raw.replace(/-/g, '').replace(/T.*/, '');
+  if (s.length === 8) return `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`;
+  return raw.split('T')[0] ?? new Date().toISOString().split('T')[0];
+}
+
+function parseNFeXmlForFinance(xmlText: string): { supplier: string; date: string; items: Omit<XmlFinanceItem, 'id' | 'selected' | 'category'>[] } {
+  const doc = new DOMParser().parseFromString(xmlText, 'application/xml');
+  const get = (el: Element | Document, tag: string) =>
+    el.querySelector(tag)?.textContent?.trim() ?? '';
+  const supplier = get(doc, 'emit xNome') || get(doc, 'xNome');
+  const rawDate = get(doc, 'dhEmi') || get(doc, 'dEmi');
+  const date = formatNFeDate(rawDate);
+  const items = Array.from(doc.querySelectorAll('det prod')).map((prod) => {
+    const qty = parseFloat(get(prod, 'qCom')) || 0;
+    const unitValue = parseFloat(get(prod, 'vUnCom')) || 0;
+    const totalValue = parseFloat(get(prod, 'vProd')) || qty * unitValue;
+    return {
+      name: get(prod, 'xProd'),
+      quantity: qty,
+      measureUnit: get(prod, 'uCom') || 'un',
+      unitValue,
+      totalValue,
+    };
+  }).filter((it) => it.name && it.totalValue > 0);
+  return { supplier, date, items };
+}
 import { useSearchParams } from 'react-router-dom';
 import { useApp } from '@frontend/contexts/AppContext';
 import { format, parseISO, isValid } from 'date-fns';
@@ -87,6 +128,59 @@ export default function Financeiro() {
   const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0]);
   const [formStatus, setFormStatus] = useState<FinanceStatus>('pending');
 
+  // XML import state
+  const [showXmlModal, setShowXmlModal] = useState(false);
+  const [xmlItems, setXmlItems] = useState<XmlFinanceItem[]>([]);
+  const [xmlSupplier, setXmlSupplier] = useState('');
+  const [xmlDate, setXmlDate] = useState('');
+  const [xmlImporting, setXmlImporting] = useState(false);
+  const xmlInputRef = useRef<HTMLInputElement>(null);
+
+  const handleXmlFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string;
+      try {
+        const { supplier, date, items } = parseNFeXmlForFinance(text);
+        setXmlSupplier(supplier);
+        setXmlDate(date);
+        setXmlItems(items.map((it, i) => ({ ...it, id: String(i), category: '', selected: true })));
+        setShowXmlModal(true);
+      } catch {
+        alert('Não foi possível ler o XML. Verifique se é uma NF-e válida.');
+      }
+    };
+    reader.readAsText(file, 'ISO-8859-1');
+    e.target.value = '';
+  };
+
+  const handleXmlImport = async () => {
+    const selected = xmlItems.filter((it) => it.selected);
+    if (!selected.length) return;
+    setXmlImporting(true);
+    for (const it of selected) {
+      await addFinance({
+        type: 'cost',
+        category: it.category || 'outro',
+        description: `${it.name}${xmlSupplier ? ` — ${xmlSupplier}` : ''}`,
+        amount: it.totalValue,
+        date: xmlDate,
+        status: 'pending',
+        eventId: '',
+      });
+    }
+    setXmlImporting(false);
+    setShowXmlModal(false);
+    setXmlItems([]);
+  };
+
+  // Event combobox state
+  const [eventSearch, setEventSearch] = useState('');
+  const [showEventDropdown, setShowEventDropdown] = useState(false);
+  const eventComboRef = useRef<HTMLDivElement>(null);
+
   // Open form from URL query params (e.g. from Dashboard shortcut)
   useEffect(() => {
     if (searchParams.get('action') === 'new') {
@@ -125,6 +219,18 @@ export default function Financeiro() {
       .catch(() => {});
   }, [showForm]);
 
+  // Close event dropdown on outside click
+  useEffect(() => {
+    if (!showEventDropdown) return;
+    const handler = (e: MouseEvent) => {
+      if (eventComboRef.current && !eventComboRef.current.contains(e.target as Node)) {
+        setShowEventDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showEventDropdown]);
+
   const activeFinances = useMemo(() => {
     if (dataScope === 'franchise') return franchiseFinances;
     if (dataScope === 'factory')   return factoryFinances;
@@ -138,6 +244,13 @@ export default function Financeiro() {
     if (dataScope === 'combined')  return [...events, ...franchiseEvents, ...factoryEvents];
     return events.length > 0 ? events : directEvents;
   }, [events, franchiseEvents, factoryEvents, dataScope, directEvents]);
+
+  const filteredEventsForCombo = useMemo(() => {
+    const sorted = [...activeEvents].filter(evt => evt?.name).sort((a, b) => a.name.localeCompare(b.name, 'pt'));
+    if (!eventSearch) return sorted;
+    const q = eventSearch.toLowerCase();
+    return sorted.filter(evt => evt.name.toLowerCase().includes(q));
+  }, [activeEvents, eventSearch]);
 
   // === DATA COMPUTATIONS ===
 
@@ -357,6 +470,7 @@ export default function Financeiro() {
   const resetForm = () => {
     setFormType('revenue');
     setFormEventId('');
+    setEventSearch('');
     setFormCategory('');
     setFormDescription('');
     setFormAmount('');
@@ -402,7 +516,7 @@ export default function Financeiro() {
               onClick={() => setDataScope('main')}
               title="Exibir apenas dados do sistema principal"
             >
-              Principal
+              Sorocaba
             </button>
             <button
               className={`${styles.scopeBtn} ${dataScope === 'franchise' ? styles.scopeBtnActive : ''}`}
@@ -426,6 +540,11 @@ export default function Financeiro() {
               Consolidado
             </button>
           </div>
+          <input ref={xmlInputRef} type="file" accept=".xml" style={{ display: 'none' }} onChange={handleXmlFile} />
+          <button className={styles.btnXml} onClick={() => xmlInputRef.current?.click()}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="12" y2="12"/><line x1="15" y1="15" x2="12" y2="12"/></svg>
+            Importar XML
+          </button>
           <Button onClick={() => setShowForm(true)}>+ Novo Lancamento</Button>
         </div>
       </div>
@@ -984,16 +1103,54 @@ export default function Financeiro() {
               </div>
               <div className={styles.formField}>
                 <label className={styles.formLabel}>Evento</label>
-                <select
-                  className={styles.formSelect}
-                  value={formEventId}
-                  onChange={(e) => setFormEventId(e.target.value)}
-                >
-                  <option value="">Selecione...</option>
-                  {[...activeEvents].filter(evt => evt?.name).sort((a, b) => a.name.localeCompare(b.name, 'pt')).map((evt) => (
-                    <option key={evt.id} value={evt.id}>{evt.name}</option>
-                  ))}
-                </select>
+                <div className={styles.eventCombo} ref={eventComboRef}>
+                  <input
+                    type="text"
+                    className={`${styles.formInput} ${styles.eventComboInput}`}
+                    placeholder="Buscar evento..."
+                    value={eventSearch}
+                    autoComplete="off"
+                    onChange={(e) => {
+                      setEventSearch(e.target.value);
+                      setFormEventId('');
+                      setShowEventDropdown(true);
+                    }}
+                    onFocus={() => setShowEventDropdown(true)}
+                  />
+                  {(eventSearch || formEventId) && (
+                    <button
+                      type="button"
+                      className={styles.eventClearBtn}
+                      onClick={() => { setFormEventId(''); setEventSearch(''); setShowEventDropdown(false); }}
+                      title="Limpar"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                  )}
+                  {showEventDropdown && (
+                    <div className={styles.eventDropdown}>
+                      {filteredEventsForCombo.length === 0 ? (
+                        <div className={styles.eventDropdownEmpty}>Nenhum evento encontrado</div>
+                      ) : (
+                        filteredEventsForCombo.map((evt) => (
+                          <button
+                            key={evt.id}
+                            type="button"
+                            className={`${styles.eventOption} ${formEventId === evt.id ? styles.eventOptionSelected : ''}`}
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              setFormEventId(evt.id);
+                              setEventSearch(evt.name);
+                              setShowEventDropdown(false);
+                            }}
+                          >
+                            {evt.name}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -1070,6 +1227,79 @@ export default function Financeiro() {
           </form>
         </Modal>
       )}
+      {/* XML Import Modal */}
+      {showXmlModal && (
+        <div className={styles.overlay} onClick={() => setShowXmlModal(false)}>
+          <div className={styles.xmlModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <div>
+                <h2 className={styles.modalTitle}>Importar NF-e XML</h2>
+                {xmlSupplier && <p className={styles.xmlSupplier}>Fornecedor: <strong>{xmlSupplier}</strong></p>}
+                {xmlDate && <p className={styles.xmlSupplier}>Data: <strong>{new Date(xmlDate + 'T12:00:00').toLocaleDateString('pt-BR')}</strong></p>}
+              </div>
+              <button className={styles.modalClose} onClick={() => setShowXmlModal(false)}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div className={styles.modalBody} style={{ padding: '16px 24px', gap: 12 }}>
+              <div className={styles.xmlMeta}>
+                <span className={styles.xmlCount}>{xmlItems.filter(i => i.selected).length} de {xmlItems.length} itens selecionados</span>
+                <button className={styles.xmlToggleAll} onClick={() => {
+                  const allSelected = xmlItems.every(i => i.selected);
+                  setXmlItems(prev => prev.map(i => ({ ...i, selected: !allSelected })));
+                }}>
+                  {xmlItems.every(i => i.selected) ? 'Desmarcar todos' : 'Selecionar todos'}
+                </button>
+              </div>
+              <div className={styles.xmlList}>
+                {xmlItems.map((item) => (
+                  <div key={item.id} className={`${styles.xmlRow} ${!item.selected ? styles.xmlRowDisabled : ''}`}>
+                    <input
+                      type="checkbox"
+                      checked={item.selected}
+                      onChange={(e) => setXmlItems(prev => prev.map(i => i.id === item.id ? { ...i, selected: e.target.checked } : i))}
+                      style={{ accentColor: 'var(--accent)', flexShrink: 0 }}
+                    />
+                    <div className={styles.xmlInfo}>
+                      <span className={styles.xmlName}>{item.name}</span>
+                      <span className={styles.xmlDetails}>
+                        {item.quantity} {item.measureUnit} × R$ {item.unitValue.toFixed(2)} = <strong>R$ {item.totalValue.toFixed(2)}</strong>
+                      </span>
+                    </div>
+                    <select
+                      className={styles.xmlCatSelect}
+                      value={item.category}
+                      onChange={(e) => setXmlItems(prev => prev.map(i => i.id === item.id ? { ...i, category: e.target.value } : i))}
+                    >
+                      <option value="">Categoria...</option>
+                      {formCategories.cost.map((cat) => (
+                        <option key={cat} value={cat}>{CATEGORY_LABELS[cat] || cat}</option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+              <div className={styles.xmlTotal}>
+                Total selecionado: <strong>R$ {xmlItems.filter(i => i.selected).reduce((acc, i) => acc + i.totalValue, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong>
+              </div>
+            </div>
+            <div className={styles.modalFooter}>
+              <button className={styles.btnCancel} onClick={() => setShowXmlModal(false)}>Cancelar</button>
+              <button
+                className={styles.btnPrimary}
+                onClick={handleXmlImport}
+                disabled={xmlImporting || xmlItems.every(i => !i.selected)}
+              >
+                {xmlImporting
+                  ? 'Importando...'
+                  : `Importar ${xmlItems.filter(i => i.selected).length} item${xmlItems.filter(i => i.selected).length !== 1 ? 's' : ''}`
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showInfo && (
         <div className={styles.overlay} onClick={() => setShowInfo(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>

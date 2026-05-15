@@ -66,7 +66,7 @@ const emptyForm: FormData = {
 };
 
 export default function Tarefas() {
-  const { tasks, events, addTask, updateTask, deleteTask } = useApp();
+  const { tasks, events, taskHistory, addTaskHistory, deleteTaskHistory, addTask, updateTask, deleteTask } = useApp();
   const [search, setSearch] = useState('');
   const [eventFilter, setEventFilter] = useState('all');
   const [viewMode, setViewMode] = useState<ViewMode>('kanban');
@@ -114,13 +114,29 @@ export default function Tarefas() {
     updateTask(taskId, { status: newStatus });
   };
 
+  const handleMoveToHistory = async (task: Task) => {
+    await addTaskHistory({
+      taskId: task.id,
+      title: task.title,
+      description: task.description,
+      priority: task.priority,
+      assignee: task.assignee,
+      dueDate: task.dueDate,
+      eventId: task.eventId,
+      completedAt: new Date().toISOString(),
+    });
+    await deleteTask(task.id);
+  };
+
   const handleDelete = (id: string) => { setDeleteTargetId(id); };
   const confirmDelete = async () => {
     if (deleteTargetId) await deleteTask(deleteTargetId);
     setDeleteTargetId(null);
   };
 
-  const doneTasks = tasks.filter((t) => t.status === 'done').length;
+  const [showHistory, setShowHistory] = useState(false);
+
+  const doneTasks = taskHistory.length;
   const urgentTasks = tasks.filter((t) => t.priority === 'urgent' && t.status !== 'done').length;
 
   return (
@@ -230,14 +246,25 @@ export default function Tarefas() {
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                               </button>
                               <span className={styles.taskMoveLabel}>{statusLabels[task.status]}</span>
-                              <button
-                                className={styles.taskMoveBtn}
-                                disabled={!next}
-                                onClick={() => next && handleMove(task.id, next.id)}
-                                title={next ? `${next.label} →` : undefined}
-                              >
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                              </button>
+                              {task.status === 'done' ? (
+                                <button
+                                  className={styles.taskArchiveBtn}
+                                  onClick={() => handleMoveToHistory(task)}
+                                  title="Mover para o histórico"
+                                >
+                                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                  Histórico
+                                </button>
+                              ) : (
+                                <button
+                                  className={styles.taskMoveBtn}
+                                  disabled={!next}
+                                  onClick={() => next && handleMove(task.id, next.id)}
+                                  title={next ? `${next.label} →` : undefined}
+                                >
+                                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                                </button>
+                              )}
                             </>
                           );
                         })()}
@@ -291,6 +318,57 @@ export default function Tarefas() {
           )}
         </div>
       )}
+
+      {/* Histórico de Concluídas */}
+      <div className={styles.historySection}>
+        <button className={styles.historyToggle} onClick={() => setShowHistory((v) => !v)}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points={showHistory ? '18 15 12 9 6 15' : '6 9 12 15 18 9'}/>
+          </svg>
+          Histórico de Concluídas
+          <span className={styles.historyCount}>{doneTasks}</span>
+        </button>
+
+        {showHistory && (
+          <div className={styles.historyList}>
+            {taskHistory.length === 0 ? (
+              <div className={styles.historyEmpty}>Nenhuma tarefa concluída ainda.</div>
+            ) : (
+              taskHistory.map((entry) => (
+                <div key={entry.id} className={styles.historyItem}>
+                  <div className={styles.historyItemLeft}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    <div className={styles.historyItemInfo}>
+                      <span className={styles.historyItemTitle}>{entry.title}</span>
+                      <span className={styles.historyItemMeta}>
+                        {entry.assignee && <span>{entry.assignee}</span>}
+                        {entry.eventId && <span> · {eventMap[entry.eventId]}</span>}
+                        {entry.completedAt && <span> · Concluída em {format(parseISO(entry.completedAt), "dd/MM/yy 'às' HH:mm", { locale: ptBR })}</span>}
+                      </span>
+                    </div>
+                  </div>
+                  <div className={styles.historyItemActions}>
+                    <Badge variant={priorityColors[entry.priority]}>{priorityLabels[entry.priority]}</Badge>
+                    <button
+                      className={styles.historyReopenBtn}
+                      onClick={async () => {
+                        await addTask({ title: entry.title, description: entry.description, status: 'todo', priority: entry.priority, assignee: entry.assignee, dueDate: entry.dueDate, eventId: entry.eventId });
+                        await deleteTaskHistory(entry.id);
+                      }}
+                      title="Reabrir tarefa"
+                    >
+                      Reabrir
+                    </button>
+                    <button className={styles.taskDelete} onClick={() => deleteTaskHistory(entry.id)} title="Remover do histórico">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </div>
 
       {showModal && (
         <div className={styles.overlay} onClick={() => { setShowModal(false); setForm(emptyForm); }}>

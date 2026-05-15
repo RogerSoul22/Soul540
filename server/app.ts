@@ -6,6 +6,7 @@ import path from 'path';
 import 'dotenv/config';
 import eventsRouter from './routes/events';
 import tasksRouter from './routes/tasks';
+import taskHistoryRouter from './routes/task-history';
 import employeesRouter from './routes/employees';
 import contractorsRouter from './routes/contractors';
 import contractorCategoriesRouter from './routes/contractor-categories';
@@ -36,6 +37,7 @@ app.use(optionalAuth);
 
 app.use('/api/events', eventsRouter);
 app.use('/api/tasks', tasksRouter);
+app.use('/api/task-history', taskHistoryRouter);
 app.use('/api/employees', employeesRouter);
 app.use('/api/contractors', contractorsRouter);
 app.use('/api/contractor-categories', contractorCategoriesRouter);

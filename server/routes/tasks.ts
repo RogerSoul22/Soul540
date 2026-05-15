@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { createTenantModels } from '../utils/tenantModel';
+import { historyModels } from './task-history';
 
 const models = createTenantModels('Task', {
   title: String,
@@ -26,7 +27,28 @@ router.post('/', async (req, res) =>
 router.put('/:id', async (req, res) => {
   const found = await models.findInAll(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
-  res.json(await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true }));
+  const updated = await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+  // Auto-create history entry when task is moved to done
+  if (req.body.status === 'done' && found.doc.status !== 'done') {
+    const hModel = historyModels.getModel(req);
+    const existing = await hModel.findOne({ taskId: req.params.id });
+    if (!existing) {
+      await hModel.create({
+        taskId: req.params.id,
+        title: updated.title,
+        description: updated.description || '',
+        priority: updated.priority || 'medium',
+        assignee: updated.assignee || '',
+        dueDate: updated.dueDate,
+        eventId: updated.eventId,
+        completedAt: new Date().toISOString(),
+        source: historyModels.getSource(req),
+      });
+    }
+  }
+
+  res.json(updated);
 });
 
 router.delete('/:id', async (req, res) => {

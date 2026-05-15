@@ -83,6 +83,19 @@ export interface Task {
   createdAt: string;
 }
 
+export interface TaskHistoryEntry {
+  id: string;
+  taskId: string;
+  title: string;
+  description: string;
+  priority: TaskPriority;
+  assignee: string;
+  dueDate?: string;
+  eventId?: string;
+  completedAt: string;
+  source?: string;
+}
+
 // ── Invoices ──────────────────────────────────────────────────────────────────
 
 export type InvoiceStatus = 'rascunho' | 'emitida' | 'cancelada';

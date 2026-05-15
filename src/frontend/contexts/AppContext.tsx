@@ -4,6 +4,7 @@ import type { PizzaEvent } from '@backend/domain/entities/Event';
 import type { FinanceEntry } from '@backend/domain/entities/Finance';
 import type { Invoice } from '@backend/domain/entities/Invoice';
 import type { Task } from '@backend/domain/entities/Task';
+import type { TaskHistoryEntry } from '@shared/types';
 import { apiFetch } from '@frontend/lib/api';
 
 interface AppContextData {
@@ -11,6 +12,10 @@ interface AppContextData {
   finances: FinanceEntry[];
   invoices: Invoice[];
   tasks: Task[];
+  taskHistory: TaskHistoryEntry[];
+  addTaskHistory: (entry: Omit<TaskHistoryEntry, 'id'>) => Promise<void>;
+  deleteTaskHistory: (id: string) => Promise<void>;
+  refreshTaskHistory: () => void;
   addFinance: (entry: Omit<FinanceEntry, 'id'>) => Promise<FinanceEntry>;
   updateFinance: (id: string, data: Partial<FinanceEntry>) => Promise<void>;
   deleteFinance: (id: string) => Promise<void>;
@@ -36,12 +41,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [finances, setFinances] = useState<FinanceEntry[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [taskHistory, setTaskHistory] = useState<TaskHistoryEntry[]>([]);
 
   const headers: HeadersInit = { 'X-System': 'main' };
 
   const loadData = useCallback(() => {
     apiFetch('/api/events', { headers }).then(r => r.json()).then(d => Array.isArray(d) && setEvents(d)).catch((err) => console.error('Falha ao carregar dados:', err));
     apiFetch('/api/tasks', { headers }).then(r => r.json()).then(d => Array.isArray(d) && setTasks(d)).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/task-history', { headers }).then(r => r.json()).then(d => Array.isArray(d) && setTaskHistory(d)).catch((err) => console.error('Falha ao carregar histórico:', err));
     apiFetch('/api/finances', { headers }).then(r => r.json()).then(d => Array.isArray(d) && setFinances(d)).catch((err) => console.error('Falha ao carregar dados:', err));
     apiFetch('/api/invoices', { headers }).then(r => r.json()).then(d => Array.isArray(d) && setInvoices(d)).catch((err) => console.error('Falha ao carregar dados:', err));
   }, []);
@@ -139,6 +146,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     apiFetch('/api/tasks', { headers }).then(r => r.json()).then(setTasks).catch((err) => console.error('Falha ao carregar dados:', err));
   }, []);
 
+  const refreshTaskHistory = useCallback(() => {
+    const headers: HeadersInit = { 'X-System': 'main' };
+    apiFetch('/api/task-history', { headers }).then(r => r.json()).then(d => Array.isArray(d) && setTaskHistory(d)).catch(() => {});
+  }, []);
+
   // Events (API)
   const addEvent = useCallback(async (data: Omit<PizzaEvent, 'id' | 'createdAt'>) => {
     const res = await apiFetch('/api/events', {
@@ -194,6 +206,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (!res.ok) throw new Error('Falha ao atualizar tarefa');
     const updated: Task = await res.json();
     setTasks((prev) => prev.map((t) => (t.id === id ? updated : t)));
+    if (data.status === 'done') {
+      const headers: HeadersInit = { 'X-System': 'main' };
+      apiFetch('/api/task-history', { headers }).then(r => r.json()).then(d => Array.isArray(d) && setTaskHistory(d)).catch(() => {});
+    }
+  }, []);
+
+  const addTaskHistory = useCallback(async (data: Omit<TaskHistoryEntry, 'id'>) => {
+    const res = await apiFetch('/api/task-history', { method: 'POST', headers: buildHeaders(true), body: JSON.stringify(data) });
+    if (!res.ok) throw new Error('Falha ao criar histórico');
+    const created: TaskHistoryEntry = await res.json();
+    setTaskHistory((prev) => [created, ...prev]);
+  }, []);
+
+  const deleteTaskHistory = useCallback(async (id: string) => {
+    const res = await apiFetch(`/api/task-history/${id}`, { method: 'DELETE', headers: buildHeaders() });
+    if (!res.ok) throw new Error('Falha ao excluir histórico');
+    setTaskHistory((prev) => prev.filter((h) => h.id !== id));
   }, []);
 
   const deleteTask = useCallback(async (id: string) => {
@@ -205,12 +234,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider
       value={{
-        events, finances, invoices, tasks,
+        events, finances, invoices, tasks, taskHistory,
         addFinance, updateFinance, deleteFinance,
         addInvoice, updateInvoice, deleteInvoice, emitInvoice, pollInvoiceStatus,
         addEvent, updateEvent, deleteEvent,
         addTask, updateTask, deleteTask,
-        refreshFinances, refreshTasks,
+        refreshFinances, refreshTasks, refreshTaskHistory, addTaskHistory, deleteTaskHistory,
       }}
     >
       {children}

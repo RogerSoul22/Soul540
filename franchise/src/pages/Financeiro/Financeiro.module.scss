@@ -802,3 +802,65 @@
 .infoSectionTitle { font-size: $font-size-sm; font-weight: $font-weight-semibold; color: $text-primary; }
 .infoText { font-size: $font-size-sm; color: $text-secondary; line-height: 1.6; strong { color: $text-primary; } }
 .infoList { font-size: $font-size-sm; color: $text-secondary; line-height: 1.8; padding-left: $spacing-lg; margin: 0; strong { color: $text-primary; } }
+
+// Event combobox
+.eventCombo { position: relative; }
+.eventComboInput { padding-right: 32px !important; }
+.eventClearBtn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: $text-muted; cursor: pointer; display: flex; padding: 2px; &:hover { color: $text-primary; } }
+.eventDropdown { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: $bg-secondary; border: 1px solid $border-accent; border-radius: $radius-sm; z-index: 50; max-height: 200px; overflow-y: auto; box-shadow: $shadow-lg; }
+.eventOption { display: block; width: 100%; text-align: left; padding: 9px 12px; background: none; border: none; color: $text-secondary; font-size: $font-size-sm; cursor: pointer; transition: background $transition-base; &:hover { background: rgba(255,255,255,0.04); color: $text-primary; } }
+.eventOptionSelected { background: rgba($accent, 0.12); color: $accent; }
+.eventDropdownEmpty { padding: 10px 12px; font-size: $font-size-sm; color: $text-muted; }
+
+// XML import
+.btnXml {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px;
+  background: rgba(245,158,11,0.1);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: $radius-sm;
+  color: #f59e0b;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+  &:hover { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.5); }
+}
+
+.xmlModal {
+  background: $bg-secondary;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  width: 100%;
+  max-width: 620px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: $shadow-lg;
+  overflow: hidden;
+}
+
+.xmlSupplier { font-size: $font-size-xs; color: $text-muted; margin-top: 4px; strong { color: $text-secondary; } }
+.xmlMeta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.xmlCount { font-size: $font-size-xs; color: $text-muted; }
+.xmlToggleAll { font-size: $font-size-xs; color: $accent; background: none; border: none; cursor: pointer; padding: 0; &:hover { text-decoration: underline; } }
+.xmlList { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; max-height: 45vh; }
+.xmlRow {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px;
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  transition: opacity $transition-fast;
+}
+.xmlRowDisabled { opacity: 0.4; }
+.xmlInfo { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.xmlName { font-size: $font-size-sm; font-weight: $font-weight-medium; color: $text-primary; @include text-ellipsis; }
+.xmlDetails { font-size: $font-size-xs; color: $text-muted; strong { color: $text-secondary; } }
+.xmlCatSelect {
+  background: $bg-input; border: 1px solid $border; border-radius: $radius-xs;
+  padding: 4px 8px; font-size: $font-size-xs; color: $text-primary; cursor: pointer; flex-shrink: 0;
+  &:focus { outline: none; border-color: $accent; }
+}
+.xmlTotal { font-size: $font-size-sm; color: $text-muted; margin-top: 8px; strong { color: $text-primary; } }
+.btnCancel { padding: 10px $spacing-md; background: none; border: none; color: $text-muted; font-size: $font-size-sm; cursor: pointer; &:hover { color: $text-primary; } }
