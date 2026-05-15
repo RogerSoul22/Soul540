@@ -40,6 +40,13 @@ type FormData = {
   paymentConditions: string;
   terms: string;
   menuId: string;
+  paid: boolean;
+  noticeHours: string;
+  serviceObservation: string;
+  paymentObservation: string;
+  lateFeePercent: string;
+  lateFeeHours: string;
+  additionalServicesObservation: string;
 };
 
 const emptyForm: FormData = {
@@ -49,6 +56,8 @@ const emptyForm: FormData = {
   additionalServices: '', value: '', minGuests: '', serviceType: 'self service e coquetel',
   drinksDescription: '', cancellationDays: '30', pizzaTeam: '', drinksTeam: '',
   startDate: '', endDate: '', paymentConditions: '', terms: '', menuId: '',
+  paid: false, noticeHours: '1', serviceObservation: '', paymentObservation: '',
+  lateFeePercent: '30', lateFeeHours: '48', additionalServicesObservation: '',
 };
 
 function formatDate(iso: string) {
@@ -104,13 +113,20 @@ export default function Contratos() {
       serviceType: c.serviceType || 'self service e coquetel',
       drinksDescription: c.drinksDescription || '',
       cancellationDays: c.cancellationDays?.toString() || '30',
-      pizzaTeam: c.pizzaTeam || '',
-      drinksTeam: c.drinksTeam || '',
+      pizzaTeam: c.pizzaTeam?.toString() || '',
+      drinksTeam: c.drinksTeam?.toString() || '',
       startDate: c.startDate,
       endDate: c.endDate || '',
       paymentConditions: c.paymentConditions || '',
       terms: c.terms || '',
       menuId: c.menuId || '',
+      paid: c.paid ?? false,
+      noticeHours: c.noticeHours?.toString() || '1',
+      serviceObservation: c.serviceObservation || '',
+      paymentObservation: c.paymentObservation || '',
+      lateFeePercent: c.lateFeePercent?.toString() || '30',
+      lateFeeHours: c.lateFeeHours?.toString() || '48',
+      additionalServicesObservation: c.additionalServicesObservation || '',
     });
     setEditingId(c.id);
     setShowModal(true);
@@ -138,13 +154,20 @@ export default function Contratos() {
       serviceType: form.serviceType || '',
       drinksDescription: form.drinksDescription || '',
       cancellationDays: Number(form.cancellationDays) || 30,
-      pizzaTeam: form.pizzaTeam || '',
-      drinksTeam: form.drinksTeam || '',
+      pizzaTeam: Number(form.pizzaTeam) || 0,
+      drinksTeam: Number(form.drinksTeam) || 0,
       startDate: form.startDate,
       endDate: form.endDate || '',
       paymentConditions: form.paymentConditions || '',
       terms: form.terms || '',
       menuId: form.menuId || '',
+      paid: form.paid,
+      noticeHours: Number(form.noticeHours) || 1,
+      serviceObservation: form.serviceObservation,
+      paymentObservation: form.paymentObservation,
+      lateFeePercent: Number(form.lateFeePercent) || 30,
+      lateFeeHours: Number(form.lateFeeHours) || 48,
+      additionalServicesObservation: form.additionalServicesObservation,
     };
     if (editingId) {
       const res = await fetch(`/api/contracts/${editingId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
@@ -315,7 +338,25 @@ export default function Contratos() {
                 </div>
                 <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
                   <label className={styles.label}>Serviços Adicionais</label>
-                  <input className={styles.input} value={form.additionalServices} onChange={(e) => setForm({ ...form, additionalServices: e.target.value })} placeholder="Descreva serviços extras e valores" />
+                  <textarea
+                    className={styles.input}
+                    value={form.additionalServices}
+                    onChange={(e) => setForm({ ...form, additionalServices: e.target.value })}
+                    placeholder="Descreva serviços extras e valores..."
+                    rows={3}
+                    style={{ resize: 'vertical' }}
+                  />
+                </div>
+                <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                  <label className={styles.label}>Observação dos Serviços Adicionais</label>
+                  <textarea
+                    className={styles.input}
+                    value={form.additionalServicesObservation}
+                    onChange={(e) => setForm({ ...form, additionalServicesObservation: e.target.value })}
+                    placeholder="Detalhes, condições ou observações sobre os serviços adicionais..."
+                    rows={2}
+                    style={{ resize: 'vertical' }}
+                  />
                 </div>
                 <div className={styles.formGroup}>
                   <label className={styles.label}>Valor Total</label>
@@ -324,6 +365,28 @@ export default function Contratos() {
                 <div className={styles.formGroup}>
                   <label className={styles.label}>Mínimo de Convidados</label>
                   <input className={styles.input} type="number" value={form.minGuests} onChange={(e) => setForm({ ...form, minGuests: e.target.value })} placeholder="0" />
+                </div>
+                <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                  <label className={styles.label}>
+                    <input
+                      type="checkbox"
+                      checked={form.paid}
+                      onChange={(e) => setForm({ ...form, paid: e.target.checked })}
+                      style={{ marginRight: 8 }}
+                    />
+                    Já foi pago?
+                  </label>
+                </div>
+                <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                  <label className={styles.label}>Observação de Pagamento</label>
+                  <textarea
+                    className={styles.input}
+                    value={form.paymentObservation}
+                    onChange={(e) => setForm({ ...form, paymentObservation: e.target.value })}
+                    placeholder="Informações sobre condições ou status do pagamento..."
+                    rows={2}
+                    style={{ resize: 'vertical' }}
+                  />
                 </div>
               </div>
 
@@ -341,7 +404,24 @@ export default function Contratos() {
                 </div>
                 <div className={styles.formGroup}>
                   <label className={styles.label}>Sistema de Servico</label>
-                  <input className={styles.input} value={form.serviceType} onChange={(e) => setForm({ ...form, serviceType: e.target.value })} placeholder="self service e coquetel" />
+                  <select
+                    className={styles.input}
+                    value={['self service e coquetel', 'volante pizza', ''].includes(form.serviceType) ? form.serviceType : 'outro'}
+                    onChange={(e) => setForm({ ...form, serviceType: e.target.value === 'outro' ? '' : e.target.value })}
+                  >
+                    <option value="self service e coquetel">Self service e coquetel</option>
+                    <option value="volante pizza">Volante pizza</option>
+                    <option value="outro">Outros (preencher abaixo)</option>
+                  </select>
+                  {!['self service e coquetel', 'volante pizza'].includes(form.serviceType) && (
+                    <input
+                      className={styles.input}
+                      style={{ marginTop: 6 }}
+                      value={form.serviceType}
+                      onChange={(e) => setForm({ ...form, serviceType: e.target.value })}
+                      placeholder="Descreva o sistema de serviço..."
+                    />
+                  )}
                 </div>
                 <div className={styles.formGroup}>
                   <label className={styles.label}>Dias sem Multa (Cancelamento)</label>
@@ -352,12 +432,72 @@ export default function Contratos() {
                   <input className={styles.input} value={form.drinksDescription} onChange={(e) => setForm({ ...form, drinksDescription: e.target.value })} placeholder="Descreva o serviço de bebidas incluso" />
                 </div>
                 <div className={styles.formGroup}>
-                  <label className={styles.label}>Equipe das Pizzas</label>
-                  <input className={styles.input} value={form.pizzaTeam} onChange={(e) => setForm({ ...form, pizzaTeam: e.target.value })} placeholder="Ex: 2 pizzaiolos + 1 auxiliar" />
+                  <label className={styles.label}>Qtd. Colaboradores Pizza</label>
+                  <input
+                    className={styles.input}
+                    type="number"
+                    min="0"
+                    value={form.pizzaTeam}
+                    onChange={(e) => setForm({ ...form, pizzaTeam: e.target.value })}
+                    placeholder="0"
+                  />
                 </div>
                 <div className={styles.formGroup}>
-                  <label className={styles.label}>Equipe de Bebidas</label>
-                  <input className={styles.input} value={form.drinksTeam} onChange={(e) => setForm({ ...form, drinksTeam: e.target.value })} placeholder="Ex: 1 barman" />
+                  <label className={styles.label}>Qtd. Colaboradores Bebidas</label>
+                  <input
+                    className={styles.input}
+                    type="number"
+                    min="0"
+                    value={form.drinksTeam}
+                    onChange={(e) => setForm({ ...form, drinksTeam: e.target.value })}
+                    placeholder="0"
+                  />
+                </div>
+                <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                  <label className={styles.label}>Observação do Serviço</label>
+                  <textarea
+                    className={styles.input}
+                    value={form.serviceObservation}
+                    onChange={(e) => setForm({ ...form, serviceObservation: e.target.value })}
+                    placeholder="Detalhes adicionais sobre o serviço, logística, restrições..."
+                    rows={3}
+                    style={{ resize: 'vertical' }}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Antecedência para lembrete (horas)</label>
+                  <input
+                    className={styles.input}
+                    type="number"
+                    min="0"
+                    value={form.noticeHours}
+                    onChange={(e) => setForm({ ...form, noticeHours: e.target.value })}
+                    placeholder="1"
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Multa por atraso (%)</label>
+                  <input
+                    className={styles.input}
+                    type="number"
+                    min="0"
+                    value={form.lateFeePercent}
+                    onChange={(e) => setForm({ ...form, lateFeePercent: e.target.value })}
+                    placeholder="30"
+                  />
+                </div>
+                <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
+                  <label className={styles.label} style={{ color: '#9ca3af', fontSize: '0.75rem' }}>
+                    Multa aplicada caso o pagamento não ocorra até {form.lateFeeHours}h após o evento.
+                  </label>
+                  <input
+                    className={styles.input}
+                    type="number"
+                    min="0"
+                    value={form.lateFeeHours}
+                    onChange={(e) => setForm({ ...form, lateFeeHours: e.target.value })}
+                    placeholder="48"
+                  />
                 </div>
               </div>
             </div>
