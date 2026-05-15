@@ -966,7 +966,7 @@ return (
                 <div className={styles.detailSection}>
                   <p className={styles.detailSectionTitle}>Cardápio</p>
                   <div className={styles.menuTags}>
-                    {viewingEvent.menu.map((item, i) => (
+                    {viewingEvent.menu.map((item: string, i: number) => (
                       <span key={i} className={styles.menuTag}>{item}</span>
                     ))}
                   </div>
@@ -1019,7 +1019,7 @@ return (
                     <div className={styles.detailItem} style={{ marginTop: 8 }}>
                       <span className={styles.detailLabel}>Equipe escalada</span>
                       <div className={styles.menuTags}>
-                        {viewingEvent.selectedEmployeeIds.map((id) => (
+                        {viewingEvent.selectedEmployeeIds.map((id: string) => (
                           <span key={id} className={styles.menuTag}>{employeeMap[id] || id}</span>
                         ))}
                       </div>
