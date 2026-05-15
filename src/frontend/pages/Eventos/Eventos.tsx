@@ -458,8 +458,8 @@ return (
         </div>
         <div className={styles.unitFilter}>
           <button className={`${styles.unitFilterBtn} ${sourceFilter === 'all' ? styles.unitFilterBtnActive : ''}`} onClick={() => setSourceFilter('all')}>Todos</button>
-          <button className={`${styles.unitFilterBtn} ${sourceFilter === 'main' ? styles.unitFilterBtnActive : ''}`} onClick={() => setSourceFilter('main')}>Principal</button>
-          <button className={`${styles.unitFilterBtn} ${sourceFilter === 'franchise' ? styles.unitFilterBtnActive : ''}`} onClick={() => setSourceFilter('franchise')}>Franquia</button>
+          <button className={`${styles.unitFilterBtn} ${sourceFilter === 'main' ? styles.unitFilterBtnActive : ''}`} onClick={() => setSourceFilter('main')}>Sorocaba</button>
+          <button className={`${styles.unitFilterBtn} ${sourceFilter === 'franchise' ? styles.unitFilterBtnActive : ''}`} onClick={() => setSourceFilter('franchise')}>Campinas</button>
         </div>
         <div className={styles.dateFilterWrap}>
           <div className={styles.dateFilterToggle}>
