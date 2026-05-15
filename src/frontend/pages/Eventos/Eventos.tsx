@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useApp } from '@frontend/contexts/AppContext';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -209,6 +210,7 @@ const STATIC_MENU_NAMES = ['Menu Eccezionale', 'Menu Superiore', 'Menu Raffinato
 
 export default function Eventos() {
   const { events, addEvent, updateEvent, deleteEvent } = useApp();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [availableMenus, setAvailableMenus] = useState<string[]>(STATIC_MENU_NAMES);
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
@@ -221,6 +223,13 @@ export default function Eventos() {
       return next;
     });
   };
+
+  useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      setShowModal(true);
+      setSearchParams({});
+    }
+  }, []);
 
   useEffect(() => {
     fetch('/api/employees').then(r => r.json()).then(setEmployees).catch(() => {});
