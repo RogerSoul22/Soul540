@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -77,6 +78,7 @@ const formatBRL = (v: number) => `R$ ${v.toLocaleString('pt-BR')}`;
 
 export default function Financeiro() {
   const { events, finances, addFinance, updateFinance, deleteFinance } = useApp();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabType>('geral');
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().substring(0, 7));
   const [costFilter, setCostFilter] = useState<CostFilter>('all');
@@ -141,6 +143,16 @@ export default function Financeiro() {
     }
     return [...set].sort();
   }, [finances]);
+
+  // Open form from URL query params (e.g. from Dashboard shortcut)
+  useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      const type = searchParams.get('type') as FinanceType | null;
+      if (type) setFormType(type);
+      setShowForm(true);
+      setSearchParams({});
+    }
+  }, []);
 
   // Auto-select most recent month when finances load
   useEffect(() => {

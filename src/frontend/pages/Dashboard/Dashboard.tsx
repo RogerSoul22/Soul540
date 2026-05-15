@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '@frontend/contexts/AppContext';
 import { useAuth } from '@frontend/hooks/useAuth';
 import { format, parseISO } from 'date-fns';
@@ -20,6 +21,7 @@ type UnitFilter = 'all' | 'main' | 'franchise';
 export default function Dashboard() {
   const { events, tasks } = useApp();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [showInfo, setShowInfo] = useState(false);
   const [unitFilter, setUnitFilter] = useState<UnitFilter>('all');
   const [calendarMonth, setCalendarMonth] = useState(new Date());
@@ -73,25 +75,35 @@ export default function Dashboard() {
               {monthEventCount} evento{monthEventCount !== 1 ? 's' : ''}
             </span>
           </div>
-          <div className={styles.unitFilter}>
+          <div className={styles.calendarHeaderRight}>
             <button
-              className={`${styles.unitFilterBtn} ${unitFilter === 'all' ? styles.unitFilterBtnActive : ''}`}
-              onClick={() => setUnitFilter('all')}
+              className={styles.btnNewEntry}
+              onClick={() => navigate('/financeiro?action=new&type=cost')}
+              title="Lançar nova despesa"
             >
-              Todos
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Lançar Despesa
             </button>
-            <button
-              className={`${styles.unitFilterBtn} ${unitFilter === 'main' ? styles.unitFilterBtnActive : ''}`}
-              onClick={() => setUnitFilter('main')}
-            >
-              Principal
-            </button>
-            <button
-              className={`${styles.unitFilterBtn} ${unitFilter === 'franchise' ? styles.unitFilterBtnActive : ''}`}
-              onClick={() => setUnitFilter('franchise')}
-            >
-              Franquia
-            </button>
+            <div className={styles.unitFilter}>
+              <button
+                className={`${styles.unitFilterBtn} ${unitFilter === 'all' ? styles.unitFilterBtnActive : ''}`}
+                onClick={() => setUnitFilter('all')}
+              >
+                Todos
+              </button>
+              <button
+                className={`${styles.unitFilterBtn} ${unitFilter === 'main' ? styles.unitFilterBtnActive : ''}`}
+                onClick={() => setUnitFilter('main')}
+              >
+                Sorocaba
+              </button>
+              <button
+                className={`${styles.unitFilterBtn} ${unitFilter === 'franchise' ? styles.unitFilterBtnActive : ''}`}
+                onClick={() => setUnitFilter('franchise')}
+              >
+                Campinas
+              </button>
+            </div>
           </div>
         </div>
         <CalendarView events={filteredEvents} month={calendarMonth} onMonthChange={setCalendarMonth} />

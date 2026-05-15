@@ -219,6 +219,31 @@
   gap: $spacing-sm;
 }
 
+.calendarHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.btnNewEntry {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 8px;
+  color: #fbbf24;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(251, 191, 36, 0.22);
+  }
+}
+
 .calendarMonth {
   font-size: $font-size-lg;
   font-weight: $font-weight-semibold;

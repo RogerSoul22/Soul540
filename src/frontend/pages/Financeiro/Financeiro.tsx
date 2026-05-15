@@ -1,5 +1,6 @@
 import type { FormEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useApp } from '@frontend/contexts/AppContext';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -55,6 +56,7 @@ type DataScope = 'main' | 'franchise' | 'factory' | 'combined';
 
 export default function Financeiro() {
   const { events, finances, addFinance, updateFinance, deleteFinance } = useApp();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabType>('geral');
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().substring(0, 7));
   const [costFilter, setCostFilter] = useState<CostFilter>('all');
@@ -84,6 +86,16 @@ export default function Financeiro() {
   const [formAmount, setFormAmount] = useState('');
   const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0]);
   const [formStatus, setFormStatus] = useState<FinanceStatus>('pending');
+
+  // Open form from URL query params (e.g. from Dashboard shortcut)
+  useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      const type = searchParams.get('type') as FinanceType | null;
+      if (type) setFormType(type);
+      setShowForm(true);
+      setSearchParams({});
+    }
+  }, []);
 
   // Fetch franchise/factory finances and events when scope includes them
   useEffect(() => {
