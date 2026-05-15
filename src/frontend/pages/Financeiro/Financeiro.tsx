@@ -51,7 +51,7 @@ const formCategories: Record<FinanceType, string[]> = {
 
 const formatBRL = (v: number) => `R$ ${v.toLocaleString('pt-BR')}`;
 
-type DataScope = 'main' | 'franchise' | 'combined';
+type DataScope = 'main' | 'franchise' | 'factory' | 'combined';
 
 export default function Financeiro() {
   const { events, finances, addFinance, updateFinance, deleteFinance } = useApp();
@@ -61,6 +61,8 @@ export default function Financeiro() {
   const [dataScope, setDataScope] = useState<DataScope>('main');
   const [franchiseFinances, setFranchiseFinances] = useState<typeof finances>([]);
   const [franchiseEvents, setFranchiseEvents] = useState<typeof events>([]);
+  const [factoryFinances, setFactoryFinances] = useState<typeof finances>([]);
+  const [factoryEvents, setFactoryEvents] = useState<typeof events>([]);
   const [directEvents, setDirectEvents] = useState<typeof events>([]);
 
   // Page-level month filter (shared by geral / despesas / valores tabs)
@@ -83,12 +85,23 @@ export default function Financeiro() {
   const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0]);
   const [formStatus, setFormStatus] = useState<FinanceStatus>('pending');
 
-  // Fetch franchise finances and events when scope includes franchise
+  // Fetch franchise/factory finances and events when scope includes them
   useEffect(() => {
-    if (dataScope === 'main') { setFranchiseFinances([]); setFranchiseEvents([]); return; }
-    const headers: HeadersInit = { 'X-System': 'franchise' };
-    fetch('/api/finances', { headers, credentials: 'include' }).then((r) => r.json()).then(setFranchiseFinances).catch(() => {});
-    fetch('/api/events',   { headers, credentials: 'include' }).then((r) => r.json()).then(setFranchiseEvents).catch(() => {});
+    if (dataScope === 'main') {
+      setFranchiseFinances([]); setFranchiseEvents([]);
+      setFactoryFinances([]); setFactoryEvents([]);
+      return;
+    }
+    if (dataScope === 'franchise' || dataScope === 'combined') {
+      const h: HeadersInit = { 'X-System': 'franchise' };
+      fetch('/api/finances', { headers: h, credentials: 'include' }).then(r => r.json()).then(d => Array.isArray(d) && setFranchiseFinances(d)).catch(() => {});
+      fetch('/api/events',   { headers: h, credentials: 'include' }).then(r => r.json()).then(d => Array.isArray(d) && setFranchiseEvents(d)).catch(() => {});
+    }
+    if (dataScope === 'factory' || dataScope === 'combined') {
+      const h: HeadersInit = { 'X-System': 'factory' };
+      fetch('/api/finances', { headers: h, credentials: 'include' }).then(r => r.json()).then(d => Array.isArray(d) && setFactoryFinances(d)).catch(() => {});
+      fetch('/api/events',   { headers: h, credentials: 'include' }).then(r => r.json()).then(d => Array.isArray(d) && setFactoryEvents(d)).catch(() => {});
+    }
   }, [dataScope]);
 
   // Ensure events are available for the form regardless of AppContext state
@@ -102,15 +115,17 @@ export default function Financeiro() {
 
   const activeFinances = useMemo(() => {
     if (dataScope === 'franchise') return franchiseFinances;
-    if (dataScope === 'combined') return [...finances, ...franchiseFinances];
+    if (dataScope === 'factory')   return factoryFinances;
+    if (dataScope === 'combined')  return [...finances, ...franchiseFinances, ...factoryFinances];
     return finances;
-  }, [finances, franchiseFinances, dataScope]);
+  }, [finances, franchiseFinances, factoryFinances, dataScope]);
 
   const activeEvents = useMemo(() => {
     if (dataScope === 'franchise') return franchiseEvents;
-    if (dataScope === 'combined') return [...events, ...franchiseEvents];
+    if (dataScope === 'factory')   return factoryEvents;
+    if (dataScope === 'combined')  return [...events, ...franchiseEvents, ...factoryEvents];
     return events.length > 0 ? events : directEvents;
-  }, [events, franchiseEvents, dataScope, directEvents]);
+  }, [events, franchiseEvents, factoryEvents, dataScope, directEvents]);
 
   // === DATA COMPUTATIONS ===
 
@@ -383,6 +398,13 @@ export default function Financeiro() {
               title="Exibir apenas dados de Campinas"
             >
               Campinas
+            </button>
+            <button
+              className={`${styles.scopeBtn} ${dataScope === 'factory' ? styles.scopeBtnActive : ''}`}
+              onClick={() => setDataScope('factory')}
+              title="Exibir apenas dados da fábrica"
+            >
+              Fábrica
             </button>
             <button
               className={`${styles.scopeBtn} ${dataScope === 'combined' ? styles.scopeBtnActive : ''}`}
