@@ -123,8 +123,8 @@ export default function ContractDocument({ contract, event, eventName: _eventNam
   );
 
   // Team
-  const [pizzaTeam, setPizzaTeam] = useState(contract.pizzaTeam || '');
-  const [drinksTeam, setDrinksTeam] = useState(contract.drinksTeam || '');
+  const [pizzaTeam, setPizzaTeam] = useState<string>(contract.pizzaTeam?.toString() || '');
+  const [drinksTeam, setDrinksTeam] = useState<string>(contract.drinksTeam?.toString() || '');
 
   // Signature location
   const [contractCity, setContractCity] = useState('Campinas/SP');
