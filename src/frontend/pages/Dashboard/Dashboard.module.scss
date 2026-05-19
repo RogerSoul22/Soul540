@@ -223,11 +223,17 @@
   display: flex;
   align-items: center;
   gap: $spacing-sm;
+
+  @include mobile {
+    flex-wrap: wrap;
+    width: 100%;
+  }
 }
 
 .btnNewSchedule {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   padding: 7px 14px;
   background: rgba(99, 179, 237, 0.12);
@@ -242,11 +248,17 @@
   &:hover {
     background: rgba(99, 179, 237, 0.22);
   }
+
+  @include mobile {
+    flex: 1;
+    font-size: 0.75rem;
+  }
 }
 
 .btnNewEntry {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
   padding: 7px 14px;
   background: rgba(251, 191, 36, 0.12);
@@ -260,6 +272,11 @@
 
   &:hover {
     background: rgba(251, 191, 36, 0.22);
+  }
+
+  @include mobile {
+    flex: 1;
+    font-size: 0.75rem;
   }
 }
 
@@ -283,6 +300,10 @@
   border-radius: $radius-sm;
   padding: 3px;
   gap: 2px;
+
+  @include mobile {
+    width: 100%;
+  }
 }
 
 .unitFilterBtn {
@@ -299,6 +320,12 @@
   &:hover {
     color: $text-primary;
     background: rgba(255, 255, 255, 0.05);
+  }
+
+  @include mobile {
+    flex: 1;
+    text-align: center;
+    padding: 5px 8px;
   }
 }
 

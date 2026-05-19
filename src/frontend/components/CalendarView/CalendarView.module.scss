@@ -245,6 +245,8 @@
   border-bottom: 1px solid $border-subtle;
   cursor: pointer;
   transition: background $transition-fast;
+  overflow: hidden;
+  min-width: 0;
 
   &:nth-child(7n) { border-right: none; }
   &:nth-last-child(-n+7) { border-bottom: none; }
@@ -569,12 +571,25 @@
   }
   .cell {
     min-height: 58px;
-    padding: 5px 3px 3px;
+    padding: 5px 2px 2px;
   }
   .weekDay {
     font-size: 9px;
     padding: $spacing-xs 2px;
     letter-spacing: 0;
+  }
+  .pill {
+    font-size: 9px;
+    padding: 1px 3px;
+  }
+  .pillMore {
+    font-size: 9px;
+    padding: 0 3px;
+  }
+  .dayNum {
+    width: 22px;
+    height: 22px;
+    font-size: 10px;
   }
   .dayTitleWeekday { font-size: $font-size-xl; }
   .timeGrid { max-height: 300px; }
