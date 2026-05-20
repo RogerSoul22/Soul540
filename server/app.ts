@@ -58,10 +58,10 @@ app.use('/api/audit-log', auditLogRouter);
 app.use('/api/production-recipes', productionRecipesRouter);
 app.use('/api/production-orders', productionOrdersRouter);
 
-// Serve franchise app at /franquia
+// Serve franchise app at /campinas
 const franchiseDist = path.join(process.cwd(), 'franchise/dist');
-app.use('/franquia', express.static(franchiseDist));
-app.get(['/franquia', '/franquia/*'], (_req, res) => res.sendFile(path.join(franchiseDist, 'index.html')));
+app.use('/campinas', express.static(franchiseDist));
+app.get(['/campinas', '/campinas/*'], (_req, res) => res.sendFile(path.join(franchiseDist, 'index.html')));
 
 // Serve factory app at /fabrica
 const factoryDist = path.join(process.cwd(), 'factory/dist');
