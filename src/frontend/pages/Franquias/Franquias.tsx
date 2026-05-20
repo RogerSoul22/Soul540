@@ -60,14 +60,29 @@ function PortalCard({ system, defaultUrl }: { system: PortalSystem; defaultUrl: 
   const fetchStats = useCallback(async () => {
     setLoading(true);
     try {
-      const headers = { 'Content-Type': 'application/json', 'X-System': system };
-      const [evR, tkR, emR, fiR] = await Promise.all([
-        fetch('/api/events/count', { headers }),
-        fetch('/api/tasks', { headers }),
-        fetch('/api/employees', { headers }),
-        fetch('/api/finances', { headers }),
-      ]);
-      if (!evR.ok) throw new Error('offline');
+      const base = url.replace(/\/$/, '');
+      const localHeaders = { 'Content-Type': 'application/json', 'X-System': system };
+
+      let evR: Response, tkR: Response, emR: Response, fiR: Response;
+
+      try {
+        [evR, tkR, emR, fiR] = await Promise.all([
+          fetch(`${base}/api/events/count`),
+          fetch(`${base}/api/tasks`),
+          fetch(`${base}/api/employees`),
+          fetch(`${base}/api/finances`),
+        ]);
+        if (!evR.ok) throw new Error('portal offline');
+      } catch {
+        [evR, tkR, emR, fiR] = await Promise.all([
+          fetch('/api/events/count', { headers: localHeaders }),
+          fetch('/api/tasks', { headers: localHeaders }),
+          fetch('/api/employees', { headers: localHeaders }),
+          fetch('/api/finances', { headers: localHeaders }),
+        ]);
+        if (!evR.ok) throw new Error('offline');
+      }
+
       const [evCount, tasks, employees, finances] = await Promise.all([
         evR.json(), tkR.json(), emR.json(), fiR.json(),
       ]);
@@ -87,7 +102,7 @@ function PortalCard({ system, defaultUrl }: { system: PortalSystem; defaultUrl: 
     } finally {
       setLoading(false);
     }
-  }, [system]);
+  }, [url, system]);
 
   useEffect(() => { fetchStats(); }, [fetchStats]);
 
