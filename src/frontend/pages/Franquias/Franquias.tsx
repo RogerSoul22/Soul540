@@ -59,42 +59,52 @@ function PortalCard({ system, defaultUrl }: { system: PortalSystem; defaultUrl: 
 
   const fetchStats = useCallback(async () => {
     setLoading(true);
-    try {
-      const base = url.replace(/\/$/, '');
-      const localHeaders = { 'Content-Type': 'application/json', 'X-System': system };
+    const localHeaders = { 'Content-Type': 'application/json', 'X-System': system };
 
-      let evR: Response, tkR: Response, emR: Response, fiR: Response;
+    const isJson = (r: Response) => (r.headers.get('content-type') ?? '').includes('application/json');
 
-      try {
-        [evR, tkR, emR, fiR] = await Promise.all([
-          fetch(`${base}/api/events/count`),
-          fetch(`${base}/api/tasks`),
-          fetch(`${base}/api/employees`),
-          fetch(`${base}/api/finances`),
-        ]);
-        if (!evR.ok) throw new Error('portal offline');
-      } catch {
-        [evR, tkR, emR, fiR] = await Promise.all([
-          fetch('/api/events/count', { headers: localHeaders }),
-          fetch('/api/tasks', { headers: localHeaders }),
-          fetch('/api/employees', { headers: localHeaders }),
-          fetch('/api/finances', { headers: localHeaders }),
-        ]);
-        if (!evR.ok) throw new Error('offline');
-      }
-
-      const [evCount, tasks, employees, finances] = await Promise.all([
-        evR.json(), tkR.json(), emR.json(), fiR.json(),
-      ]);
+    const parseAll = async (responses: Response[]) => {
+      const [evCount, tasks, employees, finances] = await Promise.all(responses.map(r => r.json()));
       const revenue = Array.isArray(finances)
         ? finances.filter((f: any) => f.type === 'revenue').reduce((acc: number, f: any) => acc + (f.amount || 0), 0)
         : 0;
-      setStats({
+      return {
         events: evCount?.count ?? 0,
         tasks: Array.isArray(tasks) ? tasks.length : 0,
         employees: Array.isArray(employees) ? employees.length : 0,
         revenue,
-      });
+      };
+    };
+
+    try {
+      const base = url.replace(/\/$/, '');
+
+      // Try the portal's own API first (with a 3-second timeout)
+      try {
+        const signal = AbortSignal.timeout(3000);
+        const responses = await Promise.all([
+          fetch(`${base}/api/events/count`, { signal }),
+          fetch(`${base}/api/tasks`, { signal }),
+          fetch(`${base}/api/employees`, { signal }),
+          fetch(`${base}/api/finances`, { signal }),
+        ]);
+        if (!responses[0].ok || !isJson(responses[0])) throw new Error('portal unavailable');
+        setStats(await parseAll(responses));
+        setOnline(true);
+        return;
+      } catch {
+        // Portal unreachable or returned non-JSON — fall back to local API
+      }
+
+      // Fallback: local API with X-System header
+      const responses = await Promise.all([
+        fetch('/api/events/count', { headers: localHeaders }),
+        fetch('/api/tasks', { headers: localHeaders }),
+        fetch('/api/employees', { headers: localHeaders }),
+        fetch('/api/finances', { headers: localHeaders }),
+      ]);
+      if (!responses[0].ok) throw new Error('local api error');
+      setStats(await parseAll(responses));
       setOnline(true);
     } catch {
       setOnline(false);
