@@ -76,27 +76,35 @@ function PortalCard({ system, defaultUrl }: { system: PortalSystem; defaultUrl: 
       };
     };
 
+    const isSameOrigin = (portalUrl: string): boolean => {
+      try { return new URL(portalUrl).origin === window.location.origin; }
+      catch { return true; }
+    };
+
     try {
       const base = url.replace(/\/$/, '');
 
-      // Try the portal's own API first (with a 3-second timeout)
-      try {
-        const signal = AbortSignal.timeout(3000);
-        const responses = await Promise.all([
-          fetch(`${base}/api/events/count`, { signal }),
-          fetch(`${base}/api/tasks`, { signal }),
-          fetch(`${base}/api/employees`, { signal }),
-          fetch(`${base}/api/finances`, { signal }),
-        ]);
-        if (!responses[0].ok || !isJson(responses[0])) throw new Error('portal unavailable');
-        setStats(await parseAll(responses));
-        setOnline(true);
-        return;
-      } catch {
-        // Portal unreachable or returned non-JSON — fall back to local API
+      // Only try the portal's own API if it's on a different server.
+      // Same-origin URLs are just paths on this app — not a real separate portal.
+      if (!isSameOrigin(base)) {
+        try {
+          const signal = AbortSignal.timeout(3000);
+          const responses = await Promise.all([
+            fetch(`${base}/api/events/count`, { signal }),
+            fetch(`${base}/api/tasks`, { signal }),
+            fetch(`${base}/api/employees`, { signal }),
+            fetch(`${base}/api/finances`, { signal }),
+          ]);
+          if (!responses[0].ok || !isJson(responses[0])) throw new Error('portal unavailable');
+          setStats(await parseAll(responses));
+          setOnline(true);
+          return;
+        } catch {
+          // Portal unreachable or returned non-JSON — fall through to local API
+        }
       }
 
-      // Fallback: local API with X-System header
+      // Local API with X-System header (used when portal is same-origin or unreachable)
       const responses = await Promise.all([
         fetch('/api/events/count', { headers: localHeaders }),
         fetch('/api/tasks', { headers: localHeaders }),
