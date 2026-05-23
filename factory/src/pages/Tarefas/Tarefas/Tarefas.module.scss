@@ -588,15 +588,93 @@
   }
 }
 
+// Order badge
+.orderBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  background: rgba(245, 158, 11, 0.15);
+  color: $accent;
+  border-radius: $radius-full;
+  font-size: 10px;
+  font-weight: $font-weight-semibold;
+  margin-right: 3px;
+}
+
+// Finalized section
+.finalizedSection {
+  background: $bg-secondary;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  margin-bottom: $spacing-xl;
+}
+
+.finalizedHeader {
+  @include flex-between;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1px solid $border;
+  background: rgba(255,255,255,0.02);
+}
+
+.finalizedList {
+  display: flex;
+  flex-direction: column;
+}
+
+.finalizedItem {
+  @include flex-between;
+  padding: $spacing-sm $spacing-lg;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  gap: $spacing-md;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: rgba(255,255,255,0.02); }
+}
+
+.finalizedInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex: 1;
+  min-width: 0;
+}
+
+.finalizedFilial {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  white-space: nowrap;
+}
+
+.finalizedItens {
+  font-size: $font-size-xs;
+  color: $text-muted;
+  @include text-ellipsis;
+}
+
+.finalizedRight {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  flex-shrink: 0;
+}
+
+.finalizedCost {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+  white-space: nowrap;
+}
+
 // Kanban
 .kanban {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: $spacing-lg;
   align-items: start;
   margin-bottom: $spacing-xl;
 
-  @include tablet { grid-template-columns: repeat(2, 1fr); }
   @include mobile { grid-template-columns: 1fr; }
 }
 

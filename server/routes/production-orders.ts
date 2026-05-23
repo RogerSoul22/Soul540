@@ -25,9 +25,10 @@ const PizzaSizeSchema = new Schema({
 const ProductionOrderSchema = new Schema({
   unit: { type: String, required: true, index: true },
   id: { type: String, required: true },
+  orderNumber: { type: Number, default: 1 },
   filial: { type: String, required: true, trim: true },
   itens: { type: [PedidoItemSchema], default: [] },
-  pizzaSize: { type: PizzaSizeSchema, required: true },
+  pizzaSize: { type: PizzaSizeSchema },
   ingredients: { type: [PedidoIngredientSchema], default: [] },
   totalCost: { type: Number, default: 0 },
   status: { type: String, default: 'a_preparar' },
@@ -49,9 +50,12 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   const unit = (req as any).headers?.['x-system'] || 'factory';
+  const last = await ProductionOrderModel.findOne({ unit }).sort({ orderNumber: -1 });
+  const orderNumber = (last?.orderNumber || 0) + 1;
   const doc = await ProductionOrderModel.create({
     ...req.body,
     unit,
+    orderNumber,
     status: req.body.status || 'a_preparar',
     createdAt: req.body.createdAt || new Date().toISOString(),
   });

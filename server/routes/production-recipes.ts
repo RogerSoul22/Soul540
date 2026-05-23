@@ -9,6 +9,13 @@ const IngredientSchema = new Schema({
   cost: { type: Number, default: 0 },
 }, { _id: false });
 
+const InsumoSchema = new Schema({
+  id: { type: String },
+  name: { type: String, default: '' },
+  measure: { type: String, default: 'un' },
+  cost: { type: Number, default: 0 },
+}, { _id: false });
+
 const PizzaSizeSchema = new Schema({
   id: { type: String },
   diameter: { type: Number, default: 25 },
@@ -18,6 +25,7 @@ const PizzaSizeSchema = new Schema({
 const RecipeSchema = new Schema({
   unit: { type: String, required: true, unique: true },
   ingredients: { type: [IngredientSchema], default: [] },
+  insumos: { type: [InsumoSchema], default: [] },
   sizes: { type: [PizzaSizeSchema], default: [] },
 }, { toJSON: { virtuals: true, versionKey: false } });
 
@@ -50,10 +58,10 @@ router.get('/', async (req, res) => {
 
 router.put('/', async (req, res) => {
   const unit = (req as any).headers?.['x-system'] || 'factory';
-  const { ingredients, sizes } = req.body;
+  const { ingredients, insumos, sizes } = req.body;
   const doc = await RecipeModel.findOneAndUpdate(
     { unit },
-    { ingredients, sizes },
+    { ingredients, insumos: insumos || [], sizes: sizes || [] },
     { upsert: true, new: true },
   );
   res.json(doc);
