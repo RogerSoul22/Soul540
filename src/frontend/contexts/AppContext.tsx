@@ -129,7 +129,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return updated;
   }, []);
   const pollInvoiceStatus = useCallback(async (id: string) => {
-    const res = await apiFetch(`/api/invoices/${id}/nfeio-status`, { headers: buildHeaders() });
+    const res = await apiFetch(`/api/invoices/${id}/status`, { headers: buildHeaders() });
     if (!res.ok) throw new Error('Falha ao consultar status da nota');
     const updated: Invoice = await res.json();
     setInvoices((prev) => prev.map((inv) => (inv.id === id ? updated : inv)));

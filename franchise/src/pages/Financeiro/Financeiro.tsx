@@ -116,6 +116,16 @@ const formCategories: Record<FinanceType, string[]> = {
 };
 
 const formatBRL = (v: number) => `R$ ${v.toLocaleString('pt-BR')}`;
+const alphaCollator = new Intl.Collator('pt-BR', { sensitivity: 'base', numeric: true });
+const normalizeAlpha = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .toLocaleLowerCase('pt-BR');
+const compareAlpha = (a: string, b: string) => alphaCollator.compare(normalizeAlpha(a), normalizeAlpha(b));
 
 export default function Financeiro() {
   const { events, finances, addFinance, updateFinance, deleteFinance } = useApp();
@@ -175,7 +185,9 @@ export default function Financeiro() {
         const { supplier, date, items } = parseNFeXmlForFinance(text);
         setXmlSupplier(supplier);
         setXmlDate(date);
-        setXmlItems(items.map((it, i) => ({ ...it, id: String(i), category: '', selected: true })));
+        setXmlItems(items
+          .map((it, i) => ({ ...it, id: String(i), category: '', selected: true }))
+          .sort((a, b) => compareAlpha(a.name, b.name)));
         setShowXmlModal(true);
       } catch {
         alert('Não foi possível ler o XML. Verifique se é uma NF-e válida.');
@@ -205,6 +217,18 @@ export default function Financeiro() {
     setXmlItems([]);
   };
 
+  const categoryOptions = useMemo(
+    () => ({
+      revenue: [...formCategories.revenue].sort((a, b) =>
+        compareAlpha(CATEGORY_LABELS[a] || a, CATEGORY_LABELS[b] || b),
+      ),
+      cost: [...formCategories.cost].sort((a, b) =>
+        compareAlpha(CATEGORY_LABELS[a] || a, CATEGORY_LABELS[b] || b),
+      ),
+    }),
+    [],
+  );
+
   // Close event dropdown on outside click
   useEffect(() => {
     if (!showEventDropdown) return;
@@ -218,11 +242,18 @@ export default function Financeiro() {
   }, [showEventDropdown]);
 
   const filteredEventsForCombo = useMemo(() => {
-    const sorted = [...events].filter(evt => evt?.name).sort((a, b) => a.name.localeCompare(b.name, 'pt'));
+    const sorted = [...events]
+      .filter(evt => evt?.name)
+      .sort((a, b) => compareAlpha(a.name, b.name));
     if (!eventSearch) return sorted;
     const q = eventSearch.toLowerCase();
     return sorted.filter(evt => evt.name.toLowerCase().includes(q));
   }, [events, eventSearch]);
+
+  const eventDropdownOptions = useMemo(
+    () => [...filteredEventsForCombo].sort((a, b) => compareAlpha(a.name, b.name)),
+    [filteredEventsForCombo],
+  );
 
   // === DATA COMPUTATIONS ===
 
@@ -314,7 +345,7 @@ export default function Financeiro() {
         value: val,
         color: CATEGORY_COLORS[cat] || '#64748b',
       }))
-      .sort((a, b) => b.value - a.value);
+      .sort((a, b) => compareAlpha(a.label, b.label));
   }, [monthFinances]);
 
   const variableCosts = useMemo(() => {
@@ -330,7 +361,7 @@ export default function Financeiro() {
         value: val,
         color: CATEGORY_COLORS[cat] || '#64748b',
       }))
-      .sort((a, b) => b.value - a.value);
+      .sort((a, b) => compareAlpha(a.label, b.label));
   }, [monthFinances]);
 
   // Gauge values for page-level month (used in Visão Geral)
@@ -367,7 +398,7 @@ export default function Financeiro() {
   const eventsWithFinalValue = useMemo(
     () => events
       .filter((e) => (e.finalValue ?? 0) > 0 && (pageMonth === 'all' || e.date.startsWith(pageMonth)))
-      .sort((a, b) => b.date.localeCompare(a.date)),
+      .sort((a, b) => compareAlpha(a.name, b.name)),
     [events, pageMonth],
   );
   const totalFinalValue = useMemo(
@@ -391,7 +422,11 @@ export default function Financeiro() {
         );
       }
       return true;
-    }).sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
+    }).sort((a, b) => {
+      const byDescription = compareAlpha(a.description || CATEGORY_LABELS[a.category] || a.category, b.description || CATEGORY_LABELS[b.category] || b.category);
+      if (byDescription !== 0) return byDescription;
+      return (b.date ?? '').localeCompare(a.date ?? '');
+    });
   }, [finances, filterType, filterMonth, search, events]);
 
   // Events with budget joined with their finance entry — filtered by pageMonth
@@ -404,8 +439,8 @@ export default function Financeiro() {
           (f) => f.eventId === e.id && f.type === 'revenue' && f.category === 'contrato',
         ),
       }))
-      .sort((a, b) => b.event.date.localeCompare(a.event.date));
-  }, [events, finances]);
+      .sort((a, b) => compareAlpha(a.event.name, b.event.name));
+  }, [events, finances, pageMonth]);
 
   const totalContracted = useMemo(
     () => eventsWithBudget.reduce((acc, { event }) => acc + (event.budget ?? 0), 0),
@@ -681,7 +716,7 @@ export default function Financeiro() {
                   total: pageMonthFinances.filter((f) => f.type === 'cost' && f.category === cat).reduce((a, f) => a + f.amount, 0),
                 }))
                 .filter(({ total }) => total > 0)
-                .sort((a, b) => b.total - a.total);
+                .sort((a, b) => compareAlpha(CATEGORY_LABELS[a.cat] || a.cat, CATEGORY_LABELS[b.cat] || b.cat));
               const max = totals[0]?.total || 1;
               if (totals.length === 0) return <p className={styles.emptyState}>Nenhuma despesa registrada.</p>;
               return (
@@ -981,10 +1016,10 @@ export default function Financeiro() {
                       className={styles.eventDropdown}
                       style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width }}
                     >
-                      {filteredEventsForCombo.length === 0 ? (
+                      {eventDropdownOptions.length === 0 ? (
                         <div className={styles.eventDropdownEmpty}>Nenhum evento encontrado</div>
                       ) : (
-                        filteredEventsForCombo.map((evt) => (
+                        eventDropdownOptions.map((evt) => (
                           <button
                             key={evt.id}
                             type="button"
@@ -1016,7 +1051,7 @@ export default function Financeiro() {
                   required
                 >
                   <option value="">Selecione...</option>
-                  {formCategories[formType].map((cat) => (
+                  {categoryOptions[formType].map((cat) => (
                     <option key={cat} value={cat}>{CATEGORY_LABELS[cat] || cat}</option>
                   ))}
                 </select>
@@ -1124,7 +1159,7 @@ export default function Financeiro() {
                       onChange={(e) => setXmlItems(prev => prev.map(i => i.id === item.id ? { ...i, category: e.target.value } : i))}
                     >
                       <option value="">Categoria...</option>
-                      {formCategories.cost.map((cat) => (
+                      {categoryOptions.cost.map((cat) => (
                         <option key={cat} value={cat}>{CATEGORY_LABELS[cat] || cat}</option>
                       ))}
                     </select>

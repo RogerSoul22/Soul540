@@ -73,9 +73,9 @@ export default function NotasFiscais() {
   const formSubtotal = formItems.reduce((acc, item) => acc + item.quantity * item.unitPrice, 0);
   const formTaxAmount = formSubtotal * (parseFloat(formTaxRate || '0') / 100);
 
-  // Polling for invoices in processing state
+  // Polling for invoices in processing state (NFS-e via nfe.io only — NF-e is synchronous)
   const processingInvoices = useMemo(
-    () => invoices.filter((inv) => inv.nfeioStatus === 'processing'),
+    () => invoices.filter((inv) => inv.emissaoStatus === 'processing' || inv.nfeioStatus === 'processing'),
     [invoices],
   );
   const pollInvoiceStatusRef = useRef(pollInvoiceStatus);
@@ -306,27 +306,27 @@ export default function NotasFiscais() {
                   </div>
                 </div>
 
-                {/* nfe.io status section */}
+                {/* Emission status section */}
                 <div className={styles.nfeioSection} onClick={(e) => e.stopPropagation()}>
-                  {!invoice.nfeioStatus && invoice.status !== 'cancelada' && (
+                  {!invoice.nfeioStatus && !invoice.emissaoStatus && invoice.status !== 'cancelada' && (
                     <button
                       className={styles.emitBtn}
                       onClick={(e) => { e.stopPropagation(); setConfirmEmitId(invoice.id); }}
                     >
-                      Emitir via nfe.io
+                      Emitir Nota Fiscal
                     </button>
                   )}
-                  {invoice.nfeioStatus === 'processing' && (
+                  {(invoice.emissaoStatus === 'processing' || invoice.nfeioStatus === 'processing') && (
                     <div className={styles.nfeioProcessing}>
                       <span className={styles.spinner} />
                       <Badge variant="amber">Processando...</Badge>
                     </div>
                   )}
-                  {invoice.nfeioStatus === 'issued' && (
+                  {(invoice.emissaoStatus === 'emitida' || invoice.nfeioStatus === 'issued') && (
                     <div className={styles.nfeioIssued}>
-                      <Badge variant="green">Emitida via nfe.io</Badge>
-                      {invoice.nfeioNumber && (
-                        <span className={styles.nfeioNumber}>NF {invoice.nfeioNumber}</span>
+                      <Badge variant="green">Nota Emitida</Badge>
+                      {(invoice.numeroNF ?? invoice.nfeioNumber) && (
+                        <span className={styles.nfeioNumber}>NF {invoice.numeroNF ?? invoice.nfeioNumber}</span>
                       )}
                       <div className={styles.nfeioLinks}>
                         <a
@@ -348,9 +348,14 @@ export default function NotasFiscais() {
                       </div>
                     </div>
                   )}
-                  {invoice.nfeioStatus === 'error' && (
+                  {(invoice.emissaoStatus === 'erro' || invoice.nfeioStatus === 'error') && (
                     <div className={styles.nfeioError}>
-                      <Badge variant="red">Erro nfe.io</Badge>
+                      <Badge variant="red">Erro na Emissão</Badge>
+                      {invoice.emissaoMotivo && (
+                        <span className={styles.nfeioNumber} title={invoice.emissaoMotivo}>
+                          {invoice.emissaoMotivo.substring(0, 40)}{invoice.emissaoMotivo.length > 40 ? '…' : ''}
+                        </span>
+                      )}
                       <button
                         className={styles.retryBtn}
                         onClick={() => setConfirmEmitId(invoice.id)}
@@ -397,10 +402,10 @@ export default function NotasFiscais() {
 
       {/* Confirm emit modal */}
       {confirmEmitInvoice && (
-        <Modal title="Confirmar Emissao via nfe.io" onClose={() => setConfirmEmitId(null)}>
+        <Modal title="Confirmar Emissão de Nota Fiscal" onClose={() => setConfirmEmitId(null)}>
           <div className={styles.confirmModal}>
             <p className={styles.confirmText}>
-              Confirma a emissao da nota fiscal via nfe.io?
+              Confirma a emissão da nota fiscal?
             </p>
             <div className={styles.confirmDetails}>
               <div className={styles.confirmRow}>
@@ -758,7 +763,14 @@ export default function NotasFiscais() {
                 <p>Tipo: {(previewInvoice.type ?? 'nfse').toUpperCase()}</p>
                 <p>Evento: {events.find((e) => e.id === previewInvoice.eventId)?.name || '-'}</p>
                 <p>Data de Emissao: {format(parseISO(previewInvoice.issueDate), 'dd/MM/yyyy')}</p>
-                {previewInvoice.nfeioNumber && <p>Numero NF: {previewInvoice.nfeioNumber}</p>}
+                {(previewInvoice.numeroNF ?? previewInvoice.nfeioNumber) && (
+                  <p>Numero NF: {previewInvoice.numeroNF ?? previewInvoice.nfeioNumber}</p>
+                )}
+                {previewInvoice.chaveAcesso && (
+                  <p style={{ wordBreak: 'break-all', fontSize: '10px' }}>
+                    Chave: {previewInvoice.chaveAcesso}
+                  </p>
+                )}
               </div>
             </div>
 

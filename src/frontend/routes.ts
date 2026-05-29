@@ -1,6 +1,6 @@
 export const ROUTES = {
   LOGIN: '/login',
-  DASHBOARD: '/',
+  DASHBOARD: '/dashboard',
   FINANCEIRO: '/financeiro',
   NOTAS_FISCAIS: '/notas-fiscais',
   USUARIO: '/usuario',

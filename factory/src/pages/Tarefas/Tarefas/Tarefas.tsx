@@ -75,7 +75,7 @@ function NovoPedidoForm({
   const [filial, setFilial] = useState('');
   const [itens, setItens] = useState<Array<{ id: string; nome: string; measure: string; quantidade: number }>>([]);
   const [itemKey, setItemKey] = useState('');
-  const [itemQtd, setItemQtd] = useState(1);
+  const [itemQtd, setItemQtd] = useState(0);
 
   const allItems = useMemo(() => [
     ...ingredients.filter(i => i.name.trim()).map(i => ({
@@ -165,7 +165,7 @@ function NovoPedidoForm({
             </select>
           </div>
           <div>
-            <input className={styles.input} type="number" min={1} value={itemQtd} onChange={e => setItemQtd(Number(e.target.value) || 1)} />
+            <input className={styles.input} type="number" min={0} value={itemQtd} onChange={e => setItemQtd(Number(e.target.value) || 0)} />
           </div>
           <div>
             <button type="button" className={styles.btnPrimary} onClick={addItem} disabled={!itemKey || allItems.length === 0}>Adicionar</button>
@@ -260,6 +260,9 @@ export default function Pedidos() {
   const pedidosByStatus = useMemo(() => {
     const map: Record<PedidoStatus, Pedido[]> = { a_preparar: [], a_enviar: [], entregue: [] };
     pedidos.forEach(p => map[p.status].push(p));
+    (Object.keys(map) as PedidoStatus[]).forEach(k => {
+      map[k].sort((a, b) => a.filial.localeCompare(b.filial, 'pt'));
+    });
     return map;
   }, [pedidos]);
 

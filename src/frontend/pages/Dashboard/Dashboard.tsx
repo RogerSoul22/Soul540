@@ -114,6 +114,24 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+        <div className={styles.legend}>
+          <span className={styles.legendItem}>
+            <span className={styles.legendDot} style={{ background: '#3b82f6' }} />
+            Orçamento
+          </span>
+          <span className={styles.legendItem}>
+            <span className={styles.legendDot} style={{ background: '#f59e0b' }} />
+            Fechado
+          </span>
+          <span className={styles.legendItem}>
+            <span className={styles.legendDot} style={{ background: '#22c55e' }} />
+            Finalizado
+          </span>
+          <span className={styles.legendItem}>
+            <span className={styles.legendDot} style={{ background: '#ef4444' }} />
+            Com observação
+          </span>
+        </div>
         <CalendarView events={filteredEvents} month={calendarMonth} onMonthChange={setCalendarMonth} />
       </div>
 

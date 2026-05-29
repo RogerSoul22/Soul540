@@ -46,6 +46,10 @@ export interface PizzaEvent {
   locationImageData?: string;
   paymentProofData?: string;
   contractPdfData?: string;
+  depositValue?: number;
+  pixKey?: string;
+  estimatedPizzas?: number;
+  actualPizzas?: number;
 }
 
 // ── Finances ─────────────────────────────────────────────────────────────────
@@ -136,7 +140,15 @@ export interface Invoice {
   clientState?: string;
   clientPostalCode?: string;
 
-  // Resposta nfe.io (preenchida após emissão)
+  // Emissão fiscal — campos genéricos (NF-e direto SEFAZ)
+  emissaoStatus?: 'processing' | 'emitida' | 'erro';
+  numeroNF?: string;
+  chaveAcesso?: string;
+  protocolo?: string;
+  xmlEmitido?: string;
+  emissaoMotivo?: string;
+
+  // Legado nfe.io — mantido para compatibilidade com NFS-e
   nfeioId?: string;
   nfeioStatus?: 'processing' | 'issued' | 'error';
   nfeioNumber?: string;

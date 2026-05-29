@@ -44,6 +44,10 @@ const EventSchema = new Schema({
   locationImageData: String,
   paymentProofData: String,
   contractPdfData: String,
+  depositValue: Number,
+  pixKey: String,
+  estimatedPizzas: Number,
+  actualPizzas: Number,
 }, { collection: 'events', toJSON: { virtuals: true, versionKey: false } });
 
 const FranchiseEventSchema = new Schema({
@@ -86,6 +90,10 @@ const FranchiseEventSchema = new Schema({
   locationImageData: String,
   paymentProofData: String,
   contractPdfData: String,
+  depositValue: Number,
+  pixKey: String,
+  estimatedPizzas: Number,
+  actualPizzas: Number,
 }, { collection: 'franchiseevents', toJSON: { virtuals: true, versionKey: false } });
 
 const FactoryEventSchema = new Schema({
@@ -128,6 +136,10 @@ const FactoryEventSchema = new Schema({
   locationImageData: String,
   paymentProofData: String,
   contractPdfData: String,
+  depositValue: Number,
+  pixKey: String,
+  estimatedPizzas: Number,
+  actualPizzas: Number,
 }, { collection: 'factoryevents', toJSON: { virtuals: true, versionKey: false } });
 
 EventSchema.index({ date: -1 });

@@ -121,6 +121,16 @@ const formCategories: Record<FinanceType, string[]> = {
 };
 
 const formatBRL = (v: number) => `R$ ${v.toLocaleString('pt-BR')}`;
+const alphaCollator = new Intl.Collator('pt-BR', { sensitivity: 'base', numeric: true });
+const normalizeAlpha = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .toLocaleLowerCase('pt-BR');
+const compareAlpha = (a: string, b: string) => alphaCollator.compare(normalizeAlpha(a), normalizeAlpha(b));
 
 export default function Financeiro() {
   const { events, finances, addFinance, updateFinance, deleteFinance } = useApp();
@@ -218,11 +228,20 @@ export default function Financeiro() {
   }, [showEventDropdown]);
 
   const filteredEventsForCombo = useMemo(() => {
-    const sorted = [...events].filter(evt => evt?.name).sort((a, b) => a.name.localeCompare(b.name, 'pt'));
+    const eventsById = new Map<string, (typeof events)[number]>();
+    for (const evt of events) {
+      if (evt?.id && evt.name?.trim()) eventsById.set(evt.id, evt);
+    }
+    const sorted = [...eventsById.values()].sort((a, b) => compareAlpha(a.name, b.name));
     if (!eventSearch) return sorted;
     const q = eventSearch.toLowerCase();
     return sorted.filter(evt => evt.name.toLowerCase().includes(q));
   }, [events, eventSearch]);
+
+  const eventDropdownOptions = useMemo(
+    () => [...filteredEventsForCombo].sort((a, b) => compareAlpha(a.name, b.name)),
+    [filteredEventsForCombo],
+  );
 
   // === DATA COMPUTATIONS ===
 
@@ -880,10 +899,10 @@ export default function Financeiro() {
                       className={styles.eventDropdown}
                       style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width }}
                     >
-                      {filteredEventsForCombo.length === 0 ? (
+                      {eventDropdownOptions.length === 0 ? (
                         <div className={styles.eventDropdownEmpty}>Nenhum evento encontrado</div>
                       ) : (
-                        filteredEventsForCombo.map((evt) => (
+                        eventDropdownOptions.map((evt) => (
                           <button
                             key={evt.id}
                             type="button"

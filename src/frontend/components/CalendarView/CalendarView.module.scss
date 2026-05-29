@@ -309,6 +309,11 @@
   &:hover { filter: brightness(1.2); }
 }
 
+.pillNotes {
+  border-left-width: 2px;
+  font-weight: $font-weight-semibold;
+}
+
 .pillMore {
   font-size: 10px;
   color: $text-muted;
@@ -773,12 +778,13 @@
 }
 
 .notesBox {
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid $border-subtle;
+  background: rgba(239, 68, 68, 0.07);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-left: 3px solid #ef4444;
   border-radius: $radius-sm;
   padding: $spacing-sm $spacing-md;
   font-size: $font-size-sm;
-  color: $text-secondary;
+  color: #fca5a5;
   line-height: 1.5;
   margin: 0;
 }
@@ -849,6 +855,26 @@
   color: #25d366; font-size: $font-size-sm; font-weight: $font-weight-medium;
   cursor: pointer; text-decoration: none; transition: all $transition-base;
   &:hover { background: rgba(37,211,102,0.15); border-color: rgba(37,211,102,0.4); }
+}
+
+.btnFinalize {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px $spacing-lg;
+  border-radius: $radius-sm;
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.08);
+  color: #22c55e;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    background: rgba(34, 197, 94, 0.16);
+    border-color: rgba(34, 197, 94, 0.55);
+  }
 }
 
 .btnDelete {

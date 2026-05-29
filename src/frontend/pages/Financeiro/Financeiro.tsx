@@ -92,6 +92,16 @@ const formCategories: Record<FinanceType, string[]> = {
 };
 
 const formatBRL = (v: number) => `R$ ${v.toLocaleString('pt-BR')}`;
+const alphaCollator = new Intl.Collator('pt-BR', { sensitivity: 'base', numeric: true });
+const normalizeAlpha = (value: string) =>
+  value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .toLocaleLowerCase('pt-BR');
+const compareAlpha = (a: string, b: string) => alphaCollator.compare(normalizeAlpha(a), normalizeAlpha(b));
 
 type DataScope = 'main' | 'franchise' | 'factory' | 'combined';
 
@@ -246,11 +256,20 @@ export default function Financeiro() {
   }, [events, franchiseEvents, factoryEvents, dataScope, directEvents]);
 
   const filteredEventsForCombo = useMemo(() => {
-    const sorted = [...activeEvents].filter(evt => evt?.name).sort((a, b) => a.name.localeCompare(b.name, 'pt'));
+    const eventsById = new Map<string, (typeof activeEvents)[number]>();
+    for (const evt of activeEvents) {
+      if (evt?.id && evt.name?.trim()) eventsById.set(evt.id, evt);
+    }
+    const sorted = [...eventsById.values()].sort((a, b) => compareAlpha(a.name, b.name));
     if (!eventSearch) return sorted;
     const q = eventSearch.toLowerCase();
     return sorted.filter(evt => evt.name.toLowerCase().includes(q));
   }, [activeEvents, eventSearch]);
+
+  const eventDropdownOptions = useMemo(
+    () => [...filteredEventsForCombo].sort((a, b) => compareAlpha(a.name, b.name)),
+    [filteredEventsForCombo],
+  );
 
   // === DATA COMPUTATIONS ===
 
@@ -400,7 +419,10 @@ export default function Financeiro() {
         );
       }
       return true;
-    }).sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
+    }).sort((a, b) => {
+    if (dataScope === 'franchise') return a.description.localeCompare(b.description, 'pt');
+    return (b.date ?? '').localeCompare(a.date ?? '');
+  });
   }, [activeFinances, filterType, filterMonth, search, activeEvents]);
 
   // Events with budget joined with their finance entry — filtered by pageMonth
@@ -1129,10 +1151,10 @@ export default function Financeiro() {
                   )}
                   {showEventDropdown && (
                     <div className={styles.eventDropdown}>
-                      {filteredEventsForCombo.length === 0 ? (
+                      {eventDropdownOptions.length === 0 ? (
                         <div className={styles.eventDropdownEmpty}>Nenhum evento encontrado</div>
                       ) : (
-                        filteredEventsForCombo.map((evt) => (
+                        eventDropdownOptions.map((evt) => (
                           <button
                             key={evt.id}
                             type="button"

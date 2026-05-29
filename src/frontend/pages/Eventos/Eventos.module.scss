@@ -234,6 +234,54 @@
   min-width: 0;
 }
 
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  margin-bottom: $spacing-sm;
+
+  &:hover .sectionChevron { color: $text-primary; }
+}
+
+.sectionHeaderLeft {
+  display: flex;
+  align-items: baseline;
+  gap: $spacing-sm;
+}
+
+.sectionHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.sectionCount {
+  font-size: $font-size-xs;
+  color: $text-muted;
+  font-weight: $font-weight-normal;
+}
+
+.sectionTotal {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+}
+
+.sectionChevron {
+  color: $text-muted;
+  transition: transform $transition-fast, color $transition-fast;
+}
+
+.sectionChevronCollapsed {
+  transform: rotate(-90deg);
+}
+
 .sectionEmpty {
   font-size: $font-size-sm;
   color: $text-muted;
@@ -246,8 +294,7 @@
   color: $text-muted;
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  padding-bottom: $spacing-xs;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin: 0;
 }
 
 // Status toggle no form
@@ -382,6 +429,7 @@
   @include card;
   @include card-hover;
   padding: $spacing-lg;
+  border-left: 3px solid transparent;
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
@@ -421,6 +469,11 @@
   svg { color: $text-muted; flex-shrink: 0; }
 }
 
+.cardBlue   { border-left-color: #3b82f6; }
+.cardYellow { border-left-color: $accent; }
+.cardGreen  { border-left-color: #22c55e; }
+.cardRed    { border-left-color: #ef4444; }
+
 .cardNotes {
   font-size: $font-size-xs;
   color: $text-muted;
@@ -428,6 +481,12 @@
   background: rgba(255,255,255,0.02);
   border-radius: $radius-xs;
   border-left: 2px solid $border-accent;
+}
+
+.cardNotesHighlight {
+  background: rgba(239, 68, 68, 0.08);
+  border-left: 2px solid #ef4444;
+  color: #fca5a5;
 }
 
 .cardActions {
@@ -484,6 +543,20 @@
   color: #25d366; cursor: pointer; text-decoration: none;
   transition: all $transition-fast;
   &:hover { background: rgba(37,211,102,0.15); }
+}
+
+.btnFinalize {
+  flex: 1;
+  padding: 8px;
+  background: rgba(34,197,94,0.07);
+  border: 1px solid rgba(34,197,94,0.3);
+  border-radius: $radius-xs;
+  color: #22c55e;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-fast;
+  &:hover { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.5); }
 }
 
 .btnEdit {

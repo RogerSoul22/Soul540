@@ -2,6 +2,10 @@ import { Schema } from 'mongoose';
 import { Router } from 'express';
 import { createTenantModels } from '../utils/tenantModel';
 import { logAudit } from '../utils/audit';
+import { emitirNFe } from '../services/nfe-sefaz';
+import { nextNumber } from '../services/nfeCounter';
+import { checkCertValidity } from '../services/cert';
+import { emitirNfseAsaas, consultarNfseAsaas } from '../services/asaas-nfse';
 
 const InvoiceItemSchema = new Schema({
   description: { type: String, default: '' },
@@ -11,13 +15,6 @@ const InvoiceItemSchema = new Schema({
   cfop: { type: String, default: '' },
   unit: { type: String, default: 'UN' },
 }, { _id: false });
-
-function nfeioHeaders() {
-  return {
-    'Authorization': process.env.NFEIO_API_KEY ?? '',
-    'Content-Type': 'application/json',
-  };
-}
 
 // Lookup IBGE city code by name (SP state — expand as needed)
 const IBGE_CITIES: Record<string, number> = {
@@ -42,17 +39,9 @@ const IBGE_CITIES: Record<string, number> = {
 };
 
 function ibgeCity(cityName: string): { code?: number; name: string } {
-  const key = cityName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const key = cityName.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
   const code = IBGE_CITIES[key];
   return code ? { code, name: cityName } : { name: cityName };
-}
-
-function nfeioBase() {
-  return `https://api.nfe.io/v1/companies/${process.env.NFEIO_COMPANY_ID_NFSE}`;
-}
-
-function nfeioBaseNfe() {
-  return `https://api.nfse.io/v2/companies/${process.env.NFEIO_COMPANY_ID_NFE}`;
 }
 
 const models = createTenantModels('Invoice', {
@@ -81,15 +70,21 @@ const models = createTenantModels('Invoice', {
   clientState: { type: String, default: '' },
   clientPostalCode: { type: String, default: '' },
 
-  // Resposta nfe.io
-  nfeioId: { type: String, default: null },
-  nfeioStatus: { type: String, default: null },
-  nfeioNumber: { type: String, default: null },
-  nfeioPdfUrl: { type: String, default: null },
-  nfeioXmlUrl: { type: String, default: null },
-  nfeioAccessKey: { type: String, default: null },
-  nfeioProtocol: { type: String, default: null },
-  nfeioRawResponse: { type: Object, default: null },
+  // Emissão fiscal — campos genéricos (NF-e direto SEFAZ)
+  emissaoStatus: { type: String, default: null },
+  numeroNF: { type: String, default: null },
+  chaveAcesso: { type: String, default: null },
+  protocolo: { type: String, default: null },
+  xmlEmitido: { type: String, default: null },
+  emissaoMotivo: { type: String, default: null },
+
+  // Asaas — NFS-e
+  asaasPaymentId: { type: String, default: null },   // ID da cobrança no Asaas (ex: pay_xxx)
+  asaasInvoiceId: { type: String, default: null },   // ID da NFS-e retornado pelo Asaas
+  asaasStatus: { type: String, default: null },
+  asaasPdfUrl: { type: String, default: null },
+  asaasXmlUrl: { type: String, default: null },
+  asaasRawResponse: { type: Object, default: null },
 }, { main: 'invoices', franchise: 'franchiseinvoices', factory: 'factoryinvoices' });
 
 // ── Helpers: document generators ─────────────────────────────────────────────
@@ -114,7 +109,7 @@ function generateInvoiceHtml(inv: any): string {
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
-<title>${docType} – ${inv.clientName}</title>
+<title>${docType} - ${inv.clientName}</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:Arial,sans-serif;font-size:12px;color:#1a1a1a;background:#fff;padding:32px}
@@ -137,11 +132,11 @@ function generateInvoiceHtml(inv: any): string {
 </head>
 <body>
 <div class="no-print" style="margin-bottom:20px">
-  <button onclick="window.print()" style="background:#1d4ed8;color:#fff;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:13px">🖨 Imprimir / Salvar como PDF</button>
+  <button onclick="window.print()" style="background:#1d4ed8;color:#fff;border:none;padding:8px 20px;border-radius:6px;cursor:pointer;font-size:13px">Imprimir / Salvar como PDF</button>
 </div>
 <h1>${docType}</h1>
-<div class="sub">Emitida via nfe.io • Protocolo ${inv.nfeioProtocol ?? '—'}</div>
-<div class="badge">✓ EMITIDA — NF ${inv.nfeioNumber ?? '—'}</div>
+<div class="sub">Protocolo ${inv.protocolo ?? '—'}</div>
+<div class="badge">EMITIDA — NF ${inv.numeroNF ?? '—'}</div>
 
 <div class="grid">
   <div class="section">
@@ -150,13 +145,13 @@ function generateInvoiceHtml(inv: any): string {
     <div class="row"><span>CPF/CNPJ</span><span>${inv.clientDocument ?? ''}</span></div>
     <div class="row"><span>E-mail</span><span>${inv.clientEmail ?? ''}</span></div>
     <div class="row"><span>Endereço</span><span>${[inv.clientAddress, inv.clientNumber, inv.clientDistrict].filter(Boolean).join(', ')}</span></div>
-    <div class="row"><span>Cidade/UF</span><span>${inv.clientCity ?? ''}${inv.clientState ? ' – ' + inv.clientState : ''}</span></div>
+    <div class="row"><span>Cidade/UF</span><span>${inv.clientCity ?? ''}${inv.clientState ? ' - ' + inv.clientState : ''}</span></div>
     <div class="row"><span>CEP</span><span>${inv.clientPostalCode ?? ''}</span></div>
   </div>
   <div class="section">
     <h2>Dados do Documento</h2>
     <div class="row"><span>Tipo</span><strong>${isNfe ? 'NF-e (Produto)' : 'NFS-e (Serviço)'}</strong></div>
-    <div class="row"><span>Número</span><span>${inv.nfeioNumber ?? '—'}</span></div>
+    <div class="row"><span>Número</span><span>${inv.numeroNF ?? '—'}</span></div>
     <div class="row"><span>Data Emissão</span><span>${inv.issueDate ?? ''}</span></div>
     ${!isNfe ? `<div class="row"><span>Cód. Serviço</span><span>${inv.serviceCode ?? ''}</span></div>` : ''}
     <div class="row"><span>ISS (${inv.taxRate ?? 0}%)</span><span>${fmtBRL(inv.taxAmount ?? 0)}</span></div>
@@ -179,11 +174,11 @@ function generateInvoiceHtml(inv: any): string {
   <div class="total">Total: ${fmtBRL(inv.totalValue ?? 0)}</div>
 </div>
 
-${isNfe && inv.nfeioAccessKey ? `<div class="chave">Chave de Acesso NF-e: ${inv.nfeioAccessKey}</div>` : ''}
+${isNfe && inv.chaveAcesso ? `<div class="chave">Chave de Acesso NF-e: ${inv.chaveAcesso}</div>` : ''}
 ${inv.notes ? `<div class="section" style="margin-top:16px"><h2>Observações</h2><p style="font-size:11px;color:#374151;line-height:1.6">${inv.notes}</p></div>` : ''}
 
 <div class="footer">
-  Documento gerado pelo sistema Soul540 • nfeioId: ${inv.nfeioId ?? '—'}
+  Documento gerado pelo sistema Soul540
 </div>
 </body></html>`;
 }
@@ -213,16 +208,15 @@ function generateInvoiceXml(inv: any): string {
     </det>`).join('');
 
     return `<?xml version="1.0" encoding="UTF-8"?>
-<!-- NF-e gerada pelo sistema Soul540 via nfe.io -->
 <nfeProc xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00">
   <NFe>
-    <infNFe Id="NFe${inv.nfeioAccessKey ?? '00000000000000000000000000000000000000000000'}" versao="4.00">
+    <infNFe Id="NFe${inv.chaveAcesso ?? '00000000000000000000000000000000000000000000'}" versao="4.00">
       <ide>
         <cUF>35</cUF>
         <natOp>Venda de produto</natOp>
         <mod>55</mod>
         <serie>001</serie>
-        <nNF>${inv.nfeioNumber ?? '1'}</nNF>
+        <nNF>${inv.numeroNF ?? '1'}</nNF>
         <dhEmi>${inv.issueDate ?? now}</dhEmi>
         <tpNF>1</tpNF>
         <idDest>2</idDest>
@@ -262,8 +256,8 @@ function generateInvoiceXml(inv: any): string {
     <infProt>
       <cStat>100</cStat>
       <xMotivo>Autorizado o uso da NF-e</xMotivo>
-      <chNFe>${inv.nfeioAccessKey ?? ''}</chNFe>
-      <nProt>${inv.nfeioProtocol ?? ''}</nProt>
+      <chNFe>${inv.chaveAcesso ?? ''}</chNFe>
+      <nProt>${inv.protocolo ?? ''}</nProt>
       <dhRecbto>${now}</dhRecbto>
     </infProt>
   </protNFe>
@@ -273,17 +267,16 @@ function generateInvoiceXml(inv: any): string {
   // NFS-e
   const desc = (inv.items ?? []).map((i: any) => i.description).filter(Boolean).join('; ') || inv.notes || '';
   return `<?xml version="1.0" encoding="UTF-8"?>
-<!-- NFS-e gerada pelo sistema Soul540 via nfe.io -->
 <ConsultarNfseResposta xmlns="http://www.abrasf.org.br/nfse.xsd">
   <ListaNfse>
     <CompNfse>
       <Nfse versao="2.01">
         <InfNfse>
-          <Numero>${inv.nfeioNumber ?? '1'}</Numero>
-          <CodigoVerificacao>${inv.nfeioProtocol ?? ''}</CodigoVerificacao>
+          <Numero>${inv.numeroNF ?? '1'}</Numero>
+          <CodigoVerificacao>${inv.protocolo ?? ''}</CodigoVerificacao>
           <DataEmissao>${inv.issueDate ?? now}</DataEmissao>
           <Prestador>
-            <RazaoSocial>Soul 540 Pizzas e Eventos</RazaoSocial>
+            <RazaoSocial>Soul Negócios Eventos e Consultoria Ltda</RazaoSocial>
           </Prestador>
           <Tomador>
             <IdentificacaoTomador>
@@ -336,7 +329,7 @@ router.get('/:id/download/xml', async (req, res) => {
   const model = models.getModel(req);
   const inv = await model.findById(req.params.id) as any;
   if (!inv) return res.status(404).send('Nota fiscal não encontrada.');
-  const filename = `NF${inv.nfeioNumber ?? inv._id}-${inv.type?.toUpperCase() ?? 'NF'}.xml`;
+  const filename = `NF${inv.numeroNF ?? inv._id}-${inv.type?.toUpperCase() ?? 'NF'}.xml`;
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
   res.send(generateInvoiceXml(inv));
@@ -367,18 +360,14 @@ router.delete('/:id', async (req, res) => {
 
 router.post('/:id/emit', async (req, res) => {
   const model = models.getModel(req);
-  console.log(`[emit] id=${req.params.id} collection=${(model as any).collection?.name} xsystem=${req.headers['x-system']}`);
   const inv = await model.findById(req.params.id) as any;
-  console.log(`[emit] found=${!!inv}`);
   if (!inv) return res.status(404).json({ error: 'Not found' });
-  const found = { doc: inv, model };
 
-  const companyId = inv.type === 'nfe' ? process.env.NFEIO_COMPANY_ID_NFE : process.env.NFEIO_COMPANY_ID_NFSE;
-  if (!process.env.NFEIO_API_KEY || !companyId) {
-    return res.status(503).json({ error: `NFEIO_API_KEY e NFEIO_COMPANY_ID_${(inv.type ?? 'nfse').toUpperCase()} não configurados no servidor.` });
+  if (!inv.clientDocument?.replace(/\D/g, '')) {
+    return res.status(400).json({ error: 'CPF/CNPJ do cliente é obrigatório para emissão.' });
   }
 
-  // Validações antes de enviar à nfe.io
+  // ── NF-e: emissão direta no SEFAZ ────────────────────────────────────────
   if (inv.type === 'nfe') {
     const items = inv.items ?? [];
     if (items.length === 0) {
@@ -386,186 +375,130 @@ router.post('/:id/emit', async (req, res) => {
     }
     const missingNcmCfop = items.find((i: any) => !i.ncm || !i.cfop);
     if (missingNcmCfop) {
-      return res.status(400).json({ error: `Item "${missingNcmCfop.description || 'sem descrição'}" está sem NCM ou CFOP. Preencha antes de emitir.` });
+      return res.status(400).json({ error: `Item "${missingNcmCfop.description || 'sem descrição'}" está sem NCM ou CFOP.` });
     }
-  }
-  if (!inv.clientDocument?.replace(/\D/g, '')) {
-    return res.status(400).json({ error: 'CPF/CNPJ do cliente é obrigatório para emissão.' });
-  }
+    if (!inv.clientAddress || !inv.clientCity || !inv.clientPostalCode) {
+      return res.status(400).json({ error: 'Endereço completo do cliente é obrigatório para NF-e.' });
+    }
 
-  let endpoint: string;
-  let payload: Record<string, unknown>;
-
-  const borrowerDoc = (inv.clientDocument ?? '').replace(/\D/g, '');
-
-  if (inv.type === 'nfe') {
-    endpoint = `${nfeioBaseNfe()}/productinvoices`;
-    payload = {
-      nature: 'Sale',
-      buyer: {
-        name: inv.clientName,
-        email: inv.clientEmail || undefined,
-        federalTaxNumber: borrowerDoc ? Number(borrowerDoc) : undefined,
-        address: {
-          country: 'BRA',
-          postalCode: (inv.clientPostalCode ?? '').replace(/\D/g, ''),
-          street: inv.clientAddress,
-          number: inv.clientNumber,
-          district: inv.clientDistrict,
-          city: ibgeCity(inv.clientCity ?? ''),
-          state: inv.clientState,
-        },
-      },
-      items: (inv.items ?? []).map((item: any, i: number) => {
-        const total = item.quantity * item.unitPrice;
-        return {
-          code: String(i + 1),
-          description: item.description,
-          quantity: item.quantity,
-          unitOfMeasure: item.unit || 'UN',
-          unitAmount: item.unitPrice,
-          amount: total,
-          ncm: item.ncm,
-          cfop: item.cfop,
-          tax: {
-            totalTax: 0,
-            icms: {
-              origin: '0',    // 0 = Nacional
-              csosn: '400',   // 400 = Não tributada pelo Simples Nacional (CRT=1)
-            },
-            pis: {
-              cst: '07',      // 07 = Operação Isenta
-              amount: 0,
-              rate: 0,
-              baseTax: 0,
-            },
-            cofins: {
-              cst: '07',      // 07 = Operação Isenta
-              amount: 0,
-              rate: 0,
-              baseTax: 0,
-            },
-          },
-        };
-      }),
-    };
-  } else {
-    endpoint = `${nfeioBase()}/serviceinvoices`;
-    const desc = (inv.items ?? []).map((i: any) => i.description).filter(Boolean).join('; ') || inv.notes || 'Serviços prestados';
-    payload = {
-      cityServiceCode: inv.serviceCode,
-      description: desc,
-      servicesAmount: inv.totalValue,
-      borrower: {
-        name: inv.clientName,
-        email: inv.clientEmail || undefined,
-        federalTaxNumber: borrowerDoc ? Number(borrowerDoc) : undefined,
-        address: {
-          country: 'BRA',
-          postalCode: (inv.clientPostalCode ?? '').replace(/\D/g, ''),
-          street: inv.clientAddress,
-          number: inv.clientNumber,
-          district: inv.clientDistrict,
-          city: ibgeCity(inv.clientCity ?? ''),
-          state: inv.clientState,
-        },
-      },
-    };
-  }
-
-  console.log(`[emit] payload=${JSON.stringify(payload)}`);
-  let nfeRes: Response;
-  let nfeData: any;
-  try {
-    nfeRes = await fetch(endpoint, {
-      method: 'POST',
-      headers: nfeioHeaders(),
-      body: JSON.stringify(payload),
-    });
-    const rawText = await nfeRes.text();
     try {
-      nfeData = JSON.parse(rawText);
-    } catch {
-      nfeData = { message: rawText || `HTTP ${nfeRes.status}` };
+      const certInfo = checkCertValidity();
+      if (!certInfo.valid) {
+        return res.status(503).json({ error: 'Certificado digital expirado. Renove o certificado A1.' });
+      }
+      if (certInfo.daysLeft < 30) {
+        console.warn(`[nfe] Certificado expira em ${certInfo.daysLeft} dias.`);
+      }
+    } catch (err) {
+      return res.status(503).json({ error: `Erro ao carregar certificado: ${String(err)}` });
     }
+
+    try {
+      const nNF = await nextNumber('nfe');
+      const result = await emitirNFe(inv, nNF);
+
+      if (result.status === 'rejeitado') {
+        const updated = await model.findByIdAndUpdate(req.params.id,
+          { emissaoStatus: 'erro', emissaoMotivo: result.motivo }, { new: true });
+        return res.status(422).json({ error: result.motivo, invoice: updated });
+      }
+
+      const updated = await model.findByIdAndUpdate(req.params.id, {
+        emissaoStatus: 'emitida',
+        status: 'emitida',
+        numeroNF: String(result.numeroNF),
+        chaveAcesso: result.chaveAcesso,
+        protocolo: result.protocolo,
+        xmlEmitido: result.xmlAutorizado,
+        emissaoMotivo: result.motivo,
+      }, { new: true });
+
+      await logAudit({ req, action: 'update', resource: 'invoices', resourceId: req.params.id, description: `Emitiu NF-e diretamente no SEFAZ: ${inv.clientName} (chave: ${result.chaveAcesso})` });
+      return res.json(updated);
+
+    } catch (err) {
+      await model.findByIdAndUpdate(req.params.id, { emissaoStatus: 'erro', emissaoMotivo: String(err) });
+      return res.status(502).json({ error: `Falha na comunicação com SEFAZ: ${String(err)}` });
+    }
+  }
+
+  // ── NFS-e: emissão via Asaas ─────────────────────────────────────────────
+  if (!inv.asaasPaymentId) {
+    return res.status(400).json({
+      error: 'Para emitir NFS-e via Asaas, informe o campo "asaasPaymentId" com o ID da cobrança no Asaas (ex: pay_xxxxxxxx).',
+    });
+  }
+
+  try {
+    const effectiveDate = (inv.issueDate ?? new Date().toISOString()).substring(0, 10);
+    const observations = inv.notes ?? '';
+
+    const result = await emitirNfseAsaas(
+      inv.asaasPaymentId,
+      effectiveDate,
+      0,
+      observations,
+    );
+
+    const updated = await model.findByIdAndUpdate(req.params.id, {
+      asaasInvoiceId:   result.id,
+      asaasStatus:      result.status,
+      asaasPdfUrl:      result.pdfUrl ?? null,
+      asaasXmlUrl:      result.xmlUrl ?? null,
+      asaasRawResponse: result.rawResponse,
+      emissaoStatus:    'processing',
+    }, { new: true });
+
+    await logAudit({ req, action: 'update', resource: 'invoices', resourceId: req.params.id, description: `Emitiu NFS-e via Asaas: ${inv.clientName} (asaasInvoiceId: ${result.id})` });
+    return res.json(updated);
+
   } catch (err) {
-    return res.status(502).json({ error: 'Falha de comunicação com nfe.io', detail: String(err) });
+    await model.findByIdAndUpdate(req.params.id, { emissaoStatus: 'erro', emissaoMotivo: String(err) });
+    return res.status(502).json({ error: `Falha ao emitir NFS-e no Asaas: ${String(err)}` });
   }
-
-  console.log(`[emit] nfeio status=${nfeRes.status} endpoint=${endpoint}`);
-  if (!nfeRes.ok) {
-    console.log(`[emit] nfeio error:`, JSON.stringify(nfeData));
-    return res.status(nfeRes.status).json({ error: nfeData?.message ?? 'Erro ao chamar nfe.io', nfeioRaw: nfeData });
-  }
-
-  const updated = await found.model.findByIdAndUpdate(
-    req.params.id,
-    {
-      nfeioId: nfeData.id,
-      nfeioStatus: 'processing',
-      nfeioRawResponse: nfeData,
-    },
-    { new: true },
-  );
-
-  await logAudit({ req, action: 'update', resource: 'invoices', resourceId: req.params.id, description: `Emitiu nota fiscal via nfe.io: ${inv.clientName}` });
-  res.json(updated);
 });
 
-router.get('/:id/nfeio-status', async (req, res) => {
+router.get('/:id/status', async (req, res) => {
   const model = models.getModel(req);
   const inv = await model.findById(req.params.id) as any;
   if (!inv) return res.status(404).json({ error: 'Not found' });
-  const found = { doc: inv, model };
+  res.json(inv);
+});
 
-  if (!inv.nfeioId) return res.status(400).json({ error: 'Nota ainda não emitida via nfe.io.' });
+router.get('/:id/nfse-status', async (req, res) => {
+  const model = models.getModel(req);
+  const inv = await model.findById(req.params.id) as any;
+  if (!inv) return res.status(404).json({ error: 'Not found' });
 
-  const isNfe = inv.type === 'nfe';
-  const endpoint = isNfe
-    ? `${nfeioBaseNfe()}/productinvoices/${inv.nfeioId}`
-    : `${nfeioBase()}/serviceinvoices/${inv.nfeioId}`;
+  if (!inv.asaasInvoiceId) {
+    return res.status(400).json({ error: 'NFS-e ainda não emitida via Asaas.' });
+  }
 
-  let nfeRes: Response;
-  let nfeData: any;
   try {
-    nfeRes = await fetch(endpoint, { headers: nfeioHeaders() });
-    const rawText = await nfeRes.text();
-    try {
-      nfeData = JSON.parse(rawText);
-    } catch {
-      nfeData = { message: rawText || `HTTP ${nfeRes.status}` };
+    const result = await consultarNfseAsaas(inv.asaasInvoiceId);
+
+    const isAuthorized = result.status === 'AUTHORIZED';
+    const isError = result.status === 'ERROR' || result.status === 'CANCELLED';
+
+    const updateFields: Record<string, unknown> = {
+      asaasStatus:      result.status,
+      asaasRawResponse: result.rawResponse,
+      emissaoStatus:    isAuthorized ? 'emitida' : isError ? 'erro' : 'processing',
+    };
+
+    if (isAuthorized) {
+      updateFields.status      = 'emitida';
+      updateFields.numeroNF    = result.number ?? null;
+      updateFields.asaasPdfUrl = result.pdfUrl ?? null;
+      updateFields.asaasXmlUrl = result.xmlUrl ?? null;
     }
+
+    const updated = await model.findByIdAndUpdate(req.params.id, updateFields, { new: true });
+    return res.json(updated);
+
   } catch (err) {
-    return res.status(502).json({ error: 'Falha de comunicação com nfe.io', detail: String(err) });
+    return res.status(502).json({ error: `Falha ao consultar NFS-e no Asaas: ${String(err)}` });
   }
-  if (!nfeRes.ok) return res.status(nfeRes.status).json({ error: nfeData?.message ?? 'Erro ao consultar nfe.io', nfeioRaw: nfeData });
-
-  const flowStatus: string = (nfeData.flowStatus ?? nfeData.status ?? '').toLowerCase();
-  let nfeioStatus: 'processing' | 'issued' | 'error';
-  if (flowStatus.includes('issued') || flowStatus === 'normal') {
-    nfeioStatus = 'issued';
-  } else if (flowStatus.includes('error') || flowStatus.includes('cancel')) {
-    nfeioStatus = 'error';
-  } else {
-    nfeioStatus = 'processing';
-  }
-
-  const updateFields: Record<string, unknown> = {
-    nfeioStatus,
-    nfeioRawResponse: nfeData,
-  };
-
-  if (nfeioStatus === 'issued') {
-    updateFields.status = 'emitida';
-    updateFields.nfeioNumber = String(nfeData.number ?? nfeData.invoiceNumber ?? '');
-    updateFields.nfeioPdfUrl = nfeData.pdfUrl ?? nfeData.links?.find((l: any) => l.rel === 'pdf')?.href ?? '';
-    updateFields.nfeioXmlUrl = nfeData.xmlUrl ?? nfeData.links?.find((l: any) => l.rel === 'xml')?.href ?? '';
-    updateFields.nfeioAccessKey = nfeData.accessKey ?? nfeData.invoiceAccessKey ?? '';
-    updateFields.nfeioProtocol = nfeData.protocol ?? nfeData.authorizationProtocol ?? '';
-  }
-
-  const updated = await found.model.findByIdAndUpdate(req.params.id, updateFields, { new: true });
-  res.json(updated);
 });
 
 export default router;

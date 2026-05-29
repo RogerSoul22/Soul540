@@ -1,0 +1,89 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.page {
+  padding: $spacing-2xl $spacing-xl;
+  animation: fadeIn 0.4s ease;
+  @include mobile { padding: $spacing-md; }
+}
+
+.header {
+  margin-bottom: $spacing-2xl;
+}
+
+.title {
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+  color: $text-muted;
+  margin-top: 6px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: $spacing-md;
+}
+
+.card {
+  @include card;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-lg;
+  cursor: pointer;
+  border: 1px solid $border;
+  text-align: left;
+  transition: all $transition-base;
+  border-left: 3px solid var(--card-color, $accent);
+
+  &:hover {
+    border-color: var(--card-color, $accent);
+    background: rgba(255, 255, 255, 0.04);
+    transform: translateY(-1px);
+
+    .arrow { opacity: 1; transform: translateX(2px); }
+  }
+}
+
+.iconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: $radius-md;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cardContent {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cardLabel {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.cardDesc {
+  font-size: $font-size-xs;
+  color: $text-muted;
+}
+
+.arrow {
+  color: $text-muted;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: all $transition-fast;
+}
