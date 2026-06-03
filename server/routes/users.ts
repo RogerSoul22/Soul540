@@ -55,6 +55,9 @@ router.put('/:id', validate(updateUserSchema), async (req, res) => {
 
 // DELETE /api/users/:id
 router.delete('/:id', async (req, res) => {
+  if (getTenantUnit(req) === 'franchise') {
+    return res.status(403).json({ error: 'User deletion is disabled for franchise system' });
+  }
   const user = await UserModel.findById(req.params.id);
   if (!user) return res.status(404).json({ error: 'not found' });
   if ((req as any).user?.role !== 'admin' && user.unit !== getTenantUnit(req)) {

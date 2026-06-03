@@ -6,7 +6,10 @@ import styles from './Sidebar.module.scss';
 const navGroups = [
   {
     label: 'Campinas',
-    items: [{ path: ROUTES.DASHBOARD, permKey: 'dashboard', label: 'Dashboard', icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg> }],
+    items: [
+      { path: '/portal.html', permKey: 'dashboard', label: 'Portal', external: true, icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> },
+      { path: ROUTES.DASHBOARD, permKey: 'dashboard', label: 'Dashboard', icon: <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg> },
+    ],
   },
   {
     label: 'Gestão',
@@ -74,7 +77,7 @@ export default function Sidebar() {
                 <button
                   key={item.path}
                   className={`${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
-                  onClick={() => navigate(item.path)}
+                  onClick={() => ('external' in item && item.external) ? (window.location.href = item.path) : navigate(item.path)}
                 >
                   {isActive && <span className={styles.activeIndicator} />}
                   <span className={styles.navIcon}>{item.icon}</span>

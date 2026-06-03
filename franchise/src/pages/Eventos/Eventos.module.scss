@@ -83,6 +83,7 @@
 .controls {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: $spacing-md;
   margin-bottom: $spacing-xl;
   flex-wrap: wrap;
@@ -92,6 +93,38 @@
   position: relative;
   flex: 1;
   max-width: 400px;
+}
+
+.unitFilter {
+  display: flex;
+  align-items: center;
+  background: var(--surface-alt, rgba(0,0,0,0.04));
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 3px;
+  gap: 2px;
+}
+
+.unitFilterBtn {
+  padding: 5px 14px;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-muted;
+  background: none;
+  border: none;
+  border-radius: calc(#{$radius-sm} - 2px);
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover { color: $text-primary; }
+}
+
+.unitFilterBtnActive {
+  background: $accent;
+  color: #fff;
+  font-weight: $font-weight-semibold;
+
+  &:hover { background: $accent-hover; color: #fff; }
 }
 
 .searchIcon {
@@ -129,6 +162,63 @@
   &:focus { outline: none; border-color: $border-accent; }
 }
 
+.dateFilterWrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dateFilterToggle {
+  display: flex;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 2px;
+  gap: 2px;
+}
+
+.dateFilterModeBtn {
+  padding: 4px 10px;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-muted;
+  background: none;
+  border: none;
+  border-radius: calc(#{$radius-sm} - 2px);
+  cursor: pointer;
+  transition: all $transition-fast;
+  &:hover { color: $text-primary; background: rgba(255, 255, 255, 0.05); }
+}
+
+.dateFilterModeBtnActive {
+  background: $accent;
+  color: #0a0f1e;
+  font-weight: $font-weight-semibold;
+  &:hover { background: $accent-hover; color: #0a0f1e; }
+}
+
+.filterDate {
+  background: $bg-secondary;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  color: $text-primary;
+  padding: 7px 10px;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  &:focus { outline: none; border-color: $border-accent; }
+}
+
+.clearDateBtn {
+  background: transparent;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  padding: 4px 6px;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  &:hover { color: $text-primary; background: $bg-secondary; }
+}
+
 // Sections
 .sections {
   display: grid;
@@ -144,6 +234,54 @@
   min-width: 0;
 }
 
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  margin-bottom: $spacing-sm;
+
+  &:hover .sectionChevron { color: $text-primary; }
+}
+
+.sectionHeaderLeft {
+  display: flex;
+  align-items: baseline;
+  gap: $spacing-sm;
+}
+
+.sectionHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.sectionCount {
+  font-size: $font-size-xs;
+  color: $text-muted;
+  font-weight: $font-weight-normal;
+}
+
+.sectionTotal {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+}
+
+.sectionChevron {
+  color: $text-muted;
+  transition: transform $transition-fast, color $transition-fast;
+}
+
+.sectionChevronCollapsed {
+  transform: rotate(-90deg);
+}
+
 .sectionEmpty {
   font-size: $font-size-sm;
   color: $text-muted;
@@ -156,8 +294,7 @@
   color: $text-muted;
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  padding-bottom: $spacing-xs;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  margin: 0;
 }
 
 // Status toggle no form
@@ -197,6 +334,88 @@
 }
 
 // Grid
+.monthGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.monthCard {
+  @include flex-between;
+  width: 100%;
+  padding: $spacing-md $spacing-lg;
+  background: $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-base;
+  text-align: left;
+
+  &:hover {
+    border-color: rgba($accent, 0.4);
+    background: rgba($accent, 0.04);
+  }
+}
+
+.monthCardOpen {
+  border-color: rgba($accent, 0.5);
+  background: rgba($accent, 0.06);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.monthCardLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.monthCardName {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  text-transform: capitalize;
+}
+
+.monthCardCount {
+  font-size: $font-size-xs;
+  color: $text-muted;
+}
+
+.monthCardRight {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.monthCardValue {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $accent;
+}
+
+.monthCardChevron {
+  color: $text-muted;
+  transition: transform $transition-base;
+  flex-shrink: 0;
+}
+
+.monthCardChevronOpen {
+  transform: rotate(180deg);
+}
+
+.monthCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  padding: $spacing-sm;
+  background: rgba($accent, 0.02);
+  border: 1px solid rgba($accent, 0.5);
+  border-top: none;
+  border-bottom-left-radius: $radius-md;
+  border-bottom-right-radius: $radius-md;
+}
+
 .grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -210,6 +429,7 @@
   @include card;
   @include card-hover;
   padding: $spacing-lg;
+  border-left: 3px solid transparent;
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
@@ -249,6 +469,11 @@
   svg { color: $text-muted; flex-shrink: 0; }
 }
 
+.cardBlue   { border-left-color: #3b82f6; }
+.cardYellow { border-left-color: $accent; }
+.cardGreen  { border-left-color: #22c55e; }
+.cardRed    { border-left-color: #ef4444; }
+
 .cardNotes {
   font-size: $font-size-xs;
   color: $text-muted;
@@ -256,6 +481,12 @@
   background: rgba(255,255,255,0.02);
   border-radius: $radius-xs;
   border-left: 2px solid $border-accent;
+}
+
+.cardNotesHighlight {
+  background: rgba(239, 68, 68, 0.08);
+  border-left: 2px solid #ef4444;
+  color: #fca5a5;
 }
 
 .cardActions {
@@ -312,6 +543,20 @@
   color: #25d366; cursor: pointer; text-decoration: none;
   transition: all $transition-fast;
   &:hover { background: rgba(37,211,102,0.15); }
+}
+
+.btnFinalize {
+  flex: 1;
+  padding: 8px;
+  background: rgba(34,197,94,0.07);
+  border: 1px solid rgba(34,197,94,0.3);
+  border-radius: $radius-xs;
+  color: #22c55e;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-fast;
+  &:hover { background: rgba(34,197,94,0.15); border-color: rgba(34,197,94,0.5); }
 }
 
 .btnEdit {
@@ -561,6 +806,45 @@
   margin-bottom: -4px;
 }
 
+// Guest summary bar
+.guestSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: $radius-md;
+  border: 1px solid $border;
+  font-size: $font-size-xs;
+  margin-top: 4px;
+}
+
+.guestSummaryPending {
+  background: rgba(251, 191, 36, 0.08);
+  border-color: rgba(251, 191, 36, 0.25);
+  color: #fbbf24;
+}
+
+.guestSummaryOk {
+  background: rgba(74, 222, 128, 0.08);
+  border-color: rgba(74, 222, 128, 0.25);
+  color: #4ade80;
+}
+
+.guestSummaryOver {
+  background: rgba(248, 113, 113, 0.08);
+  border-color: rgba(248, 113, 113, 0.25);
+  color: #f87171;
+}
+
+.guestSummaryTotal {
+  font-weight: $font-weight-semibold;
+}
+
+.guestSummaryDiff {
+  font-weight: $font-weight-medium;
+  opacity: 0.85;
+}
+
 // Detail modal
 .detailModal {
   background: $bg-secondary;
@@ -640,165 +924,6 @@
   border-radius: 20px;
   font-size: $font-size-xs;
   color: $accent;
-}
-
-// Info button
-.titleRow { display: flex; align-items: center; gap: $spacing-sm; }
-.btnInfo {
-  display: flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px; background: none; border: none;
-  color: $text-muted; cursor: pointer; border-radius: 50%;
-  transition: all $transition-fast; flex-shrink: 0;
-  &:hover { color: $text-primary; background: rgba(255,255,255,0.07); }
-}
-.infoSection { display: flex; flex-direction: column; gap: 8px; padding-bottom: $spacing-md; border-bottom: 1px solid $border; &:last-child { border-bottom: none; padding-bottom: 0; } }
-.infoSectionTitle { font-size: $font-size-sm; font-weight: $font-weight-semibold; color: $text-primary; }
-.infoText { font-size: $font-size-sm; color: $text-secondary; line-height: 1.6; strong { color: $text-primary; } }
-.infoList { font-size: $font-size-sm; color: $text-secondary; line-height: 1.8; padding-left: $spacing-lg; margin: 0; strong { color: $text-primary; } }
-
-// Mobile: bottom-sheet modals
-@include mobile {
-  .overlay {
-    padding: $spacing-xs;
-    align-items: flex-end;
-  }
-  .modal {
-    border-radius: $radius-lg $radius-lg 0 0;
-    max-height: 88vh;
-  }
-  .modalBody { padding: $spacing-md; }
-  .modalFooter { padding: $spacing-sm $spacing-md; }
-}
-
-// Month group collapsible cards
-.monthGroup {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-}
-
-.monthCard {
-  @include flex-between;
-  width: 100%;
-  padding: $spacing-md $spacing-lg;
-  background: $bg-card;
-  border: 1px solid $border;
-  border-radius: $radius-md;
-  cursor: pointer;
-  transition: all $transition-base;
-  text-align: left;
-
-  &:hover {
-    border-color: rgba($accent, 0.4);
-    background: rgba($accent, 0.04);
-  }
-}
-
-.monthCardOpen {
-  border-color: rgba($accent, 0.5);
-  background: rgba($accent, 0.06);
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.monthCardLeft {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.monthCardName {
-  font-size: $font-size-base;
-  font-weight: $font-weight-semibold;
-  color: $text-primary;
-  text-transform: capitalize;
-}
-
-.monthCardCount {
-  font-size: $font-size-xs;
-  color: $text-muted;
-}
-
-.monthCardRight {
-  display: flex;
-  align-items: center;
-  gap: $spacing-md;
-}
-
-.monthCardValue {
-  font-size: $font-size-sm;
-  font-weight: $font-weight-semibold;
-  color: $accent;
-}
-
-.monthCardChevron {
-  color: $text-muted;
-  transition: transform $transition-base;
-  flex-shrink: 0;
-}
-
-.monthCardChevronOpen {
-  transform: rotate(180deg);
-}
-
-.monthCardBody {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-  padding: $spacing-sm;
-  background: rgba($accent, 0.02);
-  border: 1px solid rgba($accent, 0.5);
-  border-top: none;
-  border-bottom-left-radius: $radius-md;
-  border-bottom-right-radius: $radius-md;
-}
-
-// 3-column form grid
-.formGrid3 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: $spacing-md;
-
-  @include mobile { grid-template-columns: 1fr; }
-}
-
-// Guest summary bar
-.guestSummary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  border-radius: $radius-md;
-  border: 1px solid $border;
-  font-size: $font-size-xs;
-  margin-top: 4px;
-}
-
-.guestSummaryPending {
-  background: rgba(251, 191, 36, 0.08);
-  border-color: rgba(251, 191, 36, 0.25);
-  color: #fbbf24;
-}
-
-.guestSummaryOk {
-  background: rgba(74, 222, 128, 0.08);
-  border-color: rgba(74, 222, 128, 0.25);
-  color: #4ade80;
-}
-
-.guestSummaryOver {
-  background: rgba(248, 113, 113, 0.08);
-  border-color: rgba(248, 113, 113, 0.25);
-  color: #f87171;
-}
-
-.guestSummaryTotal {
-  font-weight: $font-weight-semibold;
-}
-
-.guestSummaryDiff {
-  font-weight: $font-weight-medium;
-  opacity: 0.85;
 }
 
 // Location image preview
@@ -889,4 +1014,32 @@
   font-size: $font-size-sm;
   text-align: center;
   word-break: break-all;
+}
+
+// Info button
+.titleRow { display: flex; align-items: center; gap: $spacing-sm; }
+.btnInfo {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; background: none; border: none;
+  color: $text-muted; cursor: pointer; border-radius: 50%;
+  transition: all $transition-fast; flex-shrink: 0;
+  &:hover { color: $text-primary; background: rgba(255,255,255,0.07); }
+}
+.infoSection { display: flex; flex-direction: column; gap: 8px; padding-bottom: $spacing-md; border-bottom: 1px solid $border; &:last-child { border-bottom: none; padding-bottom: 0; } }
+.infoSectionTitle { font-size: $font-size-sm; font-weight: $font-weight-semibold; color: $text-primary; }
+.infoText { font-size: $font-size-sm; color: $text-secondary; line-height: 1.6; strong { color: $text-primary; } }
+.infoList { font-size: $font-size-sm; color: $text-secondary; line-height: 1.8; padding-left: $spacing-lg; margin: 0; strong { color: $text-primary; } }
+
+// Mobile: bottom-sheet modals
+@include mobile {
+  .overlay {
+    padding: $spacing-xs;
+    align-items: flex-end;
+  }
+  .modal {
+    border-radius: $radius-lg $radius-lg 0 0;
+    max-height: 88vh;
+  }
+  .modalBody { padding: $spacing-md; }
+  .modalFooter { padding: $spacing-sm $spacing-md; }
 }

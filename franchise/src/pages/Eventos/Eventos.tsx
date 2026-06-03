@@ -1,9 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { apiFetch } from '@/lib/api';
 import { useApp } from '@/contexts/AppContext';
-import type { PizzaEvent } from '@/types/Event';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import type { PizzaEvent } from '@/types/Event';
 import styles from './Eventos.module.scss';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
 
@@ -16,6 +17,13 @@ type Employee = {
   createdAt: string;
   unit?: string;
 };
+
+
+function safeFormat(date: string | undefined | null, fmt: string, options?: Parameters<typeof format>[2]): string {
+  if (!date) return '—';
+  const d = parseISO(date);
+  return isValid(d) ? format(d, fmt, options) : '—';
+}
 
 function formatBudget(value: string): string {
   const digits = value.replace(/\D/g, '');
@@ -43,6 +51,10 @@ const roleLabels: Record<string, string> = {
   administrativo: 'Administrativo',
 };
 
+function normalizeStr(s: string | undefined | null): string {
+  return (s ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+}
+
 type FormData = {
   name: string;
   date: string;
@@ -62,7 +74,7 @@ type FormData = {
   createdBy: string;
   menu: string;
   notes: string;
-  status: 'planning' | 'confirmed';
+  status: 'planning' | 'confirmed' | 'completed' | 'cancelled';
   celebration: string;
   teamArrivalTime: string;
   city: string;
@@ -81,6 +93,10 @@ type FormData = {
   locationImageData: string;
   paymentProofData: string;
   contractPdfData: string;
+  depositValue: string;
+  pixKey: string;
+  estimatedPizzas: string;
+  actualPizzas: string;
 };
 
 const emptyForm: FormData = {
@@ -121,12 +137,16 @@ const emptyForm: FormData = {
   locationImageData: '',
   paymentProofData: '',
   contractPdfData: '',
+  depositValue: '',
+  pixKey: '',
+  estimatedPizzas: '',
+  actualPizzas: '',
 };
 
 function buildWhatsAppUrl(ev: PizzaEvent): string {
   const digits = ev.phone?.replace(/\D/g, '') || '';
   if (!digits) return '';
-  const dateStr = format(parseISO(ev.date), "d 'de' MMMM 'de' yyyy", { locale: ptBR });
+  const dateStr = safeFormat(ev.date, "d 'de' MMMM 'de' yyyy", { locale: ptBR });
   const lines = [
     `Olá! Segue o resumo do evento *${ev.name}*:`,
     '',
@@ -139,21 +159,26 @@ function buildWhatsAppUrl(ev: PizzaEvent): string {
   return `https://wa.me/55${digits}?text=${encodeURIComponent(lines.join('\n'))}`;
 }
 
-function EventCard({ ev, employeeMap, onView, onEdit, onDelete }: {
+function EventCard({ ev, employeeMap, onView, onEdit, onDelete, onFinalize }: {
   ev: PizzaEvent;
   employeeMap: Record<string, string>;
   onView: (ev: PizzaEvent) => void;
   onEdit: (ev: PizzaEvent) => void;
   onDelete: (id: string) => void;
+  onFinalize: (id: string) => void;
 }) {
+  const statusClass = ev.notes?.trim() ? styles.cardRed
+    : ev.status === 'planning' ? styles.cardBlue
+    : ev.status === 'completed' ? styles.cardGreen
+    : styles.cardYellow;
   return (
-    <div className={styles.card} onClick={() => onView(ev)}>
+    <div className={`${styles.card} ${statusClass}`} onClick={() => onView(ev)}>
       <div className={styles.cardTop}>
         <div>
           <h3 className={styles.cardTitle}>{ev.name}</h3>
           <p className={styles.cardSub}>
-            {format(parseISO(ev.date), "dd 'de' MMM, yyyy", { locale: ptBR })}
-            {ev.endDate && ` → ${format(parseISO(ev.endDate), "dd 'de' MMM", { locale: ptBR })}`}
+            {safeFormat(ev.date, "dd 'de' MMM, yyyy", { locale: ptBR })}
+            {ev.endDate && ` → ${safeFormat(ev.endDate, "dd 'de' MMM", { locale: ptBR })}`}
             {ev.time && ` · ${ev.time}`}
           </p>
         </div>
@@ -178,12 +203,15 @@ function EventCard({ ev, employeeMap, onView, onEdit, onDelete }: {
           </div>
         )}
       </div>
-      {ev.notes && <p className={styles.cardNotes}>{ev.notes}</p>}
+      {ev.notes && <p className={`${styles.cardNotes} ${styles.cardNotesHighlight}`}>{ev.notes}</p>}
       <div className={styles.cardActions}>
         {ev.phone && (
           <a className={styles.btnWhatsapp} href={buildWhatsAppUrl(ev)} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} title="WhatsApp">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
           </a>
+        )}
+        {ev.status !== 'completed' && ev.status !== 'cancelled' && (
+          <button className={styles.btnFinalize} onClick={(e) => { e.stopPropagation(); onFinalize(ev.id); }}>Finalizar</button>
         )}
         <button className={styles.btnEdit} onClick={(e) => { e.stopPropagation(); onEdit(ev); }}>Editar</button>
         <button className={styles.btnDelete} onClick={(e) => { e.stopPropagation(); onDelete(ev.id); }}>Excluir</button>
@@ -195,7 +223,7 @@ function EventCard({ ev, employeeMap, onView, onEdit, onDelete }: {
 function groupByMonth(evs: PizzaEvent[]) {
   const map = new Map<string, PizzaEvent[]>();
   evs.forEach((ev) => {
-    const key = format(parseISO(ev.date), 'yyyy-MM');
+    const key = safeFormat(ev.date, 'yyyy-MM');
     if (!map.has(key)) map.set(key, []);
     map.get(key)!.push(ev);
   });
@@ -203,7 +231,7 @@ function groupByMonth(evs: PizzaEvent[]) {
     .sort((a, b) => b[0].localeCompare(a[0]))
     .map(([key, list]) => ({
       key,
-      label: format(parseISO(list[0].date), 'MMMM • yyyy', { locale: ptBR }),
+      label: safeFormat(list[0].date, 'MMMM • yyyy', { locale: ptBR }),
       events: list,
     }));
 }
@@ -212,10 +240,14 @@ const STATIC_MENU_NAMES = ['Menu Eccezionale', 'Menu Superiore', 'Menu Raffinato
 
 export default function Eventos() {
   const { events, addEvent, updateEvent, deleteEvent } = useApp();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [availableMenus, setAvailableMenus] = useState<string[]>(STATIC_MENU_NAMES);
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
   const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set(['orcamentos', 'confirmados', 'finalizados', 'cancelados']));
+  const toggleSection = (key: string) =>
+    setCollapsedSections((prev) => { const s = new Set(prev); s.has(key) ? s.delete(key) : s.add(key); return s; });
 
   const toggleMonth = (key: string) => {
     setExpandedMonths((prev) => {
@@ -226,6 +258,13 @@ export default function Eventos() {
   };
 
   useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      setShowModal(true);
+      setSearchParams({});
+    }
+  }, []);
+
+  useEffect(() => {
     apiFetch('/api/employees').then(r => r.json()).then(setEmployees).catch(() => {});
     apiFetch('/api/menus').then(r => r.json()).then((data: { name: string }[]) => {
       if (Array.isArray(data)) {
@@ -234,9 +273,11 @@ export default function Eventos() {
       }
     }).catch(() => {});
   }, []);
-
   const [search, setSearch] = useState('');
-  const [showModal, setShowModal] = useState(false);
+  const [sourceFilter, setSourceFilter] = useState<'all' | 'main' | 'franchise'>('all');
+  const [dateFilter, setDateFilter] = useState('');
+  const [dateFilterMode, setDateFilterMode] = useState<'date' | 'month'>('date');
+const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
@@ -251,13 +292,17 @@ export default function Eventos() {
 
   const filtered = useMemo(() => {
     const all = events
-      .filter((e) => !search || e.name.toLowerCase().includes(search.toLowerCase()))
+      .filter((e) => sourceFilter === 'all' || (sourceFilter === 'main' ? (!e.source || e.source === 'main') : e.source === 'franchise'))
+      .filter((e) => !search || normalizeStr(e.name).includes(normalizeStr(search)) || normalizeStr(e.location).includes(normalizeStr(search)) || (e.city && normalizeStr(e.city).includes(normalizeStr(search))))
+      .filter((e) => !dateFilter || (e.date && e.date.startsWith(dateFilter)))
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     return {
-      fechados: all.filter((e) => e.status !== 'planning'),
-      orcamentos: all.filter((e) => e.status === 'planning'),
+      orcamentos:  all.filter((e) => e.status === 'planning'),
+      confirmados: all.filter((e) => e.status === 'confirmed' || e.status === 'in_progress'),
+      finalizados: all.filter((e) => e.status === 'completed'),
+      cancelados:  all.filter((e) => e.status === 'cancelled'),
     };
-  }, [events, search]);
+  }, [events, search, sourceFilter, dateFilter]);
 
   const openCreate = () => {
     setForm(emptyForm);
@@ -272,7 +317,7 @@ export default function Eventos() {
       endDate: ev.endDate || '',
       time: ev.time || '',
       duration: ev.duration || '',
-      location: ev.location || '',
+      location: ev.location,
       outOfCity: ev.outOfCity || false,
       phone: ev.phone || '',
       guestCount: String(ev.guestCount),
@@ -283,9 +328,9 @@ export default function Eventos() {
       paymentProofName: ev.paymentProofName || '',
       contractPdfName: ev.contractPdfName || '',
       createdBy: ev.createdBy || '',
-      menu: (ev.menu ?? []).join(', '),
+      menu: ev.menu.join(', '),
       notes: ev.notes || '',
-      status: ev.status === 'planning' ? 'planning' : 'confirmed',
+      status: (['planning', 'confirmed', 'completed', 'cancelled'].includes(ev.status) ? ev.status : 'confirmed') as FormData['status'],
       celebration: ev.celebration || '',
       teamArrivalTime: ev.teamArrivalTime || '',
       city: ev.city || '',
@@ -304,6 +349,10 @@ export default function Eventos() {
       locationImageData: ev.locationImageData || '',
       paymentProofData: ev.paymentProofData || '',
       contractPdfData: ev.contractPdfData || '',
+      depositValue: ev.depositValue ? formatBudget(String(Math.round(ev.depositValue * 100))) : '',
+      pixKey: ev.pixKey || '',
+      estimatedPizzas: ev.estimatedPizzas ? String(ev.estimatedPizzas) : '',
+      actualPizzas: ev.actualPizzas ? String(ev.actualPizzas) : '',
     });
     setEditingId(ev.id);
     setShowModal(true);
@@ -412,17 +461,17 @@ export default function Eventos() {
       locationImageData: form.locationImageData || undefined,
       paymentProofData: form.paymentProofData || undefined,
       contractPdfData: form.contractPdfData || undefined,
+      depositValue: Number(form.depositValue.replace(/[R$\s.]/g, '').replace(',', '.')) || undefined,
+      pixKey: form.pixKey || undefined,
+      estimatedPizzas: Number(form.estimatedPizzas) || undefined,
+      actualPizzas: Number(form.actualPizzas) || undefined,
     };
-    try {
-      if (editingId) {
-        await updateEvent(editingId, data);
-      } else {
-        await addEvent(data);
-      }
-      closeModal();
-    } catch (err) {
-      console.error('Erro ao salvar evento:', err);
+    if (editingId) {
+      await updateEvent(editingId, data);
+    } else {
+      await addEvent(data);
     }
+    closeModal();
   };
 
   const handleDelete = (id: string) => { setDeleteTargetId(id); };
@@ -431,7 +480,7 @@ export default function Eventos() {
     setDeleteTargetId(null);
   };
 
-  return (
+return (
     <div className={styles.page}>
       <div className={styles.header}>
         <div>
@@ -449,7 +498,7 @@ export default function Eventos() {
         </button>
       </div>
 
-      <div className={styles.controls}>
+<div className={styles.controls}>
         <div className={styles.searchWrap}>
           <svg className={styles.searchIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input
@@ -459,75 +508,104 @@ export default function Eventos() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
+        <div className={styles.unitFilter}>
+          <button className={`${styles.unitFilterBtn} ${sourceFilter === 'all' ? styles.unitFilterBtnActive : ''}`} onClick={() => setSourceFilter('all')}>Todos</button>
+          <button className={`${styles.unitFilterBtn} ${sourceFilter === 'main' ? styles.unitFilterBtnActive : ''}`} onClick={() => setSourceFilter('main')}>Sorocaba</button>
+          <button className={`${styles.unitFilterBtn} ${sourceFilter === 'franchise' ? styles.unitFilterBtnActive : ''}`} onClick={() => setSourceFilter('franchise')}>Campinas</button>
+        </div>
+        <div className={styles.dateFilterWrap}>
+          <div className={styles.dateFilterToggle}>
+            <button
+              className={`${styles.dateFilterModeBtn} ${dateFilterMode === 'month' ? styles.dateFilterModeBtnActive : ''}`}
+              onClick={() => { setDateFilterMode('month'); setDateFilter(''); }}
+            >
+              Mês
+            </button>
+            <button
+              className={`${styles.dateFilterModeBtn} ${dateFilterMode === 'date' ? styles.dateFilterModeBtnActive : ''}`}
+              onClick={() => { setDateFilterMode('date'); setDateFilter(''); }}
+            >
+              Data
+            </button>
+          </div>
+          <input
+            type={dateFilterMode}
+            className={styles.filterDate}
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            title={dateFilterMode === 'month' ? 'Filtrar por mês' : 'Filtrar por data'}
+          />
+          {dateFilter && (
+            <button
+              className={styles.clearDateBtn}
+              onClick={() => setDateFilter('')}
+              title="Limpar filtro"
+            >
+              ✕
+            </button>
+          )}
+        </div>
       </div>
 
-      {filtered.fechados.length === 0 && filtered.orcamentos.length === 0 ? (
+      {filtered.orcamentos.length === 0 && filtered.confirmados.length === 0 && filtered.finalizados.length === 0 && filtered.cancelados.length === 0 ? (
         <div className={styles.empty}>
           <p>Nenhum evento encontrado.</p>
           <button className={styles.emptyBtn} onClick={openCreate}>Criar primeiro agendamento</button>
         </div>
       ) : (
         <div className={styles.sections}>
-          <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Orçamentos</h2>
-            {filtered.orcamentos.length === 0 ? (
-              <p className={styles.sectionEmpty}>Nenhum orçamento.</p>
-            ) : (
-              groupByMonth(filtered.orcamentos).map((group) => {
-                const isOpen = expandedMonths.has(group.key);
-                const total = group.events.reduce((acc, ev) => acc + (ev.finalValue && ev.finalValue > 0 ? ev.finalValue : ev.budget), 0);
-                return (
-                  <div key={group.key} className={styles.monthGroup}>
-                    <button className={`${styles.monthCard} ${isOpen ? styles.monthCardOpen : ''}`} onClick={() => toggleMonth(group.key)}>
-                      <div className={styles.monthCardLeft}>
-                        <span className={styles.monthCardName}>{group.label}</span>
-                        <span className={styles.monthCardCount}>{group.events.length} evento{group.events.length !== 1 ? 's' : ''}</span>
-                      </div>
-                      <div className={styles.monthCardRight}>
-                        <span className={styles.monthCardValue}>R$ {total.toLocaleString('pt-BR')}</span>
-                        <svg className={`${styles.monthCardChevron} ${isOpen ? styles.monthCardChevronOpen : ''}`} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                      </div>
-                    </button>
-                    {isOpen && (
-                      <div className={styles.monthCardBody}>
-                        {group.events.map((ev) => <EventCard key={ev.id} ev={ev} employeeMap={employeeMap} onView={setViewingEvent} onEdit={openEdit} onDelete={handleDelete} />)}
-                      </div>
-                    )}
-                  </div>
-                );
-              })
-            )}
-          </div>
-          <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Eventos Fechados</h2>
-            {filtered.fechados.length === 0 ? (
-              <p className={styles.sectionEmpty}>Nenhum evento fechado.</p>
-            ) : (
-              groupByMonth(filtered.fechados).map((group) => {
-                const isOpen = expandedMonths.has(group.key);
-                const total = group.events.reduce((acc, ev) => acc + (ev.finalValue && ev.finalValue > 0 ? ev.finalValue : ev.budget), 0);
-                return (
-                  <div key={group.key} className={styles.monthGroup}>
-                    <button className={`${styles.monthCard} ${isOpen ? styles.monthCardOpen : ''}`} onClick={() => toggleMonth(group.key)}>
-                      <div className={styles.monthCardLeft}>
-                        <span className={styles.monthCardName}>{group.label}</span>
-                        <span className={styles.monthCardCount}>{group.events.length} evento{group.events.length !== 1 ? 's' : ''}</span>
-                      </div>
-                      <div className={styles.monthCardRight}>
-                        <span className={styles.monthCardValue}>R$ {total.toLocaleString('pt-BR')}</span>
-                        <svg className={`${styles.monthCardChevron} ${isOpen ? styles.monthCardChevronOpen : ''}`} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                      </div>
-                    </button>
-                    {isOpen && (
-                      <div className={styles.monthCardBody}>
-                        {group.events.map((ev) => <EventCard key={ev.id} ev={ev} employeeMap={employeeMap} onView={setViewingEvent} onEdit={openEdit} onDelete={handleDelete} />)}
-                      </div>
-                    )}
-                  </div>
-                );
-              })
-            )}
-          </div>
+          {(
+            [
+              { key: 'orcamentos',  label: 'Orçamentos',       data: filtered.orcamentos,  accent: '#3b82f6' },
+              { key: 'confirmados', label: 'Eventos Fechados',  data: filtered.confirmados, accent: '#f59e0b' },
+              { key: 'finalizados', label: 'Finalizados',       data: filtered.finalizados, accent: '#22c55e' },
+              { key: 'cancelados',  label: 'Cancelados',        data: filtered.cancelados,  accent: '#6b7280' },
+            ] as const
+          ).map(({ key, label, data, accent }) => {
+            const isCollapsed = collapsedSections.has(key);
+            const sectionTotal = data.reduce((acc, ev) => acc + (ev.finalValue && ev.finalValue > 0 ? ev.finalValue : ev.budget), 0);
+            return (
+            <div key={key} className={styles.section}>
+              <button className={styles.sectionHeader} onClick={() => toggleSection(key)}>
+                <div className={styles.sectionHeaderLeft}>
+                  <h2 className={styles.sectionTitle} style={{ color: accent }}>{label}</h2>
+                  <span className={styles.sectionCount}>{data.length} evento{data.length !== 1 ? 's' : ''}</span>
+                </div>
+                <div className={styles.sectionHeaderRight}>
+                  {data.length > 0 && <span className={styles.sectionTotal} style={{ color: accent }}>R$ {sectionTotal.toLocaleString('pt-BR')}</span>}
+                  <svg className={`${styles.sectionChevron} ${isCollapsed ? styles.sectionChevronCollapsed : ''}`} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+              </button>
+              {!isCollapsed && (data.length === 0 ? (
+                <p className={styles.sectionEmpty}>Nenhum evento.</p>
+              ) : (
+                groupByMonth(data).map((group) => {
+                  const isOpen = expandedMonths.has(group.key);
+                  const total = group.events.reduce((acc, ev) => acc + (ev.finalValue && ev.finalValue > 0 ? ev.finalValue : ev.budget), 0);
+                  return (
+                    <div key={group.key} className={styles.monthGroup}>
+                      <button className={`${styles.monthCard} ${isOpen ? styles.monthCardOpen : ''}`} onClick={() => toggleMonth(group.key)}>
+                        <div className={styles.monthCardLeft}>
+                          <span className={styles.monthCardName}>{group.label}</span>
+                          <span className={styles.monthCardCount}>{group.events.length} evento{group.events.length !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div className={styles.monthCardRight}>
+                          <span className={styles.monthCardValue}>R$ {total.toLocaleString('pt-BR')}</span>
+                          <svg className={`${styles.monthCardChevron} ${isOpen ? styles.monthCardChevronOpen : ''}`} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        </div>
+                      </button>
+                      {isOpen && (
+                        <div className={styles.monthCardBody}>
+                          {group.events.map((ev) => <EventCard key={ev.id} ev={ev} employeeMap={employeeMap} onView={setViewingEvent} onEdit={openEdit} onDelete={handleDelete} onFinalize={(id) => updateEvent(id, { status: 'completed' })} />)}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              ))}
+            </div>
+          );
+          })}
         </div>
       )}
 
@@ -544,19 +622,17 @@ export default function Eventos() {
 
               {/* — Categoria — */}
               <div className={styles.statusToggle}>
-                <button
-                  type="button"
-                  className={`${styles.statusBtn} ${form.status === 'planning' ? styles.statusBtnActive : ''}`}
-                  onClick={() => setForm({ ...form, status: 'planning' })}
-                >
+                <button type="button" className={`${styles.statusBtn} ${form.status === 'planning' ? styles.statusBtnActive : ''}`} onClick={() => setForm({ ...form, status: 'planning' })}>
                   Orçamento
                 </button>
-                <button
-                  type="button"
-                  className={`${styles.statusBtn} ${form.status === 'confirmed' ? styles.statusBtnActive : ''}`}
-                  onClick={() => setForm({ ...form, status: 'confirmed' })}
-                >
-                  Evento Fechado
+                <button type="button" className={`${styles.statusBtn} ${form.status === 'confirmed' ? styles.statusBtnActive : ''}`} onClick={() => setForm({ ...form, status: 'confirmed' })}>
+                  Fechado
+                </button>
+                <button type="button" className={`${styles.statusBtn} ${form.status === 'completed' ? styles.statusBtnActive : ''}`} onClick={() => setForm({ ...form, status: 'completed' })}>
+                  Finalizado
+                </button>
+                <button type="button" className={`${styles.statusBtn} ${form.status === 'cancelled' ? styles.statusBtnActive : ''}`} onClick={() => setForm({ ...form, status: 'cancelled' })}>
+                  Cancelado
                 </button>
               </div>
 
@@ -747,6 +823,12 @@ export default function Eventos() {
                     <input className={styles.input} value={form.finalValue} onChange={(e) => setForm({ ...form, finalValue: formatBudget(e.target.value) })} placeholder="R$ 0,00" />
                   </div>
                   <div className={styles.formGroup}>
+                    <label className={styles.label}>Sinal Recebido (R$)</label>
+                    <input className={styles.input} value={form.depositValue} onChange={(e) => setForm({ ...form, depositValue: formatBudget(e.target.value) })} placeholder="R$ 0,00" />
+                  </div>
+                </div>
+                <div className={styles.formGrid2}>
+                  <div className={styles.formGroup}>
                     <label className={styles.label}>Forma de Pagamento</label>
                     <select className={styles.input} value={form.paymentMethod} onChange={(e) => setForm({ ...form, paymentMethod: e.target.value })}>
                       <option value="">Selecionar</option>
@@ -756,33 +838,50 @@ export default function Eventos() {
                       <option value="outro">Outro</option>
                     </select>
                   </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Chave PIX</label>
+                    <input className={styles.input} value={form.pixKey} onChange={(e) => setForm({ ...form, pixKey: e.target.value })} placeholder="CPF, e-mail, celular ou chave aleatória" />
+                  </div>
+                </div>
+              </div>
+
+              {/* — Pizzas — */}
+              <div className={styles.formSection}>
+                <p className={styles.formSectionTitle}>Pizzas</p>
+                <div className={styles.formGrid2}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Estimado (pizzas)</label>
+                    <input className={styles.input} type="number" value={form.estimatedPizzas} onChange={(e) => setForm({ ...form, estimatedPizzas: e.target.value })} placeholder="0" min="0" />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Realizado (pizzas)</label>
+                    <input className={styles.input} type="number" value={form.actualPizzas} onChange={(e) => setForm({ ...form, actualPizzas: e.target.value })} placeholder="0" min="0" />
+                  </div>
                 </div>
               </div>
 
               {/* — Documentos — */}
-              {form.status === 'confirmed' && (
-                <div className={styles.formSection}>
-                  <p className={styles.formSectionTitle}>Documentos</p>
-                  <div className={styles.formGrid2}>
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Comprovante de Pagamento</label>
-                      <label className={`${styles.fileUploadBtn} ${form.paymentProofName ? styles.fileSelected : ''}`}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                        {form.paymentProofName || 'Selecionar arquivo'}
-                        <input type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={handlePaymentFile} />
-                      </label>
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label className={styles.label}>Contrato (PDF)</label>
-                      <label className={`${styles.fileUploadBtn} ${form.contractPdfName ? styles.fileSelected : ''}`}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                        {form.contractPdfName || 'Selecionar PDF'}
-                        <input type="file" accept=".pdf" style={{ display: 'none' }} onChange={handleContractFile} />
-                      </label>
-                    </div>
+              {(form.status === 'confirmed' || form.status === 'completed') && <div className={styles.formSection}>
+                <p className={styles.formSectionTitle}>Documentos</p>
+                <div className={styles.formGrid2}>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Comprovante de Pagamento</label>
+                    <label className={`${styles.fileUploadBtn} ${form.paymentProofName ? styles.fileSelected : ''}`}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                      {form.paymentProofName || 'Selecionar arquivo'}
+                      <input type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={handlePaymentFile} />
+                    </label>
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Contrato (PDF)</label>
+                    <label className={`${styles.fileUploadBtn} ${form.contractPdfName ? styles.fileSelected : ''}`}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                      {form.contractPdfName || 'Selecionar PDF'}
+                      <input type="file" accept=".pdf" style={{ display: 'none' }} onChange={handleContractFile} />
+                    </label>
                   </div>
                 </div>
-              )}
+              </div>}
 
               {/* — Criador — */}
               <div className={styles.formSection}>
@@ -810,22 +909,22 @@ export default function Eventos() {
                     </div>
                     {showMenuDropdown && (
                       <>
-                        <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setShowMenuDropdown(false)} />
-                        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100, background: '#131929', border: '1px solid #2a3352', borderRadius: 8, padding: 8, marginTop: 4, maxHeight: 200, overflowY: 'auto' }}>
-                          {availableMenus.map(name => {
-                            const selected = form.menu.split(',').map(s => s.trim()).includes(name);
-                            return (
-                              <label key={name} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 8px', cursor: 'pointer', borderRadius: 4, background: selected ? 'rgba(255,193,7,0.08)' : 'transparent' }}>
-                                <input type="checkbox" checked={selected} onChange={() => {
-                                  const current = form.menu.split(',').map(s => s.trim()).filter(Boolean);
-                                  const next = selected ? current.filter(n => n !== name) : [...current, name];
-                                  setForm({ ...form, menu: next.join(', ') });
-                                }} />
-                                <span style={{ fontSize: 13, color: '#e2e8f0' }}>{name}</span>
-                              </label>
-                            );
-                          })}
-                        </div>
+                      <div style={{ position: 'fixed', inset: 0, zIndex: 99 }} onClick={() => setShowMenuDropdown(false)} />
+                      <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100, background: '#131929', border: '1px solid #2a3352', borderRadius: 8, padding: 8, marginTop: 4, maxHeight: 200, overflowY: 'auto' }}>
+                        {availableMenus.map(name => {
+                          const selected = form.menu.split(',').map(s => s.trim()).includes(name);
+                          return (
+                            <label key={name} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 8px', cursor: 'pointer', borderRadius: 4, background: selected ? 'rgba(255,193,7,0.08)' : 'transparent' }}>
+                              <input type="checkbox" checked={selected} onChange={() => {
+                                const current = form.menu.split(',').map(s => s.trim()).filter(Boolean);
+                                const next = selected ? current.filter(n => n !== name) : [...current, name];
+                                setForm({ ...form, menu: next.join(', ') });
+                              }} />
+                              <span style={{ fontSize: 13, color: '#e2e8f0' }}>{name}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
                       </>
                     )}
                   </div>
@@ -846,7 +945,6 @@ export default function Eventos() {
           </div>
         </div>
       )}
-
       {viewingEvent && (
         <div className={styles.overlay} onClick={() => setViewingEvent(null)}>
           <div className={styles.detailModal} onClick={(e) => e.stopPropagation()}>
@@ -865,8 +963,8 @@ export default function Eventos() {
                   <div className={styles.detailItem}>
                     <span className={styles.detailLabel}>Data</span>
                     <span className={styles.detailValue}>
-                      {format(parseISO(viewingEvent.date), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                      {viewingEvent.endDate && ` → ${format(parseISO(viewingEvent.endDate), "dd 'de' MMMM, yyyy", { locale: ptBR })}`}
+                      {safeFormat(viewingEvent.date, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                      {viewingEvent.endDate && ` → ${safeFormat(viewingEvent.endDate, "dd 'de' MMMM, yyyy", { locale: ptBR })}`}
                     </span>
                   </div>
                   {viewingEvent.celebration && (
@@ -952,7 +1050,7 @@ export default function Eventos() {
                 <div className={styles.detailSection}>
                   <p className={styles.detailSectionTitle}>Cardápio</p>
                   <div className={styles.menuTags}>
-                    {viewingEvent.menu.map((item, i) => (
+                    {viewingEvent.menu.map((item: string, i: number) => (
                       <span key={i} className={styles.menuTag}>{item}</span>
                     ))}
                   </div>
@@ -1005,7 +1103,7 @@ export default function Eventos() {
                     <div className={styles.detailItem} style={{ marginTop: 8 }}>
                       <span className={styles.detailLabel}>Equipe escalada</span>
                       <div className={styles.menuTags}>
-                        {viewingEvent.selectedEmployeeIds.map((id) => (
+                        {viewingEvent.selectedEmployeeIds.map((id: string) => (
                           <span key={id} className={styles.menuTag}>{employeeMap[id] || id}</span>
                         ))}
                       </div>
@@ -1034,6 +1132,12 @@ export default function Eventos() {
                       <span className={styles.detailValue} style={{ color: 'var(--accent)' }}>R$ {viewingEvent.finalValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                     </div>
                   )}
+                  {viewingEvent.depositValue != null && viewingEvent.depositValue > 0 && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>Sinal Recebido</span>
+                      <span className={styles.detailValue}>R$ {viewingEvent.depositValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                  )}
                   {viewingEvent.paymentMethod && (
                     <div className={styles.detailItem}>
                       <span className={styles.detailLabel}>Forma de Pagamento</span>
@@ -1045,8 +1149,35 @@ export default function Eventos() {
                       </span>
                     </div>
                   )}
+                  {viewingEvent.pixKey && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>Chave PIX</span>
+                      <span className={styles.detailValue}>{viewingEvent.pixKey}</span>
+                    </div>
+                  )}
                 </div>
               </div>
+
+              {/* Pizzas */}
+              {(viewingEvent.estimatedPizzas || viewingEvent.actualPizzas) && (
+                <div className={styles.detailSection}>
+                  <p className={styles.detailSectionTitle}>Pizzas</p>
+                  <div className={styles.detailGrid}>
+                    {viewingEvent.estimatedPizzas != null && viewingEvent.estimatedPizzas > 0 && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Estimado</span>
+                        <span className={styles.detailValue}>{viewingEvent.estimatedPizzas} pizzas</span>
+                      </div>
+                    )}
+                    {viewingEvent.actualPizzas != null && viewingEvent.actualPizzas > 0 && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Realizado</span>
+                        <span className={styles.detailValue}>{viewingEvent.actualPizzas} pizzas</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Observações */}
               {viewingEvent.notes && (
@@ -1076,8 +1207,7 @@ export default function Eventos() {
                             <img src={viewingEvent.paymentProofData} alt="Comprovante" className={styles.docPreviewImage} />
                           ) : (
                             <iframe src={viewingEvent.paymentProofData} className={styles.docPreviewPdf} title="Comprovante" />
-                          )
-                        ) : (
+                          )) : (
                           <div className={styles.docNoPreview}>
                             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                             <span>{viewingEvent.paymentProofName}</span>
@@ -1127,7 +1257,6 @@ export default function Eventos() {
           </div>
         </div>
       )}
-
       {showInfo && (
         <div className={styles.overlay} onClick={() => setShowInfo(false)}>
           <div className={styles.modal} style={{ maxWidth: 480 }} onClick={(e) => e.stopPropagation()}>
@@ -1162,7 +1291,6 @@ export default function Eventos() {
           </div>
         </div>
       )}
-
       {deleteTargetId && (
         <ConfirmModal
           title="Excluir Evento"

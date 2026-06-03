@@ -987,37 +987,68 @@
 .infoList { font-size: $font-size-sm; color: $text-secondary; line-height: 1.8; padding-left: $spacing-lg; margin: 0; strong { color: $text-primary; } }
 
 // ── Page-level month filter bar ───────────────────────────────────────────────
-.pageMonthBar {
+.pageMonthFilter {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  align-items: flex-end;
+  gap: $spacing-sm;
   padding: $spacing-md 0 $spacing-sm;
+  margin-bottom: $spacing-md;
+  flex-wrap: wrap;
 }
 
-.pageMonthChip {
-  padding: 5px 12px;
+.pageMonthField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 240px;
+  max-width: 320px;
+}
+
+.pageMonthLabel {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pageMonthSelect {
+  height: 40px;
+  width: 100%;
+  padding: 0 12px;
   border-radius: $radius-sm;
   border: 1px solid $border;
-  background: transparent;
-  color: $text-secondary;
-  font-size: $font-size-xs;
-  font-weight: $font-weight-medium;
+  background: $bg-card;
+  color: $text-primary;
+  font-size: $font-size-sm;
+  font-family: inherit;
   cursor: pointer;
   transition: all $transition-fast;
-  white-space: nowrap;
 
-  &:hover {
-    border-color: rgba(255, 255, 255, 0.15);
-    color: $text-primary;
-    background: rgba(255, 255, 255, 0.04);
+  &:focus {
+    outline: none;
+    border-color: $border-accent;
+    box-shadow: 0 0 0 3px rgba($accent, 0.08);
   }
 }
 
-.pageMonthChipActive {
-  background: rgba($accent, 0.12) !important;
-  border-color: rgba($accent, 0.4) !important;
-  color: $accent !important;
-  font-weight: $font-weight-semibold;
+.pageMonthClear {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: $radius-sm;
+  border: 1px solid $border;
+  background: transparent;
+  color: $text-muted;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    color: $text-primary;
+    border-color: $border-accent;
+    background: rgba($accent, 0.06);
+  }
 }
 
 // ── XML Import ────────────────────────────────────────────────────────────────

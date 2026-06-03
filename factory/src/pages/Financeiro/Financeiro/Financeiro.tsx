@@ -137,6 +137,7 @@ export default function Financeiro() {
   const [activeTab, setActiveTab] = useState<TabType>('geral');
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().substring(0, 7));
   const [costFilter, setCostFilter] = useState<CostFilter>('all');
+  const [pageMonth, setPageMonth] = useState<string>('all');
 
   // Table filters
   const [filterType, setFilterType] = useState<FilterType>('all');
@@ -244,14 +245,18 @@ export default function Financeiro() {
   );
 
   // === DATA COMPUTATIONS ===
+  const pageMonthFinances = useMemo(
+    () => pageMonth === 'all' ? finances : finances.filter((f) => f.date && f.date.startsWith(pageMonth)),
+    [finances, pageMonth],
+  );
 
   const totalRevenue = useMemo(
-    () => finances.filter((f) => f.type === 'revenue').reduce((acc, f) => acc + f.amount, 0),
-    [finances],
+    () => pageMonthFinances.filter((f) => f.type === 'revenue').reduce((acc, f) => acc + f.amount, 0),
+    [pageMonthFinances],
   );
   const totalCosts = useMemo(
-    () => finances.filter((f) => f.type === 'cost').reduce((acc, f) => acc + f.amount, 0),
-    [finances],
+    () => pageMonthFinances.filter((f) => f.type === 'cost').reduce((acc, f) => acc + f.amount, 0),
+    [pageMonthFinances],
   );
   const profit = totalRevenue - totalCosts;
   const margin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
@@ -259,7 +264,7 @@ export default function Financeiro() {
   // Monthly chart data
   const monthlyData = useMemo(() => {
     const map = new Map<string, { month: string; receita: number; despesa: number }>();
-    for (const f of finances) {
+    for (const f of pageMonthFinances) {
       const ym = f.date.substring(0, 7);
       if (!map.has(ym)) map.set(ym, { month: ym, receita: 0, despesa: 0 });
       const entry = map.get(ym)!;
@@ -267,7 +272,7 @@ export default function Financeiro() {
       else entry.despesa += f.amount;
     }
     return [...map.values()].sort((a, b) => a.month.localeCompare(b.month));
-  }, [finances]);
+  }, [pageMonthFinances]);
 
   // Available months for selector
   const availableMonths = useMemo(() => {
@@ -465,6 +470,25 @@ export default function Financeiro() {
         ))}
       </div>
 
+      {['geral', 'despesas'].includes(activeTab) && availableMonths.length > 0 && (
+        <div className={styles.pageMonthFilter}>
+          <div className={styles.pageMonthField}>
+            <label className={styles.pageMonthLabel}>Filtrar mês</label>
+            <select className={styles.pageMonthSelect} value={pageMonth} onChange={(e) => setPageMonth(e.target.value)}>
+              <option value="all">Todos os meses</option>
+              {availableMonths.map((m) => (
+                <option key={m} value={m}>{formatMonth(m)}</option>
+              ))}
+            </select>
+          </div>
+          {pageMonth !== 'all' && (
+            <button className={styles.pageMonthClear} onClick={() => setPageMonth('all')}>
+              Limpar
+            </button>
+          )}
+        </div>
+      )}
+
       {/* ===== TAB: VISAO GERAL ===== */}
       {activeTab === 'geral' && (
         <div className={styles.tabContent}>
@@ -647,7 +671,7 @@ export default function Financeiro() {
               const totals = cats
                 .map((cat) => ({
                   cat,
-                  total: finances.filter((f) => f.type === 'cost' && f.category === cat).reduce((a, f) => a + f.amount, 0),
+                  total: pageMonthFinances.filter((f) => f.type === 'cost' && f.category === cat).reduce((a, f) => a + f.amount, 0),
                 }))
                 .filter(({ total }) => total > 0)
                 .sort((a, b) => b.total - a.total);

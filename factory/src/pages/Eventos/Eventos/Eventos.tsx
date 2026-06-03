@@ -380,16 +380,33 @@ export default function Eventos() {
                       <span className={styles.detailValue}>R$ {ev.travelCost.toLocaleString('pt-BR')}</span>
                     </div>
                   )}
+                  {ev.depositValue != null && ev.depositValue > 0 && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>Sinal Recebido</span>
+                      <span className={styles.detailValue}>R$ {ev.depositValue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                  )}
                   {ev.paymentMethod && (
                     <div className={styles.detailItem}>
                       <span className={styles.detailLabel}>Forma de Pagamento</span>
-                      <span className={styles.detailValue}>{ev.paymentMethod}</span>
+                      <span className={styles.detailValue}>
+                        {ev.paymentMethod === 'pix_parcelado' ? 'Pix - 30% na reserva e restante ate o dia'
+                          : ev.paymentMethod === 'cartao' ? 'Cartao - ate 2x sem juros na reserva'
+                          : ev.paymentMethod === 'pix_total' ? 'Pix - valor total'
+                          : ev.paymentMethod}
+                      </span>
+                    </div>
+                  )}
+                  {ev.pixKey && (
+                    <div className={styles.detailItem}>
+                      <span className={styles.detailLabel}>Chave PIX</span>
+                      <span className={styles.detailValue}>{ev.pixKey}</span>
                     </div>
                   )}
                 </div>
               </div>
 
-              {(ev.responsibleEmployeeId || ev.staffCount || (ev.selectedEmployeeIds && ev.selectedEmployeeIds.length > 0) || ev.teamPizzaiolo || ev.teamHelper || ev.teamGarcon) && (
+              {(ev.responsibleEmployeeId || ev.staffCount || (ev.selectedEmployeeIds && ev.selectedEmployeeIds.length > 0) || ev.teamPizzaiolo || ev.teamHelper || ev.teamGarcon || ev.extrasLoucas || ev.extrasBebidas) && (
                 <div className={styles.detailSection}>
                   <p className={styles.detailSectionTitle}>Equipe Soul540</p>
                   <div className={styles.detailGrid}>
@@ -423,6 +440,18 @@ export default function Eventos() {
                         <span className={styles.detailValue}>{ev.staffCount} pessoas</span>
                       </div>
                     )}
+                    {ev.extrasLoucas != null && ev.extrasLoucas > 0 && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Extras - Loucas</span>
+                        <span className={styles.detailValue}>{ev.extrasLoucas} pessoa{ev.extrasLoucas > 1 ? 's' : ''}</span>
+                      </div>
+                    )}
+                    {ev.extrasBebidas != null && ev.extrasBebidas > 0 && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Extras - Bebidas</span>
+                        <span className={styles.detailValue}>{ev.extrasBebidas} pessoa{ev.extrasBebidas > 1 ? 's' : ''}</span>
+                      </div>
+                    )}
                   </div>
                   {ev.selectedEmployeeIds && ev.selectedEmployeeIds.length > 0 && (
                     <div className={styles.detailItem}>
@@ -436,6 +465,27 @@ export default function Eventos() {
                   )}
                 </div>
               )}
+
+              {(ev.estimatedPizzas || ev.actualPizzas) && (
+                <div className={styles.detailSection}>
+                  <p className={styles.detailSectionTitle}>Pizzas</p>
+                  <div className={styles.detailGrid}>
+                    {ev.estimatedPizzas != null && ev.estimatedPizzas > 0 && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Estimado</span>
+                        <span className={styles.detailValue}>{ev.estimatedPizzas} pizzas</span>
+                      </div>
+                    )}
+                    {ev.actualPizzas != null && ev.actualPizzas > 0 && (
+                      <div className={styles.detailItem}>
+                        <span className={styles.detailLabel}>Realizado</span>
+                        <span className={styles.detailValue}>{ev.actualPizzas} pizzas</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
 
               {ev.menu && ev.menu.length > 0 && (
                 <div className={styles.detailSection}>
@@ -455,25 +505,27 @@ export default function Eventos() {
                 </div>
               )}
 
-              {(ev.paymentProofData || ev.contractPdfData) && (
+              {(ev.paymentProofName || ev.paymentProofData || ev.contractPdfName || ev.contractPdfData) && (
                 <div className={styles.detailSection}>
                   <p className={styles.detailSectionTitle}>Documentos</p>
                   <div className={styles.docGrid}>
-                    {ev.paymentProofData && (
+                    {(ev.paymentProofName || ev.paymentProofData) && (
                       <div className={styles.docCard}>
                         <div className={styles.docCardHeader}>
                           <span className={styles.detailLabel}>Comprovante de Pagamento</span>
-                          <a
-                            className={styles.docDownloadBtn}
-                            href={ev.paymentProofData}
-                            download={ev.paymentProofName || 'comprovante'}
-                            onClick={(e) => e.stopPropagation()}
-                            title="Baixar"
-                          >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                          </a>
+                          {ev.paymentProofData && (
+                            <a
+                              className={styles.docDownloadBtn}
+                              href={ev.paymentProofData}
+                              download={ev.paymentProofName || 'comprovante'}
+                              onClick={(e) => e.stopPropagation()}
+                              title="Baixar"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            </a>
+                          )}
                         </div>
-                        {ev.paymentProofData.startsWith('data:image') ? (
+                        {ev.paymentProofData ? ev.paymentProofData.startsWith('data:image') ? (
                           <img src={ev.paymentProofData} alt="Comprovante" className={styles.docPreviewImage} />
                         ) : ev.paymentProofData.startsWith('data:application/pdf') ? (
                           <iframe src={ev.paymentProofData} className={styles.docPreviewPdf} title="Comprovante PDF" />
@@ -482,27 +534,39 @@ export default function Eventos() {
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                             <span>{ev.paymentProofName || 'Arquivo'}</span>
                           </div>
+                        ) : (
+                          <div className={styles.docNoPreview}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            <span>{ev.paymentProofName || 'Arquivo'}</span>
+                          </div>
                         )}
                       </div>
                     )}
-                    {ev.contractPdfData && (
+                    {(ev.contractPdfName || ev.contractPdfData) && (
                       <div className={styles.docCard}>
                         <div className={styles.docCardHeader}>
                           <span className={styles.detailLabel}>Contrato</span>
-                          <a
-                            className={styles.docDownloadBtn}
-                            href={ev.contractPdfData}
-                            download={ev.contractPdfName || 'contrato'}
-                            onClick={(e) => e.stopPropagation()}
-                            title="Baixar"
-                          >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                          </a>
+                          {ev.contractPdfData && (
+                            <a
+                              className={styles.docDownloadBtn}
+                              href={ev.contractPdfData}
+                              download={ev.contractPdfName || 'contrato'}
+                              onClick={(e) => e.stopPropagation()}
+                              title="Baixar"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            </a>
+                          )}
                         </div>
-                        {ev.contractPdfData.startsWith('data:image') ? (
+                        {ev.contractPdfData ? ev.contractPdfData.startsWith('data:image') ? (
                           <img src={ev.contractPdfData} alt="Contrato" className={styles.docPreviewImage} />
                         ) : ev.contractPdfData.startsWith('data:application/pdf') ? (
                           <iframe src={ev.contractPdfData} className={styles.docPreviewPdf} title="Contrato PDF" />
+                        ) : (
+                          <div className={styles.docNoPreview}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            <span>{ev.contractPdfName || 'Arquivo'}</span>
+                          </div>
                         ) : (
                           <div className={styles.docNoPreview}>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>

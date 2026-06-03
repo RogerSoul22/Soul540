@@ -61,7 +61,10 @@ app.use('/api/production-orders', productionOrdersRouter);
 // Serve franchise app at /campinas
 const franchiseDist = path.join(process.cwd(), 'franchise/dist');
 app.use('/campinas', express.static(franchiseDist));
-app.get(['/campinas', '/campinas/*'], (_req, res) => res.sendFile(path.join(franchiseDist, 'index.html')));
+app.get(['/campinas', '/campinas/*'], (_req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendFile(path.join(franchiseDist, 'index.html'));
+});
 
 // Serve factory app at /fabrica
 const factoryDist = path.join(process.cwd(), 'factory/dist');

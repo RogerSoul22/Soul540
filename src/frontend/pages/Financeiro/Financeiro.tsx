@@ -592,22 +592,21 @@ export default function Financeiro() {
 
       {/* ===== MONTH FILTER BAR (Geral / Despesas / Valores) ===== */}
       {['geral', 'despesas', 'valores'].includes(activeTab) && availableMonths.length > 0 && (
-        <div className={styles.pageMonthBar}>
-          <button
-            className={`${styles.pageMonthChip} ${pageMonth === 'all' ? styles.pageMonthChipActive : ''}`}
-            onClick={() => setPageMonth('all')}
-          >
-            Todos
-          </button>
-          {availableMonths.map((m) => (
-            <button
-              key={m}
-              className={`${styles.pageMonthChip} ${pageMonth === m ? styles.pageMonthChipActive : ''}`}
-              onClick={() => setPageMonth(m)}
-            >
-              {formatMonth(m)}
+        <div className={styles.pageMonthFilter}>
+          <div className={styles.pageMonthField}>
+            <label className={styles.pageMonthLabel}>Filtrar mês</label>
+            <select className={styles.pageMonthSelect} value={pageMonth} onChange={(e) => setPageMonth(e.target.value)}>
+              <option value="all">Todos os meses</option>
+              {availableMonths.map((m) => (
+                <option key={m} value={m}>{formatMonth(m)}</option>
+              ))}
+            </select>
+          </div>
+          {pageMonth !== 'all' && (
+            <button className={styles.pageMonthClear} onClick={() => setPageMonth('all')}>
+              Limpar
             </button>
-          ))}
+          )}
         </div>
       )}
 

@@ -476,8 +476,8 @@
   border: 1px solid $border;
   border-radius: $radius-lg;
   width: 100%;
-  max-width: 580px;
-  max-height: 85vh;
+  max-width: 600px;
+  max-height: 90vh;
   overflow-y: auto;
   box-shadow: $shadow-lg;
   animation: eventModalIn 0.22s cubic-bezier(0.4, 0, 0.2, 1);
@@ -567,6 +567,7 @@
   padding: $spacing-xl;
   display: flex;
   flex-direction: column;
+  gap: $spacing-md;
 }
 
 .panelActions {
@@ -574,6 +575,10 @@
   gap: $spacing-sm;
   padding: $spacing-md $spacing-lg;
   border-top: 1px solid $border;
+  position: sticky;
+  bottom: 0;
+  background: $bg-card;
+  z-index: 1;
 }
 
 // ── Detail view ───────────────────────────────────────────────────────────────
@@ -776,7 +781,8 @@
 .formRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: $spacing-md;
+  gap: $spacing-md $spacing-lg;
+  align-items: start;
 
   @include mobile { grid-template-columns: 1fr; }
 }
@@ -792,13 +798,17 @@
   font-weight: $font-weight-semibold;
   color: $text-muted;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
+  line-height: 1.2;
 }
 
 .formInput,
 .formSelect,
 .formTextarea {
-  padding: 9px $spacing-md;
+  width: 100%;
+  min-height: 40px;
+  box-sizing: border-box;
+  padding: 10px 12px;
   background: $bg-input;
   border: 1px solid $border;
   border-radius: $radius-sm;
@@ -817,6 +827,46 @@
 .formTextarea {
   resize: vertical;
   min-height: 80px;
+}
+
+.statusToggle {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+
+  @include mobile { grid-template-columns: repeat(2, 1fr); }
+}
+
+.statusBtn {
+  min-height: 34px;
+  padding: 7px 10px;
+  border: none;
+  border-radius: calc(#{$radius-sm} - 2px);
+  background: transparent;
+  color: $text-muted;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: $text-primary;
+  }
+}
+
+.statusBtnActive {
+  background: $accent;
+  color: #0a0f1e;
+
+  &:hover {
+    background: $accent-hover;
+    color: #0a0f1e;
+  }
 }
 
 // ── Delete confirm ─────────────────────────────────────────────────────────────

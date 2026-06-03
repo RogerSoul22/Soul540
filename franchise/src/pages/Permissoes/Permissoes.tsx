@@ -49,7 +49,6 @@ export default function Permissoes() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<AppUser | null>(null);
   const [changePwTarget, setChangePwTarget] = useState<AppUser | null>(null);
   const [newPassword, setNewPassword] = useState('');
   const [changePwSaving, setChangePwSaving] = useState(false);
@@ -133,13 +132,6 @@ export default function Permissoes() {
     }
   };
 
-  const deleteUser = async (u: AppUser) => {
-    await apiFetch(`/api/users/${u.id}`, { method: 'DELETE' });
-    setUsers(prev => prev.filter(x => x.id !== u.id));
-    if (selected?.id === u.id) setSelected(null);
-    setDeleteTarget(null);
-  };
-
   const handleChangePassword = async () => {
     if (!changePwTarget || newPassword.trim().length < 6) return;
     setChangePwSaving(true);
@@ -213,15 +205,6 @@ export default function Permissoes() {
                     title="Alterar senha"
                   >
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-                  </button>
-                )}
-                {!isReadOnly(u) && (
-                  <button
-                    className={styles.btnDeleteUser}
-                    onClick={(e) => { e.stopPropagation(); setDeleteTarget(u); }}
-                    title="Remover usuário"
-                  >
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
                   </button>
                 )}
               </div>
@@ -422,25 +405,6 @@ export default function Permissoes() {
         </div>
       )}
 
-      {deleteTarget && (
-        <div className={styles.overlay} onClick={() => setDeleteTarget(null)}>
-          <div className={styles.modal} style={{ maxWidth: 400 }} onClick={e => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h2 className={styles.modalTitle}>Remover usuário</h2>
-              <button className={styles.modalClose} onClick={() => setDeleteTarget(null)}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            </div>
-            <div className={styles.modalBody}>
-              <p className={styles.deleteMsg}>Tem certeza que deseja remover <strong>{deleteTarget.name}</strong>? Esta ação não pode ser desfeita.</p>
-            </div>
-            <div className={styles.modalFooter}>
-              <button className={styles.btnCancel} onClick={() => setDeleteTarget(null)}>Cancelar</button>
-              <button className={styles.btnDanger} onClick={() => deleteUser(deleteTarget)}>Remover</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

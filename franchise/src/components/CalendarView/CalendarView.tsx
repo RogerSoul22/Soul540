@@ -17,6 +17,20 @@ const EVENT_COLOR = {
 };
 
 const PLANNING_COLOR = {
+  bg: 'rgba(59,130,246,0.12)',
+  text: '#3b82f6',
+  border: 'rgba(59,130,246,0.28)',
+  solid: '#3b82f6',
+};
+
+const COMPLETED_COLOR = {
+  bg: 'rgba(34,197,94,0.12)',
+  text: '#22c55e',
+  border: 'rgba(34,197,94,0.28)',
+  solid: '#22c55e',
+};
+
+const NOTES_COLOR = {
   bg: 'rgba(239,68,68,0.12)',
   text: '#ef4444',
   border: 'rgba(239,68,68,0.28)',
@@ -24,7 +38,10 @@ const PLANNING_COLOR = {
 };
 
 function getEventColor(ev: PizzaEvent) {
-  return ev.status === 'planning' ? PLANNING_COLOR : EVENT_COLOR;
+  if (ev.notes?.trim()) return NOTES_COLOR;
+  if (ev.status === 'completed') return COMPLETED_COLOR;
+  if (ev.status === 'planning') return PLANNING_COLOR;
+  return EVENT_COLOR;
 }
 
 function buildWhatsAppUrl(ev: PizzaEvent): string {
@@ -112,6 +129,13 @@ function EventModal({ event, onClose, onUpdate, onDelete }: {
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) onClose();
   };
+
+  const updateForm = (data: Partial<PizzaEvent>) => {
+    setForm((f) => ({ ...f, ...data }));
+  };
+
+  const readNumber = (value: string) => value === '' ? undefined : Number(value);
+  const readList = (value: string) => value.split(',').map((item) => item.trim()).filter(Boolean);
 
   return (
     <div className={styles.eventOverlay} onClick={handleOverlayClick}>
@@ -267,6 +291,183 @@ function EventModal({ event, onClose, onUpdate, onDelete }: {
         {mode === 'edit' && (
           <>
             <div className={styles.panelBody}>
+              <div className={styles.statusToggle}>
+                <button type="button" className={`${styles.statusBtn} ${form.status === 'planning' ? styles.statusBtnActive : ''}`} onClick={() => updateForm({ status: 'planning' })}>
+                  Orcamento
+                </button>
+                <button type="button" className={`${styles.statusBtn} ${form.status === 'confirmed' ? styles.statusBtnActive : ''}`} onClick={() => updateForm({ status: 'confirmed' })}>
+                  Fechado
+                </button>
+                <button type="button" className={`${styles.statusBtn} ${form.status === 'completed' ? styles.statusBtnActive : ''}`} onClick={() => updateForm({ status: 'completed' })}>
+                  Finalizado
+                </button>
+                <button type="button" className={`${styles.statusBtn} ${form.status === 'cancelled' ? styles.statusBtnActive : ''}`} onClick={() => updateForm({ status: 'cancelled' })}>
+                  Cancelado
+                </button>
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Criado por</label>
+                  <input className={styles.formInput} value={form.createdBy ?? ''} onChange={(e) => updateForm({ createdBy: e.target.value })} />
+                </div>
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>O que estamos celebrando</label>
+                  <input className={styles.formInput} value={form.celebration ?? ''} onChange={(e) => updateForm({ celebration: e.target.value })} />
+                </div>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Data final</label>
+                  <input type="date" className={styles.formInput} value={(form.endDate ?? '').slice(0, 10)} onChange={(e) => updateForm({ endDate: e.target.value || undefined })} />
+                </div>
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Horario de inicio</label>
+                  <input type="time" className={styles.formInput} value={form.time ?? ''} onChange={(e) => updateForm({ time: e.target.value })} />
+                </div>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Equipe chega</label>
+                  <input type="time" className={styles.formInput} value={form.teamArrivalTime ?? ''} onChange={(e) => updateForm({ teamArrivalTime: e.target.value })} />
+                </div>
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Duracao</label>
+                  <input className={styles.formInput} value={form.duration ?? ''} onChange={(e) => updateForm({ duration: e.target.value })} />
+                </div>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Cidade</label>
+                  <input className={styles.formInput} value={form.city ?? ''} onChange={(e) => updateForm({ city: e.target.value })} />
+                </div>
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Telefone</label>
+                  <input className={styles.formInput} value={form.phone ?? ''} onChange={(e) => updateForm({ phone: e.target.value })} />
+                </div>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Fora da cidade</label>
+                  <select className={styles.formInput} value={form.outOfCity ? 'yes' : 'no'} onChange={(e) => updateForm({ outOfCity: e.target.value === 'yes' })}>
+                    <option value="no">Nao</option>
+                    <option value="yes">Sim</option>
+                  </select>
+                </div>
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Acima de 12 anos</label>
+                  <input type="number" className={styles.formInput} value={form.guestsAdult ?? ''} onChange={(e) => updateForm({ guestsAdult: readNumber(e.target.value) })} />
+                </div>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>De 8 ate 12 anos</label>
+                  <input type="number" className={styles.formInput} value={form.guestsTeen ?? ''} onChange={(e) => updateForm({ guestsTeen: readNumber(e.target.value) })} />
+                </div>
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Abaixo de 7 anos</label>
+                  <input type="number" className={styles.formInput} value={form.guestsChild ?? ''} onChange={(e) => updateForm({ guestsChild: readNumber(e.target.value) })} />
+                </div>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Deslocamento (R$)</label>
+                  <input type="number" className={styles.formInput} value={form.travelCost ?? ''} onChange={(e) => updateForm({ travelCost: readNumber(e.target.value) })} />
+                </div>
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Valor final (R$)</label>
+                  <input type="number" className={styles.formInput} value={form.finalValue ?? ''} onChange={(e) => updateForm({ finalValue: readNumber(e.target.value) })} />
+                </div>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Sinal recebido (R$)</label>
+                  <input type="number" className={styles.formInput} value={form.depositValue ?? ''} onChange={(e) => updateForm({ depositValue: readNumber(e.target.value) })} />
+                </div>
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Forma de pagamento</label>
+                  <select className={styles.formInput} value={form.paymentMethod ?? ''} onChange={(e) => updateForm({ paymentMethod: e.target.value })}>
+                    <option value="">Selecionar</option>
+                    <option value="pix_parcelado">Pix - 30% na reserva e restante ate o dia</option>
+                    <option value="cartao">Cartao - ate 2x sem juros na reserva</option>
+                    <option value="pix_total">Pix - valor total</option>
+                    <option value="outro">Outro</option>
+                  </select>
+                </div>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Chave PIX</label>
+                  <input className={styles.formInput} value={form.pixKey ?? ''} onChange={(e) => updateForm({ pixKey: e.target.value })} />
+                </div>
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Estimado (pizzas)</label>
+                  <input type="number" className={styles.formInput} value={form.estimatedPizzas ?? ''} onChange={(e) => updateForm({ estimatedPizzas: readNumber(e.target.value) })} />
+                </div>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Realizado (pizzas)</label>
+                  <input type="number" className={styles.formInput} value={form.actualPizzas ?? ''} onChange={(e) => updateForm({ actualPizzas: readNumber(e.target.value) })} />
+                </div>
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Pizzaiolo(a)</label>
+                  <input className={styles.formInput} value={form.teamPizzaiolo ?? ''} onChange={(e) => updateForm({ teamPizzaiolo: e.target.value })} />
+                </div>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Ajudante</label>
+                  <input className={styles.formInput} value={form.teamHelper ?? ''} onChange={(e) => updateForm({ teamHelper: e.target.value })} />
+                </div>
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Garcom</label>
+                  <input className={styles.formInput} value={form.teamGarcon ?? ''} onChange={(e) => updateForm({ teamGarcon: e.target.value })} />
+                </div>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Funcionario responsavel</label>
+                  <input className={styles.formInput} value={form.responsibleEmployeeId ?? ''} onChange={(e) => updateForm({ responsibleEmployeeId: e.target.value })} />
+                </div>
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Funcionarios no evento</label>
+                  <input type="number" className={styles.formInput} value={form.staffCount ?? ''} onChange={(e) => updateForm({ staffCount: readNumber(e.target.value) })} />
+                </div>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Equipe escalada (IDs separados por virgula)</label>
+                  <input className={styles.formInput} value={(form.selectedEmployeeIds ?? []).join(', ')} onChange={(e) => updateForm({ selectedEmployeeIds: readList(e.target.value) })} />
+                </div>
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Extras - loucas (pessoas)</label>
+                  <input type="number" className={styles.formInput} value={form.extrasLoucas ?? ''} onChange={(e) => updateForm({ extrasLoucas: readNumber(e.target.value) })} />
+                </div>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Extras - bebidas (pessoas)</label>
+                  <input type="number" className={styles.formInput} value={form.extrasBebidas ?? ''} onChange={(e) => updateForm({ extrasBebidas: readNumber(e.target.value) })} />
+                </div>
+              </div>
+              <div className={styles.formField}>
+                <label className={styles.formLabel}>Cardapio (separado por virgula)</label>
+                <input className={styles.formInput} value={(form.menu ?? []).join(', ')} onChange={(e) => updateForm({ menu: readList(e.target.value) })} />
+              </div>
+              <div className={styles.formRow}>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Imagem do local</label>
+                  <input className={styles.formInput} value={form.locationImageName ?? ''} onChange={(e) => updateForm({ locationImageName: e.target.value })} />
+                </div>
+                <div className={styles.formField}>
+                  <label className={styles.formLabel}>Comprovante de pagamento</label>
+                  <input className={styles.formInput} value={form.paymentProofName ?? ''} onChange={(e) => updateForm({ paymentProofName: e.target.value })} />
+                </div>
+              </div>
+              <div className={styles.formField}>
+                <label className={styles.formLabel}>Contrato (PDF)</label>
+                <input className={styles.formInput} value={form.contractPdfName ?? ''} onChange={(e) => updateForm({ contractPdfName: e.target.value })} />
+              </div>
               <div className={styles.formRow}>
                 <div className={styles.formField}>
                   <label className={styles.formLabel}>Nome do evento</label>
