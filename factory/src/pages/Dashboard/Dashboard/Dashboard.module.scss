@@ -357,3 +357,37 @@
 .modalBody { padding: $spacing-xl; display: flex; flex-direction: column; gap: $spacing-md; }
 .modalFooter { @include flex-between; padding: $spacing-md $spacing-xl; border-top: 1px solid $border; }
 .btnPrimary { display: flex; align-items: center; gap: $spacing-sm; padding: 10px $spacing-md; background: $accent; color: #0a0f1e; font-size: $font-size-sm; font-weight: $font-weight-semibold; border: none; border-radius: $radius-sm; cursor: pointer; transition: background $transition-fast; &:hover { background: $accent-hover; } }
+
+.opsPanel { border: 1px solid $border; background: $bg-card; border-radius: $radius-md; padding: $spacing-md; margin-bottom: $spacing-md; }
+.opsHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: $spacing-md; margin-bottom: $spacing-md; @include mobile { flex-direction: column; } }
+.opsTitle { font-size: $font-size-base; font-weight: $font-weight-semibold; color: $text-primary; }
+.opsSubtitle { margin-top: 2px; font-size: $font-size-sm; color: $text-muted; }
+.opsAction { border: 1px solid $border; background: rgba(255,255,255,0.04); color: $text-secondary; border-radius: $radius-xs; padding: 8px 12px; font-size: $font-size-sm; font-weight: $font-weight-medium; cursor: pointer; transition: all $transition-fast; &:hover { color: $text-primary; border-color: $border-light; } }
+.opsList { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: $spacing-sm; @include mobile { grid-template-columns: 1fr; } }
+.opsItem { display: flex; justify-content: space-between; gap: $spacing-md; border: 1px solid $border-faint; border-radius: $radius-sm; padding: $spacing-sm; background: rgba(255,255,255,0.03); min-width: 0; @include mobile { flex-direction: column; } }
+.opsItemMain { min-width: 0; }
+.opsEventName { color: $text-primary; font-size: $font-size-sm; font-weight: $font-weight-semibold; @include text-ellipsis; }
+.opsEventDate { margin-top: 2px; color: $text-muted; font-size: $font-size-xs; }
+.opsBadges { display: flex; flex-wrap: wrap; justify-content: flex-end; align-content: flex-start; gap: 6px; @include mobile { justify-content: flex-start; } }
+.opsBadge { border-radius: 999px; padding: 3px 8px; font-size: 11px; font-weight: $font-weight-semibold; white-space: nowrap; border: 1px solid transparent; }
+.opsBadgeinfo { color: #86efac; background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.24); }
+.opsBadgewarning { color: #facc15; background: rgba(250,204,21,0.12); border-color: rgba(250,204,21,0.24); }
+.opsBadgedanger { color: #fca5a5; background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.26); }
+
+.opsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+.opsEmpty {
+  display: block;
+  padding: 10px 0;
+  color: $text-muted;
+  font-size: $font-size-sm;
+}

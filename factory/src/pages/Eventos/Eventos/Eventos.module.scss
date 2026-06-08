@@ -465,6 +465,48 @@
 
 .textarea { resize: vertical; }
 
+.productionNotice {
+  padding: 10px 12px;
+  border: 1px solid rgba(96, 165, 250, 0.24);
+  border-radius: $radius-md;
+  background: rgba(96, 165, 250, 0.08);
+  color: #bfdbfe;
+  font-size: $font-size-xs;
+  margin-bottom: $spacing-sm;
+}
+
+.forecastBox {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: $spacing-md;
+
+  span {
+    padding: 8px 10px;
+    border: 1px solid rgba(34, 197, 94, 0.24);
+    border-radius: $radius-sm;
+    background: rgba(34, 197, 94, 0.08);
+    color: #bbf7d0;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+  }
+
+  @include mobile {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.productionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
 // Checkbox list (employee selection)
 .checkList {
   background: $bg-input;

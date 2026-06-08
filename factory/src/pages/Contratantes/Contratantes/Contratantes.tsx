@@ -159,6 +159,30 @@ export default function Contratantes() {
 
   const totalActive = contractors.filter((c) => c.status === 'ativo').length;
 
+  const exportCSV = () => {
+    const escape = (value: string) => `"${value.replace(/"/g, '""')}"`;
+    const rows = [
+      ['Nome', 'Tipo', 'Telefone', 'Email', 'Cidade', 'Categoria', 'Status', 'Receita Total (R$)'].map(escape).join(';'),
+      ...filtered.map((c) => [
+        c.name,
+        c.type === 'pessoa_fisica' ? 'Pessoa Fisica' : 'Pessoa Juridica',
+        c.phone,
+        c.email,
+        c.city ?? '',
+        displayCategory(c.category ?? ''),
+        statusConfig[c.status].label,
+        (c.totalRevenue ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
+      ].map(escape).join(';')),
+    ];
+    const blob = new Blob(['\uFEFF' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `contratantes-fabrica-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const addCategory = async () => {
     const trimmed = newCategory.trim();
     if (trimmed && !categories.map(c => c.toLowerCase()).includes(trimmed.toLowerCase())) {
@@ -244,10 +268,16 @@ export default function Contratantes() {
           </div>
           <p className={styles.subtitle}>Gerencie clientes e contratantes</p>
         </div>
-        <button className={styles.btnPrimary} onClick={openCreate}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Novo Contratante
-        </button>
+        <div className={styles.headerActions}>
+          <button className={styles.btnExport} onClick={exportCSV} title="Exportar contratantes filtrados">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Exportar
+          </button>
+          <button className={styles.btnPrimary} onClick={openCreate}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Novo Contratante
+          </button>
+        </div>
       </div>
 
       {/* KPIs */}

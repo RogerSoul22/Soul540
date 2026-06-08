@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { apiFetch } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import styles from './Permissoes.module.scss';
@@ -53,6 +53,7 @@ export default function Permissoes() {
   const [newPassword, setNewPassword] = useState('');
   const [changePwSaving, setChangePwSaving] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [search, setSearch] = useState('');
   const { user: authUser } = useAuth();
   const revealedPasswords: Record<string, boolean> = {};
 
@@ -66,6 +67,15 @@ export default function Permissoes() {
     if (currentUnit === 'main') return true;
     return target.unit === currentUnit;
   };
+
+  const filteredUsers = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return users;
+    return users.filter((u) => {
+      const unit = unitLabel[u.unit || 'franchise'] || u.unit || '';
+      return [u.name, u.email, unit].some((value) => value.toLowerCase().includes(q));
+    });
+  }, [users, search, unitLabel]);
 
   useEffect(() => {
     apiFetch('/api/users')
@@ -178,8 +188,12 @@ export default function Permissoes() {
       <div className={styles.layout}>
         {/* Left — user list */}
         <div className={styles.userList}>
-          <p className={styles.listTitle}>Usuários ({users.length})</p>
-          {users.map(u => (
+          <p className={styles.listTitle}>Usuários ({filteredUsers.length}/{users.length})</p>
+          <div className={styles.searchWrap}>
+            <svg className={styles.searchIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input className={styles.searchInput} placeholder="Buscar usuarios..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          </div>
+          {filteredUsers.map(u => (
             <div
               key={u.id}
               className={`${styles.userCard} ${selected?.id === u.id ? styles.userCardActive : ''}`}
@@ -211,6 +225,7 @@ export default function Permissoes() {
             </div>
           ))}
           {users.length === 0 && <p className={styles.empty}>Nenhum usuário cadastrado.</p>}
+          {users.length > 0 && filteredUsers.length === 0 && <p className={styles.empty}>Nenhum usuário encontrado.</p>}
         </div>
 
         {/* Right — permission checkboxes */}

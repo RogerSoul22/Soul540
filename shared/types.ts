@@ -50,6 +50,12 @@ export interface PizzaEvent {
   pixKey?: string;
   estimatedPizzas?: number;
   actualPizzas?: number;
+  factoryProductionStatus?: 'pending' | 'preparing' | 'ready' | 'delivered';
+  factoryProductionNotes?: string;
+  factoryDoughBalls?: number;
+  factorySauceKg?: number;
+  factoryCheeseKg?: number;
+  factoryPackagingUnits?: number;
 }
 
 // ── Finances ─────────────────────────────────────────────────────────────────

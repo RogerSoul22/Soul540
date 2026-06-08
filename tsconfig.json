@@ -19,7 +19,8 @@
     "baseUrl": ".",
     "paths": {
       "@frontend/*": ["src/frontend/*"],
-      "@backend/*": ["src/backend/*"]
+      "@backend/*": ["src/backend/*"],
+      "@shared/*": ["shared/*"]
     }
   },
   "include": ["src", "server"],

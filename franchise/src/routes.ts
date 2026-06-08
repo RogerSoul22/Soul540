@@ -12,4 +12,5 @@ export const ROUTES = {
   FINANCEIRO: '/financeiro',
   TAREFAS: '/tarefas',
   USUARIO: '/minha-conta',
+  AUDITORIA: '/auditoria',
 } as const;

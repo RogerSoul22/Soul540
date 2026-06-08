@@ -48,6 +48,12 @@ const EventSchema = new Schema({
   pixKey: String,
   estimatedPizzas: Number,
   actualPizzas: Number,
+  factoryProductionStatus: { type: String, default: 'pending' },
+  factoryProductionNotes: String,
+  factoryDoughBalls: Number,
+  factorySauceKg: Number,
+  factoryCheeseKg: Number,
+  factoryPackagingUnits: Number,
 }, { collection: 'events', toJSON: { virtuals: true, versionKey: false } });
 
 const FranchiseEventSchema = new Schema({
@@ -94,6 +100,12 @@ const FranchiseEventSchema = new Schema({
   pixKey: String,
   estimatedPizzas: Number,
   actualPizzas: Number,
+  factoryProductionStatus: { type: String, default: 'pending' },
+  factoryProductionNotes: String,
+  factoryDoughBalls: Number,
+  factorySauceKg: Number,
+  factoryCheeseKg: Number,
+  factoryPackagingUnits: Number,
 }, { collection: 'franchiseevents', toJSON: { virtuals: true, versionKey: false } });
 
 const FactoryEventSchema = new Schema({
@@ -140,6 +152,12 @@ const FactoryEventSchema = new Schema({
   pixKey: String,
   estimatedPizzas: Number,
   actualPizzas: Number,
+  factoryProductionStatus: { type: String, default: 'pending' },
+  factoryProductionNotes: String,
+  factoryDoughBalls: Number,
+  factorySauceKg: Number,
+  factoryCheeseKg: Number,
+  factoryPackagingUnits: Number,
 }, { collection: 'factoryevents', toJSON: { virtuals: true, versionKey: false } });
 
 EventSchema.index({ date: -1 });
@@ -159,6 +177,23 @@ function isFromFranchise(req: any): boolean {
 
 function isFromFactory(req: any): boolean {
   return getTenantUnit(req) === 'factory';
+}
+
+const FACTORY_OPERATIONAL_FIELDS = [
+  'factoryProductionStatus',
+  'factoryProductionNotes',
+  'factoryDoughBalls',
+  'factorySauceKg',
+  'factoryCheeseKg',
+  'factoryPackagingUnits',
+  'actualPizzas',
+] as const;
+
+function pickFactoryOperationalUpdate(body: Record<string, unknown>) {
+  return FACTORY_OPERATIONAL_FIELDS.reduce<Record<string, unknown>>((acc, key) => {
+    if (Object.prototype.hasOwnProperty.call(body, key)) acc[key] = body[key];
+    return acc;
+  }, {});
 }
 
 async function findEventInAllCollections(id: string) {
@@ -214,22 +249,7 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   if (isFromFactory(req)) {
-    const event = await FactoryEvent.create({ ...req.body, source: 'factory' });
-    if (event.budget && event.budget > 0) {
-      await FactoryFinance.create({
-        eventId: event.id,
-        type: 'revenue',
-        category: 'contrato',
-        description: `Contrato - ${event.name}`,
-        amount: event.budget,
-        date: event.date,
-        status: 'pending',
-        autoEventBudget: true,
-        source: 'factory',
-      });
-    }
-    await logAudit({ req, action: 'create', resource: 'events', resourceId: event.id, description: `Criou evento: ${event.name} (${event.date})` });
-    return res.status(201).json(event);
+    return res.status(403).json({ error: 'Factory can only update operational production fields' });
   }
   if (isFromFranchise(req)) {
     const event = await FranchiseEvent.create({ ...req.body, source: 'franchise' });
@@ -270,12 +290,16 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const found = await findEventInAllCollections(req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
-  const event = await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  const updateData = isFromFactory(req) ? pickFactoryOperationalUpdate(req.body) : req.body;
+  if (isFromFactory(req) && Object.keys(updateData).length === 0) {
+    return res.status(403).json({ error: 'Factory can only update operational production fields' });
+  }
+  const event = await found.model.findByIdAndUpdate(req.params.id, updateData, { new: true });
   if (!event) return res.status(404).json({ error: 'Not found' });
   const FinanceModel = found.financeModel;
   const financeSource = found.financeSource;
   const existing = await FinanceModel.findOne({ eventId: event.id, autoEventBudget: true });
-  if (event.budget && event.budget > 0) {
+  if (!isFromFactory(req) && event.budget && event.budget > 0) {
     if (existing) {
       await FinanceModel.findByIdAndUpdate(existing._id, {
         amount: event.budget,
@@ -295,7 +319,7 @@ router.put('/:id', async (req, res) => {
         source: financeSource,
       });
     }
-  } else if (existing) {
+  } else if (!isFromFactory(req) && existing) {
     await FinanceModel.findByIdAndDelete(existing._id);
   }
   await logAudit({ req, action: 'update', resource: 'events', resourceId: req.params.id, description: `Atualizou evento: ${event.name}` });
@@ -303,6 +327,9 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
+  if (isFromFactory(req)) {
+    return res.status(403).json({ error: 'Factory cannot delete events' });
+  }
   const found = await findEventInAllCollections(req.params.id);
   if (!found) return res.status(204).end();
   const eventName = found.doc?.name || req.params.id;

@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 import { ROUTES } from '@/routes';
 import Login from '@/pages/Login/Login';
 import Layout from '@/components/Layout/Layout';
+import Dashboard from '@/pages/Dashboard/Dashboard/Dashboard';
 import Funcionarios from '@/pages/Funcionarios/Funcionarios/Funcionarios';
 import Contratantes from '@/pages/Contratantes/Contratantes/Contratantes';
 import Eventos from '@/pages/Eventos/Eventos/Eventos';
@@ -14,6 +15,7 @@ import Permissoes from '@/pages/Permissoes/Permissoes/Permissoes';
 import Financeiro from '@/pages/Financeiro/Financeiro/Financeiro';
 import Tarefas from '@/pages/Tarefas/Tarefas/Tarefas';
 import MinhaConta from '@/pages/MinhaConta/MinhaConta';
+import Auditoria from '@/pages/Auditoria/Auditoria/Auditoria';
 
 function AppLoading() {
   return (
@@ -40,7 +42,7 @@ function PermissionRoute({ routeKey }: { routeKey: string }) {
 function PublicRoute() {
   const { authenticated, loading } = useAuth();
   if (loading) return <AppLoading />;
-  return authenticated ? <Navigate to={ROUTES.EVENTOS} replace /> : <Outlet />;
+  return authenticated ? <Navigate to={ROUTES.DASHBOARD} replace /> : <Outlet />;
 }
 
 export default function App() {
@@ -55,6 +57,7 @@ export default function App() {
           </Route>
           <Route element={<PrivateRoute />}>
             <Route element={<Layout />}>
+              <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
               <Route element={<PermissionRoute routeKey="funcionarios" />}>
                 <Route path={ROUTES.FUNCIONARIOS} element={<Funcionarios />} />
               </Route>
@@ -72,6 +75,7 @@ export default function App() {
               </Route>
               <Route element={<PermissionRoute routeKey="__admin__" />}>
                 <Route path={ROUTES.PERMISSOES} element={<Permissoes />} />
+                <Route path={ROUTES.AUDITORIA} element={<Auditoria />} />
               </Route>
               <Route element={<PermissionRoute routeKey="financeiro" />}>
                 <Route path={ROUTES.FINANCEIRO} element={<Financeiro />} />

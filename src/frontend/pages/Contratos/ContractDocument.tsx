@@ -186,8 +186,8 @@ export default function ContractDocument({ contract, event, eventName, onClose }
   );
 
   // Team
-  const [pizzaTeam, setPizzaTeam] = useState(contract.pizzaTeam || '');
-  const [drinksTeam, setDrinksTeam] = useState(contract.drinksTeam || '');
+  const [pizzaTeam, setPizzaTeam] = useState(String(contract.pizzaTeam || ''));
+  const [drinksTeam, setDrinksTeam] = useState(String(contract.drinksTeam || ''));
 
   // Clause static texts
   const [clause3Text, setClause3Text] = useState('Horas adicionais serão cobradas em 20% do valor total por hora, conforme disponibilidade de insumos e equipe.');

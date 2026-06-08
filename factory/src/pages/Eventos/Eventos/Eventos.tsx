@@ -4,6 +4,7 @@ import { useApp } from '@/contexts/AppContext';
 import type { PizzaEvent } from '@/types/Event';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { getEventSupplyForecast } from '@shared/eventOperations';
 import styles from './Eventos.module.scss';
 
 type Employee = {
@@ -117,7 +118,7 @@ function EventCard({ ev, employeeMap, onView }: {
 }
 
 export default function Eventos() {
-  const { events } = useApp();
+  const { events, updateEvent } = useApp();
   const [employees, setEmployees] = useState<Employee[]>([]);
 
   useEffect(() => {
@@ -126,7 +127,30 @@ export default function Eventos() {
 
   const [search, setSearch] = useState('');
   const [viewingEvent, setViewingEvent] = useState<PizzaEvent | null>(null);
+  const [productionForm, setProductionForm] = useState({
+    factoryProductionStatus: 'pending',
+    factoryProductionNotes: '',
+    factoryDoughBalls: '',
+    factorySauceKg: '',
+    factoryCheeseKg: '',
+    factoryPackagingUnits: '',
+    actualPizzas: '',
+  });
   const [showInfo, setShowInfo] = useState(false);
+
+  useEffect(() => {
+    if (!viewingEvent) return;
+    const forecast = getEventSupplyForecast(viewingEvent);
+    setProductionForm({
+      factoryProductionStatus: viewingEvent.factoryProductionStatus || 'pending',
+      factoryProductionNotes: viewingEvent.factoryProductionNotes || '',
+      factoryDoughBalls: String(viewingEvent.factoryDoughBalls ?? forecast.doughBalls),
+      factorySauceKg: String(viewingEvent.factorySauceKg ?? forecast.sauceKg),
+      factoryCheeseKg: String(viewingEvent.factoryCheeseKg ?? forecast.cheeseKg),
+      factoryPackagingUnits: String(viewingEvent.factoryPackagingUnits ?? forecast.pizzas),
+      actualPizzas: String(viewingEvent.actualPizzas ?? ''),
+    });
+  }, [viewingEvent]);
   const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
 
   const employeeMap = useMemo(() => {
@@ -160,6 +184,30 @@ export default function Eventos() {
   const totalGuests = ev
     ? ((ev.guestsAdult ?? 0) + (ev.guestsTeen ?? 0) + (ev.guestsChild ?? 0)) || ev.guestCount || 0
     : 0;
+  const productionForecast = ev ? getEventSupplyForecast(ev) : null;
+
+  const saveProduction = async () => {
+    if (!ev) return;
+    await updateEvent(ev.id, {
+      factoryProductionStatus: productionForm.factoryProductionStatus as PizzaEvent['factoryProductionStatus'],
+      factoryProductionNotes: productionForm.factoryProductionNotes || undefined,
+      factoryDoughBalls: Number(productionForm.factoryDoughBalls) || undefined,
+      factorySauceKg: Number(productionForm.factorySauceKg) || undefined,
+      factoryCheeseKg: Number(productionForm.factoryCheeseKg) || undefined,
+      factoryPackagingUnits: Number(productionForm.factoryPackagingUnits) || undefined,
+      actualPizzas: Number(productionForm.actualPizzas) || undefined,
+    });
+    setViewingEvent((current) => current ? {
+      ...current,
+      factoryProductionStatus: productionForm.factoryProductionStatus as PizzaEvent['factoryProductionStatus'],
+      factoryProductionNotes: productionForm.factoryProductionNotes,
+      factoryDoughBalls: Number(productionForm.factoryDoughBalls) || undefined,
+      factorySauceKg: Number(productionForm.factorySauceKg) || undefined,
+      factoryCheeseKg: Number(productionForm.factoryCheeseKg) || undefined,
+      factoryPackagingUnits: Number(productionForm.factoryPackagingUnits) || undefined,
+      actualPizzas: Number(productionForm.actualPizzas) || undefined,
+    } : current);
+  };
 
   return (
     <div className={styles.page}>
@@ -483,6 +531,54 @@ export default function Eventos() {
                       </div>
                     )}
                   </div>
+                </div>
+              )}
+
+              {productionForecast && (
+                <div className={styles.detailSection}>
+                  <p className={styles.detailSectionTitle}>Producao da fabrica</p>
+                  <div className={styles.productionNotice}>
+                    Dados comerciais em somente leitura. A fabrica altera apenas os campos operacionais abaixo.
+                  </div>
+                  <div className={styles.forecastBox}>
+                    <span>{productionForecast.pizzas} pizzas previstas</span>
+                    <span>{productionForecast.flourKg} kg farinha</span>
+                    <span>{productionForecast.sauceKg} kg molho</span>
+                    <span>{productionForecast.cheeseKg} kg queijo</span>
+                  </div>
+                  <div className={styles.productionGrid}>
+                    <div>
+                      <span className={styles.detailLabel}>Status</span>
+                      <select className={styles.input} value={productionForm.factoryProductionStatus} onChange={(e) => setProductionForm((prev) => ({ ...prev, factoryProductionStatus: e.target.value }))}>
+                        <option value="pending">Pendente</option>
+                        <option value="preparing">Em preparo</option>
+                        <option value="ready">Pronto</option>
+                        <option value="delivered">Entregue</option>
+                      </select>
+                    </div>
+                    <div>
+                      <span className={styles.detailLabel}>Massas</span>
+                      <input className={styles.input} type="number" value={productionForm.factoryDoughBalls} onChange={(e) => setProductionForm((prev) => ({ ...prev, factoryDoughBalls: e.target.value }))} />
+                    </div>
+                    <div>
+                      <span className={styles.detailLabel}>Molho (kg)</span>
+                      <input className={styles.input} type="number" value={productionForm.factorySauceKg} onChange={(e) => setProductionForm((prev) => ({ ...prev, factorySauceKg: e.target.value }))} />
+                    </div>
+                    <div>
+                      <span className={styles.detailLabel}>Queijo (kg)</span>
+                      <input className={styles.input} type="number" value={productionForm.factoryCheeseKg} onChange={(e) => setProductionForm((prev) => ({ ...prev, factoryCheeseKg: e.target.value }))} />
+                    </div>
+                    <div>
+                      <span className={styles.detailLabel}>Embalagens</span>
+                      <input className={styles.input} type="number" value={productionForm.factoryPackagingUnits} onChange={(e) => setProductionForm((prev) => ({ ...prev, factoryPackagingUnits: e.target.value }))} />
+                    </div>
+                    <div>
+                      <span className={styles.detailLabel}>Realizado (pizzas)</span>
+                      <input className={styles.input} type="number" value={productionForm.actualPizzas} onChange={(e) => setProductionForm((prev) => ({ ...prev, actualPizzas: e.target.value }))} />
+                    </div>
+                  </div>
+                  <textarea className={styles.textarea} value={productionForm.factoryProductionNotes} onChange={(e) => setProductionForm((prev) => ({ ...prev, factoryProductionNotes: e.target.value }))} placeholder="Observacoes internas da producao" />
+                  <button className={styles.btnPrimary} type="button" onClick={saveProduction}>Salvar producao</button>
                 </div>
               )}
 

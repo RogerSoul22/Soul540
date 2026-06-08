@@ -11,4 +11,5 @@ export const ROUTES = {
   NOTAS_FISCAIS: '/notas-fiscais',
   TAREFAS: '/tarefas',
   USUARIO: '/minha-conta',
+  AUDITORIA: '/auditoria',
 } as const;

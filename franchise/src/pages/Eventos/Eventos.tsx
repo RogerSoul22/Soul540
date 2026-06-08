@@ -7,6 +7,7 @@ import { ptBR } from 'date-fns/locale';
 import type { PizzaEvent } from '@/types/Event';
 import styles from './Eventos.module.scss';
 import ConfirmModal from '@/components/ConfirmModal/ConfirmModal';
+import { getAvailabilityConflicts, getEventSupplyForecast } from '@shared/eventOperations';
 
 type Employee = {
   id: string;
@@ -290,6 +291,28 @@ const [showModal, setShowModal] = useState(false);
     return m;
   }, [employees]);
 
+  const formDraft = useMemo<Partial<PizzaEvent>>(() => ({
+    date: form.date,
+    guestCount: Number(form.guestCount) || 0,
+    guestsAdult: Number(form.guestsAdult) || undefined,
+    guestsTeen: Number(form.guestsTeen) || undefined,
+    guestsChild: Number(form.guestsChild) || undefined,
+    menu: form.menu.split(',').map((s) => s.trim()).filter(Boolean),
+    selectedEmployeeIds: form.selectedEmployeeIds,
+    responsibleEmployeeId: form.responsibleEmployeeId || undefined,
+    teamPizzaiolo: form.teamPizzaiolo || undefined,
+    teamHelper: form.teamHelper || undefined,
+    teamGarcon: form.teamGarcon || undefined,
+    estimatedPizzas: Number(form.estimatedPizzas) || undefined,
+  }), [form]);
+
+  const availabilityConflicts = useMemo(
+    () => getAvailabilityConflicts(formDraft, events, employees, editingId || undefined),
+    [formDraft, events, employees, editingId],
+  );
+
+  const formSupplyForecast = useMemo(() => getEventSupplyForecast(formDraft), [formDraft]);
+
   const filtered = useMemo(() => {
     const all = events
       .filter((e) => sourceFilter === 'all' || (sourceFilter === 'main' ? (!e.source || e.source === 'main') : e.source === 'franchise'))
@@ -423,6 +446,10 @@ const [showModal, setShowModal] = useState(false);
 
   const handleSubmit = async () => {
     if (!form.name || !form.date || !form.location) return;
+    if (availabilityConflicts.length > 0) {
+      alert(`Funcionario indisponivel nesta data: ${availabilityConflicts.map((conflict) => `${conflict.employeeName} em ${conflict.eventName}`).join(', ')}`);
+      return;
+    }
     const data: Omit<PizzaEvent, 'id' | 'createdAt'> = {
       name: form.name,
       date: form.date,
@@ -763,6 +790,15 @@ return (
                     ))}
                   </div>
                 </div>
+                {availabilityConflicts.length > 0 && (
+                  <div className={styles.availabilityWarning}>
+                    {availabilityConflicts.map((conflict) => (
+                      <span key={`${conflict.employeeId}-${conflict.eventName}`}>
+                        {conflict.employeeName} ja esta em {conflict.eventName} nesta data.
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* — Convidados — */}
@@ -857,6 +893,12 @@ return (
                     <label className={styles.label}>Realizado (pizzas)</label>
                     <input className={styles.input} type="number" value={form.actualPizzas} onChange={(e) => setForm({ ...form, actualPizzas: e.target.value })} placeholder="0" min="0" />
                   </div>
+                </div>
+                <div className={styles.forecastBox}>
+                  <span>{formSupplyForecast.pizzas} pizzas previstas</span>
+                  <span>{formSupplyForecast.flourKg} kg farinha</span>
+                  <span>{formSupplyForecast.sauceKg} kg molho</span>
+                  <span>{formSupplyForecast.cheeseKg} kg queijo</span>
                 </div>
               </div>
 

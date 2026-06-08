@@ -273,7 +273,7 @@ export default function Sidebar() {
           const visibleItems = group.items.filter(item => {
             if (item.permKey === '__admin__') return isAdmin;
             if (isAdmin) return true;
-            return permissions.includes(item.permKey);
+            return item.permKey === 'dashboard' || permissions.includes(item.permKey);
           });
           if (visibleItems.length === 0) return null;
           return (

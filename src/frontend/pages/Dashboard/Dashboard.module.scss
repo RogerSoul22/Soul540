@@ -504,3 +504,37 @@
 .modalBody { padding: $spacing-xl; display: flex; flex-direction: column; gap: $spacing-md; }
 .modalFooter { @include flex-between; padding: $spacing-md $spacing-xl; border-top: 1px solid $border; }
 .btnPrimary { display: flex; align-items: center; gap: $spacing-sm; padding: 10px $spacing-md; background: $accent; color: #0a0f1e; font-size: $font-size-sm; font-weight: $font-weight-semibold; border: none; border-radius: $radius-sm; cursor: pointer; transition: background $transition-fast; &:hover { background: $accent-hover; } }
+
+.opsPanel { border: 1px solid $border; background: $bg-card; border-radius: $radius-md; padding: $spacing-md; margin-bottom: $spacing-md; }
+.opsHeader { display: flex; align-items: center; justify-content: space-between; gap: $spacing-md; margin-bottom: $spacing-sm; }
+.opsTitle { font-size: $font-size-sm; font-weight: $font-weight-semibold; color: $text-primary; }
+.opsSubtitle { font-size: $font-size-xs; color: $text-muted; margin-top: 2px; }
+.opsAction { border: 1px solid $border; background: rgba(255,255,255,0.04); color: $text-secondary; border-radius: $radius-sm; padding: 7px 12px; font-size: $font-size-xs; font-weight: $font-weight-medium; cursor: pointer; transition: all $transition-fast; &:hover { color: $text-primary; border-color: $border-accent; background: rgba($accent,0.06); } }
+.opsList { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: $spacing-sm; @include mobile { grid-template-columns: 1fr; } }
+.opsItem { display: flex; flex-direction: column; gap: 8px; padding: $spacing-sm; border: 1px solid rgba(255,255,255,0.07); border-radius: $radius-sm; background: rgba(255,255,255,0.025); }
+.opsItemMain { display: flex; justify-content: space-between; gap: $spacing-sm; min-width: 0; }
+.opsEventName { color: $text-primary; font-size: $font-size-sm; font-weight: $font-weight-semibold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.opsEventDate { color: $text-muted; font-size: $font-size-xs; flex-shrink: 0; }
+.opsBadges { display: flex; flex-wrap: wrap; gap: 6px; }
+.opsBadge { border-radius: $radius-full; padding: 3px 8px; font-size: 10px; font-weight: $font-weight-semibold; border: 1px solid transparent; }
+.opsBadgeinfo { color: #60a5fa; background: rgba(96,165,250,0.08); border-color: rgba(96,165,250,0.24); }
+.opsBadgewarning { color: #fbbf24; background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.24); }
+.opsBadgedanger { color: #f87171; background: rgba(248,113,113,0.08); border-color: rgba(248,113,113,0.24); }
+
+.opsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+.opsEmpty {
+  display: block;
+  padding: 10px 0;
+  color: $text-muted;
+  font-size: $font-size-sm;
+}

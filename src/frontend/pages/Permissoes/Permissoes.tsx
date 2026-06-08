@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@frontend/hooks/useAuth';
 import styles from './Permissoes.module.scss';
 
@@ -72,6 +72,7 @@ export default function Permissoes() {
   const [changePwTarget, setChangePwTarget] = useState<AppUser | null>(null);
   const [newPassword, setNewPassword] = useState('');
   const [changePwSaving, setChangePwSaving] = useState(false);
+  const [search, setSearch] = useState('');
   const { user: authUser } = useAuth();
 
   const currentUnit = (authUser as any)?.unit || 'main';
@@ -84,6 +85,15 @@ export default function Permissoes() {
     if (myUnit === 'main') return true;
     return target.unit === myUnit;
   };
+
+  const filteredUsers = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return users;
+    return users.filter((u) => {
+      const unit = SYSTEM_LABELS[u.unit || 'main'] || u.unit || '';
+      return [u.name, u.email, unit].some((value) => value.toLowerCase().includes(q));
+    });
+  }, [users, search]);
 
   const handleChangePassword = async () => {
     if (!changePwTarget || !newPassword.trim()) return;
@@ -189,8 +199,12 @@ export default function Permissoes() {
       <div className={styles.layout}>
         {/* Left — user list */}
         <div className={styles.userList}>
-          <p className={styles.listTitle}>Usuários ({users.length})</p>
-          {groupUsersByUnit(users).map(group => (
+          <p className={styles.listTitle}>Usuários ({filteredUsers.length}/{users.length})</p>
+          <div className={styles.searchWrap}>
+            <svg className={styles.searchIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input className={styles.searchInput} placeholder="Buscar usuarios..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          </div>
+          {groupUsersByUnit(filteredUsers).map(group => (
             <div key={group.label}>
               <p className={styles.systemGroupLabel}>{group.label}</p>
               {group.users.map(u => (
@@ -230,6 +244,7 @@ export default function Permissoes() {
             </div>
           ))}
           {users.length === 0 && <p className={styles.empty}>Nenhum usuário cadastrado.</p>}
+          {users.length > 0 && filteredUsers.length === 0 && <p className={styles.empty}>Nenhum usuário encontrado.</p>}
         </div>
 
         {/* Right — permission checkboxes */}

@@ -55,12 +55,13 @@ router.put('/:id', validate(updateUserSchema), async (req, res) => {
 
 // DELETE /api/users/:id
 router.delete('/:id', async (req, res) => {
-  if (getTenantUnit(req) === 'franchise') {
-    return res.status(403).json({ error: 'User deletion is disabled for franchise system' });
+  const tenantUnit = getTenantUnit(req);
+  if (tenantUnit === 'franchise' || tenantUnit === 'factory') {
+    return res.status(403).json({ error: 'User deletion is disabled for this system' });
   }
   const user = await UserModel.findById(req.params.id);
   if (!user) return res.status(404).json({ error: 'not found' });
-  if ((req as any).user?.role !== 'admin' && user.unit !== getTenantUnit(req)) {
+  if ((req as any).user?.role !== 'admin' && user.unit !== tenantUnit) {
     return res.status(403).json({ error: 'forbidden' });
   }
   await UserModel.findByIdAndDelete(req.params.id);

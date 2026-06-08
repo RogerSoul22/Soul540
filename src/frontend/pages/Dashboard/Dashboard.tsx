@@ -1,10 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@frontend/contexts/AppContext';
 import { useAuth } from '@frontend/hooks/useAuth';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import CalendarView from '@frontend/components/CalendarView/CalendarView';
+import { getUpcomingOperationalAlerts } from '@shared/eventInsights';
+import { buildEmployeeSchedule, getEventFinancialClosing, getEventSupplyForecast, type OperationalEmployee } from '@shared/eventOperations';
+import { apiFetch } from '@frontend/lib/api';
 import styles from './Dashboard.module.scss';
 
 function getGreeting(name?: string): string {
@@ -19,12 +22,20 @@ function getGreeting(name?: string): string {
 type UnitFilter = 'all' | 'main' | 'franchise';
 
 export default function Dashboard() {
-  const { events, tasks } = useApp();
+  const { events, tasks, finances } = useApp();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showInfo, setShowInfo] = useState(false);
   const [unitFilter, setUnitFilter] = useState<UnitFilter>('all');
   const [calendarMonth, setCalendarMonth] = useState(new Date());
+  const [employees, setEmployees] = useState<OperationalEmployee[]>([]);
+
+  useEffect(() => {
+    apiFetch('/api/employees', { headers: { 'X-System': 'main' } })
+      .then((r) => r.json())
+      .then((data) => Array.isArray(data) && setEmployees(data))
+      .catch(() => {});
+  }, []);
 
   const urgentTasks = useMemo(() => tasks.filter((t) => t.priority === 'urgent' && t.status !== 'done'), [tasks]);
 
@@ -40,6 +51,34 @@ export default function Dashboard() {
       return d.getMonth() === calendarMonth.getMonth() && d.getFullYear() === calendarMonth.getFullYear();
     }).length;
   }, [filteredEvents, calendarMonth]);
+
+  const operationalAlerts = useMemo(
+    () => getUpcomingOperationalAlerts(filteredEvents, { limit: 4 }),
+    [filteredEvents],
+  );
+
+  const teamSchedule = useMemo(
+    () => buildEmployeeSchedule(filteredEvents, employees, { limit: 3 }).slice(0, 4),
+    [filteredEvents, employees],
+  );
+
+  const financialClosings = useMemo(
+    () => filteredEvents
+      .filter((event) => event.status === 'completed')
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .slice(0, 3)
+      .map((event) => ({ event, closing: getEventFinancialClosing(event, finances) })),
+    [filteredEvents, finances],
+  );
+
+  const supplyForecasts = useMemo(
+    () => filteredEvents
+      .filter((event) => event.status !== 'completed' && event.status !== 'cancelled')
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(0, 3)
+      .map((event) => ({ event, forecast: getEventSupplyForecast(event) })),
+    [filteredEvents],
+  );
 
   const now = new Date();
   const today = format(now, "EEEE, d 'de' MMMM", { locale: ptBR });
@@ -131,6 +170,108 @@ export default function Dashboard() {
             <span className={styles.legendDot} style={{ background: '#ef4444' }} />
             Com observação
           </span>
+        </div>
+        {operationalAlerts.length > 0 && (
+          <div className={styles.opsPanel}>
+            <div className={styles.opsHeader}>
+              <div>
+                <p className={styles.opsTitle}>Atenção operacional</p>
+                <p className={styles.opsSubtitle}>Eventos próximos com pendências para revisar</p>
+              </div>
+              <button className={styles.opsAction} onClick={() => navigate('/eventos')}>
+                Ver eventos
+              </button>
+            </div>
+            <div className={styles.opsList}>
+              {operationalAlerts.map((alert) => (
+                <div key={alert.event.id} className={styles.opsItem}>
+                  <div className={styles.opsItemMain}>
+                    <span className={styles.opsEventName}>{alert.event.name}</span>
+                    <span className={styles.opsEventDate}>{format(parseISO(alert.event.date), 'dd/MM/yyyy')}</span>
+                  </div>
+                  <div className={styles.opsBadges}>
+                    <span className={`${styles.opsBadge} ${styles[`opsBadge${alert.paymentSeverity}`]}`}>
+                      {alert.paymentLabel}
+                    </span>
+                    {alert.issues.slice(0, 3).map((issue) => (
+                      <span key={issue.key} className={`${styles.opsBadge} ${styles[`opsBadge${issue.severity}`]}`}>
+                        {issue.label}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        <div className={styles.opsGrid}>
+          <div className={styles.opsPanel}>
+            <div className={styles.opsHeader}>
+              <div>
+                <p className={styles.opsTitle}>Agenda da equipe</p>
+                <p className={styles.opsSubtitle}>Funcionarios escalados nos proximos eventos</p>
+              </div>
+            </div>
+            <div className={styles.opsList}>
+              {teamSchedule.length === 0 ? (
+                <span className={styles.opsEmpty}>Nenhuma escala futura.</span>
+              ) : teamSchedule.map((item) => (
+                <div key={item.employeeId} className={styles.opsItem}>
+                  <div className={styles.opsItemMain}>
+                    <span className={styles.opsEventName}>{item.employeeName}</span>
+                    <span className={styles.opsEventDate}>{item.events.map((event) => `${format(parseISO(event.date), 'dd/MM')} ${event.name}`).join(' | ')}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className={styles.opsPanel}>
+            <div className={styles.opsHeader}>
+              <div>
+                <p className={styles.opsTitle}>Fechamento financeiro</p>
+                <p className={styles.opsSubtitle}>Estimado x realizado nos eventos finalizados</p>
+              </div>
+            </div>
+            <div className={styles.opsList}>
+              {financialClosings.length === 0 ? (
+                <span className={styles.opsEmpty}>Nenhum evento finalizado para comparar.</span>
+              ) : financialClosings.map(({ event, closing }) => (
+                <div key={event.id} className={styles.opsItem}>
+                  <div className={styles.opsItemMain}>
+                    <span className={styles.opsEventName}>{event.name}</span>
+                    <span className={styles.opsEventDate}>
+                      Est. R$ {closing.estimatedRevenue.toLocaleString('pt-BR')} | Real. R$ {closing.realizedResult.toLocaleString('pt-BR')}
+                    </span>
+                  </div>
+                  <span className={`${styles.opsBadge} ${closing.difference >= 0 ? styles.opsBadgeinfo : styles.opsBadgewarning}`}>
+                    {closing.statusLabel}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className={styles.opsPanel}>
+            <div className={styles.opsHeader}>
+              <div>
+                <p className={styles.opsTitle}>Previsao de insumos</p>
+                <p className={styles.opsSubtitle}>Baseada em convidados e cardapio</p>
+              </div>
+            </div>
+            <div className={styles.opsList}>
+              {supplyForecasts.length === 0 ? (
+                <span className={styles.opsEmpty}>Nenhum evento futuro para prever.</span>
+              ) : supplyForecasts.map(({ event, forecast }) => (
+                <div key={event.id} className={styles.opsItem}>
+                  <div className={styles.opsItemMain}>
+                    <span className={styles.opsEventName}>{event.name}</span>
+                    <span className={styles.opsEventDate}>
+                      {forecast.pizzas} pizzas | {forecast.flourKg} kg farinha | {forecast.cheeseKg} kg queijo
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
         <CalendarView events={filteredEvents} month={calendarMonth} onMonthChange={setCalendarMonth} />
       </div>

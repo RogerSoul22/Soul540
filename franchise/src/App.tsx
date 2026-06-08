@@ -17,6 +17,7 @@ import Tarefas from '@/pages/Tarefas/Tarefas';
 import MinhaConta from '@/pages/MinhaConta/MinhaConta';
 import Cardapios from '@/pages/Cardapios/Cardapios';
 import Contratos from '@/pages/Contratos/Contratos';
+import Auditoria from '@/pages/Auditoria/Auditoria';
 
 function AppLoading() {
   return (
@@ -91,6 +92,7 @@ export default function App() {
               </Route>
               <Route element={<PermissionRoute routeKey="__admin__" />}>
                 <Route path={ROUTES.PERMISSOES} element={<Permissoes />} />
+                <Route path={ROUTES.AUDITORIA} element={<Auditoria />} />
               </Route>
             </Route>
           </Route>

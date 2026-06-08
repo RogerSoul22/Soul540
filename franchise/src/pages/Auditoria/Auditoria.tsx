@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { apiFetch } from '@frontend/lib/api';
+import { apiFetch } from '@/lib/api';
 import styles from './Auditoria.module.scss';
 
 interface AuditEntry {
@@ -17,7 +17,7 @@ interface AuditEntry {
 const RESOURCE_LABELS: Record<string, string> = {
   finances: 'Financeiro',
   events: 'Eventos',
-  users: 'Usuários',
+  users: 'Usuarios',
   invoices: 'Notas Fiscais',
   contractors: 'Contratantes',
   contracts: 'Contratos',
@@ -26,14 +26,14 @@ const RESOURCE_LABELS: Record<string, string> = {
 
 const UNIT_LABELS: Record<string, string> = {
   main: 'Principal',
-  franchise: 'Franquia',
-  factory: 'Fábrica',
+  franchise: 'Campinas',
+  factory: 'Fabrica',
 };
 
 const ACTION_LABELS: Record<string, string> = {
-  create: 'Criação',
-  update: 'Atualização',
-  delete: 'Exclusão',
+  create: 'Criacao',
+  update: 'Atualizacao',
+  delete: 'Exclusao',
 };
 
 const ACTION_COLORS: Record<string, string> = {
@@ -87,7 +87,7 @@ export default function Auditoria() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `auditoria-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `auditoria-campinas-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -106,25 +106,13 @@ export default function Auditoria() {
       </div>
 
       <div className={styles.filters}>
-        <select
-          className={styles.select}
-          value={resource}
-          onChange={e => { setResource(e.target.value); setPage(1); }}
-        >
+        <select className={styles.select} value={resource} onChange={e => { setResource(e.target.value); setPage(1); }}>
           <option value="">Todos os recursos</option>
-          {Object.entries(RESOURCE_LABELS).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
+          {Object.entries(RESOURCE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
         </select>
-        <select
-          className={styles.select}
-          value={unit}
-          onChange={e => { setUnit(e.target.value); setPage(1); }}
-        >
+        <select className={styles.select} value={unit} onChange={e => { setUnit(e.target.value); setPage(1); }}>
           <option value="">Todos os sistemas</option>
-          {Object.entries(UNIT_LABELS).map(([k, v]) => (
-            <option key={k} value={k}>{v}</option>
-          ))}
+          {Object.entries(UNIT_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
         </select>
       </div>
 
@@ -138,11 +126,11 @@ export default function Auditoria() {
             <thead>
               <tr>
                 <th>Data/Hora</th>
-                <th>Usuário</th>
+                <th>Usuario</th>
                 <th>Sistema</th>
-                <th>Ação</th>
+                <th>Acao</th>
                 <th>Recurso</th>
-                <th>Descrição</th>
+                <th>Descricao</th>
               </tr>
             </thead>
             <tbody>
@@ -170,13 +158,9 @@ export default function Auditoria() {
 
       {totalPages > 1 && (
         <div className={styles.pagination}>
-          <button className={styles.pageBtn} disabled={page <= 1} onClick={() => setPage(p => p - 1)}>
-            ← Anterior
-          </button>
-          <span className={styles.pageInfo}>Página {page} de {totalPages}</span>
-          <button className={styles.pageBtn} disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>
-            Próxima →
-          </button>
+          <button className={styles.pageBtn} disabled={page <= 1} onClick={() => setPage(p => p - 1)}>Anterior</button>
+          <span className={styles.pageInfo}>Pagina {page} de {totalPages}</span>
+          <button className={styles.pageBtn} disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>Proxima</button>
         </div>
       )}
     </div>

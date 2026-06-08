@@ -8,6 +8,25 @@
 
 .filters { display: flex; gap: $spacing-md; margin-bottom: $spacing-lg; flex-wrap: wrap; }
 
+.btnExport {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px $spacing-md;
+  background: rgba($accent, 0.08);
+  border: 1px solid rgba($accent, 0.25);
+  border-radius: $radius-sm;
+  color: $accent;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all $transition-fast;
+
+  &:hover:not(:disabled) { background: rgba($accent, 0.15); border-color: rgba($accent, 0.4); }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
 .select {
   padding: 8px $spacing-md;
   background: $bg-secondary;

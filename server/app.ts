@@ -35,6 +35,8 @@ app.use(express.json({ limit: '100mb' }));
 app.use(cookieParser());
 app.use(optionalAuth);
 
+app.get('/api/health', (_req, res) => res.json({ ok: true }));
+
 app.use('/api/events', eventsRouter);
 app.use('/api/tasks', tasksRouter);
 app.use('/api/task-history', taskHistoryRouter);
