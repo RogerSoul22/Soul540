@@ -6,9 +6,20 @@ import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import CalendarView from '@/components/CalendarView/CalendarView';
 import { getUpcomingOperationalAlerts } from '@shared/eventInsights';
-import { buildEmployeeSchedule, getEventFinancialClosing, getEventSupplyForecast, type OperationalEmployee } from '@shared/eventOperations';
+import { buildEmployeeSchedule, getEventFinancialClosing, type OperationalEmployee } from '@shared/eventOperations';
 import { apiFetch } from '@/lib/api';
 import styles from './Dashboard.module.scss';
+
+type ProductionOrderStatus = 'a_preparar' | 'a_enviar' | 'entregue';
+
+type ProductionOrder = {
+  id: string;
+  orderNumber?: number;
+  filial: string;
+  itens: Array<{ nome: string; measure: string; quantidade: number }>;
+  totalCost: number;
+  status: ProductionOrderStatus;
+};
 
 function getGreeting(name?: string): string {
   const hour = new Date().getHours();
@@ -25,11 +36,16 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [showInfo, setShowInfo] = useState(false);
   const [employees, setEmployees] = useState<OperationalEmployee[]>([]);
+  const [productionOrders, setProductionOrders] = useState<ProductionOrder[]>([]);
 
   useEffect(() => {
     apiFetch('/api/employees')
       .then((r) => r.json())
       .then((data) => Array.isArray(data) && setEmployees(data))
+      .catch(() => {});
+    apiFetch('/api/production-orders')
+      .then((r) => r.json())
+      .then((data) => Array.isArray(data) && setProductionOrders(data))
       .catch(() => {});
   }, []);
 
@@ -64,13 +80,11 @@ export default function Dashboard() {
     [events, finances],
   );
 
-  const supplyForecasts = useMemo(
-    () => events
-      .filter((event) => event.status !== 'completed' && event.status !== 'cancelled')
-      .sort((a, b) => a.date.localeCompare(b.date))
-      .slice(0, 3)
-      .map((event) => ({ event, forecast: getEventSupplyForecast(event) })),
-    [events],
+  const activeProductionOrders = useMemo(
+    () => productionOrders
+      .filter((order) => order.status === 'a_preparar' || order.status === 'a_enviar')
+      .sort((a, b) => (a.orderNumber || 0) - (b.orderNumber || 0)),
+    [productionOrders],
   );
 
   return (
@@ -141,22 +155,24 @@ export default function Dashboard() {
             <div className={styles.opsHeader}>
               <div>
                 <p className={styles.opsTitle}>Modo fabrica</p>
-                <p className={styles.opsSubtitle}>Somente leitura comercial, com apontamentos operacionais de producao</p>
+                <p className={styles.opsSubtitle}>Pedidos ativos de producao</p>
               </div>
             </div>
             <div className={styles.opsList}>
-              {supplyForecasts.length === 0 ? (
-                <span className={styles.opsEmpty}>Nenhum evento futuro para produzir.</span>
-              ) : supplyForecasts.map(({ event, forecast }) => (
-                <div key={event.id} className={styles.opsItem}>
+              {activeProductionOrders.length === 0 ? (
+                <span className={styles.opsEmpty}>Nenhum pedido ativo para produzir.</span>
+              ) : activeProductionOrders.slice(0, 4).map((order) => (
+                <div key={order.id} className={styles.opsItem}>
                   <div className={styles.opsItemMain}>
-                    <span className={styles.opsEventName}>{event.name}</span>
+                    <span className={styles.opsEventName}>
+                      {order.orderNumber ? `#${order.orderNumber} ` : ''}{order.filial}
+                    </span>
                     <span className={styles.opsEventDate}>
-                      {forecast.pizzas} pizzas | {forecast.doughBalls} massas | {forecast.sauceKg} kg molho
+                      {order.itens.map((item) => `${item.nome} ${item.quantidade} ${item.measure}`).join(' | ')}
                     </span>
                   </div>
                   <span className={`${styles.opsBadge} ${styles.opsBadgeinfo}`}>
-                    {event.factoryProductionStatus || 'pending'}
+                    {order.status === 'a_preparar' ? 'A preparar' : 'A enviar'}
                   </span>
                 </div>
               ))}
