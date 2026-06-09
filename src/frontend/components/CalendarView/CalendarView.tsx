@@ -38,8 +38,8 @@ const NOTES_COLOR = {
 };
 
 function getEventColor(ev: PizzaEvent) {
-  if (ev.notes?.trim()) return NOTES_COLOR;
   if (ev.status === 'completed') return COMPLETED_COLOR;
+  if (ev.notes?.trim()) return NOTES_COLOR;
   if (ev.status === 'planning') return PLANNING_COLOR;
   return EVENT_COLOR;
 }

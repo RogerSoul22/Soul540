@@ -158,9 +158,9 @@ function EventCard({ ev, employeeMap, onView, onEdit, onDelete, onFinalize }: {
   onDelete: (id: string) => void;
   onFinalize: (id: string) => void;
 }) {
-  const statusClass = ev.notes?.trim() ? styles.cardRed
+  const statusClass = ev.status === 'completed' ? styles.cardGreen
+    : ev.notes?.trim() ? styles.cardRed
     : ev.status === 'planning' ? styles.cardBlue
-    : ev.status === 'completed' ? styles.cardGreen
     : styles.cardYellow;
   return (
     <div className={`${styles.card} ${statusClass}`} onClick={() => onView(ev)}>
