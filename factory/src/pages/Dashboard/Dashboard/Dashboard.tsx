@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@/contexts/AppContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { format, parseISO } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import CalendarView from '@/components/CalendarView/CalendarView';
 import { getUpcomingOperationalAlerts } from '@shared/eventInsights';
@@ -30,6 +30,17 @@ function getGreeting(name?: string): string {
   return `Boa noite${suffix}`;
 }
 
+function parseEventDate(value: string | undefined | null): Date | null {
+  if (!value) return null;
+  const parsed = parseISO(value);
+  return isValid(parsed) ? parsed : null;
+}
+
+function formatEventDate(value: string | undefined | null, pattern: string): string {
+  const parsed = parseEventDate(value);
+  return parsed ? format(parsed, pattern) : 'Sem data';
+}
+
 export default function Dashboard() {
   const { events, tasks, finances } = useApp();
   const { user } = useAuth();
@@ -54,7 +65,8 @@ export default function Dashboard() {
   const now = new Date();
   const monthEventCount = useMemo(() => {
     return events.filter((e) => {
-      const d = parseISO(e.date);
+      const d = parseEventDate(e.date);
+      if (!d) return false;
       return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
     }).length;
   }, [events]);
@@ -74,7 +86,8 @@ export default function Dashboard() {
   const financialClosings = useMemo(
     () => events
       .filter((event) => event.status === 'completed')
-      .sort((a, b) => b.date.localeCompare(a.date))
+      .filter((event) => parseEventDate(event.date))
+      .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
       .slice(0, 3)
       .map((event) => ({ event, closing: getEventFinancialClosing(event, finances) })),
     [events, finances],
@@ -133,7 +146,7 @@ export default function Dashboard() {
                 <div key={alert.event.id} className={styles.opsItem}>
                   <div className={styles.opsItemMain}>
                     <span className={styles.opsEventName}>{alert.event.name}</span>
-                    <span className={styles.opsEventDate}>{format(parseISO(alert.event.date), 'dd/MM/yyyy')}</span>
+                    <span className={styles.opsEventDate}>{formatEventDate(alert.event.date, 'dd/MM/yyyy')}</span>
                   </div>
                   <div className={styles.opsBadges}>
                     <span className={`${styles.opsBadge} ${styles[`opsBadge${alert.paymentSeverity}`]}`}>
@@ -192,7 +205,7 @@ export default function Dashboard() {
                 <div key={item.employeeId} className={styles.opsItem}>
                   <div className={styles.opsItemMain}>
                     <span className={styles.opsEventName}>{item.employeeName}</span>
-                    <span className={styles.opsEventDate}>{item.events.map((event) => `${format(parseISO(event.date), 'dd/MM')} ${event.name}`).join(' | ')}</span>
+                    <span className={styles.opsEventDate}>{item.events.map((event) => `${formatEventDate(event.date, 'dd/MM')} ${event.name}`).join(' | ')}</span>
                   </div>
                 </div>
               ))}

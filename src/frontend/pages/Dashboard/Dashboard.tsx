@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '@frontend/contexts/AppContext';
 import { useAuth } from '@frontend/hooks/useAuth';
-import { format, parseISO } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import CalendarView from '@frontend/components/CalendarView/CalendarView';
 import { getUpcomingOperationalAlerts } from '@shared/eventInsights';
@@ -17,6 +17,17 @@ function getGreeting(name?: string): string {
   if (hour < 12) return `Bom dia${suffix}`;
   if (hour < 18) return `Boa tarde${suffix}`;
   return `Boa noite${suffix}`;
+}
+
+function parseEventDate(value: string | undefined | null): Date | null {
+  if (!value) return null;
+  const parsed = parseISO(value);
+  return isValid(parsed) ? parsed : null;
+}
+
+function formatEventDate(value: string | undefined | null, pattern: string): string {
+  const parsed = parseEventDate(value);
+  return parsed ? format(parsed, pattern) : 'Sem data';
 }
 
 type UnitFilter = 'all' | 'main' | 'franchise';
@@ -47,7 +58,8 @@ export default function Dashboard() {
 
   const monthEventCount = useMemo(() => {
     return filteredEvents.filter((e) => {
-      const d = parseISO(e.date);
+      const d = parseEventDate(e.date);
+      if (!d) return false;
       return d.getMonth() === calendarMonth.getMonth() && d.getFullYear() === calendarMonth.getFullYear();
     }).length;
   }, [filteredEvents, calendarMonth]);
@@ -65,7 +77,8 @@ export default function Dashboard() {
   const financialClosings = useMemo(
     () => filteredEvents
       .filter((event) => event.status === 'completed')
-      .sort((a, b) => b.date.localeCompare(a.date))
+      .filter((event) => parseEventDate(event.date))
+      .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
       .slice(0, 3)
       .map((event) => ({ event, closing: getEventFinancialClosing(event, finances) })),
     [filteredEvents, finances],
@@ -74,7 +87,8 @@ export default function Dashboard() {
   const supplyForecasts = useMemo(
     () => filteredEvents
       .filter((event) => event.status !== 'completed' && event.status !== 'cancelled')
-      .sort((a, b) => a.date.localeCompare(b.date))
+      .filter((event) => parseEventDate(event.date))
+      .sort((a, b) => (a.date || '').localeCompare(b.date || ''))
       .slice(0, 3)
       .map((event) => ({ event, forecast: getEventSupplyForecast(event) })),
     [filteredEvents],
@@ -187,7 +201,7 @@ export default function Dashboard() {
                 <div key={alert.event.id} className={styles.opsItem}>
                   <div className={styles.opsItemMain}>
                     <span className={styles.opsEventName}>{alert.event.name}</span>
-                    <span className={styles.opsEventDate}>{format(parseISO(alert.event.date), 'dd/MM/yyyy')}</span>
+                    <span className={styles.opsEventDate}>{formatEventDate(alert.event.date, 'dd/MM/yyyy')}</span>
                   </div>
                   <div className={styles.opsBadges}>
                     <span className={`${styles.opsBadge} ${styles[`opsBadge${alert.paymentSeverity}`]}`}>
@@ -219,7 +233,7 @@ export default function Dashboard() {
                 <div key={item.employeeId} className={styles.opsItem}>
                   <div className={styles.opsItemMain}>
                     <span className={styles.opsEventName}>{item.employeeName}</span>
-                    <span className={styles.opsEventDate}>{item.events.map((event) => `${format(parseISO(event.date), 'dd/MM')} ${event.name}`).join(' | ')}</span>
+                    <span className={styles.opsEventDate}>{item.events.map((event) => `${formatEventDate(event.date, 'dd/MM')} ${event.name}`).join(' | ')}</span>
                   </div>
                 </div>
               ))}
@@ -264,7 +278,7 @@ export default function Dashboard() {
                 <div key={event.id} className={`${styles.opsItem} ${styles.opsForecastItem}`}>
                   <div className={styles.opsForecastHeader}>
                     <span className={styles.opsEventName} title={event.name}>{event.name}</span>
-                    <span className={styles.opsEventDate}>{format(parseISO(event.date), 'dd/MM/yyyy')}</span>
+                    <span className={styles.opsEventDate}>{formatEventDate(event.date, 'dd/MM/yyyy')}</span>
                   </div>
                   <div className={styles.opsForecastMeta}>
                     <span>{forecast.pizzas} pizzas</span>
