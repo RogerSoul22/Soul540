@@ -233,12 +233,15 @@ export default function Dashboard() {
               {supplyForecasts.length === 0 ? (
                 <span className={styles.opsEmpty}>Nenhum evento futuro para prever.</span>
               ) : supplyForecasts.map(({ event, forecast }) => (
-                <div key={event.id} className={styles.opsItem}>
-                  <div className={styles.opsItemMain}>
-                    <span className={styles.opsEventName}>{event.name}</span>
-                    <span className={styles.opsEventDate}>
-                      {forecast.pizzas} pizzas | {forecast.flourKg} kg farinha | {forecast.cheeseKg} kg queijo
-                    </span>
+                <div key={event.id} className={`${styles.opsItem} ${styles.opsForecastItem}`}>
+                  <div className={styles.opsForecastHeader}>
+                    <span className={styles.opsEventName} title={event.name}>{event.name}</span>
+                    <span className={styles.opsEventDate}>{format(parseISO(event.date), 'dd/MM/yyyy')}</span>
+                  </div>
+                  <div className={styles.opsForecastMeta}>
+                    <span>{forecast.pizzas} pizzas</span>
+                    <span>{forecast.flourKg} kg farinha</span>
+                    <span>{forecast.cheeseKg} kg queijo</span>
                   </div>
                 </div>
               ))}
