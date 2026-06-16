@@ -13,6 +13,7 @@ import NotasFiscais from '@frontend/pages/NotasFiscais/NotasFiscais';
 import Usuario from '@frontend/pages/Usuario/Usuario';
 import Eventos from '@frontend/pages/Eventos/Eventos';
 import Tarefas from '@frontend/pages/Tarefas/Tarefas';
+import ChecklistEnvio from '@frontend/pages/ChecklistEnvio/ChecklistEnvio';
 import Funcionarios from '@frontend/pages/Funcionarios/Funcionarios';
 import Contratantes from '@frontend/pages/Contratantes/Contratantes';
 import Contratos from '@frontend/pages/Contratos/Contratos';
@@ -61,6 +62,7 @@ export default function App() {
               <Route element={<PublicRoute />}>
                 <Route path={ROUTES.LOGIN} element={<Login />} />
               </Route>
+              <Route path={ROUTES.CHECKLIST_ENVIO} element={<ChecklistEnvio />} />
               <Route element={<PrivateRoute />}>
                 <Route element={<Layout />}>
                   <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />

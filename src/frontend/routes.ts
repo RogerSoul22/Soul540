@@ -6,6 +6,7 @@ export const ROUTES = {
   USUARIO: '/usuario',
   EVENTOS: '/eventos',
   TAREFAS: '/tarefas',
+  CHECKLIST_ENVIO: '/checklist-envio',
   FUNCIONARIOS: '/funcionarios',
   CONTRATANTES: '/contratantes',
   CONTRATOS: '/contratos',

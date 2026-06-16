@@ -10,6 +10,7 @@ export const ROUTES = {
   FINANCEIRO: '/financeiro',
   NOTAS_FISCAIS: '/notas-fiscais',
   TAREFAS: '/tarefas',
+  CHECKLIST_ENVIO: '/checklist-envio',
   USUARIO: '/minha-conta',
   AUDITORIA: '/auditoria',
 } as const;

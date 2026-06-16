@@ -11,6 +11,7 @@ export const ROUTES = {
   PERMISSOES: '/permissoes',
   FINANCEIRO: '/financeiro',
   TAREFAS: '/tarefas',
+  CHECKLIST_ENVIO: '/checklist-envio',
   USUARIO: '/minha-conta',
   AUDITORIA: '/auditoria',
 } as const;

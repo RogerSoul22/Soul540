@@ -14,6 +14,7 @@ import EstoqueUtensilios from '@/pages/EstoqueUtensilios/EstoqueUtensilios';
 import Permissoes from '@/pages/Permissoes/Permissoes';
 import Financeiro from '@/pages/Financeiro/Financeiro';
 import Tarefas from '@/pages/Tarefas/Tarefas';
+import ChecklistEnvio from '@/pages/ChecklistEnvio/ChecklistEnvio';
 import MinhaConta from '@/pages/MinhaConta/MinhaConta';
 import Cardapios from '@/pages/Cardapios/Cardapios';
 import Contratos from '@/pages/Contratos/Contratos';
@@ -57,6 +58,7 @@ export default function App() {
           <Route element={<PublicRoute />}>
             <Route path={ROUTES.LOGIN} element={<Login />} />
           </Route>
+          <Route path={ROUTES.CHECKLIST_ENVIO} element={<ChecklistEnvio />} />
           <Route element={<PrivateRoute />}>
             <Route element={<Layout />}>
               <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
