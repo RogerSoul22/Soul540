@@ -6,7 +6,6 @@ import { ptBR } from 'date-fns/locale';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import GaugeChart from '@/components/GaugeChart/GaugeChart';
 import HorizontalBarChart from '@/components/HorizontalBarChart/HorizontalBarChart';
-import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import Modal from '@/components/Modal/Modal';
 import styles from './Financeiro.module.scss';
@@ -103,23 +102,6 @@ type CostFilter = 'all' | 'fixed' | 'variable';
 
 const MONTHS_PT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
-const statusLabels: Record<FinanceStatus, string> = {
-  pending: 'Pendente',
-  paid: 'Pago',
-  received: 'Recebido',
-};
-
-const statusColors: Record<FinanceStatus, 'amber' | 'green'> = {
-  pending: 'amber',
-  paid: 'green',
-  received: 'green',
-};
-
-const formCategories: Record<FinanceType, string[]> = {
-  revenue: ['contrato', 'adicional', 'taxa', 'outro'],
-  cost: [...FIXED_CATEGORIES, ...VARIABLE_CATEGORIES],
-};
-
 const formatBRL = (v: number) => `R$ ${v.toLocaleString('pt-BR')}`;
 const alphaCollator = new Intl.Collator('pt-BR', { sensitivity: 'base', numeric: true });
 const normalizeAlpha = (value: string) =>
@@ -131,6 +113,14 @@ const normalizeAlpha = (value: string) =>
     .replace(/\s+/g, ' ')
     .toLocaleLowerCase('pt-BR');
 const compareAlpha = (a: string, b: string) => alphaCollator.compare(normalizeAlpha(a), normalizeAlpha(b));
+const getCategoryLabel = (category: string) => CATEGORY_LABELS[category] || category;
+const sortCategoriesAlpha = (categories: readonly string[]) =>
+  [...categories].sort((a, b) => compareAlpha(getCategoryLabel(a), getCategoryLabel(b)));
+
+const formCategories: Record<FinanceType, string[]> = {
+  revenue: sortCategoriesAlpha(['contrato', 'adicional', 'taxa', 'outro']),
+  cost: sortCategoriesAlpha([...FIXED_CATEGORIES, ...VARIABLE_CATEGORIES]),
+};
 
 export default function Financeiro() {
   const { events, finances, addFinance, updateFinance, deleteFinance } = useApp();
@@ -319,7 +309,7 @@ export default function Financeiro() {
         value: val,
         color: CATEGORY_COLORS[cat] || '#64748b',
       }))
-      .sort((a, b) => b.value - a.value);
+      .sort((a, b) => compareAlpha(a.label, b.label));
   }, [monthFinances]);
 
   const variableCosts = useMemo(() => {
@@ -335,7 +325,7 @@ export default function Financeiro() {
         value: val,
         color: CATEGORY_COLORS[cat] || '#64748b',
       }))
-      .sort((a, b) => b.value - a.value);
+      .sort((a, b) => compareAlpha(a.label, b.label));
   }, [monthFinances]);
 
   // Gauge values for selected month
@@ -648,11 +638,12 @@ export default function Financeiro() {
                       <span className={styles.agendamentoValue}>{formatBRL(event.budget ?? 0)}</span>
                       {finance ? (
                         <select
-                          className={`${styles.agendamentoStatus} ${finance.status === 'received' ? styles.statusReceived : styles.statusPending}`}
+                          className={`${styles.agendamentoStatus} ${finance.status === 'received' || finance.status === 'paid' ? styles.statusReceived : styles.statusPending}`}
                           value={finance.status}
                           onChange={(e) => handleEventFinanceStatus(finance.id, e.target.value as FinanceStatus)}
                         >
                           <option value="pending">Pendente</option>
+                          <option value="paid">Pago</option>
                           <option value="received">Recebido</option>
                         </select>
                       ) : (
@@ -688,16 +679,15 @@ export default function Financeiro() {
           <div className={styles.chartSection}>
             <h3 className={styles.sectionTitle}>Total por Categoria</h3>
             {(() => {
-              const cats = costFilter === 'fixed' ? [...FIXED_CATEGORIES]
-                : costFilter === 'variable' ? [...VARIABLE_CATEGORIES]
-                  : [...FIXED_CATEGORIES, ...VARIABLE_CATEGORIES];
+              const cats = costFilter === 'fixed' ? sortCategoriesAlpha(FIXED_CATEGORIES)
+                : costFilter === 'variable' ? sortCategoriesAlpha(VARIABLE_CATEGORIES)
+                  : sortCategoriesAlpha([...FIXED_CATEGORIES, ...VARIABLE_CATEGORIES]);
               const totals = cats
                 .map((cat) => ({
                   cat,
                   total: pageMonthFinances.filter((f) => f.type === 'cost' && f.category === cat).reduce((a, f) => a + f.amount, 0),
                 }))
-                .filter(({ total }) => total > 0)
-                .sort((a, b) => b.total - a.total);
+                .filter(({ total }) => total > 0);
               const max = totals[0]?.total || 1;
               if (totals.length === 0) return <p className={styles.emptyState}>Nenhuma despesa registrada.</p>;
               return (
@@ -870,9 +860,15 @@ export default function Financeiro() {
                     </td>
                     <td>{safeFormat(entry.date, 'dd/MM/yy', { locale: ptBR })}</td>
                     <td>
-                      <Badge variant={statusColors[entry.status as FinanceStatus] ?? 'amber'}>
-                        {statusLabels[entry.status as FinanceStatus] ?? entry.status}
-                      </Badge>
+                      <select
+                        className={`${styles.agendamentoStatus} ${entry.status === 'received' || entry.status === 'paid' ? styles.statusReceived : styles.statusPending}`}
+                        value={entry.status}
+                        onChange={(e) => handleEventFinanceStatus(entry.id, e.target.value as FinanceStatus)}
+                      >
+                        <option value="pending">Pendente</option>
+                        <option value="paid">Pago</option>
+                        <option value="received">Recebido</option>
+                      </select>
                     </td>
                     <td>
                       <span className={entry.type === 'revenue' ? styles.typeRevenue : styles.typeCost}>
