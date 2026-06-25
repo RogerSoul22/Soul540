@@ -1,6 +1,7 @@
 import type { ChangeEvent, FormEvent } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '@/contexts/AppContext';
+import type { FinanceEntry } from '@shared/types';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -134,6 +135,7 @@ export default function Financeiro() {
   const [filterMonth, setFilterMonth] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [showInfo, setShowInfo] = useState(false);
 
   // Form state
@@ -416,6 +418,7 @@ export default function Financeiro() {
   };
 
   const resetForm = () => {
+    setEditingId(null);
     setFormType('revenue');
     setFormEventId('');
     setEventSearch('');
@@ -426,10 +429,23 @@ export default function Financeiro() {
     setFormStatus('pending');
   };
 
+  const handleEdit = (entry: FinanceEntry) => {
+    setEditingId(entry.id);
+    setFormType(entry.type);
+    setFormEventId(entry.eventId || '');
+    setEventSearch(events.find((e) => e.id === entry.eventId)?.name || '');
+    setFormCategory(entry.category);
+    setFormDescription(entry.description || '');
+    setFormAmount(formatCurrency(String(Math.round(entry.amount * 100))));
+    setFormDate(entry.date);
+    setFormStatus(entry.status);
+    setShowForm(true);
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!formCategory || !formAmount) return;
-    await addFinance({
+    const payload = {
       eventId: formEventId,
       type: formType,
       category: formCategory,
@@ -437,7 +453,12 @@ export default function Financeiro() {
       amount: parseCurrency(formAmount),
       date: formDate,
       status: formStatus,
-    });
+    };
+    if (editingId) {
+      await updateFinance(editingId, payload);
+    } else {
+      await addFinance(payload);
+    }
     resetForm();
     setShowForm(false);
   };
@@ -463,7 +484,7 @@ export default function Financeiro() {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="12" y2="12"/><line x1="15" y1="15" x2="12" y2="12"/></svg>
             Importar XML
           </button>
-          <Button onClick={() => setShowForm(true)}>+ Novo Lancamento</Button>
+          <Button onClick={() => { resetForm(); setShowForm(true); }}>+ Novo Lancamento</Button>
         </div>
       </div>
 
@@ -889,6 +910,13 @@ export default function Financeiro() {
                     </td>
                     <td>
                       <button
+                        className={styles.actionBtn}
+                        onClick={() => handleEdit(entry)}
+                        title="Editar"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                      </button>
+                      <button
                         className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
                         onClick={() => deleteFinance(entry.id)}
                         title="Excluir"
@@ -910,7 +938,7 @@ export default function Financeiro() {
 
       {/* Form Modal */}
       {showForm && (
-        <Modal title="Novo Lancamento Financeiro" size="lg" onClose={() => setShowForm(false)}>
+        <Modal title={editingId ? 'Editar Lancamento Financeiro' : 'Novo Lancamento Financeiro'} size="lg" onClose={() => setShowForm(false)}>
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.formRow}>
               <div className={styles.formField}>
