@@ -66,12 +66,12 @@ async function syncFinanceForProductionOrder(doc: any, req?: any) {
     { eventId, source: 'factory' },
     {
       eventId,
-      type: 'cost',
-      category: 'insumos',
+      type: 'revenue',
+      category: 'ingredientes',
       description: `Pedido #${doc.orderNumber || doc.id} - ${doc.filial}`,
       amount: doc.totalCost,
       date: getDateOnly(doc.createdAt),
-      status: 'paid',
+      status: 'received',
       autoEventBudget: false,
       source: 'factory',
     },
@@ -84,7 +84,7 @@ async function syncFinanceForProductionOrder(doc: any, req?: any) {
       action: 'update',
       resource: 'finances',
       resourceId: finance.id,
-      description: `Gerou custo do pedido finalizado: ${finance.description} (R$ ${finance.amount})`,
+      description: `Gerou receita do pedido finalizado: ${finance.description} (R$ ${finance.amount})`,
     });
   }
 }
