@@ -299,7 +299,7 @@ export default function ContractDocument({ contract, event, eventName, onClose }
 
             {/* ——— CABEÇALHO ——— */}
             <div className={styles.docHeader}>
-              <img src="/logo.jpeg" alt="Soul540" className={styles.docLogo} />
+              <img src="/logo.png" alt="Soul540" className={styles.docLogo} />
               <div className={styles.docHeaderInfo}>
                 <div className={styles.docCompanyName}>
                   <EF value={companyName} onChange={setCompanyName} editing={editing} bold />

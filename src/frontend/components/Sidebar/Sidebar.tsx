@@ -266,7 +266,7 @@ export default function Sidebar() {
   return (
     <aside className={styles.sidebar}>
       <div className={styles.logoWrap}>
-        <img src="/logo.jpeg" alt="Soul540" className={styles.logoImg} />
+        <img src="/logo.png" alt="Soul540" className={styles.logoImg} />
       </div>
       <nav className={styles.nav}>
         {navGroups.map((group) => {

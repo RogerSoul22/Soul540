@@ -26,7 +26,7 @@ export default function Login() {
     <div className={styles.container}>
       <div className={styles.branding}>
         <div className={styles.brandingContent}>
-          <img src="/logo.jpeg" alt="Soul540" className={styles.brandingLogo} />
+          <img src="/logo.png" alt="Soul540" className={styles.brandingLogo} />
           <h1 className={styles.brandingTitle}>
             Soul<span className={styles.brandingHighlight}>540</span>
             <br />Campinas

@@ -29,14 +29,14 @@ export default function Login() {
     <div className={styles.container}>
       <div className={styles.branding}>
         <div className={styles.brandingContent}>
-          <img src="/logo.jpeg" alt="Soul540" className={styles.brandingLogo} />
+          <img src="/logo.png" alt="Soul540" className={styles.brandingLogo} />
         </div>
       </div>
 
       <div className={styles.formSide}>
         <div className={styles.formContainer}>
           <div className={styles.formLogo}>
-            <img src="/logo.jpeg" alt="Soul540" className={styles.formLogoImg} />
+            <img src="/logo.png" alt="Soul540" className={styles.formLogoImg} />
           </div>
 
           <form className={styles.form} onSubmit={handleSubmit}>
