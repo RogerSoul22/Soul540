@@ -1,17 +1,20 @@
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
-import type { PizzaEvent, FinanceEntry, Task, Invoice, InvoiceItem, InvoiceStatus } from '@shared/types';
+import type { PizzaEvent, FinanceEntry, Task, Invoice, InvoiceItem, InvoiceStatus, FinanceCategoryEntry } from '@shared/types';
 export type { InvoiceItem, InvoiceStatus, Invoice };
 
 interface AppContextData {
   events: PizzaEvent[];
   finances: FinanceEntry[];
+  financeCategories: FinanceCategoryEntry[];
   tasks: Task[];
   invoices: Invoice[];
   addFinance: (entry: Omit<FinanceEntry, 'id'>) => Promise<FinanceEntry>;
   updateFinance: (id: string, data: Partial<FinanceEntry>) => Promise<void>;
   deleteFinance: (id: string) => Promise<void>;
+  reverseFinance: (id: string, reason?: string) => Promise<void>;
+  addFinanceCategory: (entry: Omit<FinanceCategoryEntry, 'id'>) => Promise<FinanceCategoryEntry>;
   addEvent: (event: Omit<PizzaEvent, 'id' | 'createdAt'>) => Promise<PizzaEvent>;
   updateEvent: (id: string, data: Partial<PizzaEvent>) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
@@ -30,6 +33,7 @@ const AppContext = createContext<AppContextData>({} as AppContextData);
 export function AppProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<PizzaEvent[]>([]);
   const [finances, setFinances] = useState<FinanceEntry[]>([]);
+  const [financeCategories, setFinanceCategories] = useState<FinanceCategoryEntry[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
 
@@ -38,6 +42,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     apiFetch('/api/tasks').then(r => r.json()).then(setTasks).catch((err) => console.error('Falha ao carregar dados:', err));
     apiFetch('/api/finances').then(r => r.json()).then(setFinances).catch((err) => console.error('Falha ao carregar dados:', err));
     apiFetch('/api/invoices').then(r => r.json()).then(setInvoices).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/finance-categories').then(r => r.json()).then(d => Array.isArray(d) && setFinanceCategories(d)).catch(() => {});
   }, []);
 
   const refreshFinances = useCallback(() => {
@@ -63,6 +68,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const res = await apiFetch(`/api/finances/${id}`, { method: 'DELETE' });
     if (!res.ok) throw new Error('Falha ao excluir lançamento financeiro');
     setFinances((prev) => prev.filter((f) => f.id !== id));
+  }, []);
+
+  const reverseFinance = useCallback(async (id: string, reason = 'Estorno manual') => {
+    const res = await apiFetch(`/api/finances/${id}/reverse`, { method: 'POST', body: JSON.stringify({ reason }) });
+    if (!res.ok) throw new Error('Falha ao estornar lanÃ§amento financeiro');
+    setFinances((prev) => prev.filter((f) => f.id !== id));
+  }, []);
+
+  const addFinanceCategory = useCallback(async (data: Omit<FinanceCategoryEntry, 'id'>) => {
+    const res = await apiFetch('/api/finance-categories', { method: 'POST', body: JSON.stringify(data) });
+    if (!res.ok) throw new Error('Falha ao criar categoria financeira');
+    const created: FinanceCategoryEntry = await res.json();
+    setFinanceCategories((prev) => [...prev.filter((c) => c.id !== created.id), created]);
+    return created;
   }, []);
 
   const addEvent = useCallback(async (data: Omit<PizzaEvent, 'id' | 'createdAt'>) => {
@@ -147,7 +166,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AppContext.Provider value={{ events, finances, tasks, invoices, addFinance, updateFinance, deleteFinance, addEvent, updateEvent, deleteEvent, addTask, updateTask, deleteTask, addInvoice, updateInvoice, deleteInvoice, emitInvoice, pollInvoiceStatus }}>
+    <AppContext.Provider value={{ events, finances, financeCategories, tasks, invoices, addFinance, updateFinance, deleteFinance, reverseFinance, addFinanceCategory, addEvent, updateEvent, deleteEvent, addTask, updateTask, deleteTask, addInvoice, updateInvoice, deleteInvoice, emitInvoice, pollInvoiceStatus }}>
       {children}
     </AppContext.Provider>
   );

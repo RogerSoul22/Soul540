@@ -13,6 +13,7 @@
     "dev:all": "concurrently \"npm run dev\" \"npm run server\"",
     "seed": "tsx server/seed.ts",
     "seed:units": "tsx server/seed-units.ts",
+    "test:finance": "tsx --test server/routes/__tests__/eventFinance.test.ts",
     "docker:up": "docker compose up --build",
     "docker:down": "docker compose down"
   },

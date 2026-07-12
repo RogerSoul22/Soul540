@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { PizzaEvent } from '@backend/domain/entities/Event';
-import type { FinanceEntry } from '@backend/domain/entities/Finance';
+import type { FinanceEntry, FinanceCategoryEntry } from '@backend/domain/entities/Finance';
 import type { Invoice } from '@backend/domain/entities/Invoice';
 import type { Task } from '@backend/domain/entities/Task';
 import type { TaskHistoryEntry } from '@shared/types';
@@ -10,6 +10,7 @@ import { apiFetch } from '@frontend/lib/api';
 interface AppContextData {
   events: PizzaEvent[];
   finances: FinanceEntry[];
+  financeCategories: FinanceCategoryEntry[];
   invoices: Invoice[];
   tasks: Task[];
   taskHistory: TaskHistoryEntry[];
@@ -19,6 +20,8 @@ interface AppContextData {
   addFinance: (entry: Omit<FinanceEntry, 'id'>) => Promise<FinanceEntry>;
   updateFinance: (id: string, data: Partial<FinanceEntry>) => Promise<void>;
   deleteFinance: (id: string) => Promise<void>;
+  reverseFinance: (id: string, reason?: string) => Promise<void>;
+  addFinanceCategory: (entry: Omit<FinanceCategoryEntry, 'id'>) => Promise<FinanceCategoryEntry>;
   addInvoice: (invoice: Invoice) => void;
   updateInvoice: (id: string, data: Partial<Invoice>) => void;
   deleteInvoice: (id: string) => void;
@@ -27,6 +30,8 @@ interface AppContextData {
   addEvent: (event: Omit<PizzaEvent, 'id' | 'createdAt'>) => Promise<PizzaEvent>;
   updateEvent: (id: string, data: Partial<PizzaEvent>) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
+  closeEventFinance: (id: string, markBalanceReceived?: boolean) => Promise<void>;
+  reopenEventFinance: (id: string) => Promise<void>;
   addTask: (task: Omit<Task, 'id' | 'createdAt'>) => Promise<Task>;
   updateTask: (id: string, data: Partial<Task>) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
@@ -39,6 +44,7 @@ const AppContext = createContext<AppContextData>({} as AppContextData);
 export function AppProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<PizzaEvent[]>([]);
   const [finances, setFinances] = useState<FinanceEntry[]>([]);
+  const [financeCategories, setFinanceCategories] = useState<FinanceCategoryEntry[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [taskHistory, setTaskHistory] = useState<TaskHistoryEntry[]>([]);
@@ -50,6 +56,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     apiFetch('/api/tasks', { headers }).then(r => r.json()).then(d => Array.isArray(d) && setTasks(d)).catch((err) => console.error('Falha ao carregar dados:', err));
     apiFetch('/api/task-history', { headers }).then(r => r.json()).then(d => Array.isArray(d) && setTaskHistory(d)).catch((err) => console.error('Falha ao carregar histórico:', err));
     apiFetch('/api/finances', { headers }).then(r => r.json()).then(d => Array.isArray(d) && setFinances(d)).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/finance-categories', { headers }).then(r => r.json()).then(d => Array.isArray(d) && setFinanceCategories(d)).catch((err) => console.error('Falha ao carregar categorias financeiras:', err));
     apiFetch('/api/invoices', { headers }).then(r => r.json()).then(d => Array.isArray(d) && setInvoices(d)).catch((err) => console.error('Falha ao carregar dados:', err));
   }, []);
 
@@ -92,6 +99,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const res = await apiFetch(`/api/finances/${id}`, { method: 'DELETE', headers: buildHeaders() });
     if (!res.ok) throw new Error('Falha ao excluir lançamento financeiro');
     setFinances((prev) => prev.filter((f) => f.id !== id));
+  }, []);
+
+  const reverseFinance = useCallback(async (id: string, reason = 'Estorno manual') => {
+    const res = await apiFetch(`/api/finances/${id}/reverse`, { method: 'POST', headers: buildHeaders(true), body: JSON.stringify({ reason }) });
+    if (!res.ok) throw new Error('Falha ao estornar lanÃ§amento financeiro');
+    setFinances((prev) => prev.filter((f) => f.id !== id));
+  }, []);
+
+  // Finance Categories (API)
+  const addFinanceCategory = useCallback(async (data: Omit<FinanceCategoryEntry, 'id'>) => {
+    const res = await apiFetch('/api/finance-categories', {
+      method: 'POST',
+      headers: buildHeaders(true),
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) throw new Error('Falha ao criar categoria financeira');
+    const created: FinanceCategoryEntry = await res.json();
+    setFinanceCategories((prev) => (prev.some((c) => c.id === created.id) ? prev : [...prev, created]));
+    return created;
   }, []);
 
   // Invoice (API)
@@ -184,6 +210,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setFinances((prev) => prev.filter((f) => f.eventId !== id));
   }, []);
 
+  const closeEventFinance = useCallback(async (id: string, markBalanceReceived = false) => {
+    const res = await apiFetch(`/api/events/${id}/financial-close`, { method: 'POST', headers: buildHeaders(true), body: JSON.stringify({ markBalanceReceived }) });
+    if (!res.ok) throw new Error('Falha ao fechar financeiro do evento');
+    const updated: PizzaEvent = await res.json();
+    setEvents((prev) => prev.map((event) => event.id === id ? updated : event));
+    refreshFinances();
+  }, [refreshFinances]);
+
+  const reopenEventFinance = useCallback(async (id: string) => {
+    const res = await apiFetch(`/api/events/${id}/financial-reopen`, { method: 'POST', headers: buildHeaders(true), body: '{}' });
+    if (!res.ok) throw new Error('Falha ao reabrir financeiro do evento');
+    const updated: PizzaEvent = await res.json();
+    setEvents((prev) => prev.map((event) => event.id === id ? updated : event));
+    refreshFinances();
+  }, [refreshFinances]);
+
   // Tasks (API)
   const addTask = useCallback(async (data: Omit<Task, 'id' | 'createdAt'>) => {
     const res = await apiFetch('/api/tasks', {
@@ -234,10 +276,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider
       value={{
-        events, finances, invoices, tasks, taskHistory,
-        addFinance, updateFinance, deleteFinance,
+        events, finances, financeCategories, invoices, tasks, taskHistory,
+        addFinance, updateFinance, deleteFinance, reverseFinance, addFinanceCategory,
         addInvoice, updateInvoice, deleteInvoice, emitInvoice, pollInvoiceStatus,
-        addEvent, updateEvent, deleteEvent,
+        addEvent, updateEvent, deleteEvent, closeEventFinance, reopenEventFinance,
         addTask, updateTask, deleteTask,
         refreshFinances, refreshTasks, refreshTaskHistory, addTaskHistory, deleteTaskHistory,
       }}

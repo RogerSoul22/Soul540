@@ -58,22 +58,33 @@ async function syncFinanceForProductionOrder(doc: any, req?: any) {
   const eventId = getProductionOrderFinanceEventId(doc.unit, doc.id);
 
   if (doc.status !== 'entregue' || !doc.totalCost || doc.totalCost <= 0) {
-    await FactoryFinance.deleteMany({ eventId, source: 'factory' });
+    await FactoryFinance.updateMany(
+      { eventId, source: 'factory', reversedAt: { $exists: false } },
+      { $set: { reversedAt: new Date().toISOString(), reversalReason: 'Pedido deixou de estar concluÃ­do', settlementStatus: 'cancelled' } },
+    );
     return;
   }
 
   const finance = await FactoryFinance.findOneAndUpdate(
     { eventId, source: 'factory' },
     {
-      eventId,
-      type: 'revenue',
-      category: 'ingredientes',
-      description: `Pedido #${doc.orderNumber || doc.id} - ${doc.filial}`,
-      amount: doc.totalCost,
-      date: getDateOnly(doc.createdAt),
-      status: 'received',
-      autoEventBudget: false,
-      source: 'factory',
+      $set: {
+        eventId,
+        type: 'revenue',
+        category: 'ingredientes',
+        description: `Pedido #${doc.orderNumber || doc.id} - ${doc.filial}`,
+        amount: doc.totalCost,
+        date: getDateOnly(doc.createdAt),
+        status: 'received',
+        settlementStatus: 'settled',
+        settledAt: new Date().toISOString(),
+        autoEventBudget: false,
+        automatic: true,
+        origin: 'factory_order',
+        kind: 'manual',
+        source: 'factory',
+      },
+      $unset: { reversedAt: 1, reversedBy: 1, reversalReason: 1 },
     },
     { new: true, upsert: true, setDefaultsOnInsert: true },
   );
@@ -129,10 +140,10 @@ router.delete('/:id', async (req, res) => {
   const doc = await ProductionOrderModel.findOneAndDelete({ unit, id: req.params.id });
 
   if (!doc) return res.status(404).json({ error: 'Pedido não encontrado' });
-  await FactoryFinance.deleteMany({
-    eventId: getProductionOrderFinanceEventId(unit, doc.id),
-    source: 'factory',
-  });
+  await FactoryFinance.updateMany(
+    { eventId: getProductionOrderFinanceEventId(unit, doc.id), source: 'factory', reversedAt: { $exists: false } },
+    { $set: { reversedAt: new Date().toISOString(), reversalReason: 'Pedido excluÃ­do', settlementStatus: 'cancelled' } },
+  );
   res.status(204).end();
 });
 

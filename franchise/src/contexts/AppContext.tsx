@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
-import type { PizzaEvent, FinanceEntry, Task, TaskHistoryEntry } from '@shared/types';
+import type { PizzaEvent, FinanceEntry, Task, TaskHistoryEntry, FinanceCategoryEntry } from '@shared/types';
 
 interface AppContextData {
   events: PizzaEvent[];
   finances: FinanceEntry[];
+  financeCategories: FinanceCategoryEntry[];
   tasks: Task[];
   taskHistory: TaskHistoryEntry[];
   addTaskHistory: (entry: Omit<TaskHistoryEntry, 'id'>) => Promise<void>;
@@ -13,9 +14,13 @@ interface AppContextData {
   addFinance: (entry: Omit<FinanceEntry, 'id'>) => Promise<FinanceEntry>;
   updateFinance: (id: string, data: Partial<FinanceEntry>) => Promise<void>;
   deleteFinance: (id: string) => Promise<void>;
+  reverseFinance: (id: string, reason?: string) => Promise<void>;
+  addFinanceCategory: (entry: Omit<FinanceCategoryEntry, 'id'>) => Promise<FinanceCategoryEntry>;
   addEvent: (event: Omit<PizzaEvent, 'id' | 'createdAt'>) => Promise<PizzaEvent>;
   updateEvent: (id: string, data: Partial<PizzaEvent>) => Promise<void>;
   deleteEvent: (id: string) => Promise<void>;
+  closeEventFinance: (id: string, markBalanceReceived?: boolean) => Promise<void>;
+  reopenEventFinance: (id: string) => Promise<void>;
   addTask: (task: Omit<Task, 'id' | 'createdAt'>) => Promise<Task>;
   updateTask: (id: string, data: Partial<Task>) => Promise<void>;
   deleteTask: (id: string) => Promise<void>;
@@ -26,6 +31,7 @@ const AppContext = createContext<AppContextData>({} as AppContextData);
 export function AppProvider({ children }: { children: ReactNode }) {
   const [events, setEvents] = useState<PizzaEvent[]>([]);
   const [finances, setFinances] = useState<FinanceEntry[]>([]);
+  const [financeCategories, setFinanceCategories] = useState<FinanceCategoryEntry[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [taskHistory, setTaskHistory] = useState<TaskHistoryEntry[]>([]);
 
@@ -34,6 +40,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     apiFetch('/api/tasks').then(r => r.json()).then(setTasks).catch((err) => console.error('Falha ao carregar dados:', err));
     apiFetch('/api/task-history').then(r => r.json()).then(d => Array.isArray(d) && setTaskHistory(d)).catch(() => {});
     apiFetch('/api/finances').then(r => r.json()).then(setFinances).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/finance-categories').then(r => r.json()).then(d => Array.isArray(d) && setFinanceCategories(d)).catch(() => {});
   }, []);
 
   const refreshFinances = useCallback(() => {
@@ -61,6 +68,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setFinances((prev) => prev.filter((f) => f.id !== id));
   }, []);
 
+  const reverseFinance = useCallback(async (id: string, reason = 'Estorno manual') => {
+    const res = await apiFetch(`/api/finances/${id}/reverse`, { method: 'POST', body: JSON.stringify({ reason }) });
+    if (!res.ok) throw new Error('Falha ao estornar lanÃ§amento financeiro');
+    setFinances((prev) => prev.filter((f) => f.id !== id));
+  }, []);
+
+  const addFinanceCategory = useCallback(async (data: Omit<FinanceCategoryEntry, 'id'>) => {
+    const res = await apiFetch('/api/finance-categories', { method: 'POST', body: JSON.stringify(data) });
+    if (!res.ok) throw new Error('Falha ao criar categoria financeira');
+    const created: FinanceCategoryEntry = await res.json();
+    setFinanceCategories((prev) => [...prev.filter((c) => c.id !== created.id), created]);
+    return created;
+  }, []);
+
   const addEvent = useCallback(async (data: Omit<PizzaEvent, 'id' | 'createdAt'>) => {
     const res = await apiFetch('/api/events', { method: 'POST', body: JSON.stringify(data) });
     if (!res.ok) throw new Error(`Erro ao criar evento: ${res.status}`);
@@ -84,6 +105,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setEvents((prev) => prev.filter((e) => e.id !== id));
     setFinances((prev) => prev.filter((f) => f.eventId !== id));
   }, []);
+
+  const closeEventFinance = useCallback(async (id: string, markBalanceReceived = false) => {
+    const res = await apiFetch(`/api/events/${id}/financial-close`, { method: 'POST', body: JSON.stringify({ markBalanceReceived }) });
+    if (!res.ok) throw new Error('Falha ao fechar financeiro do evento');
+    const updated: PizzaEvent = await res.json();
+    setEvents((prev) => prev.map((event) => event.id === id ? updated : event));
+    refreshFinances();
+  }, [refreshFinances]);
+
+  const reopenEventFinance = useCallback(async (id: string) => {
+    const res = await apiFetch(`/api/events/${id}/financial-reopen`, { method: 'POST', body: '{}' });
+    if (!res.ok) throw new Error('Falha ao reabrir financeiro do evento');
+    const updated: PizzaEvent = await res.json();
+    setEvents((prev) => prev.map((event) => event.id === id ? updated : event));
+    refreshFinances();
+  }, [refreshFinances]);
 
   const addTask = useCallback(async (data: Omit<Task, 'id' | 'createdAt'>) => {
     const res = await apiFetch('/api/tasks', { method: 'POST', body: JSON.stringify(data) });
@@ -123,7 +160,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AppContext.Provider value={{ events, finances, tasks, taskHistory, addFinance, updateFinance, deleteFinance, addEvent, updateEvent, deleteEvent, addTask, updateTask, deleteTask, addTaskHistory, deleteTaskHistory }}>
+    <AppContext.Provider value={{ events, finances, financeCategories, tasks, taskHistory, addFinance, updateFinance, deleteFinance, reverseFinance, addFinanceCategory, addEvent, updateEvent, deleteEvent, closeEventFinance, reopenEventFinance, addTask, updateTask, deleteTask, addTaskHistory, deleteTaskHistory }}>
       {children}
     </AppContext.Provider>
   );

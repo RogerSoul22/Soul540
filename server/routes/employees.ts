@@ -11,6 +11,7 @@ const models = createTenantModels('Employee', {
   state: String,
   hireDate: String,
   salary: Number,
+  commissionRate: { type: Number, default: 0, min: 0, max: 100 },
   cpf: String,
   rg: String,
   address: String,

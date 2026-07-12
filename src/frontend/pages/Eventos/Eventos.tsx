@@ -256,6 +256,16 @@ export default function Eventos() {
   }, []);
 
   useEffect(() => {
+    const editId = searchParams.get('edit');
+    if (!editId) return;
+    const eventToEdit = events.find((event) => event.id === editId);
+    if (eventToEdit) {
+      openEdit(eventToEdit);
+      setSearchParams({});
+    }
+  }, [events, searchParams, setSearchParams]);
+
+  useEffect(() => {
     fetch('/api/employees').then(r => r.json()).then(setEmployees).catch(() => {});
     fetch('/api/menus').then(r => r.json()).then((data: { name: string }[]) => {
       if (Array.isArray(data)) {
@@ -627,7 +637,7 @@ return (
       )}
 
       {showModal && (
-        <div className={styles.overlay} onClick={closeModal}>
+        <div className={styles.overlay}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h2 className={styles.modalTitle}>{editingId ? 'Editar Agendamento' : 'Novo Agendamento'}</h2>

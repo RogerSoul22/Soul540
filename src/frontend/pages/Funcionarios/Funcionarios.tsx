@@ -58,13 +58,14 @@ type FormData = {
   address: string;
   notes: string;
   pixKey: string;
+  commissionRate: string;
   availableDays: string[];
   status: Employee['status'];
   skills: Skill[];
 };
 
 const emptyForm: FormData = {
-  name: '', role: 'auxiliar', phone: '', cpf: '', rg: '', address: '', notes: '', pixKey: '', availableDays: [], status: 'ativo', skills: [],
+  name: '', role: 'auxiliar', phone: '', cpf: '', rg: '', address: '', notes: '', pixKey: '', commissionRate: '0', availableDays: [], status: 'ativo', skills: [],
 };
 
 export default function Funcionarios() {
@@ -129,7 +130,7 @@ export default function Funcionarios() {
     setForm({
       name: emp.name, role: emp.role, phone: emp.phone, status: emp.status,
       cpf: emp.cpf ?? '', rg: emp.rg ?? '', address: emp.address ?? '',
-      notes: emp.notes ?? '', pixKey: emp.pixKey ?? '', availableDays: emp.availableDays ?? [], skills: emp.skills ?? [],
+      notes: emp.notes ?? '', pixKey: emp.pixKey ?? '', commissionRate: String(emp.commissionRate ?? 0), availableDays: emp.availableDays ?? [], skills: emp.skills ?? [],
     });
     setEditingId(emp.id);
     setShowModal(true);
@@ -151,6 +152,7 @@ export default function Funcionarios() {
       name: form.name, role: form.role, phone: form.phone, status: form.status,
       cpf: form.cpf || undefined, rg: form.rg || undefined, address: form.address || undefined,
       notes: form.notes || undefined, pixKey: form.pixKey || undefined,
+      commissionRate: Math.min(100, Math.max(0, Number(form.commissionRate) || 0)),
       availableDays: form.availableDays.length > 0 ? form.availableDays : undefined,
       skills: form.skills.length > 0 ? form.skills : undefined,
     };
@@ -348,6 +350,10 @@ export default function Funcionarios() {
               <div className={styles.formGroup}>
                 <label className={styles.label}>Chave Pix</label>
                 <input className={styles.input} value={form.pixKey} onChange={(e) => setForm({ ...form, pixKey: e.target.value })} placeholder="CPF, e-mail, telefone ou chave aleatória" />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Comissão por evento (%)</label>
+                <input className={styles.input} type="number" min="0" max="100" step="0.1" value={form.commissionRate} onChange={(e) => setForm({ ...form, commissionRate: e.target.value })} />
               </div>
               <div className={styles.formGroup}>
                 <label className={styles.label}>Observação</label>

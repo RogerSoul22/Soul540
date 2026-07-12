@@ -56,12 +56,33 @@ export interface PizzaEvent {
   factorySauceKg?: number;
   factoryCheeseKg?: number;
   factoryPackagingUnits?: number;
+  financialStatus?: 'open' | 'partial' | 'settled' | 'closed';
+  financiallyClosedAt?: string;
+  financiallyClosedBy?: string;
+  financeSyncVersion?: number;
 }
 
 // ── Finances ─────────────────────────────────────────────────────────────────
 
 export type FinanceType = 'revenue' | 'cost';
 export type FinanceStatus = 'pending' | 'paid' | 'received';
+export type FinanceOrigin = 'event' | 'manual' | 'factory_order' | 'bank_import';
+export type FinanceKind = 'balance' | 'deposit' | 'travel' | 'commission' | 'expense' | 'manual';
+export type SettlementStatus = 'open' | 'partial' | 'settled' | 'cancelled';
+
+// Seções do DRE (Demonstrativo de Resultado), na ordem em que aparecem no relatório.
+export type DreSection =
+  | 'faturamentos'
+  | 'deducoes'
+  | 'custos-operacionais'
+  | 'despesas-logistica'
+  | 'despesas-administrativas'
+  | 'despesas-comerciais'
+  | 'despesas-financeiras'
+  | 'receitas-nao-operacionais'
+  | 'outras-saidas';
+
+export type RecurrenceFrequency = 'monthly' | 'weekly' | 'yearly';
 
 export interface FinanceEntry {
   id: string;
@@ -73,6 +94,41 @@ export interface FinanceEntry {
   date: string;
   status: FinanceStatus;
   autoEventBudget?: boolean;
+  origin?: FinanceOrigin;
+  kind?: FinanceKind;
+  paymentMethod?: string;
+  dueDate?: string;
+  settledAt?: string;
+  settlementStatus?: SettlementStatus;
+  automatic?: boolean;
+  reversedAt?: string;
+  reversedBy?: string;
+  reversalReason?: string;
+  employeeId?: string;
+  source?: string;
+  // Parcelamento: agrupa lançamentos gerados a partir de uma compra parcelada.
+  installmentGroupId?: string;
+  installmentNumber?: number;
+  installmentTotal?: number;
+  // Recorrência: agrupa ocorrências geradas a partir de um lançamento recorrente.
+  recurrenceId?: string;
+  recurrenceFrequency?: RecurrenceFrequency;
+  recurrenceEndDate?: string;
+  // Identificacao de movimentos importados de extratos bancarios (OFX).
+  externalId?: string;
+  importBatchId?: string;
+  bankAccount?: string;
+  bankStatementBalance?: number;
+}
+
+// Categoria financeira personalizada, criada pelo usuário e associada a uma seção do DRE.
+export interface FinanceCategoryEntry {
+  id: string;
+  key: string;
+  label: string;
+  type: FinanceType;
+  section: DreSection;
+  color?: string;
   source?: string;
 }
 

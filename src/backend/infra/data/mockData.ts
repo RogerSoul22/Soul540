@@ -15,6 +15,7 @@ export interface Employee {
   state?: string;
   hireDate?: string;
   salary?: number;
+  commissionRate?: number;
   cpf?: string;
   rg?: string;
   address?: string;
@@ -182,28 +183,8 @@ export const mockEvents: PizzaEvent[] = [
   },
 ];
 
-export const FIXED_CATEGORIES = ['salario', 'pro-labore', 'aluguel', 'emprestimos', 'contador', 'agua-luz', 'tarifa-bancos', 'investimento'] as const;
-export const VARIABLE_CATEGORIES = ['insumos', 'impostos', 'embalagens', 'marketing', 'tarifa-cartao', 'carro-manut', 'combustivel', 'maquinas-manut', 'outros', 'pedagio', 'gas', 'premio', 'batatas', 'alimentacao', 'bebidas', 'prod-limpeza'] as const;
-
-export const CATEGORY_LABELS: Record<string, string> = {
-  'salario': 'Salario', 'pro-labore': 'Pro Labore', 'aluguel': 'Aluguel', 'emprestimos': 'Emprestimos',
-  'contador': 'Contador', 'agua-luz': 'Agua e Luz', 'tarifa-bancos': 'Tarifa Bancos', 'investimento': 'Investimento',
-  'insumos': 'Insumos', 'impostos': 'Impostos', 'embalagens': 'Embalagens', 'marketing': 'Marketing',
-  'tarifa-cartao': 'Tarifa Cartao', 'carro-manut': 'Carro Manut.', 'combustivel': 'Combustivel',
-  'maquinas-manut': 'Maquinas Manut.', 'outros': 'Outros', 'pedagio': 'Pedagio', 'gas': 'Gas',
-  'premio': 'Premio', 'batatas': 'Batatas', 'alimentacao': 'Alimentacao', 'bebidas': 'Bebidas',
-  'prod-limpeza': 'Prod. Limpeza', 'contrato': 'Contrato', 'adicional': 'Adicional', 'equipe': 'Equipe',
-  'ingredientes': 'Ingredientes', 'logistica': 'Logistica',
-};
-
-export const CATEGORY_COLORS: Record<string, string> = {
-  'insumos': '#ef4444', 'impostos': '#f97316', 'embalagens': '#eab308', 'marketing': '#84cc16',
-  'tarifa-cartao': '#22c55e', 'carro-manut': '#06b6d4', 'combustivel': '#3b82f6', 'gas': '#8b5cf6',
-  'maquinas-manut': '#d946ef', 'outros': '#64748b', 'pedagio': '#14b8a6', 'premio': '#f43f5e',
-  'batatas': '#a3e635', 'alimentacao': '#fb923c', 'bebidas': '#38bdf8', 'prod-limpeza': '#a78bfa',
-  'salario': '#dc2626', 'pro-labore': '#b91c1c', 'aluguel': '#0ea5e9', 'emprestimos': '#7c3aed',
-  'contador': '#059669', 'agua-luz': '#0891b2', 'tarifa-bancos': '#6366f1', 'investimento': '#ca8a04',
-};
+// Categorias, seções DRE, rótulos e cores agora vivem em `financeCategories.ts`
+// (import { FIXED_CATEGORIES, VARIABLE_CATEGORIES, CATEGORY_LABELS, CATEGORY_COLORS } from './financeCategories').
 
 function generateMonthlyData(): FinanceEntry[] {
   const entries: FinanceEntry[] = [];

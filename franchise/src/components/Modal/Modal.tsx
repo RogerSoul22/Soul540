@@ -10,7 +10,7 @@ interface ModalProps {
 
 export default function Modal({ children, title, size = 'md', onClose }: ModalProps) {
   return (
-    <div className={styles.overlay} onClick={onClose}>
+    <div className={styles.overlay}>
       <div
         className={`${styles.modal} ${styles[size]}`}
         onClick={(e) => e.stopPropagation()}

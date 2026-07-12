@@ -5,6 +5,12 @@ import type { FinanceEntry } from '@shared/types';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import type { DreSection, RecurrenceFrequency } from '@shared/types';
+import {
+  FIXED_CATEGORIES, VARIABLE_CATEGORIES, CATEGORY_LABELS as BUILTIN_CATEGORY_LABELS, CATEGORY_COLORS as BUILTIN_CATEGORY_COLORS,
+  DRE_SECTIONS, groupCategoriesBySection,
+} from '@shared/financeCategories';
+import type { CategoryDef } from '@shared/financeCategories';
 import GaugeChart from '@/components/GaugeChart/GaugeChart';
 import HorizontalBarChart from '@/components/HorizontalBarChart/HorizontalBarChart';
 import Button from '@/components/Button/Button';
@@ -61,29 +67,6 @@ function safeFormat(date: string | undefined | null, fmt: string, options?: Para
 type FinanceType = 'revenue' | 'cost';
 type FinanceStatus = 'pending' | 'paid' | 'received';
 
-const FIXED_CATEGORIES = ['salario', 'pro-labore', 'aluguel', 'emprestimos', 'contador', 'agua-luz', 'tarifa-bancos', 'investimento'] as const;
-const VARIABLE_CATEGORIES = ['insumos', 'impostos', 'embalagens', 'marketing', 'tarifa-cartao', 'carro-manut', 'combustivel', 'maquinas-manut', 'outros', 'pedagio', 'gas', 'premio', 'batatas', 'alimentacao', 'bebidas', 'prod-limpeza'] as const;
-
-const CATEGORY_LABELS: Record<string, string> = {
-  'salario': 'Salario', 'pro-labore': 'Pro Labore', 'aluguel': 'Aluguel', 'emprestimos': 'Emprestimos',
-  'contador': 'Contador', 'agua-luz': 'Agua e Luz', 'tarifa-bancos': 'Tarifa Bancos', 'investimento': 'Investimento',
-  'insumos': 'Insumos', 'impostos': 'Impostos', 'embalagens': 'Embalagens', 'marketing': 'Marketing',
-  'tarifa-cartao': 'Tarifa Cartao', 'carro-manut': 'Carro Manut.', 'combustivel': 'Combustivel',
-  'maquinas-manut': 'Maquinas Manut.', 'outros': 'Outros', 'pedagio': 'Pedagio', 'gas': 'Gas',
-  'premio': 'Premio', 'batatas': 'Batatas', 'alimentacao': 'Alimentacao', 'bebidas': 'Bebidas',
-  'prod-limpeza': 'Prod. Limpeza', 'contrato': 'Contrato', 'adicional': 'Adicional', 'equipe': 'Equipe',
-  'ingredientes': 'Ingredientes', 'logistica': 'Logistica',
-};
-
-const CATEGORY_COLORS: Record<string, string> = {
-  'insumos': '#ef4444', 'impostos': '#f97316', 'embalagens': '#eab308', 'marketing': '#84cc16',
-  'tarifa-cartao': '#22c55e', 'carro-manut': '#06b6d4', 'combustivel': '#3b82f6', 'gas': '#8b5cf6',
-  'maquinas-manut': '#d946ef', 'outros': '#64748b', 'pedagio': '#14b8a6', 'premio': '#f43f5e',
-  'batatas': '#a3e635', 'alimentacao': '#fb923c', 'bebidas': '#38bdf8', 'prod-limpeza': '#a78bfa',
-  'salario': '#dc2626', 'pro-labore': '#b91c1c', 'aluguel': '#0ea5e9', 'emprestimos': '#7c3aed',
-  'contador': '#059669', 'agua-luz': '#0891b2', 'tarifa-bancos': '#6366f1', 'investimento': '#ca8a04',
-};
-
 function formatCurrency(value: string): string {
   const digits = value.replace(/\D/g, '');
   if (!digits) return '';
@@ -95,6 +78,26 @@ function formatCurrency(value: string): string {
 
 function parseCurrency(value: string): number {
   return Number(value.replace(/[R$\s.]/g, '').replace(',', '.')) || 0;
+}
+
+function addMonths(dateStr: string, months: number): string {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const targetMonth = (m - 1) + months;
+  const targetYear = y + Math.floor(targetMonth / 12);
+  const normalizedMonth = ((targetMonth % 12) + 12) % 12;
+  const lastDay = new Date(Date.UTC(targetYear, normalizedMonth + 1, 0)).getUTCDate();
+  const safeDay = Math.min(d, lastDay);
+  return [
+    String(targetYear).padStart(4, '0'),
+    String(normalizedMonth + 1).padStart(2, '0'),
+    String(safeDay).padStart(2, '0'),
+  ].join('-');
+}
+
+function addDays(dateStr: string, days: number): string {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const date = new Date(y, m - 1, d + days);
+  return date.toISOString().split('T')[0];
 }
 
 type TabType = 'geral' | 'despesas' | 'mensal' | 'lancamentos';
@@ -114,17 +117,9 @@ const normalizeAlpha = (value: string) =>
     .replace(/\s+/g, ' ')
     .toLocaleLowerCase('pt-BR');
 const compareAlpha = (a: string, b: string) => alphaCollator.compare(normalizeAlpha(a), normalizeAlpha(b));
-const getCategoryLabel = (category: string) => CATEGORY_LABELS[category] || category;
-const sortCategoriesAlpha = (categories: readonly string[]) =>
-  [...categories].sort((a, b) => compareAlpha(getCategoryLabel(a), getCategoryLabel(b)));
-
-const formCategories: Record<FinanceType, string[]> = {
-  revenue: sortCategoriesAlpha(['contrato', 'adicional', 'taxa', 'outro']),
-  cost: sortCategoriesAlpha([...FIXED_CATEGORIES, ...VARIABLE_CATEGORIES]),
-};
 
 export default function Financeiro() {
-  const { events, finances, addFinance, updateFinance, deleteFinance } = useApp();
+  const { events, finances, financeCategories, addFinance, updateFinance, deleteFinance, reverseFinance, addFinanceCategory } = useApp();
   const [activeTab, setActiveTab] = useState<TabType>('geral');
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().substring(0, 7));
   const [costFilter, setCostFilter] = useState<CostFilter>('all');
@@ -133,6 +128,9 @@ export default function Financeiro() {
   // Table filters
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [filterMonth, setFilterMonth] = useState<string>('all');
+  const [useCustomRange, setUseCustomRange] = useState(false);
+  const [filterDateFrom, setFilterDateFrom] = useState('');
+  const [filterDateTo, setFilterDateTo] = useState('');
   const [search, setSearch] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -146,6 +144,21 @@ export default function Financeiro() {
   const [formAmount, setFormAmount] = useState('');
   const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0]);
   const [formStatus, setFormStatus] = useState<FinanceStatus>('pending');
+  const [formPaymentMethod, setFormPaymentMethod] = useState('');
+
+  // Parcelamento
+  const [formInstallments, setFormInstallments] = useState('1');
+
+  // Recorrência
+  const [formRecurring, setFormRecurring] = useState(false);
+  const [formRecurrenceFrequency, setFormRecurrenceFrequency] = useState<RecurrenceFrequency>('monthly');
+  const [formRecurrenceEndDate, setFormRecurrenceEndDate] = useState('');
+
+  // Nova categoria personalizada
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [newCategoryLabel, setNewCategoryLabel] = useState('');
+  const [newCategorySection, setNewCategorySection] = useState<DreSection>('despesas-administrativas');
+  const [savingCategory, setSavingCategory] = useState(false);
 
   // Event combobox state
   const [eventSearch, setEventSearch] = useState('');
@@ -237,6 +250,50 @@ export default function Financeiro() {
     [filteredEventsForCombo],
   );
 
+  // Categorias (padrão + personalizadas), rótulos/cores mesclados e agrupamento por seção do DRE
+  const categoryLabels = useMemo(() => {
+    const merged: Record<string, string> = { ...BUILTIN_CATEGORY_LABELS };
+    for (const c of financeCategories) merged[c.key] = c.label;
+    return merged;
+  }, [financeCategories]);
+
+  const categoryColors = useMemo(() => {
+    const merged: Record<string, string> = { ...BUILTIN_CATEGORY_COLORS };
+    for (const c of financeCategories) merged[c.key] = c.color || '#64748b';
+    return merged;
+  }, [financeCategories]);
+
+  const groupedRevenueCategories = useMemo(
+    () => groupCategoriesBySection('revenue', financeCategories),
+    [financeCategories],
+  );
+  const groupedCostCategories = useMemo(
+    () => groupCategoriesBySection('cost', financeCategories),
+    [financeCategories],
+  );
+  const groupedFormCategories = formType === 'revenue' ? groupedRevenueCategories : groupedCostCategories;
+
+  const handleCreateCategory = async () => {
+    if (!newCategoryLabel.trim()) return;
+    setSavingCategory(true);
+    try {
+      const created = await addFinanceCategory({
+        key: '', // gerada no servidor a partir do label
+        label: newCategoryLabel.trim(),
+        type: formType,
+        section: newCategorySection,
+        color: '#64748b',
+      } as any);
+      setFormCategory(created.key);
+      setShowCategoryModal(false);
+      setNewCategoryLabel('');
+    } catch {
+      alert('Não foi possível criar a categoria.');
+    } finally {
+      setSavingCategory(false);
+    }
+  };
+
   // === DATA COMPUTATIONS ===
   const pageMonthFinances = useMemo(
     () => pageMonth === 'all' ? finances : finances.filter((f) => f.date && f.date.startsWith(pageMonth)),
@@ -253,6 +310,22 @@ export default function Financeiro() {
   );
   const profit = totalRevenue - totalCosts;
   const margin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
+
+  // Carteira: saldo calculado automaticamente a partir de TODOS os lançamentos
+  // já liquidados (receitas recebidas − custos pagos), independente do filtro de mês.
+  const walletBalance = useMemo(() => {
+    const received = finances.filter((f) => f.type === 'revenue' && f.status === 'received').reduce((acc, f) => acc + f.amount, 0);
+    const paid = finances.filter((f) => f.type === 'cost' && f.status === 'paid').reduce((acc, f) => acc + f.amount, 0);
+    return received - paid;
+  }, [finances]);
+
+  // Faturamento (tudo que foi vendido/contratado, mesmo pendente) x Recebido x Saldo em Aberto
+  const faturamentoTotal = totalRevenue;
+  const faturamentoRecebido = useMemo(
+    () => pageMonthFinances.filter((f) => f.type === 'revenue' && f.status === 'received').reduce((acc, f) => acc + f.amount, 0),
+    [pageMonthFinances],
+  );
+  const saldoEmAberto = faturamentoTotal - faturamentoRecebido;
 
   // Monthly chart data
   const monthlyData = useMemo(() => {
@@ -308,12 +381,12 @@ export default function Financeiro() {
     }
     return Object.entries(costs)
       .map(([cat, val]) => ({
-        label: CATEGORY_LABELS[cat] || cat,
+        label: categoryLabels[cat] || cat,
         value: val,
-        color: CATEGORY_COLORS[cat] || '#64748b',
+        color: categoryColors[cat] || '#64748b',
       }))
       .sort((a, b) => compareAlpha(a.label, b.label));
-  }, [monthFinances]);
+  }, [monthFinances, categoryLabels, categoryColors]);
 
   const variableCosts = useMemo(() => {
     const costs: Record<string, number> = {};
@@ -324,12 +397,12 @@ export default function Financeiro() {
     }
     return Object.entries(costs)
       .map(([cat, val]) => ({
-        label: CATEGORY_LABELS[cat] || cat,
+        label: categoryLabels[cat] || cat,
         value: val,
-        color: CATEGORY_COLORS[cat] || '#64748b',
+        color: categoryColors[cat] || '#64748b',
       }))
       .sort((a, b) => compareAlpha(a.label, b.label));
-  }, [monthFinances]);
+  }, [monthFinances, categoryLabels, categoryColors]);
 
   // Gauge values for selected month
   const insumosRatio = useMemo(() => {
@@ -349,8 +422,14 @@ export default function Financeiro() {
   // Table filter
   const filtered = useMemo(() => {
     return finances.filter((f) => {
+      if (!f.date) return false;
+      if (useCustomRange) {
+        if (filterDateFrom && f.date < filterDateFrom) return false;
+        if (filterDateTo && f.date > filterDateTo) return false;
+      } else if (filterMonth !== 'all' && !f.date.startsWith(filterMonth)) {
+        return false;
+      }
       if (filterType !== 'all' && f.type !== filterType) return false;
-      if (filterMonth !== 'all' && !f.date.startsWith(filterMonth)) return false;
       if (search) {
         const q = search.toLowerCase();
         const event = events.find((e) => e.id === f.eventId);
@@ -361,8 +440,8 @@ export default function Financeiro() {
         );
       }
       return true;
-    });
-  }, [finances, filterType, filterMonth, search, events]);
+    }).sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
+  }, [finances, filterType, filterMonth, useCustomRange, filterDateFrom, filterDateTo, search, events]);
 
   // Events with budget joined with their finance entry
   const eventsWithBudget = useMemo(() => {
@@ -383,7 +462,7 @@ export default function Financeiro() {
   );
   const totalReceived = useMemo(
     () => eventsWithBudget
-      .filter(({ finance }) => finance?.status === 'received')
+      .filter(({ finance }) => ['paid', 'received'].includes(finance?.status ?? ''))
       .reduce((acc, { event }) => acc + (event.budget ?? 0), 0),
     [eventsWithBudget],
   );
@@ -402,7 +481,7 @@ export default function Financeiro() {
       ...filtered.map((f) => [
         f.date,
         typeLabel[f.type] || f.type,
-        CATEGORY_LABELS[f.category] || f.category,
+        categoryLabels[f.category] || f.category,
         `"${(f.description || '').replace(/"/g, '""')}"`,
         stLabel[f.status] || f.status,
         f.amount.toFixed(2).replace('.', ','),
@@ -417,6 +496,82 @@ export default function Financeiro() {
     URL.revokeObjectURL(url);
   };
 
+  // Exporta\u00E7\u00E3o no padr\u00E3o do arquivo "DRE 2026 - SOUL PIZZA.xlsx": meses em coluna,
+  // categorias agrupadas por se\u00E7\u00E3o do DRE, totais por se\u00E7\u00E3o e linhas de resultado.
+  const exportDRE = () => {
+    if (availableMonths.length === 0) {
+      alert('Nenhum lan\u00E7amento financeiro para exportar.');
+      return;
+    }
+    const months = availableMonths;
+    const fmt = (v: number) => v.toFixed(2).replace('.', ',');
+    const monthAmount = (categoryKey: string, type: FinanceType, month: string) =>
+      finances
+        .filter((f) => f.type === type && f.category === categoryKey && f.date && f.date.startsWith(month))
+        .reduce((acc, f) => acc + f.amount, 0);
+
+    const sectionCategoriesMap = new Map<DreSection, CategoryDef[]>();
+    for (const g of [...groupedRevenueCategories, ...groupedCostCategories]) sectionCategoriesMap.set(g.section.key, g.categories);
+
+    const header = ['Categoria', ...months.map(formatMonth), 'Total'];
+    const rows: string[][] = [header];
+    const sectionTotalsByMonth: Record<string, number[]> = {};
+
+    for (const sectionDef of DRE_SECTIONS) {
+      const cats = sectionCategoriesMap.get(sectionDef.key) || [];
+      rows.push([sectionDef.label, ...months.map(() => ''), '']);
+
+      const totalsByMonth = months.map(() => 0);
+      for (const cat of cats) {
+        const values = months.map((m) => monthAmount(cat.key, sectionDef.type, m));
+        values.forEach((v, i) => { totalsByMonth[i] += v; });
+        rows.push([cat.label, ...values.map(fmt), fmt(values.reduce((a, b) => a + b, 0))]);
+      }
+      rows.push([`Total ${sectionDef.label}`, ...totalsByMonth.map(fmt), fmt(totalsByMonth.reduce((a, b) => a + b, 0))]);
+      sectionTotalsByMonth[sectionDef.key] = totalsByMonth;
+    }
+
+    const faturamentos = sectionTotalsByMonth['faturamentos'];
+    const deducoes = sectionTotalsByMonth['deducoes'];
+    const receitaLiquida = faturamentos.map((v, i) => v - deducoes[i]);
+    rows.push(['( = ) Receita L\u00EDquida Operacional', ...receitaLiquida.map(fmt), fmt(receitaLiquida.reduce((a, b) => a + b, 0))]);
+
+    const custosOperacionais = sectionTotalsByMonth['custos-operacionais'];
+    const despesasLogistica = sectionTotalsByMonth['despesas-logistica'];
+    const totalCustos = custosOperacionais.map((v, i) => v + despesasLogistica[i]);
+    rows.push(['Total Custos', ...totalCustos.map(fmt), fmt(totalCustos.reduce((a, b) => a + b, 0))]);
+
+    const lucroBruto = receitaLiquida.map((v, i) => v - totalCustos[i]);
+    rows.push(['( = ) Lucro Bruto / Margem de Contribui\u00E7\u00E3o', ...lucroBruto.map(fmt), fmt(lucroBruto.reduce((a, b) => a + b, 0))]);
+
+    const despesasAdm = sectionTotalsByMonth['despesas-administrativas'];
+    const despesasCom = sectionTotalsByMonth['despesas-comerciais'];
+    const despesasFin = sectionTotalsByMonth['despesas-financeiras'];
+    const totalDespesas = despesasAdm.map((v, i) => v + despesasCom[i] + despesasFin[i]);
+    rows.push(['Total Despesas Adm/Comerciais/Financeiras', ...totalDespesas.map(fmt), fmt(totalDespesas.reduce((a, b) => a + b, 0))]);
+
+    const lucroLiquidoOp = lucroBruto.map((v, i) => v - totalDespesas[i]);
+    rows.push(['( = ) Lucro L\u00EDquido Operacional', ...lucroLiquidoOp.map(fmt), fmt(lucroLiquidoOp.reduce((a, b) => a + b, 0))]);
+
+    let acumulado = 0;
+    const resultadoAcumulado = lucroLiquidoOp.map((v) => { acumulado += v; return acumulado; });
+    rows.push(['( = ) Resultado L\u00EDquido Acumulado', ...resultadoAcumulado.map(fmt), '']);
+
+    const receitasNaoOperacionais = sectionTotalsByMonth['receitas-nao-operacionais'];
+    const outrasSaidas = sectionTotalsByMonth['outras-saidas'];
+    const resultadoFinal = lucroLiquidoOp.map((v, i) => v + receitasNaoOperacionais[i] - outrasSaidas[i]);
+    rows.push(['( = ) Resultado Ap\u00F3s Empr\u00E9stimos/Investimentos', ...resultadoFinal.map(fmt), fmt(resultadoFinal.reduce((a, b) => a + b, 0))]);
+
+    const csv = rows.map((r) => r.join(';')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `dre-fabrica-${months[0]}_a_${months[months.length - 1]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const resetForm = () => {
     setEditingId(null);
     setFormType('revenue');
@@ -427,6 +582,11 @@ export default function Financeiro() {
     setFormAmount('');
     setFormDate(new Date().toISOString().split('T')[0]);
     setFormStatus('pending');
+    setFormPaymentMethod('');
+    setFormInstallments('1');
+    setFormRecurring(false);
+    setFormRecurrenceFrequency('monthly');
+    setFormRecurrenceEndDate('');
   };
 
   const handleEdit = (entry: FinanceEntry) => {
@@ -439,13 +599,16 @@ export default function Financeiro() {
     setFormAmount(formatCurrency(String(Math.round(entry.amount * 100))));
     setFormDate(entry.date);
     setFormStatus(entry.status);
+    setFormPaymentMethod(entry.paymentMethod || '');
+    setFormInstallments('1');
+    setFormRecurring(false);
     setShowForm(true);
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!formCategory || !formAmount) return;
-    const payload = {
+    const base = {
       eventId: formEventId,
       type: formType,
       category: formCategory,
@@ -453,12 +616,54 @@ export default function Financeiro() {
       amount: parseCurrency(formAmount),
       date: formDate,
       status: formStatus,
+      paymentMethod: formPaymentMethod || undefined,
     };
+
     if (editingId) {
-      await updateFinance(editingId, payload);
-    } else {
-      await addFinance(payload);
+      await updateFinance(editingId, base);
+      resetForm();
+      setShowForm(false);
+      return;
     }
+
+    const installments = Math.max(1, parseInt(formInstallments, 10) || 1);
+
+    if (installments > 1) {
+      const groupId = `parc-${Date.now()}`;
+      for (let i = 0; i < installments; i++) {
+        await addFinance({
+          ...base,
+          description: formDescription ? `${formDescription} (${i + 1}/${installments})` : `Parcela ${i + 1}/${installments}`,
+          date: addMonths(formDate, i),
+          status: i === 0 ? formStatus : 'pending',
+          installmentGroupId: groupId,
+          installmentNumber: i + 1,
+          installmentTotal: installments,
+        });
+      }
+    } else if (formRecurring) {
+      const recurrenceId = `rec-${Date.now()}`;
+      const endDate = formRecurrenceEndDate || addMonths(formDate, 11);
+      let current = formDate;
+      let i = 0;
+      while (current <= endDate && i < 60) {
+        await addFinance({
+          ...base,
+          date: current,
+          status: i === 0 ? formStatus : 'pending',
+          recurrenceId,
+          recurrenceFrequency: formRecurrenceFrequency,
+          recurrenceEndDate: endDate,
+        });
+        i++;
+        current = formRecurrenceFrequency === 'weekly' ? addDays(current, 7)
+          : formRecurrenceFrequency === 'yearly' ? addMonths(current, 12)
+          : addMonths(current, 1);
+      }
+    } else {
+      await addFinance(base);
+    }
+
     resetForm();
     setShowForm(false);
   };
@@ -550,6 +755,45 @@ export default function Financeiro() {
             <div className={styles.summaryItem}>
               <span className={styles.summaryItemLabel}>Margem</span>
               <span className={`${styles.summaryItemValue} ${styles.amber}`}>{margin.toFixed(1)}%</span>
+            </div>
+          </div>
+
+          {/* Carteira + Faturamento x Saldo em Aberto */}
+          <div className={styles.walletGrid}>
+            <div className={styles.agendamentosCard}>
+              <div className={styles.agendamentosHeader}>
+                <h3 className={styles.sectionTitle} style={{ margin: 0 }}>Carteira</h3>
+              </div>
+              <div className={styles.summaryItem} style={{ padding: '4px 0' }}>
+                <span className={styles.summaryItemLabel}>Saldo disponível</span>
+                <span className={`${styles.summaryItemValue} ${walletBalance >= 0 ? styles.green : styles.red}`} style={{ fontSize: 28 }}>
+                  {formatBRL(walletBalance)}
+                </span>
+              </div>
+              <p className={styles.agendamentosEmpty} style={{ marginTop: 4 }}>
+                Receitas já recebidas menos custos já pagos (todos os lançamentos, não só o mês filtrado).
+              </p>
+            </div>
+            <div className={styles.agendamentosCard}>
+              <div className={styles.agendamentosHeader}>
+                <h3 className={styles.sectionTitle} style={{ margin: 0 }}>Faturamento x Saldo em Aberto</h3>
+              </div>
+              <div className={styles.summaryBar} style={{ padding: '4px 0' }}>
+                <div className={styles.summaryItem}>
+                  <span className={styles.summaryItemLabel}>Faturamento</span>
+                  <span className={styles.summaryItemValue}>{formatBRL(faturamentoTotal)}</span>
+                </div>
+                <div className={styles.summaryDivider} />
+                <div className={styles.summaryItem}>
+                  <span className={styles.summaryItemLabel}>Recebido</span>
+                  <span className={`${styles.summaryItemValue} ${styles.green}`}>{formatBRL(faturamentoRecebido)}</span>
+                </div>
+                <div className={styles.summaryDivider} />
+                <div className={styles.summaryItem}>
+                  <span className={styles.summaryItemLabel}>Em Aberto</span>
+                  <span className={`${styles.summaryItemValue} ${saldoEmAberto > 0 ? styles.amber : styles.green}`}>{formatBRL(saldoEmAberto)}</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -702,25 +946,26 @@ export default function Financeiro() {
           <div className={styles.chartSection}>
             <h3 className={styles.sectionTitle}>Total por Categoria</h3>
             {(() => {
-              const cats = costFilter === 'fixed' ? sortCategoriesAlpha(FIXED_CATEGORIES)
-                : costFilter === 'variable' ? sortCategoriesAlpha(VARIABLE_CATEGORIES)
-                  : sortCategoriesAlpha([...FIXED_CATEGORIES, ...VARIABLE_CATEGORIES]);
+              const cats = costFilter === 'fixed' ? [...FIXED_CATEGORIES]
+                : costFilter === 'variable' ? [...VARIABLE_CATEGORIES]
+                  : [...FIXED_CATEGORIES, ...VARIABLE_CATEGORIES];
               const totals = cats
                 .map((cat) => ({
                   cat,
                   total: pageMonthFinances.filter((f) => f.type === 'cost' && f.category === cat).reduce((a, f) => a + f.amount, 0),
                 }))
-                .filter(({ total }) => total > 0);
+                .filter(({ total }) => total > 0)
+                .sort((a, b) => compareAlpha(categoryLabels[a.cat] || a.cat, categoryLabels[b.cat] || b.cat));
               const max = totals[0]?.total || 1;
               if (totals.length === 0) return <p className={styles.emptyState}>Nenhuma despesa registrada.</p>;
               return (
                 <div className={styles.catList}>
                   {totals.map(({ cat, total }) => (
                     <div key={cat} className={styles.catRow}>
-                      <span className={styles.catDot} style={{ background: CATEGORY_COLORS[cat] || '#64748b' }} />
-                      <span className={styles.catName}>{CATEGORY_LABELS[cat] || cat}</span>
+                      <span className={styles.catDot} style={{ background: categoryColors[cat] || '#64748b' }} />
+                      <span className={styles.catName}>{categoryLabels[cat] || cat}</span>
                       <div className={styles.catBarWrap}>
-                        <div className={styles.catBar} style={{ width: `${(total / max) * 100}%`, background: CATEGORY_COLORS[cat] || '#64748b' }} />
+                        <div className={styles.catBar} style={{ width: `${(total / max) * 100}%`, background: categoryColors[cat] || '#64748b' }} />
                       </div>
                       <span className={styles.catValue}>{formatBRL(total)}</span>
                     </div>
@@ -737,15 +982,17 @@ export default function Financeiro() {
         <div className={styles.tabContent}>
           {/* Month selector */}
           <div className={styles.monthSelector}>
-            {availableMonths.map((m) => (
-              <button
-                key={m}
-                className={`${styles.monthBtn} ${selectedMonth === m ? styles.monthBtnActive : ''}`}
-                onClick={() => setSelectedMonth(m)}
-              >
-                {formatMonth(m)}
-              </button>
-            ))}
+            <label className={styles.monthSelectLabel} htmlFor="finance-month-select">Período</label>
+            <select
+              id="finance-month-select"
+              className={styles.monthSelect}
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              disabled={availableMonths.length === 0}
+            >
+              {availableMonths.length === 0 && <option value={selectedMonth}>Nenhum período disponível</option>}
+              {availableMonths.map((m) => <option key={m} value={m}>{formatMonth(m)}</option>)}
+            </select>
           </div>
 
           {/* Monthly summary bar */}
@@ -833,16 +1080,49 @@ export default function Financeiro() {
                 </button>
               ))}
             </div>
-            <select
-              className={styles.searchInput}
-              value={filterMonth}
-              onChange={(e) => setFilterMonth(e.target.value)}
-            >
-              <option value="all">Todos os meses</option>
-              {availableMonths.map((m) => (
-                <option key={m} value={m}>{formatMonth(m)}</option>
-              ))}
-            </select>
+            <div className={styles.filterGroup}>
+              <button
+                className={`${styles.filterBtn} ${!useCustomRange ? styles.filterBtnActive : ''}`}
+                onClick={() => setUseCustomRange(false)}
+              >
+                Mês
+              </button>
+              <button
+                className={`${styles.filterBtn} ${useCustomRange ? styles.filterBtnActive : ''}`}
+                onClick={() => setUseCustomRange(true)}
+              >
+                Período
+              </button>
+            </div>
+            {!useCustomRange ? (
+              <select
+                className={styles.searchInput}
+                value={filterMonth}
+                onChange={(e) => setFilterMonth(e.target.value)}
+              >
+                <option value="all">Todos os meses</option>
+                {availableMonths.map((m) => (
+                  <option key={m} value={m}>{formatMonth(m)}</option>
+                ))}
+              </select>
+            ) : (
+              <>
+                <input
+                  type="date"
+                  className={styles.searchInput}
+                  value={filterDateFrom}
+                  onChange={(e) => setFilterDateFrom(e.target.value)}
+                  title="Data inicial"
+                />
+                <input
+                  type="date"
+                  className={styles.searchInput}
+                  value={filterDateTo}
+                  onChange={(e) => setFilterDateTo(e.target.value)}
+                  title="Data final"
+                />
+              </>
+            )}
             <input
               type="text"
               className={styles.searchInput}
@@ -853,6 +1133,10 @@ export default function Financeiro() {
             <button className={styles.btnExport} onClick={exportCSV} title="Exportar lancamentos filtrados para CSV">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Exportar CSV
+            </button>
+            <button className={styles.btnExport} onClick={exportDRE} title="Exportar no padrão DRE (mensal, por seção)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              Exportar DRE
             </button>
           </div>
 
@@ -886,9 +1170,9 @@ export default function Financeiro() {
                       <span className={styles.categoryTag}>
                         <span
                           className={styles.categoryDot}
-                          style={{ background: CATEGORY_COLORS[entry.category] || '#64748b' }}
+                          style={{ background: categoryColors[entry.category] || '#64748b' }}
                         />
-                        {CATEGORY_LABELS[entry.category] || entry.category}
+                        {categoryLabels[entry.category] || entry.category}
                       </span>
                     </td>
                     <td>{safeFormat(entry.date, 'dd/MM/yy', { locale: ptBR })}</td>
@@ -909,20 +1193,24 @@ export default function Financeiro() {
                       </span>
                     </td>
                     <td>
-                      <button
-                        className={styles.actionBtn}
-                        onClick={() => handleEdit(entry)}
-                        title="Editar"
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                      </button>
-                      <button
-                        className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
-                        onClick={() => deleteFinance(entry.id)}
-                        title="Excluir"
-                      >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                      </button>
+                      <div style={{ display: 'flex', gap: 4 }}>
+                        <button
+                          className={styles.actionBtn}
+                          onClick={() => handleEdit(entry)}
+                          title={entry.automatic ? 'Altere pelo registro de origem' : 'Editar'}
+                          disabled={entry.automatic}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        <button
+                          className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
+                          onClick={() => deleteFinance(entry.id)}
+                          title={entry.automatic ? 'Altere pelo registro de origem' : 'Excluir'}
+                          disabled={entry.automatic}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -938,7 +1226,7 @@ export default function Financeiro() {
 
       {/* Form Modal */}
       {showForm && (
-        <Modal title={editingId ? 'Editar Lancamento Financeiro' : 'Novo Lancamento Financeiro'} size="lg" onClose={() => setShowForm(false)}>
+        <Modal title={editingId ? 'Editar Lancamento Financeiro' : 'Novo Lancamento Financeiro'} size="lg" onClose={() => { resetForm(); setShowForm(false); }}>
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.formRow}>
               <div className={styles.formField}>
@@ -1013,7 +1301,17 @@ export default function Financeiro() {
 
             <div className={styles.formRow}>
               <div className={styles.formField}>
-                <label className={styles.formLabel}>Categoria</label>
+                <label className={styles.formLabel}>
+                  Categoria
+                  <button
+                    type="button"
+                    className={styles.btnAddCategory}
+                    onClick={() => { setNewCategorySection(formType === 'revenue' ? 'faturamentos' : 'despesas-administrativas'); setShowCategoryModal(true); }}
+                    title="Criar nova categoria"
+                  >
+                    + Nova categoria
+                  </button>
+                </label>
                 <select
                   className={styles.formSelect}
                   value={formCategory}
@@ -1021,8 +1319,12 @@ export default function Financeiro() {
                   required
                 >
                   <option value="">Selecione...</option>
-                  {formCategories[formType].map((cat) => (
-                    <option key={cat} value={cat}>{CATEGORY_LABELS[cat] || cat}</option>
+                  {groupedFormCategories.filter((g) => g.categories.length > 0).map((g) => (
+                    <optgroup key={g.section.key} label={g.section.label}>
+                      {g.categories.map((cat) => (
+                        <option key={cat.key} value={cat.key}>{cat.label}</option>
+                      ))}
+                    </optgroup>
                   ))}
                 </select>
               </div>
@@ -1075,11 +1377,79 @@ export default function Financeiro() {
               </div>
             </div>
 
+            <div className={styles.formRow}>
+              <div className={styles.formField}>
+                <label className={styles.formLabel}>Forma de pagamento</label>
+                <select className={styles.formSelect} value={formPaymentMethod} onChange={(e) => setFormPaymentMethod(e.target.value)}>
+                  <option value="">Nao informada</option>
+                  <option value="pix">Pix</option>
+                  <option value="money">Dinheiro</option>
+                  <option value="debit">Cartao de debito</option>
+                  <option value="credit">Cartao de credito</option>
+                  <option value="transfer">Transferencia</option>
+                  <option value="other">Outro</option>
+                </select>
+              </div>
+            </div>
+
+            {!editingId && (
+              <div className={styles.formSection}>
+                <div className={styles.formRow}>
+                  <div className={styles.formField}>
+                    <label className={styles.formLabel}>Parcelar em quantas vezes?</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="60"
+                      className={styles.formInput}
+                      value={formInstallments}
+                      onChange={(e) => { setFormInstallments(e.target.value); if (Number(e.target.value) > 1) setFormRecurring(false); }}
+                    />
+                    <p className={styles.formHint}>1 = à vista. Acima disso gera parcelas mensais (1/N, 2/N...).</p>
+                  </div>
+                  <div className={styles.formField}>
+                    <label className={styles.formLabel}>
+                      <span>
+                        <input
+                          type="checkbox"
+                          checked={formRecurring}
+                          onChange={(e) => { setFormRecurring(e.target.checked); if (e.target.checked) setFormInstallments('1'); }}
+                          disabled={Number(formInstallments) > 1}
+                          style={{ marginRight: 6 }}
+                        />
+                        Lançamento recorrente
+                      </span>
+                    </label>
+                    {formRecurring && (
+                      <div className={styles.formRow} style={{ marginTop: 6 }}>
+                        <select
+                          className={styles.formSelect}
+                          value={formRecurrenceFrequency}
+                          onChange={(e) => setFormRecurrenceFrequency(e.target.value as RecurrenceFrequency)}
+                        >
+                          <option value="monthly">Mensal</option>
+                          <option value="weekly">Semanal</option>
+                          <option value="yearly">Anual</option>
+                        </select>
+                        <input
+                          type="date"
+                          className={styles.formInput}
+                          value={formRecurrenceEndDate}
+                          onChange={(e) => setFormRecurrenceEndDate(e.target.value)}
+                          title="Repetir até (opcional, padrão 12 ocorrências)"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className={styles.formActions}>
-              <Button variant="secondary" type="button" onClick={() => setShowForm(false)}>
+              <Button variant="secondary" type="button" onClick={() => { resetForm(); setShowForm(false); }}>
                 Cancelar
               </Button>
-              <Button type="submit">Salvar</Button>
+              <Button type="submit">{editingId ? 'Salvar Alterações' : 'Salvar'}</Button>
             </div>
           </form>
         </Modal>
@@ -1129,8 +1499,12 @@ export default function Financeiro() {
                       onChange={(e) => setXmlItems(prev => prev.map(i => i.id === item.id ? { ...i, category: e.target.value } : i))}
                     >
                       <option value="">Categoria...</option>
-                      {formCategories.cost.map((cat) => (
-                        <option key={cat} value={cat}>{CATEGORY_LABELS[cat] || cat}</option>
+                      {groupedCostCategories.filter((g) => g.categories.length > 0).map((g) => (
+                        <optgroup key={g.section.key} label={g.section.label}>
+                          {g.categories.map((cat) => (
+                            <option key={cat.key} value={cat.key}>{cat.label}</option>
+                          ))}
+                        </optgroup>
                       ))}
                     </select>
                   </div>
@@ -1155,6 +1529,43 @@ export default function Financeiro() {
             </div>
           </div>
         </div>
+      )}
+
+      {showCategoryModal && (
+        <Modal title="Nova Categoria" size="sm" onClose={() => setShowCategoryModal(false)}>
+          <div className={styles.form}>
+            <div className={styles.formField}>
+              <label className={styles.formLabel}>Nome da categoria</label>
+              <input
+                type="text"
+                className={styles.formInput}
+                value={newCategoryLabel}
+                onChange={(e) => setNewCategoryLabel(e.target.value)}
+                placeholder="Ex: Manutenção de Fornos"
+                autoFocus
+              />
+            </div>
+            <div className={styles.formField}>
+              <label className={styles.formLabel}>Seção do DRE</label>
+              <select
+                className={styles.formSelect}
+                value={newCategorySection}
+                onChange={(e) => setNewCategorySection(e.target.value as DreSection)}
+              >
+                {DRE_SECTIONS.filter((s) => s.type === formType).map((s) => (
+                  <option key={s.key} value={s.key}>{s.label}</option>
+                ))}
+              </select>
+              <p className={styles.formHint}>Define em qual linha do DRE essa categoria entra na exportação.</p>
+            </div>
+            <div className={styles.formActions}>
+              <Button variant="secondary" type="button" onClick={() => setShowCategoryModal(false)}>Cancelar</Button>
+              <Button type="button" onClick={handleCreateCategory} disabled={savingCategory || !newCategoryLabel.trim()}>
+                {savingCategory ? 'Salvando...' : 'Criar categoria'}
+              </Button>
+            </div>
+          </div>
+        </Modal>
       )}
 
       {showInfo && (

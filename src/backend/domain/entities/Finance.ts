@@ -1,1 +1,1 @@
-export type { FinanceType, FinanceStatus, FinanceEntry } from '@shared/types';
+export type { FinanceType, FinanceStatus, FinanceEntry, DreSection, RecurrenceFrequency, FinanceCategoryEntry } from '@shared/types';

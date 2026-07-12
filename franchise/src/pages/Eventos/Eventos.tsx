@@ -637,7 +637,7 @@ return (
       )}
 
       {showModal && (
-        <div className={styles.overlay} onClick={closeModal}>
+        <div className={styles.overlay}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h2 className={styles.modalTitle}>{editingId ? 'Editar Agendamento' : 'Novo Agendamento'}</h2>
