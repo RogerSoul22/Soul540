@@ -82,7 +82,7 @@ export type DreSection =
   | 'receitas-nao-operacionais'
   | 'outras-saidas';
 
-export type RecurrenceFrequency = 'monthly' | 'weekly' | 'yearly';
+export type RecurrenceFrequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
 
 export interface FinanceEntry {
   id: string;
@@ -114,6 +114,8 @@ export interface FinanceEntry {
   recurrenceId?: string;
   recurrenceFrequency?: RecurrenceFrequency;
   recurrenceEndDate?: string;
+  recurrenceInterval?: number;
+  recurrenceTotal?: number;
   // Identificacao de movimentos importados de extratos bancarios (OFX).
   externalId?: string;
   importBatchId?: string;

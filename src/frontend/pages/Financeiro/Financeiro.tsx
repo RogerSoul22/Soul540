@@ -91,6 +91,7 @@ import {
   DRE_SECTIONS, groupCategoriesBySection, getCategorySection,
 } from '@backend/infra/data/financeCategories';
 import type { CategoryDef } from '@backend/infra/data/financeCategories';
+import { buildDreTemplateValues, DRE_TEMPLATE_INPUT_CELLS, DRE_TEMPLATE_SHEET } from '@shared/dreTemplate';
 import GaugeChart from '@frontend/components/GaugeChart/GaugeChart';
 import HorizontalBarChart from '@frontend/components/HorizontalBarChart/HorizontalBarChart';
 import Badge from '@frontend/components/Badge/Badge';
@@ -131,6 +132,13 @@ function addDays(dateStr: string, days: number): string {
   return date.toISOString().split('T')[0];
 }
 
+function advanceRecurrence(date: string, frequency: RecurrenceFrequency, interval: number): string {
+  if (frequency === 'daily') return addDays(date, interval);
+  if (frequency === 'weekly') return addDays(date, interval * 7);
+  if (frequency === 'yearly') return addMonths(date, interval * 12);
+  return addMonths(date, interval);
+}
+
 type TabType = 'geral' | 'despesas' | 'mensal' | 'lancamentos' | 'valores';
 type FilterType = 'all' | 'revenue' | 'cost';
 type CostFilter = 'all' | 'fixed' | 'variable';
@@ -163,16 +171,6 @@ const compareAlpha = (a: string, b: string) => alphaCollator.compare(normalizeAl
 
 type DataScope = 'main' | 'franchise' | 'factory' | 'combined';
 
-interface FinanceBackendSummary {
-  realizedIncome: number;
-  projectedIncome: number;
-  realizedExpense: number;
-  projectedExpense: number;
-  openReceivables: number;
-  netRealized: number;
-  byPaymentMethod: Array<{ method: string; amount: number; count: number }>;
-}
-
 export default function Financeiro() {
   const { events, finances, financeCategories, addFinance, updateFinance, deleteFinance, reverseFinance, addFinanceCategory, deleteEvent, closeEventFinance, reopenEventFinance } = useApp();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -185,7 +183,6 @@ export default function Financeiro() {
   const [factoryFinances, setFactoryFinances] = useState<typeof finances>([]);
   const [factoryEvents, setFactoryEvents] = useState<typeof events>([]);
   const [directEvents, setDirectEvents] = useState<typeof events>([]);
-  const [backendSummary, setBackendSummary] = useState<FinanceBackendSummary | null>(null);
 
   // Page-level month filter (shared by geral / despesas / valores tabs)
   const [pageMonth, setPageMonth] = useState<string>('all');
@@ -227,13 +224,27 @@ export default function Financeiro() {
   // Recorrência
   const [formRecurring, setFormRecurring] = useState(false);
   const [formRecurrenceFrequency, setFormRecurrenceFrequency] = useState<RecurrenceFrequency>('monthly');
-  const [formRecurrenceEndDate, setFormRecurrenceEndDate] = useState('');
+  const [formRecurrenceInterval, setFormRecurrenceInterval] = useState('1');
+  const [formRecurrenceTotal, setFormRecurrenceTotal] = useState('12');
 
   // Nova categoria personalizada
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [newCategoryLabel, setNewCategoryLabel] = useState('');
   const [newCategorySection, setNewCategorySection] = useState<DreSection>('despesas-administrativas');
   const [savingCategory, setSavingCategory] = useState(false);
+
+  const recurrencePreview = useMemo(() => {
+    if (!formRecurring || !formDate) return [];
+    const interval = Math.max(1, Math.min(365, Number(formRecurrenceInterval) || 1));
+    const total = Math.max(1, Math.min(366, Number(formRecurrenceTotal) || 1));
+    const dates: string[] = [];
+    let current = formDate;
+    for (let index = 0; index < total; index += 1) {
+      dates.push(current);
+      current = advanceRecurrence(current, formRecurrenceFrequency, interval);
+    }
+    return dates;
+  }, [formRecurring, formDate, formRecurrenceFrequency, formRecurrenceInterval, formRecurrenceTotal]);
 
   // XML import state
   const [showXmlModal, setShowXmlModal] = useState(false);
@@ -385,23 +396,6 @@ export default function Financeiro() {
       fetch('/api/events',   { headers: h, credentials: 'include' }).then(r => r.json()).then(d => Array.isArray(d) && setFactoryEvents(d)).catch(() => {});
     }
   }, [dataScope]);
-
-  useEffect(() => {
-    const params = new URLSearchParams({ scope: dataScope });
-    if (activeTab === 'geral' && generalFilterMode === 'period') {
-      if (generalDateFrom) params.set('start', generalDateFrom);
-      if (generalDateTo) params.set('end', generalDateTo);
-    } else if (pageMonth !== 'all') {
-      const [year, month] = pageMonth.split('-').map(Number);
-      const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
-      params.set('start', `${pageMonth}-01`);
-      params.set('end', `${pageMonth}-${String(lastDay).padStart(2, '0')}`);
-    }
-    fetch(`/api/finances/summary?${params.toString()}`, { credentials: 'include', headers: { 'X-System': 'main' } })
-      .then((response) => response.ok ? response.json() : Promise.reject(new Error('summary')))
-      .then(setBackendSummary)
-      .catch(() => setBackendSummary(null));
-  }, [dataScope, pageMonth, activeTab, generalFilterMode, generalDateFrom, generalDateTo, finances, franchiseFinances, factoryFinances]);
 
   // Ensure events are available for the form regardless of AppContext state
   useEffect(() => {
@@ -595,10 +589,17 @@ export default function Financeiro() {
     [pageMonthFinances],
   );
   const saldoEmAberto = faturamentoTotal - faturamentoRecebido;
-  const paymentMethodSummary = useMemo(
-    () => [...(backendSummary?.byPaymentMethod ?? [])].sort((a, b) => b.amount - a.amount),
-    [backendSummary?.byPaymentMethod],
-  );
+  const paymentMethodSummary = useMemo(() => {
+    const grouped = new Map<string, { method: string; amount: number; count: number }>();
+    for (const entry of pageMonthFinances.filter((item) => item.type === 'revenue' && item.status === 'received')) {
+      const method = entry.paymentMethod || 'nao-informado';
+      const current = grouped.get(method) || { method, amount: 0, count: 0 };
+      current.amount += entry.amount;
+      current.count += 1;
+      grouped.set(method, current);
+    }
+    return [...grouped.values()].sort((a, b) => b.amount - a.amount);
+  }, [pageMonthFinances]);
   const paymentMethodTotal = useMemo(
     () => paymentMethodSummary.reduce((sum, item) => sum + item.amount, 0),
     [paymentMethodSummary],
@@ -625,13 +626,14 @@ export default function Financeiro() {
     for (const f of activeFinances) {
       if (f.date && /^\d{4}-\d{2}/.test(f.date)) set.add(f.date.substring(0, 7));
     }
-    return [...set].sort();
+    const currentMonth = new Date().toISOString().substring(0, 7);
+    return [...set].sort((a, b) => a === currentMonth ? -1 : b === currentMonth ? 1 : b.localeCompare(a));
   }, [activeFinances]);
 
   // Auto-select most recent month when finances load
   useEffect(() => {
     if (availableMonths.length > 0 && !availableMonths.includes(selectedMonth)) {
-      setSelectedMonth(availableMonths[availableMonths.length - 1]);
+      setSelectedMonth(availableMonths[0]);
     }
   }, [availableMonths]);
 
@@ -805,12 +807,12 @@ export default function Financeiro() {
 
   // Exportação no padrão do arquivo "DRE 2026 - SOUL PIZZA.xlsx": meses em coluna,
   // categorias agrupadas por seção do DRE, totais por seção e linhas de resultado.
-  const exportDRE = () => {
+  const exportDRELegacy = () => {
     if (availableMonths.length === 0) {
       alert('Nenhum lançamento financeiro para exportar.');
       return;
     }
-    const months = availableMonths;
+    const months = [...availableMonths].sort();
     const fmt = (v: number) => v.toFixed(2).replace('.', ',');
     const monthAmount = (categoryKey: string, type: FinanceType, month: string) =>
       activeFinances
@@ -879,6 +881,46 @@ export default function Financeiro() {
     URL.revokeObjectURL(url);
   };
 
+  const exportDRE = async () => {
+    const dreValues = buildDreTemplateValues(activeFinances, financeCategories);
+    if (dreValues.size === 0) {
+      alert('Nenhum lançamento entre julho e dezembro de 2026 para exportar.');
+      return;
+    }
+
+    try {
+      const [{ default: ExcelJS }, templateResponse] = await Promise.all([
+        import('exceljs'),
+        fetch('/dre-2026-soul-pizza.xlsx'),
+      ]);
+      if (!templateResponse.ok) throw new Error('Modelo oficial do DRE não encontrado.');
+
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(await templateResponse.arrayBuffer());
+      const worksheet = workbook.getWorksheet(DRE_TEMPLATE_SHEET);
+      if (!worksheet) throw new Error(`A aba "${DRE_TEMPLATE_SHEET}" não existe no modelo.`);
+
+      for (const address of DRE_TEMPLATE_INPUT_CELLS) worksheet.getCell(address).value = 0;
+      for (const [address, amount] of dreValues) worksheet.getCell(address).value = amount;
+      workbook.calcProperties.fullCalcOnLoad = true;
+      workbook.calcProperties.forceFullCalc = true;
+      workbook.calcProperties.calcMode = 'auto';
+
+      const output = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([output as BlobPart], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `DRE 2026 - SOUL PIZZA - ${dataScope}.xlsx`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Não foi possível gerar o DRE.');
+    }
+  };
+
   const resetForm = () => {
     setFormType('revenue');
     setFormEventId('');
@@ -892,7 +934,8 @@ export default function Financeiro() {
     setFormInstallments('1');
     setFormRecurring(false);
     setFormRecurrenceFrequency('monthly');
-    setFormRecurrenceEndDate('');
+    setFormRecurrenceInterval('1');
+    setFormRecurrenceTotal('12');
     setEditingFinanceId(null);
   };
 
@@ -981,10 +1024,11 @@ export default function Financeiro() {
       }
     } else if (formRecurring) {
       const recurrenceId = `rec-${Date.now()}`;
-      const endDate = formRecurrenceEndDate || addMonths(formDate, 11);
+      const interval = Math.max(1, Math.min(365, Number(formRecurrenceInterval) || 1));
+      const total = Math.max(1, Math.min(366, Number(formRecurrenceTotal) || 1));
+      const endDate = recurrencePreview[recurrencePreview.length - 1] || formDate;
       let current = formDate;
-      let i = 0;
-      while (current <= endDate && i < 60) {
+      for (let i = 0; i < total; i += 1) {
         await addFinance({
           ...base,
           date: current,
@@ -992,11 +1036,10 @@ export default function Financeiro() {
           recurrenceId,
           recurrenceFrequency: formRecurrenceFrequency,
           recurrenceEndDate: endDate,
+          recurrenceInterval: interval,
+          recurrenceTotal: total,
         });
-        i++;
-        current = formRecurrenceFrequency === 'weekly' ? addDays(current, 7)
-          : formRecurrenceFrequency === 'yearly' ? addMonths(current, 12)
-          : addMonths(current, 1);
+        current = advanceRecurrence(current, formRecurrenceFrequency, interval);
       }
     } else {
       await addFinance(base);
@@ -1201,17 +1244,17 @@ export default function Financeiro() {
               <div className={styles.summaryBar} style={{ padding: '4px 0' }}>
                 <div className={styles.summaryItem}>
                   <span className={styles.summaryItemLabel}>Faturamento</span>
-                  <span className={styles.summaryItemValue}>{formatBRL(backendSummary ? backendSummary.realizedIncome + backendSummary.projectedIncome : faturamentoTotal)}</span>
+                  <span className={styles.summaryItemValue}>{formatBRL(faturamentoTotal)}</span>
                 </div>
                 <div className={styles.summaryDivider} />
                 <div className={styles.summaryItem}>
                   <span className={styles.summaryItemLabel}>Recebido</span>
-                  <span className={`${styles.summaryItemValue} ${styles.green}`}>{formatBRL(backendSummary?.realizedIncome ?? faturamentoRecebido)}</span>
+                  <span className={`${styles.summaryItemValue} ${styles.green}`}>{formatBRL(faturamentoRecebido)}</span>
                 </div>
                 <div className={styles.summaryDivider} />
                 <div className={styles.summaryItem}>
                   <span className={styles.summaryItemLabel}>Em Aberto</span>
-                  <span className={`${styles.summaryItemValue} ${(backendSummary?.openReceivables ?? saldoEmAberto) > 0 ? styles.amber : styles.green}`}>{formatBRL(backendSummary?.openReceivables ?? saldoEmAberto)}</span>
+                  <span className={`${styles.summaryItemValue} ${saldoEmAberto > 0 ? styles.amber : styles.green}`}>{formatBRL(saldoEmAberto)}</span>
                 </div>
               </div>
             </div>
@@ -2232,40 +2275,25 @@ export default function Financeiro() {
                     <p className={styles.formHint}>1 = à vista. Acima disso gera parcelas mensais (1/N, 2/N...).</p>
                   </div>
                   <div className={styles.formField}>
-                    <label className={styles.formLabel}>
-                      <span>
-                        <input
-                          type="checkbox"
-                          checked={formRecurring}
-                          onChange={(e) => { setFormRecurring(e.target.checked); if (e.target.checked) setFormInstallments('1'); }}
-                          disabled={Number(formInstallments) > 1}
-                          style={{ marginRight: 6 }}
-                        />
-                        Lançamento recorrente
-                      </span>
+                    <label className={styles.recurrenceToggle}>
+                      <input type="checkbox" checked={formRecurring} onChange={(e) => { setFormRecurring(e.target.checked); if (e.target.checked) setFormInstallments('1'); }} disabled={Number(formInstallments) > 1} />
+                      <span><strong>Repetir lançamento</strong><small>Crie automaticamente as próximas ocorrências</small></span>
                     </label>
-                    {formRecurring && (
-                      <div className={styles.formRow} style={{ marginTop: 6 }}>
-                        <select
-                          className={styles.formSelect}
-                          value={formRecurrenceFrequency}
-                          onChange={(e) => setFormRecurrenceFrequency(e.target.value as RecurrenceFrequency)}
-                        >
-                          <option value="monthly">Mensal</option>
-                          <option value="weekly">Semanal</option>
-                          <option value="yearly">Anual</option>
-                        </select>
-                        <input
-                          type="date"
-                          className={styles.formInput}
-                          value={formRecurrenceEndDate}
-                          onChange={(e) => setFormRecurrenceEndDate(e.target.value)}
-                          title="Repetir até (opcional, padrão 12 ocorrências)"
-                        />
-                      </div>
-                    )}
                   </div>
                 </div>
+                {formRecurring && (
+                  <div className={styles.recurrencePanel}>
+                    <div className={styles.recurrenceFields}>
+                      <label><span>Repetir a cada</span><input type="number" min="1" max="365" className={styles.formInput} value={formRecurrenceInterval} onChange={(e) => setFormRecurrenceInterval(e.target.value)} /></label>
+                      <label><span>Frequência</span><select className={styles.formSelect} value={formRecurrenceFrequency} onChange={(e) => setFormRecurrenceFrequency(e.target.value as RecurrenceFrequency)}><option value="daily">Dia(s)</option><option value="weekly">Semana(s)</option><option value="monthly">Mês(es)</option><option value="yearly">Ano(s)</option></select></label>
+                      <label><span>Terminar após</span><div className={styles.occurrenceInput}><input type="number" min="1" max="366" className={styles.formInput} value={formRecurrenceTotal} onChange={(e) => setFormRecurrenceTotal(e.target.value)} /><span>ocorrências</span></div></label>
+                    </div>
+                    <div className={styles.recurrencePreview}>
+                      <div><strong>Recorrências previstas</strong><span>{recurrencePreview.length} lançamentos · Total {formatBRL(parseCurrency(formAmount) * recurrencePreview.length)}</span></div>
+                      <div className={styles.recurrenceDates}>{recurrencePreview.slice(0, 6).map((date, index) => <span key={`${date}-${index}`}>{index + 1}. {safeFormatDate(date, 'dd/MM/yyyy')}</span>)}{recurrencePreview.length > 6 && <span>+ {recurrencePreview.length - 6} ocorrências</span>}</div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

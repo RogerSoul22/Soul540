@@ -94,6 +94,12 @@ function addDays(dateStr: string, days: number): string {
   const date = new Date(y, m - 1, d + days);
   return date.toISOString().split('T')[0];
 }
+function advanceRecurrence(date: string, frequency: RecurrenceFrequency, interval: number): string {
+  if (frequency === 'daily') return addDays(date, interval);
+  if (frequency === 'weekly') return addDays(date, interval * 7);
+  if (frequency === 'yearly') return addMonths(date, interval * 12);
+  return addMonths(date, interval);
+}
 
 type TabType = 'geral' | 'despesas' | 'mensal' | 'lancamentos' | 'valores';
 type FilterType = 'all' | 'revenue' | 'cost';
@@ -165,7 +171,16 @@ export default function Financeiro() {
   // Recorrência
   const [formRecurring, setFormRecurring] = useState(false);
   const [formRecurrenceFrequency, setFormRecurrenceFrequency] = useState<RecurrenceFrequency>('monthly');
-  const [formRecurrenceEndDate, setFormRecurrenceEndDate] = useState('');
+  const [formRecurrenceInterval, setFormRecurrenceInterval] = useState('1');
+  const [formRecurrenceTotal, setFormRecurrenceTotal] = useState('12');
+  const recurrencePreview = useMemo(() => {
+    if (!formRecurring || !formDate) return [];
+    const interval = Math.max(1, Math.min(365, Number(formRecurrenceInterval) || 1));
+    const total = Math.max(1, Math.min(366, Number(formRecurrenceTotal) || 1));
+    const dates: string[] = []; let current = formDate;
+    for (let index = 0; index < total; index += 1) { dates.push(current); current = advanceRecurrence(current, formRecurrenceFrequency, interval); }
+    return dates;
+  }, [formRecurring, formDate, formRecurrenceFrequency, formRecurrenceInterval, formRecurrenceTotal]);
 
   // Nova categoria personalizada
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -362,7 +377,8 @@ export default function Financeiro() {
     for (const f of finances) {
       if (f.date && /^\d{4}-\d{2}/.test(f.date)) set.add(f.date.substring(0, 7));
     }
-    return [...set].sort();
+    const currentMonth = new Date().toISOString().substring(0, 7);
+    return [...set].sort((a, b) => a === currentMonth ? -1 : b === currentMonth ? 1 : b.localeCompare(a));
   }, [finances]);
 
   // Open form from URL query params (e.g. from Dashboard shortcut)
@@ -378,7 +394,7 @@ export default function Financeiro() {
   // Auto-select most recent month when finances load
   useEffect(() => {
     if (availableMonths.length > 0 && !availableMonths.includes(selectedMonth)) {
-      setSelectedMonth(availableMonths[availableMonths.length - 1]);
+      setSelectedMonth(availableMonths[0]);
     }
   }, [availableMonths]);
 
@@ -558,7 +574,7 @@ export default function Financeiro() {
       alert('Nenhum lan\u00E7amento financeiro para exportar.');
       return;
     }
-    const months = availableMonths;
+    const months = [...availableMonths].sort();
     const fmt = (v: number) => v.toFixed(2).replace('.', ',');
     const monthAmount = (categoryKey: string, type: FinanceType, month: string) =>
       finances
@@ -640,7 +656,8 @@ export default function Financeiro() {
     setFormInstallments('1');
     setFormRecurring(false);
     setFormRecurrenceFrequency('monthly');
-    setFormRecurrenceEndDate('');
+    setFormRecurrenceInterval('1');
+    setFormRecurrenceTotal('12');
     setEditingFinanceId(null);
   };
 
@@ -699,10 +716,11 @@ export default function Financeiro() {
       }
     } else if (formRecurring) {
       const recurrenceId = `rec-${Date.now()}`;
-      const endDate = formRecurrenceEndDate || addMonths(formDate, 11);
+      const interval = Math.max(1, Math.min(365, Number(formRecurrenceInterval) || 1));
+      const total = Math.max(1, Math.min(366, Number(formRecurrenceTotal) || 1));
+      const endDate = recurrencePreview[recurrencePreview.length - 1] || formDate;
       let current = formDate;
-      let i = 0;
-      while (current <= endDate && i < 60) {
+      for (let i = 0; i < total; i += 1) {
         await addFinance({
           ...base,
           date: current,
@@ -710,11 +728,10 @@ export default function Financeiro() {
           recurrenceId,
           recurrenceFrequency: formRecurrenceFrequency,
           recurrenceEndDate: endDate,
+          recurrenceInterval: interval,
+          recurrenceTotal: total,
         });
-        i++;
-        current = formRecurrenceFrequency === 'weekly' ? addDays(current, 7)
-          : formRecurrenceFrequency === 'yearly' ? addMonths(current, 12)
-          : addMonths(current, 1);
+        current = advanceRecurrence(current, formRecurrenceFrequency, interval);
       }
     } else {
       await addFinance(base);
@@ -1523,23 +1540,22 @@ export default function Financeiro() {
                       </span>
                     </label>
                     {formRecurring && (
-                      <div className={styles.formRow} style={{ marginTop: 6 }}>
+                      <div className={styles.recurrenceConfig}>
+                        <label>Repetir a cada<input type="number" min="1" max="365" className={styles.formInput} value={formRecurrenceInterval} onChange={(e) => setFormRecurrenceInterval(e.target.value)} /></label>
+                        <label>Frequência
                         <select
                           className={styles.formSelect}
                           value={formRecurrenceFrequency}
                           onChange={(e) => setFormRecurrenceFrequency(e.target.value as RecurrenceFrequency)}
                         >
+                          <option value="daily">Dia(s)</option>
                           <option value="monthly">Mensal</option>
                           <option value="weekly">Semanal</option>
                           <option value="yearly">Anual</option>
                         </select>
-                        <input
-                          type="date"
-                          className={styles.formInput}
-                          value={formRecurrenceEndDate}
-                          onChange={(e) => setFormRecurrenceEndDate(e.target.value)}
-                          title="Repetir até (opcional, padrão 12 ocorrências)"
-                        />
+                        </label>
+                        <label>Terminar após<input type="number" min="1" max="366" className={styles.formInput} value={formRecurrenceTotal} onChange={(e) => setFormRecurrenceTotal(e.target.value)} /></label>
+                        <div className={styles.recurrenceSummary}><strong>Recorrências previstas</strong><span>{recurrencePreview.length} lançamentos · {formatBRL(parseCurrency(formAmount) * recurrencePreview.length)}</span><small>{recurrencePreview.slice(0, 4).map((date) => safeFormatDate(date, 'dd/MM/yyyy')).join(' · ')}</small></div>
                       </div>
                     )}
                   </div>

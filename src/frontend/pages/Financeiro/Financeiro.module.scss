@@ -905,6 +905,24 @@
   color: $text-muted;
   margin-top: 4px;
 }
+.recurrenceToggle { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 9px 11px; border: 1px solid #cfd9e7; border-radius: 5px; background: #fff; cursor: pointer; }
+.recurrenceToggle input { width: 16px; height: 16px; accent-color: #f5a000; }
+.recurrenceToggle > span { display: flex; flex-direction: column; gap: 2px; }
+.recurrenceToggle strong { color: #182235; font-size: 12px; }
+.recurrenceToggle small { color: #718096; font-size: 10px; }
+.recurrencePanel { margin-top: 12px; padding: 14px; border: 1px solid #f0d397; border-radius: 5px; background: #fffaf0; }
+.recurrenceFields { display: grid; grid-template-columns: 140px minmax(160px, 1fr) minmax(200px, 1fr); gap: 10px; }
+.recurrenceFields label { display: flex; min-width: 0; flex-direction: column; gap: 5px; }
+.recurrenceFields label > span { color: #63738b; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.occurrenceInput { display: flex; align-items: center; gap: 8px; }
+.occurrenceInput span { flex-shrink: 0; color: #63738b; font-size: 11px; }
+.recurrencePreview { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0d397; }
+.recurrencePreview > div:first-child { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.recurrencePreview strong { color: #182235; font-size: 12px; }
+.recurrencePreview > div:first-child span { color: #a85f00; font-size: 11px; font-weight: 700; }
+.recurrenceDates { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 10px; }
+.recurrenceDates span { padding: 6px 8px; border: 1px solid #eadfc9; border-radius: 4px; background: #fff; color: #40516a; font-size: 10px; }
+@media (max-width: 700px) { .recurrenceFields, .recurrenceDates { grid-template-columns: 1fr; } .recurrencePreview > div:first-child { align-items: flex-start; flex-direction: column; } }
 
 .formSelect,
 .formInput,

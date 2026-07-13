@@ -1029,3 +1029,10 @@
 .monthSelect { min-width: 190px; min-height: 34px; padding: 6px 32px 6px 10px; border: 1px solid #cfd9e7; border-radius: 4px; background: #fff; color: #182235; font-size: 12px; cursor: pointer; }
 .monthSelect:focus { outline: none; border-color: #1464b4; box-shadow: 0 0 0 3px rgba(20,100,180,.12); }
 @media (max-width: 700px) { .page { padding: 14px 12px 28px; } .summaryBar { grid-template-columns: repeat(2, minmax(0, 1fr)); } .summaryBar > .summaryItem:nth-child(2) { border-right: 0; } .summaryBar > .summaryItem:nth-child(-n+2) { border-bottom: 1px solid #dbe3ef; } .filterRow { align-items: stretch; flex-wrap: wrap; } .filterGroup { flex: 1 1 160px; } .filterGroup:has(.searchInput) { flex-basis: 100%; } }
+.recurrenceConfig { display: grid; grid-template-columns: 120px minmax(130px, 1fr) 130px; gap: 8px; margin-top: 8px; padding: 12px; border: 1px solid #f0d397; border-radius: 5px; background: #fffaf0; }
+.recurrenceConfig label { display: flex; flex-direction: column; gap: 5px; color: #63738b; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.recurrenceSummary { display: flex; grid-column: 1 / -1; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 7px; padding-top: 10px; border-top: 1px solid #f0d397; }
+.recurrenceSummary strong { color: #182235; font-size: 11px; }
+.recurrenceSummary span { color: #a85f00; font-size: 11px; font-weight: 700; }
+.recurrenceSummary small { width: 100%; color: #64748b; font-size: 10px; }
+@media (max-width: 700px) { .recurrenceConfig { grid-template-columns: 1fr; } .recurrenceSummary { grid-column: auto; } }
