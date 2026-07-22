@@ -92,6 +92,7 @@ import {
 } from '@backend/infra/data/financeCategories';
 import type { CategoryDef } from '@backend/infra/data/financeCategories';
 import { buildDreTemplateValues, DRE_TEMPLATE_INPUT_CELLS, DRE_TEMPLATE_SHEET } from '@shared/dreTemplate';
+import { isRealizedRevenue } from '@shared/financeSettlement';
 import GaugeChart from '@frontend/components/GaugeChart/GaugeChart';
 import HorizontalBarChart from '@frontend/components/HorizontalBarChart/HorizontalBarChart';
 import Badge from '@frontend/components/Badge/Badge';
@@ -519,7 +520,7 @@ export default function Financeiro() {
   );
   const profit = totalRevenue - totalCosts;
   const margin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
-  const realizedIncome = useMemo(() => pageMonthFinances.filter((entry) => entry.type === 'revenue' && entry.status === 'received').reduce((sum, entry) => sum + entry.amount, 0), [pageMonthFinances]);
+  const realizedIncome = useMemo(() => pageMonthFinances.filter((entry) => entry.type === 'revenue' && isRealizedRevenue(entry)).reduce((sum, entry) => sum + entry.amount, 0), [pageMonthFinances]);
   const projectedIncome = totalRevenue - realizedIncome;
   const realizedExpense = useMemo(() => pageMonthFinances.filter((entry) => entry.type === 'cost' && entry.status === 'paid').reduce((sum, entry) => sum + entry.amount, 0), [pageMonthFinances]);
   const projectedExpense = totalCosts - realizedExpense;
@@ -563,7 +564,7 @@ export default function Financeiro() {
   // Carteira: saldo calculado automaticamente a partir de TODOS os lançamentos
   // já liquidados (receitas recebidas − custos pagos), independente do filtro de mês.
   const wallet = useMemo(() => {
-    const received = pageMonthFinances.filter((f) => f.type === 'revenue' && f.status === 'received').reduce((acc, f) => acc + f.amount, 0);
+    const received = pageMonthFinances.filter((f) => f.type === 'revenue' && isRealizedRevenue(f)).reduce((acc, f) => acc + f.amount, 0);
     const paid = pageMonthFinances.filter((f) => f.type === 'cost' && f.status === 'paid').reduce((acc, f) => acc + f.amount, 0);
     return { received, paid, balance: received - paid };
   }, [pageMonthFinances]);
@@ -585,7 +586,7 @@ export default function Financeiro() {
   // Faturamento (tudo que foi vendido/contratado, mesmo pendente) x Recebido x Saldo em Aberto
   const faturamentoTotal = totalRevenue;
   const faturamentoRecebido = useMemo(
-    () => pageMonthFinances.filter((f) => f.type === 'revenue' && f.status === 'received').reduce((acc, f) => acc + f.amount, 0),
+    () => pageMonthFinances.filter((f) => f.type === 'revenue' && isRealizedRevenue(f)).reduce((acc, f) => acc + f.amount, 0),
     [pageMonthFinances],
   );
   const saldoEmAberto = faturamentoTotal - faturamentoRecebido;

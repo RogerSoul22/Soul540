@@ -5,6 +5,7 @@ import { useApp } from '@/contexts/AppContext';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { isRealizedRevenue } from '@shared/financeSettlement';
 import type { DreSection, RecurrenceFrequency } from '@shared/types';
 import {
   FIXED_CATEGORIES, VARIABLE_CATEGORIES, CATEGORY_LABELS as BUILTIN_CATEGORY_LABELS, CATEGORY_COLORS as BUILTIN_CATEGORY_COLORS,
@@ -344,7 +345,7 @@ export default function Financeiro() {
   // Carteira: saldo calculado automaticamente a partir de TODOS os lançamentos
   // já liquidados (receitas recebidas − custos pagos), independente do filtro de mês.
   const walletBalance = useMemo(() => {
-    const received = finances.filter((f) => f.type === 'revenue' && f.status === 'received').reduce((acc, f) => acc + f.amount, 0);
+    const received = finances.filter((f) => f.type === 'revenue' && isRealizedRevenue(f)).reduce((acc, f) => acc + f.amount, 0);
     const paid = finances.filter((f) => f.type === 'cost' && f.status === 'paid').reduce((acc, f) => acc + f.amount, 0);
     return received - paid;
   }, [finances]);
@@ -352,7 +353,7 @@ export default function Financeiro() {
   // Faturamento (tudo que foi vendido/contratado, mesmo pendente) x Recebido x Saldo em Aberto
   const faturamentoTotal = totalRevenue;
   const faturamentoRecebido = useMemo(
-    () => pageMonthFinances.filter((f) => f.type === 'revenue' && f.status === 'received').reduce((acc, f) => acc + f.amount, 0),
+    () => pageMonthFinances.filter((f) => f.type === 'revenue' && isRealizedRevenue(f)).reduce((acc, f) => acc + f.amount, 0),
     [pageMonthFinances],
   );
   const saldoEmAberto = faturamentoTotal - faturamentoRecebido;
