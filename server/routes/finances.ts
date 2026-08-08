@@ -504,53 +504,33 @@ router.put('/:id', validate(updateFinanceSchema), async (req, res) => {
     }
 
     if (command.kind === 'settle') {
-      const amountCents = getFinanceAmountCents(entry);
-      const updated = await (found.model as any).findOneAndUpdate(
-        {
-          _id: entry._id,
-          settlementStatus: { $ne: 'cancelled' },
-          'settlements.idempotencyKey': { $ne: command.settlement.idempotencyKey },
-        },
-        [
-          {
-            $set: {
-              settlements: { $concatArrays: [{ $ifNull: ['$settlements', []] }, [command.settlement]] },
-              settledCents: { $add: [{ $ifNull: ['$settledCents', 0] }, command.settlement.amountCents] },
-              settledAt: command.settlement.settledAt,
-            },
-          },
-          {
-            $set: {
-              settlementStatus: { $cond: [{ $gte: ['$settledCents', amountCents] }, 'settled', 'partial'] },
-              status: { $cond: [{ $gte: ['$settledCents', amountCents] }, entry.type === 'revenue' ? 'received' : 'paid', 'pending'] },
-            },
-          },
-        ],
-        { new: true },
-      );
-      if (!updated) return res.status(409).json({ error: 'Não foi possível alterar o status; atualize e tente novamente' });
-      await logAudit({
-        req,
-        action: 'update',
-        resource: 'finances',
-        resourceId: req.params.id,
-        description: `Alterou status de "${STATUS_LABELS[entry.status] || entry.status}" para "${STATUS_LABELS[req.body.status] || req.body.status}": ${updated.description}`,
-      });
-      return res.json(serializeFinanceEntry(updated));
+      const outcome = await appendSettlementToFinance(found.model, oldDoc, command.settlement);
+      if (outcome.kind === 'error') return res.status(outcome.status).json({ error: outcome.error });
+      if (outcome.kind === 'created') {
+        await logAudit({
+          req,
+          action: 'update',
+          resource: 'finances',
+          resourceId: req.params.id,
+          description: `Alterou status de "${STATUS_LABELS[entry.status] || entry.status}" para "${STATUS_LABELS[req.body.status] || req.body.status}": ${outcome.finance.description}`,
+        });
+      }
+      return res.json(serializeFinanceEntry(outcome.finance));
     }
 
     if (command.kind === 'reopen') {
-      const updated = await found.model.findByIdAndUpdate(
-        entry._id,
+      const updated = await found.model.findOneAndUpdate(
+        { _id: entry._id, settlementStatus: { $ne: 'cancelled' } },
         { $set: { settlementStatus: 'open', settledCents: 0, status: 'pending' }, $unset: { settledAt: 1, settlements: 1 } },
         { new: true },
       );
+      if (!updated) return res.status(409).json({ error: 'Não é possível reabrir um lançamento cancelado' });
       await logAudit({
         req,
         action: 'update',
         resource: 'finances',
         resourceId: req.params.id,
-        description: `Alterou status de "${STATUS_LABELS[entry.status] || entry.status}" para "Pendente": ${updated?.description}`,
+        description: `Alterou status de "${STATUS_LABELS[entry.status] || entry.status}" para "Pendente": ${updated.description}`,
       });
       return res.json(serializeFinanceEntry(updated));
     }

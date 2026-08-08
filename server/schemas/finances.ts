@@ -26,6 +26,8 @@ export const createFinanceSchema = z.object({
   paymentMethod: z.string().optional(),
   dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
   settledAt: z.string().optional(),
+  settledOn: z.string().refine(isDateOnly, 'Data efetiva deve ser YYYY-MM-DD').optional(),
+  reason: z.string().max(500).optional(),
   settlementStatus: z.enum(['open', 'partial', 'settled', 'cancelled']).optional(),
   automatic: z.boolean().optional(),
   reversedAt: z.string().optional(),
