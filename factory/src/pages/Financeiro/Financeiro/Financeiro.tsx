@@ -130,11 +130,13 @@ export default function Financeiro() {
   const [activeTab, setActiveTab] = useState<TabType>('geral');
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().substring(0, 7));
   const [costFilter, setCostFilter] = useState<CostFilter>('all');
-  const [pageMonth, setPageMonth] = useState<string>('all');
+  const [pageMonthPart, setPageMonthPart] = useState<string>('all');
+  const [pageYearPart, setPageYearPart] = useState<string>('all');
 
   // Table filters
   const [filterType, setFilterType] = useState<FilterType>('all');
-  const [filterMonth, setFilterMonth] = useState<string>('all');
+  const [filterMonthPart, setFilterMonthPart] = useState<string>('all');
+  const [filterYearPart, setFilterYearPart] = useState<string>('all');
   const [useCustomRange, setUseCustomRange] = useState(false);
   const [filterDateFrom, setFilterDateFrom] = useState('');
   const [filterDateTo, setFilterDateTo] = useState('');
@@ -312,8 +314,13 @@ export default function Financeiro() {
 
   // === DATA COMPUTATIONS ===
   const pageMonthFinances = useMemo(
-    () => pageMonth === 'all' ? finances : finances.filter((f) => f.date && f.date.startsWith(pageMonth)),
-    [finances, pageMonth],
+    () => finances.filter((f) => {
+      if (!f.date) return false;
+      if (pageYearPart !== 'all' && !f.date.startsWith(pageYearPart)) return false;
+      if (pageMonthPart !== 'all' && f.date.slice(5, 7) !== pageMonthPart) return false;
+      return true;
+    }),
+    [finances, pageMonthPart, pageYearPart],
   );
 
   const totalRevenue = useMemo(
@@ -362,6 +369,13 @@ export default function Financeiro() {
     for (const f of finances) set.add(f.date.substring(0, 7));
     const currentMonth = new Date().toISOString().substring(0, 7);
     return [...set].sort((a, b) => a === currentMonth ? -1 : b === currentMonth ? 1 : b.localeCompare(a));
+  }, [finances]);
+
+  // Available years for month+year filters
+  const availableYears = useMemo(() => {
+    const set = new Set<string>();
+    for (const f of finances) if (f.date) set.add(f.date.substring(0, 4));
+    return [...set].sort((a, b) => b.localeCompare(a));
   }, [finances]);
 
   // Auto-select most recent month when finances load
@@ -443,8 +457,9 @@ export default function Financeiro() {
       if (useCustomRange) {
         if (filterDateFrom && f.date < filterDateFrom) return false;
         if (filterDateTo && f.date > filterDateTo) return false;
-      } else if (filterMonth !== 'all' && !f.date.startsWith(filterMonth)) {
-        return false;
+      } else {
+        if (filterYearPart !== 'all' && !f.date.startsWith(filterYearPart)) return false;
+        if (filterMonthPart !== 'all' && f.date.slice(5, 7) !== filterMonthPart) return false;
       }
       if (filterType !== 'all' && f.type !== filterType) return false;
       if (search) {
@@ -458,7 +473,7 @@ export default function Financeiro() {
       }
       return true;
     }).sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
-  }, [finances, filterType, filterMonth, useCustomRange, filterDateFrom, filterDateTo, search, events]);
+  }, [finances, filterType, filterMonthPart, filterYearPart, useCustomRange, filterDateFrom, filterDateTo, search, events]);
 
   // Events with budget joined with their finance entry
   const eventsWithBudget = useMemo(() => {
@@ -746,19 +761,26 @@ export default function Financeiro() {
         ))}
       </div>
 
-      {['geral', 'despesas'].includes(activeTab) && availableMonths.length > 0 && (
+      {['geral', 'despesas'].includes(activeTab) && (availableMonths.length > 0) && (
         <div className={styles.pageMonthFilter}>
           <div className={styles.pageMonthField}>
-            <label className={styles.pageMonthLabel}>Filtrar mês</label>
-            <select className={styles.pageMonthSelect} value={pageMonth} onChange={(e) => setPageMonth(e.target.value)}>
+            <label className={styles.pageMonthLabel}>Mês</label>
+            <select className={styles.pageMonthSelect} value={pageMonthPart} onChange={(e) => setPageMonthPart(e.target.value)}>
               <option value="all">Todos os meses</option>
-              {availableMonths.map((m) => (
-                <option key={m} value={m}>{formatMonth(m)}</option>
+              {MONTHS_PT.map((label, index) => (
+                <option key={label} value={String(index + 1).padStart(2, '0')}>{label}</option>
               ))}
             </select>
           </div>
-          {pageMonth !== 'all' && (
-            <button className={styles.pageMonthClear} onClick={() => setPageMonth('all')}>
+          <div className={styles.pageMonthField}>
+            <label className={styles.pageMonthLabel}>Ano</label>
+            <select className={styles.pageMonthSelect} value={pageYearPart} onChange={(e) => setPageYearPart(e.target.value)}>
+              <option value="all">Todos os anos</option>
+              {availableYears.map((y) => <option key={y} value={y}>{y}</option>)}
+            </select>
+          </div>
+          {(pageMonthPart !== 'all' || pageYearPart !== 'all') && (
+            <button className={styles.pageMonthClear} onClick={() => { setPageMonthPart('all'); setPageYearPart('all'); }}>
               Limpar
             </button>
           )}
@@ -1130,16 +1152,26 @@ export default function Financeiro() {
               </button>
             </div>
             {!useCustomRange ? (
-              <select
-                className={styles.searchInput}
-                value={filterMonth}
-                onChange={(e) => setFilterMonth(e.target.value)}
-              >
-                <option value="all">Todos os meses</option>
-                {availableMonths.map((m) => (
-                  <option key={m} value={m}>{formatMonth(m)}</option>
-                ))}
-              </select>
+              <>
+                <select
+                  className={styles.searchInput}
+                  value={filterMonthPart}
+                  onChange={(e) => setFilterMonthPart(e.target.value)}
+                >
+                  <option value="all">Todos os meses</option>
+                  {MONTHS_PT.map((label, index) => (
+                    <option key={label} value={String(index + 1).padStart(2, '0')}>{label}</option>
+                  ))}
+                </select>
+                <select
+                  className={styles.searchInput}
+                  value={filterYearPart}
+                  onChange={(e) => setFilterYearPart(e.target.value)}
+                >
+                  <option value="all">Todos os anos</option>
+                  {availableYears.map((y) => <option key={y} value={y}>{y}</option>)}
+                </select>
+              </>
             ) : (
               <>
                 <input
