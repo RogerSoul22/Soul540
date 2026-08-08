@@ -68,15 +68,18 @@ test('creates an event deposit as an open receivable until it is explicitly sett
   assert.equal(deposit.dueDate, undefined);
 });
 
-test('cancels automatic finances when an event is cancelled', async () => {
-  const updates: Array<{ query: unknown; update: unknown }> = [];
+test('deletes never-settled automatic finances when an event is cancelled', async () => {
+  const deletedQueries: unknown[] = [];
+  const updatedQueries: Array<{ query: unknown; update: unknown }> = [];
+  const openEntries = [
+    { _id: 'f-1', eventId: 'event-2', automatic: true, settlements: [], settledCents: 0 },
+  ];
   const financeModel = {
-    updateMany: async (query: unknown, update: unknown) => {
-      updates.push({ query, update });
-    },
+    find: (query: unknown) => ({ ...openEntries, __query: query, lean: async () => openEntries }),
+    deleteMany: async (query: unknown) => { deletedQueries.push(query); },
+    updateMany: async (query: unknown, update: unknown) => { updatedQueries.push({ query, update }); },
     findOne: async () => null,
     create: async () => undefined,
-    find: () => ({ sort: async () => [] }),
   };
 
   await syncEventFinances({
@@ -86,16 +89,36 @@ test('cancels automatic finances when an event is cancelled', async () => {
     constructor: { findByIdAndUpdate: async () => undefined },
   }, financeModel as any, 'main');
 
-  assert.equal(updates.length, 1);
-  assert.deepEqual(updates[0].query, {
-    eventId: 'event-2',
-    $or: [{ automatic: true }, { autoEventBudget: true }],
-  });
-  assert.deepEqual(updates[0].update, {
-    $set: {
-      settlementStatus: 'cancelled',
-      reversalReason: 'Evento cancelado',
-    },
+  assert.equal(deletedQueries.length, 1);
+  assert.deepEqual(deletedQueries[0], { _id: { $in: ['f-1'] } });
+});
+
+test('keeps already-settled automatic finances marked as cancelled instead of deleting them', async () => {
+  const deletedQueries: unknown[] = [];
+  const updatedQueries: Array<{ query: unknown; update: unknown }> = [];
+  const settledEntries = [
+    { _id: 'f-2', eventId: 'event-2', automatic: true, settlements: [{ id: 's-1', amountCents: 5_000 }], settledCents: 5_000 },
+  ];
+  const financeModel = {
+    find: () => ({ lean: async () => settledEntries }),
+    deleteMany: async (query: unknown) => { deletedQueries.push(query); },
+    updateMany: async (query: unknown, update: unknown) => { updatedQueries.push({ query, update }); },
+    findOne: async () => null,
+    create: async () => undefined,
+  };
+
+  await syncEventFinances({
+    _id: 'event-2',
+    id: 'event-2',
+    status: 'cancelled',
+    constructor: { findByIdAndUpdate: async () => undefined },
+  }, financeModel as any, 'main');
+
+  assert.equal(deletedQueries.length, 0);
+  assert.equal(updatedQueries.length, 1);
+  assert.deepEqual(updatedQueries[0].query, { _id: { $in: ['f-2'] } });
+  assert.deepEqual(updatedQueries[0].update, {
+    $set: { settlementStatus: 'cancelled', reversalReason: 'Evento cancelado' },
   });
 });
 

@@ -306,10 +306,18 @@ export async function syncEventFinances(event: any, FinanceModel: FinanceModel, 
   if (source === 'factory') return;
   if (event.status === 'cancelled') {
     const eventId = event.id || event._id.toString();
-    await FinanceModel.updateMany(
-      { eventId, $or: [{ automatic: true }, { autoEventBudget: true }] },
-      { $set: { settlementStatus: 'cancelled', reversalReason: 'Evento cancelado' } },
-    );
+    const linkedEntries = await FinanceModel.find({ eventId, $or: [{ automatic: true }, { autoEventBudget: true }] }).lean();
+    const neverSettledIds = linkedEntries.filter((entry: any) => !(entry.settledCents > 0)).map((entry: any) => entry._id);
+    const settledIds = linkedEntries.filter((entry: any) => entry.settledCents > 0).map((entry: any) => entry._id);
+    if (neverSettledIds.length > 0) {
+      await FinanceModel.deleteMany({ _id: { $in: neverSettledIds } });
+    }
+    if (settledIds.length > 0) {
+      await FinanceModel.updateMany(
+        { _id: { $in: settledIds } },
+        { $set: { settlementStatus: 'cancelled', reversalReason: 'Evento cancelado' } },
+      );
+    }
     return;
   }
   const { deposit, travel, targetRevenue, balance } = calculateEventFinanceAmounts(event);
