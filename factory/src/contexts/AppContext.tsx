@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 import type { PizzaEvent, FinanceEntry, Task, Invoice, InvoiceItem, InvoiceStatus, FinanceCategoryEntry } from '@shared/types';
 export type { InvoiceItem, InvoiceStatus, Invoice };
 
@@ -32,6 +33,7 @@ interface AppContextData {
 const AppContext = createContext<AppContextData>({} as AppContextData);
 
 export function AppProvider({ children }: { children: ReactNode }) {
+  const { authenticated } = useAuth();
   const [events, setEvents] = useState<PizzaEvent[]>([]);
   const [finances, setFinances] = useState<FinanceEntry[]>([]);
   const [financeCategories, setFinanceCategories] = useState<FinanceCategoryEntry[]>([]);
@@ -39,12 +41,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
 
   useEffect(() => {
-    apiFetch('/api/events').then(r => r.json()).then(setEvents).catch((err) => console.error('Falha ao carregar dados:', err));
-    apiFetch('/api/tasks').then(r => r.json()).then(setTasks).catch((err) => console.error('Falha ao carregar dados:', err));
-    apiFetch('/api/finances').then(r => r.json()).then(setFinances).catch((err) => console.error('Falha ao carregar dados:', err));
-    apiFetch('/api/invoices').then(r => r.json()).then(setInvoices).catch((err) => console.error('Falha ao carregar dados:', err));
+    // AppProvider wraps the whole app, including the public /login route, so this
+    // effect can run before the user is authenticated. Wait for a real session
+    // before fetching protected data, and keep Array.isArray as defense-in-depth
+    // against an error payload (e.g. a session expiring mid-use) ever landing in state.
+    if (!authenticated) return;
+    apiFetch('/api/events').then(r => r.json()).then(d => Array.isArray(d) && setEvents(d)).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/tasks').then(r => r.json()).then(d => Array.isArray(d) && setTasks(d)).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/finances').then(r => r.json()).then(d => Array.isArray(d) && setFinances(d)).catch((err) => console.error('Falha ao carregar dados:', err));
+    apiFetch('/api/invoices').then(r => r.json()).then(d => Array.isArray(d) && setInvoices(d)).catch((err) => console.error('Falha ao carregar dados:', err));
     apiFetch('/api/finance-categories').then(r => r.json()).then(d => Array.isArray(d) && setFinanceCategories(d)).catch(() => {});
-  }, []);
+  }, [authenticated]);
 
   const refreshFinances = useCallback(() => {
     apiFetch('/api/finances').then(r => r.json()).then(setFinances).catch((err) => console.error('Falha ao carregar dados:', err));
