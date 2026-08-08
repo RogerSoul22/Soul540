@@ -99,6 +99,53 @@ test('cancels automatic finances when an event is cancelled', async () => {
   });
 });
 
+test('uses the deposit date field as the deposit finance entry date when set', async () => {
+  const created: any[] = [];
+  const financeModel = {
+    findOne: async () => null,
+    create: async (payload: any) => { created.push(payload); return payload; },
+    find: () => ({ sort: async () => [] }),
+  };
+  const event = {
+    _id: 'event-3',
+    id: 'event-3',
+    name: 'Evento com data de sinal',
+    date: '2026-07-10',
+    depositDate: '2026-06-20',
+    budget: 1_000,
+    depositValue: 300,
+    constructor: { findByIdAndUpdate: async () => undefined },
+  };
+
+  await syncEventFinances(event, financeModel as any, 'main');
+
+  const deposit = created.find((entry) => entry.kind === 'deposit');
+  assert.equal(deposit.date, '2026-06-20');
+});
+
+test('falls back to the event date when no deposit date is set', async () => {
+  const created: any[] = [];
+  const financeModel = {
+    findOne: async () => null,
+    create: async (payload: any) => { created.push(payload); return payload; },
+    find: () => ({ sort: async () => [] }),
+  };
+  const event = {
+    _id: 'event-4',
+    id: 'event-4',
+    name: 'Evento sem data de sinal',
+    date: '2026-07-10',
+    budget: 1_000,
+    depositValue: 300,
+    constructor: { findByIdAndUpdate: async () => undefined },
+  };
+
+  await syncEventFinances(event, financeModel as any, 'main');
+
+  const deposit = created.find((entry) => entry.kind === 'deposit');
+  assert.equal(deposit.date, '2026-07-10');
+});
+
 test('requires a refund, fee or approved adjustment decision before cancelling a settled event', () => {
   assert.equal(eventCancellationRequiresDecision([
     { type: 'revenue', amount: 100, amountCents: 10_000, date: '2026-07-01', settlements: [] },

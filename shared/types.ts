@@ -48,6 +48,7 @@ export interface PizzaEvent {
   paymentProofData?: string;
   contractPdfData?: string;
   depositValue?: number;
+  depositDate?: string;
   pixKey?: string;
   estimatedPizzas?: number;
   actualPizzas?: number;

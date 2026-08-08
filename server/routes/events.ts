@@ -49,6 +49,7 @@ const EventSchema = new Schema({
   paymentProofData: String,
   contractPdfData: String,
   depositValue: Number,
+  depositDate: String,
   pixKey: String,
   estimatedPizzas: Number,
   actualPizzas: Number,
@@ -106,6 +107,7 @@ const FranchiseEventSchema = new Schema({
   paymentProofData: String,
   contractPdfData: String,
   depositValue: Number,
+  depositDate: String,
   pixKey: String,
   estimatedPizzas: Number,
   actualPizzas: Number,
@@ -163,6 +165,7 @@ const FactoryEventSchema = new Schema({
   paymentProofData: String,
   contractPdfData: String,
   depositValue: Number,
+  depositDate: String,
   pixKey: String,
   estimatedPizzas: Number,
   actualPizzas: Number,
@@ -268,7 +271,7 @@ async function upsertAutomaticEventFinance(
     description: `${isDeposit ? 'Sinal' : isTravel ? 'Deslocamento' : 'Saldo'} - ${event.name}`,
     amount,
     amountCents: toCents(amount),
-    date: event.date,
+    date: isDeposit && event.depositDate ? event.depositDate : event.date,
     paymentMethod: event.paymentMethod || undefined,
     origin: 'event',
     kind,
@@ -507,7 +510,7 @@ router.put('/:id', async (req, res) => {
   if (req.body?.status === 'cancelled' && found.doc.status !== 'cancelled' && await cancellationRequiresDecision(found.doc, found.financeModel)) {
     return res.status(409).json({ error: 'Registre reembolso, multa retida ou ajuste aprovado antes de cancelar um evento com baixa financeira' });
   }
-  const protectedFinancialFields = ['budget', 'finalValue', 'depositValue', 'travelCost', 'paymentMethod', 'pixKey'];
+  const protectedFinancialFields = ['budget', 'finalValue', 'depositValue', 'depositDate', 'travelCost', 'paymentMethod', 'pixKey'];
   if (
     (found.doc.financialCloseStatus === 'closed' || found.doc.financialStatus === 'closed') &&
     !isFromFactory(req) &&
