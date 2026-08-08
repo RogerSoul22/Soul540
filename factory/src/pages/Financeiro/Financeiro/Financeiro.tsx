@@ -654,7 +654,7 @@ export default function Financeiro() {
     };
 
     if (editingId) {
-      const { eventId: _eventId, status: _status, ...editableBase } = base;
+      const { eventId: _eventId, ...editableBase } = base;
       await updateFinance(editingId, editableBase);
       resetForm();
       setShowForm(false);
