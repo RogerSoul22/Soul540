@@ -82,7 +82,7 @@ test('deletes never-settled automatic finances when an event is cancelled', asyn
     create: async () => undefined,
   };
 
-  await syncEventFinances({
+  const result = await syncEventFinances({
     _id: 'event-2',
     id: 'event-2',
     status: 'cancelled',
@@ -91,6 +91,7 @@ test('deletes never-settled automatic finances when an event is cancelled', asyn
 
   assert.equal(deletedQueries.length, 1);
   assert.deepEqual(deletedQueries[0], { _id: { $in: ['f-1'] }, settledCents: { $not: { $gt: 0 } } });
+  assert.deepEqual(result, { deletedCount: 1 });
 });
 
 test('soft-cancels a legacy settled finance entry that predates the settledCents field', async () => {
@@ -144,7 +145,7 @@ test('keeps already-settled automatic finances marked as cancelled instead of de
     create: async () => undefined,
   };
 
-  await syncEventFinances({
+  const result = await syncEventFinances({
     _id: 'event-2',
     id: 'event-2',
     status: 'cancelled',
@@ -156,6 +157,32 @@ test('keeps already-settled automatic finances marked as cancelled instead of de
   assert.deepEqual(updatedQueries[0].query, { _id: { $in: ['f-2'] } });
   assert.deepEqual(updatedQueries[0].update, {
     $set: { settlementStatus: 'cancelled', reversalReason: 'Evento cancelado' },
+  });
+  assert.deepEqual(result, { deletedCount: 0 });
+});
+
+test('excludes already-cancelled linked entries from the cancelled-event cleanup query', async () => {
+  const findQueries: unknown[] = [];
+  const financeModel = {
+    find: (query: unknown) => { findQueries.push(query); return { lean: async () => [] }; },
+    deleteMany: async () => undefined,
+    updateMany: async () => undefined,
+    findOne: async () => null,
+    create: async () => undefined,
+  };
+
+  await syncEventFinances({
+    _id: 'event-2',
+    id: 'event-2',
+    status: 'cancelled',
+    constructor: { findByIdAndUpdate: async () => undefined },
+  }, financeModel as any, 'main');
+
+  assert.equal(findQueries.length, 1);
+  assert.deepEqual(findQueries[0], {
+    eventId: 'event-2',
+    $or: [{ automatic: true }, { autoEventBudget: true }],
+    settlementStatus: { $ne: 'cancelled' },
   });
 });
 

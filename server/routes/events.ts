@@ -306,7 +306,11 @@ export async function syncEventFinances(event: any, FinanceModel: FinanceModel, 
   if (source === 'factory') return;
   if (event.status === 'cancelled') {
     const eventId = event.id || event._id.toString();
-    const linkedEntries = await FinanceModel.find({ eventId, $or: [{ automatic: true }, { autoEventBudget: true }] }).lean();
+    const linkedEntries = await FinanceModel.find({
+      eventId,
+      $or: [{ automatic: true }, { autoEventBudget: true }],
+      settlementStatus: { $ne: 'cancelled' },
+    }).lean();
     const neverSettledIds = linkedEntries.filter((entry: any) => !(getSettledCents(entry) > 0)).map((entry: any) => entry._id);
     const settledIds = linkedEntries.filter((entry: any) => getSettledCents(entry) > 0).map((entry: any) => entry._id);
     if (neverSettledIds.length > 0) {
@@ -318,7 +322,7 @@ export async function syncEventFinances(event: any, FinanceModel: FinanceModel, 
         { $set: { settlementStatus: 'cancelled', reversalReason: 'Evento cancelado' } },
       );
     }
-    return;
+    return { deletedCount: neverSettledIds.length };
   }
   const { deposit, travel, targetRevenue, balance } = calculateEventFinanceAmounts(event);
 
@@ -335,6 +339,7 @@ export async function syncEventFinances(event: any, FinanceModel: FinanceModel, 
   } else {
     await event.constructor.findByIdAndUpdate(event._id, { financeSyncVersion: 1 });
   }
+  return { deletedCount: 0 };
 }
 
 export function calculateEventFinanceAmounts(event: any) {
@@ -532,8 +537,17 @@ router.put('/:id', async (req, res) => {
   }
   const event = await found.model.findByIdAndUpdate(req.params.id, updateData, { new: true });
   if (!event) return res.status(404).json({ error: 'Not found' });
-  if (!isFromFactory(req)) await syncEventFinances(event, found.financeModel, found.financeSource);
+  const syncResult = isFromFactory(req) ? undefined : await syncEventFinances(event, found.financeModel, found.financeSource);
   await logAudit({ req, action: 'update', resource: 'events', resourceId: req.params.id, description: `Atualizou evento: ${event.name}` });
+  if (syncResult && syncResult.deletedCount > 0) {
+    await logAudit({
+      req,
+      action: 'delete',
+      resource: 'finances',
+      resourceId: req.params.id,
+      description: `Excluiu ${syncResult.deletedCount} lançamento(s) automático(s) nunca liquidado(s) do evento cancelado: ${event.name}`,
+    });
+  }
   res.json(event);
 });
 

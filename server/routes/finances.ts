@@ -493,6 +493,7 @@ router.put('/:id', validate(updateFinanceSchema), async (req, res) => {
   const found = await findFinanceForRequest(req, req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   const oldDoc = found.doc;
+  let currentDoc: any = oldDoc;
 
   if (Object.prototype.hasOwnProperty.call(req.body, 'status')) {
     const entry = oldDoc.toJSON();
@@ -515,10 +516,8 @@ router.put('/:id', validate(updateFinanceSchema), async (req, res) => {
           description: `Alterou status de "${STATUS_LABELS[entry.status] || entry.status}" para "${STATUS_LABELS[req.body.status] || req.body.status}": ${outcome.finance.description}`,
         });
       }
-      return res.json(serializeFinanceEntry(outcome.finance));
-    }
-
-    if (command.kind === 'reopen') {
+      currentDoc = outcome.finance;
+    } else if (command.kind === 'reopen') {
       const updated = await found.model.findOneAndUpdate(
         { _id: entry._id, settlementStatus: { $ne: 'cancelled' } },
         { $set: { settlementStatus: 'open', settledCents: 0, status: 'pending' }, $unset: { settledAt: 1, settlements: 1 } },
@@ -532,9 +531,9 @@ router.put('/:id', validate(updateFinanceSchema), async (req, res) => {
         resourceId: req.params.id,
         description: `Alterou status de "${STATUS_LABELS[entry.status] || entry.status}" para "Pendente": ${updated.description}`,
       });
-      return res.json(serializeFinanceEntry(updated));
+      currentDoc = updated;
     }
-    // command.kind === 'noop': segue para o resto do corpo, se houver outros campos.
+    // command.kind === 'noop': currentDoc segue sendo oldDoc; continua para os outros campos abaixo, se houver.
   }
 
   if ((oldDoc as any).automatic) {
@@ -556,11 +555,10 @@ router.put('/:id', validate(updateFinanceSchema), async (req, res) => {
     update.classificationStatus = getClassificationStatusForCategory(update.category);
   }
   if (Object.keys(update).length === 0) {
-    if (Object.prototype.hasOwnProperty.call(req.body, 'status')) return res.json(serializeFinanceEntry(oldDoc));
-    return res.status(400).json({ error: 'Nenhum campo financeiro permitido foi informado' });
+    return res.json(serializeFinanceEntry(currentDoc));
   }
   if (Object.prototype.hasOwnProperty.call(update, 'amount')) {
-    const settledCents = getSettledCents(oldDoc.toJSON());
+    const settledCents = getSettledCents(currentDoc.toJSON ? currentDoc.toJSON() : currentDoc);
     if (settledCents > 0) {
       return res.status(409).json({ error: 'Não altere o valor de um lançamento que já possui baixa' });
     }
@@ -568,7 +566,7 @@ router.put('/:id', validate(updateFinanceSchema), async (req, res) => {
   }
   const finance = await found.model.findByIdAndUpdate(req.params.id, update, { new: true });
   await logAudit({ req, action: 'update', resource: 'finances', resourceId: req.params.id, description: `Atualizou lançamento: ${finance?.description} (R$ ${finance?.amount})` });
-  res.json(finance);
+  res.json(serializeFinanceEntry(finance));
 });
 
 router.post('/:id/settlements', validate(createSettlementSchema), async (req, res) => {
