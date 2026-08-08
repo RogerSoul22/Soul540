@@ -87,21 +87,16 @@ iteração, conforme já sinalizado no plano de reconciliação):
   resolve a percepção de "status fixo", já que hoje a edição parecia não ter
   efeito nenhum.
 
-## 5. Status "orçamento" nos eventos
+## 5. Status "orçamento" nos eventos — já existe, fora de escopo
 
-Adiciona `'orcamento'` a `EventStatus` em `shared/types.ts`:
-
-```ts
-export type EventStatus = 'orcamento' | 'planning' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
-```
-
-Sem mudança de comportamento financeiro: eventos em `orcamento` continuam
-gerando os lançamentos automáticos de sinal/saldo/deslocamento normalmente
-(mesmo tratamento de previsão aberta que já existe para `planning`), conforme
-decisão do usuário ("o orçamento tem que entrar como receita prevista"). A
-mudança é só de rótulo/seleção nas telas de evento (badge, filtro de status,
-select do formulário) nas três frentes (Matriz, Franquia — Fábrica não edita
-status de evento).
+Verificado por inspeção de código: o status `planning` já é exposto como
+botão **"Orçamento"** no formulário de evento (`src/frontend/pages/Eventos/Eventos.tsx:652-654`
+e o equivalente em `franchise/src/pages/Eventos/Eventos.tsx`), já agrupa os
+eventos na aba "Orçamentos" da listagem, e `syncEventFinances` já trata
+qualquer status diferente de `cancelled` (incluindo `planning`) gerando
+sinal/saldo/deslocamento como previsão aberta — exatamente "entra como
+receita prevista", confirmado com o usuário. Nenhuma mudança de código
+necessária; este item sai do plano de implementação.
 
 ## Fora de escopo
 
