@@ -857,7 +857,7 @@ return (
                     <input className={styles.input} value={form.travelCost} onChange={(e) => setForm({ ...form, travelCost: formatBudget(e.target.value) })} placeholder="R$ 0,00" />
                   </div>
                 </div>
-                <div className={styles.formGrid3}>
+                <div className={styles.formGrid2}>
                   <div className={styles.formGroup}>
                     <label className={styles.label}>Valor Final (R$)</label>
                     <input className={styles.input} value={form.finalValue} onChange={(e) => setForm({ ...form, finalValue: formatBudget(e.target.value) })} placeholder="R$ 0,00" />
@@ -866,10 +866,10 @@ return (
                     <label className={styles.label}>Sinal Recebido (R$)</label>
                     <input className={styles.input} value={form.depositValue} onChange={(e) => setForm({ ...form, depositValue: formatBudget(e.target.value) })} placeholder="R$ 0,00" />
                   </div>
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>Data do Sinal</label>
-                    <input type="date" className={styles.input} value={form.depositDate} onChange={(e) => setForm({ ...form, depositDate: e.target.value })} />
-                  </div>
+                </div>
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Data do Sinal</label>
+                  <input type="date" className={styles.input} value={form.depositDate} onChange={(e) => setForm({ ...form, depositDate: e.target.value })} />
                 </div>
                 <div className={styles.formGrid2}>
                   <div className={styles.formGroup}>
