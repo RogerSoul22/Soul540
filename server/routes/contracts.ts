@@ -50,18 +50,18 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  const found = await models.findInAll(req.params.id);
-  if (!found) return res.status(404).json({ error: 'Not found' });
-  const updated = await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  const model = models.getModel(req);
+  if (!await model.findById(req.params.id)) return res.status(404).json({ error: 'Not found' });
+  const updated = await model.findByIdAndUpdate(req.params.id, req.body, { new: true });
   await logAudit({ req, action: 'update', resource: 'contracts', resourceId: req.params.id, description: `Atualizou contrato: ${updated?.clientName || updated?.description || req.params.id}` });
   res.json(updated);
 });
 
 router.delete('/:id', async (req, res) => {
-  const found = await models.findInAll(req.params.id);
-  if (!found) return res.status(404).json({ error: 'Not found' });
-  const contract = await found.model.findById(req.params.id);
-  await found.model.findByIdAndDelete(req.params.id);
+  const model = models.getModel(req);
+  const contract = await model.findById(req.params.id);
+  if (!contract) return res.status(404).json({ error: 'Not found' });
+  await model.findByIdAndDelete(req.params.id);
   await logAudit({ req, action: 'delete', resource: 'contracts', resourceId: req.params.id, description: `Excluiu contrato: ${contract?.clientName || contract?.description || req.params.id}` });
   res.status(204).end();
 });

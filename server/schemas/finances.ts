@@ -1,11 +1,22 @@
 import { z } from 'zod';
+import { isDateOnly } from '../../shared/financeDates';
+import { toCents } from '../../shared/money';
+
+const moneyAmount = z.number().positive('Valor deve ser positivo').refine((value) => {
+  try {
+    toCents(value);
+    return true;
+  } catch {
+    return false;
+  }
+}, 'Valor deve ter no máximo duas casas decimais');
 
 export const createFinanceSchema = z.object({
   eventId: z.string().optional().default(''),
   type: z.enum(['revenue', 'cost']),
   category: z.string().min(1, 'Categoria obrigatória').trim(),
   description: z.string().optional().default(''),
-  amount: z.number().positive('Valor deve ser positivo'),
+  amount: moneyAmount,
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data deve ser YYYY-MM-DD'),
   status: z.enum(['pending', 'paid', 'received']).optional().default('pending'),
   autoEventBudget: z.boolean().optional().default(false),
@@ -35,3 +46,26 @@ export const createFinanceSchema = z.object({
 });
 
 export const updateFinanceSchema = createFinanceSchema.partial();
+
+export const createSettlementSchema = z.object({
+  amount: moneyAmount,
+  settledOn: z.string().refine(isDateOnly, 'Data efetiva deve ser YYYY-MM-DD'),
+  paymentMethod: z.string().max(100).optional(),
+  reason: z.string().max(500).optional(),
+  idempotencyKey: z.string().trim().min(8).max(200),
+});
+
+const ofxTextSchema = z.string().trim().min(1, 'Arquivo OFX vazio').max(5_000_000, 'Arquivo OFX excede 5 MB');
+
+export const previewOfxSchema = z.object({
+  ofxText: ofxTextSchema,
+});
+
+export const importOfxSchema = z.object({
+  ofxText: ofxTextSchema,
+  selections: z.array(z.object({
+    externalId: z.string().trim().min(8).max(300),
+    category: z.string().trim().min(1).max(100).optional(),
+    financeId: z.string().trim().min(1).max(100).optional(),
+  })).min(1).max(500),
+});

@@ -1,5 +1,8 @@
 import { getCategorySection } from './financeCategories';
 import type { DreSection, FinanceCategoryEntry, FinanceEntry } from './types';
+import { isReportableInDre } from './financePolicy';
+import { fromCents } from './money';
+import { getFinanceReportingAllocations, type ReportingUnit } from './reportingUnitPolicy';
 
 export const DRE_TEMPLATE_SHEET = 'DRE 2026';
 
@@ -99,20 +102,36 @@ const SECTION_FALLBACK_ROWS: Record<DreSection, number> = {
   'outras-saidas': 86,
 };
 
+export type DreView = 'cash' | 'competence';
+
+export interface DreTemplateOptions {
+  view?: DreView;
+  reportingUnit?: ReportingUnit;
+}
+
 export function buildDreTemplateValues(
   finances: FinanceEntry[],
   customCategories: FinanceCategoryEntry[] = [],
+  options: DreTemplateOptions = {},
 ): Map<string, number> {
   const values = new Map<string, number>();
+  const view = options.view || 'cash';
 
   for (const finance of finances) {
-    const column = MONTH_COLUMNS[finance.date?.slice(0, 7)];
-    if (!column || !Number.isFinite(finance.amount)) continue;
-    const key = `${finance.type}:${finance.category}`;
-    const section = getCategorySection(finance.category, finance.type, customCategories);
-    const row = CATEGORY_ROWS[key] ?? SECTION_FALLBACK_ROWS[section];
-    const cell = `${column}${row}`;
-    values.set(cell, (values.get(cell) ?? 0) + finance.amount);
+    if (!isReportableInDre(finance)) continue;
+    const valuesByDate = getFinanceReportingAllocations(finance, view)
+      .filter((allocation) => !options.reportingUnit || allocation.reportingUnit === options.reportingUnit)
+      .map((allocation) => ({ date: allocation.date, amount: fromCents(allocation.amountCents) }));
+
+    for (const value of valuesByDate) {
+      const column = MONTH_COLUMNS[value.date?.slice(0, 7)];
+      if (!column || !Number.isFinite(value.amount)) continue;
+      const key = `${finance.type}:${finance.category}`;
+      const section = getCategorySection(finance.category, finance.type, customCategories);
+      const row = CATEGORY_ROWS[key] ?? SECTION_FALLBACK_ROWS[section];
+      const cell = `${column}${row}`;
+      values.set(cell, (values.get(cell) ?? 0) + value.amount);
+    }
   }
 
   return values;

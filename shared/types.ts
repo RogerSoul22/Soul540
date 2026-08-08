@@ -1,4 +1,5 @@
 // Shared types used across main, franchise, and factory apps
+import type { FinanceSettlement } from './financePolicy';
 
 // ── Events ──────────────────────────────────────────────────────────────────
 
@@ -57,6 +58,7 @@ export interface PizzaEvent {
   factoryCheeseKg?: number;
   factoryPackagingUnits?: number;
   financialStatus?: 'open' | 'partial' | 'settled' | 'closed';
+  financialCloseStatus?: 'open' | 'closed';
   financiallyClosedAt?: string;
   financiallyClosedBy?: string;
   financeSyncVersion?: number;
@@ -89,8 +91,10 @@ export interface FinanceEntry {
   eventId: string;
   type: FinanceType;
   category: string;
+  classificationStatus?: 'classified' | 'unclassified';
   description: string;
   amount: number;
+  amountCents?: number;
   date: string;
   status: FinanceStatus;
   autoEventBudget?: boolean;
@@ -99,6 +103,8 @@ export interface FinanceEntry {
   paymentMethod?: string;
   dueDate?: string;
   settledAt?: string;
+  settledCents?: number;
+  settlements?: FinanceSettlement[];
   settlementStatus?: SettlementStatus;
   automatic?: boolean;
   reversedAt?: string;

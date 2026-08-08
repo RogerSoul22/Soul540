@@ -22,10 +22,11 @@ type OfxFinanceItem = {
   type: FinanceType;
   category: string;
   selected: boolean;
-  duplicate: boolean;
+  decision: 'duplicate' | 'link' | 'ambiguous' | 'create_unclassified';
+  financeId?: string;
 };
 
-function parseOfxForFinance(ofxText: string): { bankAccount: string; balance?: number; items: Omit<OfxFinanceItem, 'id' | 'category' | 'selected' | 'duplicate'>[] } {
+function unusedLegacyOfxParser(ofxText: string): { bankAccount: string; balance?: number; items: Omit<OfxFinanceItem, 'id' | 'category' | 'selected' | 'decision' | 'financeId'>[] } {
   const value = (source: string, tag: string) => {
     const match = source.match(new RegExp(`<${tag}[^>]*>\\s*([^<\\r\\n]+)`, 'i'));
     return match?.[1]?.trim() ?? '';
@@ -82,6 +83,7 @@ function parseNFeXmlForFinance(xmlText: string): { supplier: string; date: strin
 }
 import { useSearchParams } from 'react-router-dom';
 import { useApp } from '@frontend/contexts/AppContext';
+import { apiFetch } from '@frontend/lib/api';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -173,7 +175,7 @@ const compareAlpha = (a: string, b: string) => alphaCollator.compare(normalizeAl
 type DataScope = 'main' | 'franchise' | 'factory' | 'combined';
 
 export default function Financeiro() {
-  const { events, finances, financeCategories, addFinance, updateFinance, deleteFinance, reverseFinance, addFinanceCategory, deleteEvent, closeEventFinance, reopenEventFinance } = useApp();
+  const { events, finances, financeCategories, addFinance, updateFinance, settleFinance, deleteFinance, reverseFinance, addFinanceCategory, deleteEvent, closeEventFinance, reopenEventFinance, refreshFinances } = useApp();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabType>('geral');
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().substring(0, 7));
@@ -260,6 +262,8 @@ export default function Financeiro() {
   const [ofxItems, setOfxItems] = useState<OfxFinanceItem[]>([]);
   const [ofxBankAccount, setOfxBankAccount] = useState('');
   const [ofxStatementBalance, setOfxStatementBalance] = useState<number | undefined>();
+  const [ofxText, setOfxText] = useState('');
+  const [ofxPreviewing, setOfxPreviewing] = useState(false);
   const [ofxImporting, setOfxImporting] = useState(false);
   const ofxInputRef = useRef<HTMLInputElement>(null);
 
@@ -307,22 +311,33 @@ export default function Financeiro() {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       try {
         const bytes = ev.target?.result as ArrayBuffer;
         const utf8 = new TextDecoder('utf-8').decode(bytes);
         const text = utf8.includes('\uFFFD') ? new TextDecoder('windows-1252').decode(bytes) : utf8;
-        const parsed = parseOfxForFinance(text);
-        const knownIds = new Set(activeFinances.map((item) => item.externalId).filter(Boolean));
-        setOfxBankAccount(parsed.bankAccount);
-        setOfxStatementBalance(parsed.balance);
-        setOfxItems(parsed.items.map((item, index) => {
-          const duplicate = knownIds.has(item.externalId);
-          return { ...item, id: String(index), category: 'outro', selected: !duplicate, duplicate };
-        }));
+        setOfxPreviewing(true);
+        const response = await apiFetch('/api/finances/ofx/preview', {
+          method: 'POST',
+          headers: { 'X-System': 'main' },
+          body: JSON.stringify({ ofxText: text }),
+        });
+        const preview = await response.json();
+        if (!response.ok) throw new Error(preview.error || 'OFX preview failed');
+        setOfxText(text);
+        setOfxBankAccount(preview.bankAccount);
+        setOfxStatementBalance(preview.statementBalance);
+        setOfxItems(preview.suggestions.map((item: Omit<OfxFinanceItem, 'id' | 'category' | 'selected'>, index: number) => ({
+          ...item,
+          id: String(index),
+          category: '',
+          selected: item.decision === 'link' || item.decision === 'create_unclassified',
+        })));
         setShowOfxModal(true);
       } catch (error) {
         alert(error instanceof Error ? error.message : 'Não foi possível ler o arquivo OFX.');
+      } finally {
+        setOfxPreviewing(false);
       }
     };
     reader.readAsArrayBuffer(file);
@@ -330,33 +345,28 @@ export default function Financeiro() {
   };
 
   const handleOfxImport = async () => {
-    const selected = ofxItems.filter((item) => item.selected && !item.duplicate);
-    if (!selected.length) return;
+    const selected = ofxItems.filter((item) => item.selected && item.decision !== 'duplicate' && item.decision !== 'ambiguous');
+    if (!selected.length || !ofxText) return;
     setOfxImporting(true);
-    const batchId = `ofx-${Date.now()}`;
     try {
-      for (const item of selected) {
-        await addFinance({
-          eventId: '',
-          type: item.type,
-          category: item.category || 'outro',
-          description: item.description,
-          amount: item.amount,
-          date: item.date,
-          status: item.type === 'revenue' ? 'received' : 'paid',
-          origin: 'bank_import',
-          kind: 'manual',
-          paymentMethod: 'bank',
-          settlementStatus: 'settled',
-          settledAt: `${item.date}T12:00:00.000Z`,
-          externalId: item.externalId,
-          importBatchId: batchId,
-          bankAccount: ofxBankAccount,
-          bankStatementBalance: ofxStatementBalance,
-        });
-      }
+      const response = await apiFetch('/api/finances/ofx/import', {
+        method: 'POST',
+        headers: { 'X-System': 'main' },
+        body: JSON.stringify({
+          ofxText,
+          selections: selected.map((item) => ({
+            externalId: item.externalId,
+            ...(item.decision === 'create_unclassified' && item.category ? { category: item.category } : {}),
+            ...(item.financeId ? { financeId: item.financeId } : {}),
+          })),
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'OFX import failed');
+      refreshFinances();
       setShowOfxModal(false);
       setOfxItems([]);
+      setOfxText('');
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Falha ao importar o extrato OFX.');
     } finally {
@@ -779,8 +789,27 @@ export default function Financeiro() {
 
   // === HANDLERS ===
 
-  const handleEventFinanceStatus = async (financeId: string, status: FinanceStatus) => {
-    await updateFinance(financeId, { status });
+  const handleEventFinanceStatus = async (entry: (typeof finances)[number], status: FinanceStatus) => {
+    if (status === 'pending') {
+      alert('Para reabrir ou cancelar uma baixa, use o comando específico com justificativa. A situação não é alterada por um seletor.');
+      return;
+    }
+    if (entry.status === status) return;
+    const amountText = window.prompt(
+      'Baixa financeira: informe o valor efetivamente recebido/pago. A competência do lançamento não será alterada.',
+      entry.amount.toFixed(2).replace('.', ','),
+    );
+    if (amountText === null) return;
+    const amount = parseCurrency(amountText);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      alert('Informe um valor de baixa válido.');
+      return;
+    }
+    const settledOn = window.prompt('Data efetiva da baixa (AAAA-MM-DD):', entry.date);
+    if (!settledOn) return;
+    const paymentMethod = window.prompt('Método de pagamento/recebimento:', entry.paymentMethod || '');
+    const reason = window.prompt('Justificativa ou referência (opcional):', '') || undefined;
+    await settleFinance(entry.id, { amount, settledOn, paymentMethod: paymentMethod || undefined, reason });
   };
 
   const exportCSV = () => {
@@ -904,8 +933,6 @@ export default function Financeiro() {
       for (const address of DRE_TEMPLATE_INPUT_CELLS) worksheet.getCell(address).value = 0;
       for (const [address, amount] of dreValues) worksheet.getCell(address).value = amount;
       workbook.calcProperties.fullCalcOnLoad = true;
-      workbook.calcProperties.forceFullCalc = true;
-      workbook.calcProperties.calcMode = 'auto';
 
       const output = await workbook.xlsx.writeBuffer();
       const blob = new Blob([output as BlobPart], {
@@ -1002,7 +1029,8 @@ export default function Financeiro() {
     };
 
     if (editingFinanceId) {
-      await updateFinance(editingFinanceId, base);
+      const { eventId: _eventId, status: _status, ...editableBase } = base;
+      await updateFinance(editingFinanceId, editableBase);
       resetForm();
       setShowForm(false);
       return;
@@ -1778,11 +1806,10 @@ export default function Financeiro() {
                         className={`${styles.agendamentoStatus} ${entry.status === 'received' || entry.status === 'paid' ? styles.statusReceived : styles.statusPending}`}
                         value={entry.status}
                         onClick={(event) => event.stopPropagation()}
-                        onChange={(e) => handleEventFinanceStatus(entry.id, e.target.value as FinanceStatus)}
-                      >
-                        <option value="pending">Pendente</option>
-                        <option value="paid">Pago</option>
-                        <option value="received">Recebido</option>
+                          onChange={(e) => handleEventFinanceStatus(entry, e.target.value as FinanceStatus)}
+                        >
+                          <option value="pending">Pendente</option>
+                          <option value={entry.type === 'revenue' ? 'received' : 'paid'}>{entry.type === 'revenue' ? 'Recebido' : 'Pago'}</option>
                       </select>
                     </td>
                     <td>
@@ -1975,20 +2002,15 @@ export default function Financeiro() {
           </div>
           {selectedEvent.notes && <div className={styles.eventDetailNotes}><span className={styles.eventDetailLabel}>Observações</span><p>{selectedEvent.notes}</p></div>}
           <div className={styles.eventDetailActions}>
-            {selectedEvent.financialStatus === 'closed' ? (
+            {selectedEvent.financialCloseStatus === 'closed' ? (
               <button className={styles.btnExport} type="button" onClick={async () => { await reopenEventFinance(selectedEvent.id); setSelectedEvent(null); }}>
                 Reabrir financeiro
               </button>
             ) : (
               <>
-                <button className={styles.btnExport} type="button" onClick={async () => { await closeEventFinance(selectedEvent.id, false); setSelectedEvent(null); }}>
+                <button className={styles.btnExport} type="button" onClick={async () => { await closeEventFinance(selectedEvent.id); setSelectedEvent(null); }}>
                   Fechar financeiro
                 </button>
-                {Math.max((selectedEvent.finalValue || selectedEvent.budget || 0) - (selectedEvent.depositValue || 0), 0) > 0 && (
-                  <button className={styles.btnExport} type="button" onClick={async () => { await closeEventFinance(selectedEvent.id, true); setSelectedEvent(null); }}>
-                    Fechar e quitar saldo
-                  </button>
-                )}
               </>
             )}
             <button className={styles.btnPrimary} type="button" onClick={() => { window.location.href = `/eventos?edit=${encodeURIComponent(selectedEvent.id)}`; }}>
@@ -2403,25 +2425,25 @@ export default function Financeiro() {
               <div className={styles.xmlMeta}>
                 <span className={styles.xmlCount}>
                   {ofxItems.filter((item) => item.selected).length} de {ofxItems.length} movimentos selecionados
-                  {ofxItems.some((item) => item.duplicate) && ` - ${ofxItems.filter((item) => item.duplicate).length} ja importado(s)`}
+                  {ofxItems.some((item) => item.decision === 'duplicate') && ` - ${ofxItems.filter((item) => item.decision === 'duplicate').length} ja importado(s)`}
                 </span>
                 <button className={styles.xmlToggleAll} onClick={() => {
-                  const available = ofxItems.filter((item) => !item.duplicate);
+                  const available = ofxItems.filter((item) => item.decision === 'link' || item.decision === 'create_unclassified');
                   const allSelected = available.length > 0 && available.every((item) => item.selected);
-                  setOfxItems((current) => current.map((item) => ({ ...item, selected: item.duplicate ? false : !allSelected })));
+                  setOfxItems((current) => current.map((item) => ({ ...item, selected: item.decision === 'duplicate' || item.decision === 'ambiguous' ? false : !allSelected })));
                 }}>
-                  {ofxItems.filter((item) => !item.duplicate).every((item) => item.selected) ? 'Desmarcar todos' : 'Selecionar todos'}
+                  {ofxItems.filter((item) => item.decision === 'link' || item.decision === 'create_unclassified').every((item) => item.selected) ? 'Desmarcar todos' : 'Selecionar todos'}
                 </button>
               </div>
               <div className={styles.xmlList}>
                 {ofxItems.map((item) => {
                   const groups = item.type === 'revenue' ? groupedRevenueCategories : groupedCostCategories;
                   return (
-                    <div key={item.id} className={`${styles.xmlRow} ${(!item.selected || item.duplicate) ? styles.xmlRowDisabled : ''}`}>
+                    <div key={item.id} className={`${styles.xmlRow} ${(!item.selected || item.decision === 'duplicate' || item.decision === 'ambiguous') ? styles.xmlRowDisabled : ''}`}>
                       <input
                         type="checkbox"
                         checked={item.selected}
-                        disabled={item.duplicate}
+                        disabled={item.decision === 'duplicate' || item.decision === 'ambiguous'}
                         onChange={(event) => setOfxItems((current) => current.map((currentItem) => currentItem.id === item.id ? { ...currentItem, selected: event.target.checked } : currentItem))}
                       />
                       <span className={`${styles.ofxType} ${item.type === 'revenue' ? styles.ofxCredit : styles.ofxDebit}`}>
@@ -2429,14 +2451,15 @@ export default function Financeiro() {
                       </span>
                       <div className={styles.xmlInfo}>
                         <span className={styles.xmlName}>{item.description}</span>
-                        <span className={styles.xmlDetails}>{safeFormatDate(item.date, 'dd/MM/yyyy')} - <strong>{formatBRL(item.amount)}</strong>{item.duplicate ? ' - Ja importado' : ''}</span>
+                        <span className={styles.xmlDetails}>{safeFormatDate(item.date, 'dd/MM/yyyy')} - <strong>{formatBRL(item.amount)}</strong>{item.decision === 'duplicate' ? ' - Já importado' : item.decision === 'link' ? ' - Vincular à previsão' : item.decision === 'ambiguous' ? ' - Requer decisão manual' : ' - Não classificado até escolher categoria'}</span>
                       </div>
                       <select
                         className={styles.xmlCatSelect}
                         value={item.category}
-                        disabled={item.duplicate}
+                        disabled={item.decision !== 'create_unclassified'}
                         onChange={(event) => setOfxItems((current) => current.map((currentItem) => currentItem.id === item.id ? { ...currentItem, category: event.target.value } : currentItem))}
                       >
+                        <option value="">Não classificar agora — fora do DRE</option>
                         <option value="outro">Outros</option>
                         {groups.filter((group) => group.categories.length > 0).map((group) => (
                           <optgroup key={group.section.key} label={group.section.label}>
@@ -2455,8 +2478,8 @@ export default function Financeiro() {
             </div>
             <div className={styles.modalFooter}>
               <button className={styles.btnCancel} onClick={() => setShowOfxModal(false)}>Cancelar</button>
-              <button className={styles.btnPrimary} onClick={handleOfxImport} disabled={ofxImporting || !ofxItems.some((item) => item.selected && !item.duplicate)}>
-                {ofxImporting ? 'Importando...' : `Importar ${ofxItems.filter((item) => item.selected && !item.duplicate).length} movimentos`}
+              <button className={styles.btnPrimary} onClick={handleOfxImport} disabled={ofxPreviewing || ofxImporting || !ofxItems.some((item) => item.selected && item.decision !== 'duplicate' && item.decision !== 'ambiguous')}>
+                {ofxImporting ? 'Importando...' : `Importar ${ofxItems.filter((item) => item.selected && item.decision !== 'duplicate' && item.decision !== 'ambiguous').length} movimentos`}
               </button>
             </div>
           </div>
@@ -2522,7 +2545,9 @@ export default function Financeiro() {
                   <li>Clique em <strong>Novo Lançamento</strong> no canto superior direito.</li>
                   <li>Selecione o tipo: <strong>Receita</strong> ou <strong>Despesa</strong>.</li>
                   <li>Escolha a categoria, descreva o lançamento e informe o valor.</li>
-                  <li>Defina a data e o status (Pendente, Pago ou Recebido).</li>
+                  <li><strong>Competência</strong> é a data prevista; <strong>Caixa</strong> usa a data efetiva de cada baixa.</li>
+                  <li>Para liquidar, informe valor, data efetiva, método e referência. Uma receita liquidada aparece como Recebido; uma despesa, como Pago.</li>
+                  <li>Pendente ainda não possui baixa, Parcial possui baixa incompleta e Cancelado não compõe os totais.</li>
                   <li>Clique em <strong>Salvar</strong> para confirmar.</li>
                 </ol>
               </div>

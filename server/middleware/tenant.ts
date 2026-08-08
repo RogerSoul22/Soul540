@@ -3,7 +3,7 @@ function resolveUnit(req: any): string {
 
   // Authenticated non-admin users are ALWAYS locked to their own unit
   // regardless of what X-System header says
-  if (req.user && !req.user.isAdmin && userUnit && userUnit !== 'main') {
+  if (req.user && !req.user.isAdmin && userUnit) {
     return userUnit;
   }
 

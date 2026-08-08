@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import mongoose, { Schema } from 'mongoose';
+import { getTenantUnit } from '../middleware/tenant';
 
 const IngredientSchema = new Schema({
   id: { type: String },
@@ -34,8 +35,12 @@ const RecipeModel = mongoose.models.ProductionRecipe ||
 
 const router = Router();
 
+export function getProductionRecipeUnit(req: any): string {
+  return getTenantUnit(req);
+}
+
 router.get('/', async (req, res) => {
-  const unit = (req as any).headers?.['x-system'] || 'factory';
+  const unit = getProductionRecipeUnit(req);
   let doc = await RecipeModel.findOne({ unit });
   if (!doc) {
     doc = await RecipeModel.create({
@@ -57,7 +62,7 @@ router.get('/', async (req, res) => {
 });
 
 router.put('/', async (req, res) => {
-  const unit = (req as any).headers?.['x-system'] || 'factory';
+  const unit = getProductionRecipeUnit(req);
   const { ingredients, insumos, sizes } = req.body;
   const doc = await RecipeModel.findOneAndUpdate(
     { unit },

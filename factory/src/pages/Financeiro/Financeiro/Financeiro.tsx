@@ -126,7 +126,7 @@ const normalizeAlpha = (value: string) =>
 const compareAlpha = (a: string, b: string) => alphaCollator.compare(normalizeAlpha(a), normalizeAlpha(b));
 
 export default function Financeiro() {
-  const { events, finances, financeCategories, addFinance, updateFinance, deleteFinance, reverseFinance, addFinanceCategory } = useApp();
+  const { events, finances, financeCategories, addFinance, updateFinance, settleFinance, deleteFinance, reverseFinance, addFinanceCategory } = useApp();
   const [activeTab, setActiveTab] = useState<TabType>('geral');
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().substring(0, 7));
   const [costFilter, setCostFilter] = useState<CostFilter>('all');
@@ -486,8 +486,24 @@ export default function Financeiro() {
 
   // === HANDLERS ===
 
-  const handleEventFinanceStatus = async (financeId: string, status: FinanceStatus) => {
-    await updateFinance(financeId, { status });
+  const handleEventFinanceStatus = async (entry: (typeof finances)[number], status: FinanceStatus) => {
+    if (status === 'pending') {
+      alert('Para reabrir ou cancelar uma baixa, use o comando específico com justificativa.');
+      return;
+    }
+    if (entry.status === status) return;
+    const amountText = window.prompt('Baixa financeira: informe o valor efetivamente recebido/pago.', entry.amount.toFixed(2).replace('.', ','));
+    if (amountText === null) return;
+    const amount = parseCurrency(amountText);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      alert('Informe um valor de baixa válido.');
+      return;
+    }
+    const settledOn = window.prompt('Data efetiva da baixa (AAAA-MM-DD):', entry.date);
+    if (!settledOn) return;
+    const paymentMethod = window.prompt('Método de pagamento/recebimento:', entry.paymentMethod || '');
+    const reason = window.prompt('Justificativa ou referência (opcional):', '') || undefined;
+    await settleFinance(entry.id, { amount, settledOn, paymentMethod: paymentMethod || undefined, reason });
   };
 
   const exportCSV = () => {
@@ -638,7 +654,8 @@ export default function Financeiro() {
     };
 
     if (editingId) {
-      await updateFinance(editingId, base);
+      const { eventId: _eventId, status: _status, ...editableBase } = base;
+      await updateFinance(editingId, editableBase);
       resetForm();
       setShowForm(false);
       return;
@@ -925,7 +942,7 @@ export default function Financeiro() {
                         <select
                           className={`${styles.agendamentoStatus} ${finance.status === 'received' || finance.status === 'paid' ? styles.statusReceived : styles.statusPending}`}
                           value={finance.status}
-                          onChange={(e) => handleEventFinanceStatus(finance.id, e.target.value as FinanceStatus)}
+                           onChange={(e) => handleEventFinanceStatus(finance, e.target.value as FinanceStatus)}
                         >
                           <option value="pending">Pendente</option>
                           <option value="paid">Pago</option>
@@ -1198,7 +1215,7 @@ export default function Financeiro() {
                       <select
                         className={`${styles.agendamentoStatus} ${entry.status === 'received' || entry.status === 'paid' ? styles.statusReceived : styles.statusPending}`}
                         value={entry.status}
-                        onChange={(e) => handleEventFinanceStatus(entry.id, e.target.value as FinanceStatus)}
+                        onChange={(e) => handleEventFinanceStatus(entry, e.target.value as FinanceStatus)}
                       >
                         <option value="pending">Pendente</option>
                         <option value="paid">Pago</option>
@@ -1607,7 +1624,9 @@ export default function Financeiro() {
                   <li>Clique em <strong>Novo Lançamento</strong> no canto superior direito.</li>
                   <li>Selecione o tipo: <strong>Receita</strong> ou <strong>Despesa</strong>.</li>
                   <li>Escolha a categoria, descreva o lançamento e informe o valor.</li>
-                  <li>Defina a data e o status (Pendente, Pago ou Recebido).</li>
+                  <li><strong>Competência</strong> é a data prevista; <strong>Caixa</strong> usa a data efetiva de cada baixa.</li>
+                  <li>Para liquidar, informe valor, data efetiva, método e referência. Uma receita liquidada aparece como Recebido; uma despesa, como Pago.</li>
+                  <li>Pendente ainda não possui baixa, Parcial possui baixa incompleta e Cancelado não compõe os totais.</li>
                   <li>Clique em <strong>Salvar</strong> para confirmar.</li>
                 </ol>
               </div>

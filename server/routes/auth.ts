@@ -9,7 +9,6 @@ const UserSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true },
   passwordHash: { type: String, required: true },
-  passwordPlain: { type: String, default: '' },
   isAdmin: { type: Boolean, default: false },
   permissions: { type: [String], default: [] },
   unit: { type: String, enum: ['main', 'franchise', 'factory'], default: 'main' },
@@ -29,10 +28,6 @@ router.post('/login', validate(loginSchema), async (req, res) => {
 
   const match = await bcrypt.compare(password, user.passwordHash);
   if (!match) return res.status(401).json({ error: 'Email ou senha incorretos' });
-
-  if (!(user as any).passwordPlain) {
-    await UserModel.findByIdAndUpdate(user._id, { passwordPlain: password });
-  }
 
   const userUnit = (user as any).unit || 'main';
   const xSystem = (req.headers['x-system'] as string) || 'main';
@@ -62,7 +57,7 @@ router.get('/me', async (req, res) => {
   if (!token) return res.status(401).json({ error: 'not authenticated' });
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET || 'soul540-secret') as any;
-    const user = await UserModel.findById(payload.userId).select('-passwordHash').lean() as any;
+    const user = await UserModel.findById(payload.userId).select('-passwordHash -passwordPlain').lean() as any;
     if (!user) return res.status(401).json({ error: 'user not found' });
     res.json({ user: { id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin, permissions: user.permissions, unit: user.unit } });
   } catch {

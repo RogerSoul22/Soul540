@@ -43,3 +43,52 @@ test('uses the DRE section fallback for custom categories', () => {
 
   assert.equal(values.get('F34'), 75);
 });
+
+test('excludes cancelled financial entries from DRE values', () => {
+  const values = buildDreTemplateValues([
+    finance({ amount: 1_000, settlementStatus: 'cancelled' }),
+  ]);
+
+  assert.equal(values.size, 0);
+});
+
+test('excludes unclassified OFX movements from DRE values until they are categorized', () => {
+  const values = buildDreTemplateValues([
+    finance({ amount: 1_000, category: 'nao-classificado', classificationStatus: 'unclassified' }),
+  ]);
+
+  assert.equal(values.size, 0);
+});
+
+test('uses each settlement date in the default cash view', () => {
+  const values = buildDreTemplateValues([
+    finance({
+      amount: 100,
+      status: 'pending',
+      settlements: [
+        { id: 's-1', amountCents: 3_000, settledOn: '2026-07-31', settledAt: '2026-07-31T15:00:00.000Z', idempotencyKey: 'first' },
+        { id: 's-2', amountCents: 7_000, settledOn: '2026-08-01', settledAt: '2026-08-01T15:00:00.000Z', idempotencyKey: 'second' },
+      ],
+    }),
+  ]);
+
+  assert.equal(values.get('B4'), 30);
+  assert.equal(values.get('D4'), 70);
+});
+
+test('filters DRE by the reporting unit calculated for the selected view', () => {
+  const entry = finance({
+    amount: 100,
+    amountCents: 10_000,
+    source: 'franchise',
+    date: '2026-07-20',
+    status: 'pending',
+    settlements: [{
+      id: 'settlement-1', amountCents: 10_000, settledOn: '2026-08-03',
+      settledAt: '2026-08-03T12:00:00.000Z', idempotencyKey: 'settlement-1',
+    }],
+  });
+
+  assert.equal(buildDreTemplateValues([entry], [], { view: 'competence', reportingUnit: 'main' }).size, 0);
+  assert.equal(buildDreTemplateValues([entry], [], { view: 'cash', reportingUnit: 'main' }).get('D4'), 100);
+});

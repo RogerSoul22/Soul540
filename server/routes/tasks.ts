@@ -25,12 +25,13 @@ router.post('/', async (req, res) =>
   res.status(201).json(await models.getModel(req).create({ ...req.body, source: models.getSource(req) })));
 
 router.put('/:id', async (req, res) => {
-  const found = await models.findInAll(req.params.id);
-  if (!found) return res.status(404).json({ error: 'Not found' });
-  const updated = await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  const model = models.getModel(req);
+  const current = await model.findById(req.params.id);
+  if (!current) return res.status(404).json({ error: 'Not found' });
+  const updated = await model.findByIdAndUpdate(req.params.id, req.body, { new: true });
 
   // Auto-create history entry when task is moved to done
-  if (req.body.status === 'done' && found.doc.status !== 'done') {
+  if (req.body.status === 'done' && current.status !== 'done') {
     const hModel = historyModels.getModel(req);
     const existing = await hModel.findOne({ taskId: req.params.id });
     if (!existing) {
@@ -52,9 +53,9 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
-  const found = await models.findInAll(req.params.id);
-  if (!found) return res.status(404).json({ error: 'Not found' });
-  await found.model.findByIdAndDelete(req.params.id);
+  const model = models.getModel(req);
+  if (!await model.findById(req.params.id)) return res.status(404).json({ error: 'Not found' });
+  await model.findByIdAndDelete(req.params.id);
   res.status(204).end();
 });
 

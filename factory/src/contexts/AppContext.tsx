@@ -12,6 +12,7 @@ interface AppContextData {
   invoices: Invoice[];
   addFinance: (entry: Omit<FinanceEntry, 'id'>) => Promise<FinanceEntry>;
   updateFinance: (id: string, data: Partial<FinanceEntry>) => Promise<void>;
+  settleFinance: (id: string, settlement: { amount: number; settledOn: string; paymentMethod?: string; reason?: string }) => Promise<void>;
   deleteFinance: (id: string) => Promise<void>;
   reverseFinance: (id: string, reason?: string) => Promise<void>;
   addFinanceCategory: (entry: Omit<FinanceCategoryEntry, 'id'>) => Promise<FinanceCategoryEntry>;
@@ -62,6 +63,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (!res.ok) throw new Error('Falha ao atualizar lançamento financeiro');
     const updated: FinanceEntry = await res.json();
     setFinances((prev) => prev.map((f) => (f.id === id ? updated : f)));
+  }, []);
+
+  const settleFinance = useCallback(async (id: string, settlement: { amount: number; settledOn: string; paymentMethod?: string; reason?: string }) => {
+    const res = await apiFetch(`/api/finances/${id}/settlements`, { method: 'POST', body: JSON.stringify({ ...settlement, idempotencyKey: crypto.randomUUID() }) });
+    const payload = await res.json();
+    if (!res.ok) throw new Error(payload.error || 'Falha ao registrar baixa financeira');
+    setFinances((prev) => prev.map((finance) => (finance.id === id ? payload : finance)));
   }, []);
 
   const deleteFinance = useCallback(async (id: string) => {
@@ -166,7 +174,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AppContext.Provider value={{ events, finances, financeCategories, tasks, invoices, addFinance, updateFinance, deleteFinance, reverseFinance, addFinanceCategory, addEvent, updateEvent, deleteEvent, addTask, updateTask, deleteTask, addInvoice, updateInvoice, deleteInvoice, emitInvoice, pollInvoiceStatus }}>
+    <AppContext.Provider value={{ events, finances, financeCategories, tasks, invoices, addFinance, updateFinance, settleFinance, deleteFinance, reverseFinance, addFinanceCategory, addEvent, updateEvent, deleteEvent, addTask, updateTask, deleteTask, addInvoice, updateInvoice, deleteInvoice, emitInvoice, pollInvoiceStatus }}>
       {children}
     </AppContext.Provider>
   );

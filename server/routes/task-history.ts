@@ -23,9 +23,9 @@ router.post('/', async (req, res) =>
   ));
 
 router.delete('/:id', async (req, res) => {
-  const found = await historyModels.findInAll(req.params.id);
-  if (!found) return res.status(404).json({ error: 'Not found' });
-  await found.model.findByIdAndDelete(req.params.id);
+  const model = historyModels.getModel(req);
+  if (!await model.findById(req.params.id)) return res.status(404).json({ error: 'Not found' });
+  await model.findByIdAndDelete(req.params.id);
   res.status(204).end();
 });
 

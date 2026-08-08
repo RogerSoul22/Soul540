@@ -342,18 +342,19 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  const found = await models.findInAll(req.params.id);
-  if (!found) return res.status(404).json({ error: 'Not found' });
-  const invoice = await found.model.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  const model = models.getModel(req);
+  if (!await model.findById(req.params.id)) return res.status(404).json({ error: 'Not found' });
+  const invoice = await model.findByIdAndUpdate(req.params.id, req.body, { new: true });
   await logAudit({ req, action: 'update', resource: 'invoices', resourceId: req.params.id, description: `Atualizou nota fiscal: ${invoice?.clientName}` });
   res.json(invoice);
 });
 
 router.delete('/:id', async (req, res) => {
-  const found = await models.findInAll(req.params.id);
-  if (!found) return res.status(404).json({ error: 'Not found' });
-  const clientName = found.doc?.clientName || req.params.id;
-  await found.model.findByIdAndDelete(req.params.id);
+  const model = models.getModel(req);
+  const invoice = await model.findById(req.params.id);
+  if (!invoice) return res.status(404).json({ error: 'Not found' });
+  const clientName = invoice.clientName || req.params.id;
+  await model.findByIdAndDelete(req.params.id);
   await logAudit({ req, action: 'delete', resource: 'invoices', resourceId: req.params.id, description: `Excluiu nota fiscal: ${clientName}` });
   res.status(204).end();
 });

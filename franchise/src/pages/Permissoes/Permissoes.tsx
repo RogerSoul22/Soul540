@@ -10,7 +10,6 @@ type AppUser = {
   isAdmin: boolean;
   permissions: string[];
   unit?: string;
-  passwordPlain?: string;
 };
 
 const ALL_PAGES = [

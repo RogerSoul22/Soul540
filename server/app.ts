@@ -27,7 +27,7 @@ import chatRouter from './routes/chat';
 import auditLogRouter from './routes/auditlog';
 import productionRecipesRouter from './routes/production-recipes';
 import productionOrdersRouter from './routes/production-orders';
-import { optionalAuth } from './middleware/auth';
+import { authMiddleware, optionalAuth } from './middleware/auth';
 
 const app = express();
 
@@ -37,6 +37,8 @@ app.use(cookieParser());
 app.use(optionalAuth);
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
+app.use('/api/auth', authRouter);
+app.use('/api', authMiddleware);
 
 app.use('/api/events', eventsRouter);
 app.use('/api/tasks', tasksRouter);
@@ -51,7 +53,6 @@ app.use('/api/utensils', utensilsRouter);
 app.use('/api/supplies', suppliesRouter);
 app.use('/api/utensil-categories', utensilCategoriesRouter);
 app.use('/api/supply-categories', supplyCategoriesRouter);
-app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/contracts', contractsRouter);
 app.use('/api/franchises', franchisesRouter);

@@ -1,5 +1,5 @@
 import type { FormEvent } from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { apiFetch } from '@/lib/api';
@@ -15,22 +15,11 @@ export default function MinhaConta() {
   const [saved, setSaved] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
 
-  const [passwordPlain, setPasswordPlain] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
   const [passwordSaved, setPasswordSaved] = useState(false);
-
-  useEffect(() => {
-    apiFetch('/api/users')
-      .then(r => r.json())
-      .then((users: any[]) => {
-        const me = users.find(u => u.id === (user as any)?.id || u._id === (user as any)?.id);
-        if (me?.passwordPlain) setPasswordPlain(me.passwordPlain);
-      })
-      .catch(() => {});
-  }, [user]);
 
   const handleSave = (e: FormEvent) => {
     e.preventDefault();
@@ -46,7 +35,6 @@ export default function MinhaConta() {
         method: 'PUT',
         body: JSON.stringify({ password: newPassword }),
       });
-      setPasswordPlain(newPassword);
       setNewPassword('');
       setPasswordSaved(true);
       setTimeout(() => setPasswordSaved(false), 2000);
@@ -116,7 +104,7 @@ export default function MinhaConta() {
               <input
                 className={styles.formInput}
                 type={showPassword ? 'text' : 'password'}
-                value={passwordPlain || ''}
+                value="••••••••"
                 readOnly
               />
               <button
@@ -200,7 +188,6 @@ export default function MinhaConta() {
               <div className={styles.infoSection}>
                 <p className={styles.infoSectionTitle}>Segurança</p>
                 <ul className={styles.infoList}>
-                  <li>Visualize sua senha atual clicando no ícone de olho</li>
                   <li>Para alterar a senha, digite a nova senha e clique em "Alterar Senha"</li>
                 </ul>
               </div>

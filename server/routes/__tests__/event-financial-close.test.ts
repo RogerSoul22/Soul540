@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+test('does not settle an event balance through the operational close endpoint', () => {
+  const source = readFileSync(resolve(process.cwd(), 'server/routes/events.ts'), 'utf8');
+  assert.equal(source.includes('markBalanceReceived'), false);
+  assert.equal(source.includes('financialCloseStatus'), true);
+});

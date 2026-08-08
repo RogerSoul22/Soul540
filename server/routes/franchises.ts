@@ -31,7 +31,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const franchise = await Franchise.findById(req.params.id);
   if (!franchise) return res.status(404).json({ error: 'Not found' });
-  if ((req as any).user?.role !== 'admin' && franchise.unit !== getTenantUnit(req)) {
+  if (!(req as any).user?.isAdmin && franchise.unit !== getTenantUnit(req)) {
     return res.status(403).json({ error: 'forbidden' });
   }
   const updated = await Franchise.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -41,7 +41,7 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const franchise = await Franchise.findById(req.params.id);
   if (!franchise) return res.status(404).json({ error: 'Not found' });
-  if ((req as any).user?.role !== 'admin' && franchise.unit !== getTenantUnit(req)) {
+  if (!(req as any).user?.isAdmin && franchise.unit !== getTenantUnit(req)) {
     return res.status(403).json({ error: 'forbidden' });
   }
   await Franchise.findByIdAndDelete(req.params.id);

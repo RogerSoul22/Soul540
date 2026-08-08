@@ -10,7 +10,6 @@ export interface TenantModels {
   Factory: Model<any>;
   getModel(req: any): Model<any>;
   getSource(req: any): string;
-  findInAll(id: string): Promise<{ doc: any; model: Model<any> } | null>;
 }
 
 export function createTenantModels(
@@ -55,15 +54,6 @@ export function createTenantModels(
       if (unit === 'factory') return 'factory';
       if (unit === 'franchise') return 'franchise';
       return 'main';
-    },
-    async findInAll(id: string) {
-      const doc = await Main.findById(id);
-      if (doc) return { doc, model: Main };
-      const fdoc = await Franchise.findById(id);
-      if (fdoc) return { doc: fdoc, model: Franchise };
-      const factDoc = await Factory.findById(id);
-      if (factDoc) return { doc: factDoc, model: Factory };
-      return null;
     },
   };
 }

@@ -1,7 +1,10 @@
 import { Router } from 'express';
 import mongoose, { Schema } from 'mongoose';
 import { FactoryFinance } from './finances';
+import { getTenantUnit } from '../middleware/tenant';
 import { logAudit } from '../utils/audit';
+import { canChangeForecast } from '../../shared/financePolicy';
+import { toCents } from '../../shared/money';
 
 const PedidoItemSchema = new Schema({
   id: { type: String, required: true },
@@ -33,6 +36,8 @@ const ProductionOrderSchema = new Schema({
   pizzaSize: { type: PizzaSizeSchema },
   ingredients: { type: [PedidoIngredientSchema], default: [] },
   totalCost: { type: Number, default: 0 },
+  accountingTreatment: { type: String, enum: ['internal_transfer', 'external_sale'], default: 'internal_transfer' },
+  commercialValue: { type: Number, default: 0 },
   status: { type: String, default: 'a_preparar' },
   createdAt: { type: String, default: () => new Date().toISOString() },
 }, { toJSON: { virtuals: true, versionKey: false } });
@@ -54,37 +59,58 @@ function getDateOnly(value?: string) {
   return date.toISOString().slice(0, 10);
 }
 
+export function getProductionOrderFinanceState(order: any): 'none' | 'open' {
+  if (order.accountingTreatment !== 'external_sale') return 'none';
+  if (order.status !== 'entregue') return 'none';
+  if (Number(order.commercialValue) <= 0) return 'none';
+  return 'open';
+}
+
+export function canSynchronizeOrderForecast(finance: any): boolean {
+  return canChangeForecast(finance);
+}
+
 async function syncFinanceForProductionOrder(doc: any, req?: any) {
   const eventId = getProductionOrderFinanceEventId(doc.unit, doc.id);
+  const existing = await FactoryFinance.findOne({
+    eventId,
+    source: 'factory',
+    reversedAt: { $exists: false },
+    settlementStatus: { $ne: 'cancelled' },
+  }).lean();
 
-  if (doc.status !== 'entregue' || !doc.totalCost || doc.totalCost <= 0) {
+  if (existing && !canSynchronizeOrderForecast(existing)) return;
+
+  if (getProductionOrderFinanceState(doc) === 'none') {
     await FactoryFinance.updateMany(
-      { eventId, source: 'factory', reversedAt: { $exists: false } },
-      { $set: { reversedAt: new Date().toISOString(), reversalReason: 'Pedido deixou de estar concluÃ­do', settlementStatus: 'cancelled' } },
+    { eventId, source: 'factory', reversedAt: { $exists: false }, settlementStatus: 'open' },
+      { $set: { reversedAt: new Date().toISOString(), reversalReason: 'Pedido sem receita externa ativa', settlementStatus: 'cancelled' } },
     );
     return;
   }
 
   const finance = await FactoryFinance.findOneAndUpdate(
-    { eventId, source: 'factory' },
+    { eventId, source: 'factory', settlementStatus: { $ne: 'cancelled' } },
     {
       $set: {
         eventId,
         type: 'revenue',
-        category: 'ingredientes',
+        category: 'outro',
         description: `Pedido #${doc.orderNumber || doc.id} - ${doc.filial}`,
-        amount: doc.totalCost,
+        amount: doc.commercialValue,
+        amountCents: toCents(doc.commercialValue),
         date: getDateOnly(doc.createdAt),
-        status: 'received',
-        settlementStatus: 'settled',
-        settledAt: new Date().toISOString(),
+        status: 'pending',
+        settlementStatus: 'open',
+        settledCents: 0,
+        settlements: [],
         autoEventBudget: false,
         automatic: true,
         origin: 'factory_order',
         kind: 'manual',
         source: 'factory',
       },
-      $unset: { reversedAt: 1, reversedBy: 1, reversalReason: 1 },
+      $unset: { reversedAt: 1, reversedBy: 1, reversalReason: 1, settledAt: 1 },
     },
     { new: true, upsert: true, setDefaultsOnInsert: true },
   );
@@ -101,19 +127,19 @@ async function syncFinanceForProductionOrder(doc: any, req?: any) {
 }
 
 router.get('/', async (req, res) => {
-  const unit = (req as any).headers?.['x-system'] || 'factory';
+  const unit = getTenantUnit(req);
   const docs = await ProductionOrderModel.find({ unit }).sort({ createdAt: -1 });
-  await Promise.all(docs.map((doc) => syncFinanceForProductionOrder(doc)));
   res.json(docs);
 });
 
 router.post('/', async (req, res) => {
-  const unit = (req as any).headers?.['x-system'] || 'factory';
+  const unit = getTenantUnit(req);
   const last = await ProductionOrderModel.findOne({ unit }).sort({ orderNumber: -1 });
   const orderNumber = (last?.orderNumber || 0) + 1;
   const doc = await ProductionOrderModel.create({
     ...req.body,
     unit,
+    accountingTreatment: req.body.accountingTreatment || 'internal_transfer',
     orderNumber,
     status: req.body.status || 'a_preparar',
     createdAt: req.body.createdAt || new Date().toISOString(),
@@ -123,7 +149,7 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  const unit = (req as any).headers?.['x-system'] || 'factory';
+  const unit = getTenantUnit(req);
   const doc = await ProductionOrderModel.findOneAndUpdate(
     { unit, id: req.params.id },
     req.body,
@@ -136,7 +162,7 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
-  const unit = (req as any).headers?.['x-system'] || 'factory';
+  const unit = getTenantUnit(req);
   const doc = await ProductionOrderModel.findOneAndDelete({ unit, id: req.params.id });
 
   if (!doc) return res.status(404).json({ error: 'Pedido não encontrado' });

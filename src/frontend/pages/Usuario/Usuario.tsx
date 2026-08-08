@@ -1,5 +1,5 @@
 import type { FormEvent } from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@frontend/hooks/useAuth';
 import { useTheme } from '@frontend/contexts/ThemeContext';
 import Button from '@frontend/components/Button/Button';
@@ -15,22 +15,11 @@ export default function Usuario() {
   const [address, setAddress] = useState('Rua das Pizzas, 540 - Sao Paulo, SP');
   const [saved, setSaved] = useState(false);
 
-  const [passwordPlain, setPasswordPlain] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
   const [passwordSaved, setPasswordSaved] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/users')
-      .then(r => r.json())
-      .then((users: any[]) => {
-        const me = users.find((u: any) => u.id === (user as any)?.id || u._id === (user as any)?.id);
-        if (me?.passwordPlain) setPasswordPlain(me.passwordPlain);
-      })
-      .catch(() => {});
-  }, [user]);
 
   const handleChangePassword = async () => {
     if (!newPassword.trim() || newPassword.length < 6) return;
@@ -41,7 +30,6 @@ export default function Usuario() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: newPassword }),
       });
-      setPasswordPlain(newPassword);
       setNewPassword('');
       setPasswordSaved(true);
       setTimeout(() => setPasswordSaved(false), 2000);
@@ -129,7 +117,7 @@ export default function Usuario() {
                   <input
                     className={styles.formInput}
                     type={showPassword ? 'text' : 'password'}
-                    value={passwordPlain || ''}
+                    value="••••••••"
                     readOnly
                   />
                   <button type="button" className={styles.eyeBtn} onClick={() => setShowPassword(v => !v)}>
