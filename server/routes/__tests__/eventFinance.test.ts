@@ -75,7 +75,7 @@ test('deletes never-settled automatic finances when an event is cancelled', asyn
     { _id: 'f-1', eventId: 'event-2', automatic: true, settlements: [], settledCents: 0 },
   ];
   const financeModel = {
-    find: (query: unknown) => ({ ...openEntries, __query: query, lean: async () => openEntries }),
+    find: () => ({ lean: async () => openEntries }),
     deleteMany: async (query: unknown) => { deletedQueries.push(query); },
     updateMany: async (query: unknown, update: unknown) => { updatedQueries.push({ query, update }); },
     findOne: async () => null,
@@ -90,7 +90,44 @@ test('deletes never-settled automatic finances when an event is cancelled', asyn
   }, financeModel as any, 'main');
 
   assert.equal(deletedQueries.length, 1);
-  assert.deepEqual(deletedQueries[0], { _id: { $in: ['f-1'] } });
+  assert.deepEqual(deletedQueries[0], { _id: { $in: ['f-1'] }, settledCents: { $not: { $gt: 0 } } });
+});
+
+test('soft-cancels a legacy settled finance entry that predates the settledCents field', async () => {
+  const deletedQueries: unknown[] = [];
+  const updatedQueries: Array<{ query: unknown; update: unknown }> = [];
+  const legacyEntries = [
+    {
+      _id: 'f-legacy',
+      eventId: 'event-2',
+      automatic: true,
+      type: 'revenue',
+      amount: 100,
+      date: '2026-07-01',
+      status: 'received',
+    },
+  ];
+  const financeModel = {
+    find: () => ({ lean: async () => legacyEntries }),
+    deleteMany: async (query: unknown) => { deletedQueries.push(query); },
+    updateMany: async (query: unknown, update: unknown) => { updatedQueries.push({ query, update }); },
+    findOne: async () => null,
+    create: async () => undefined,
+  };
+
+  await syncEventFinances({
+    _id: 'event-2',
+    id: 'event-2',
+    status: 'cancelled',
+    constructor: { findByIdAndUpdate: async () => undefined },
+  }, financeModel as any, 'main');
+
+  assert.equal(deletedQueries.length, 0);
+  assert.equal(updatedQueries.length, 1);
+  assert.deepEqual(updatedQueries[0].query, { _id: { $in: ['f-legacy'] } });
+  assert.deepEqual(updatedQueries[0].update, {
+    $set: { settlementStatus: 'cancelled', reversalReason: 'Evento cancelado' },
+  });
 });
 
 test('keeps already-settled automatic finances marked as cancelled instead of deleting them', async () => {

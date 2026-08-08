@@ -6,7 +6,7 @@ import { getTenantUnit } from '../middleware/tenant';
 import { logAudit } from '../utils/audit';
 import { getEventUnitsForRequest, type EventUnit } from '../utils/eventTenant';
 import { toCents } from '../../shared/money';
-import { canChangeForecast } from '../../shared/financePolicy';
+import { canChangeForecast, getSettledCents } from '../../shared/financePolicy';
 
 const EventSchema = new Schema({
   name: String,
@@ -307,10 +307,10 @@ export async function syncEventFinances(event: any, FinanceModel: FinanceModel, 
   if (event.status === 'cancelled') {
     const eventId = event.id || event._id.toString();
     const linkedEntries = await FinanceModel.find({ eventId, $or: [{ automatic: true }, { autoEventBudget: true }] }).lean();
-    const neverSettledIds = linkedEntries.filter((entry: any) => !(entry.settledCents > 0)).map((entry: any) => entry._id);
-    const settledIds = linkedEntries.filter((entry: any) => entry.settledCents > 0).map((entry: any) => entry._id);
+    const neverSettledIds = linkedEntries.filter((entry: any) => !(getSettledCents(entry) > 0)).map((entry: any) => entry._id);
+    const settledIds = linkedEntries.filter((entry: any) => getSettledCents(entry) > 0).map((entry: any) => entry._id);
     if (neverSettledIds.length > 0) {
-      await FinanceModel.deleteMany({ _id: { $in: neverSettledIds } });
+      await FinanceModel.deleteMany({ _id: { $in: neverSettledIds }, settledCents: { $not: { $gt: 0 } } });
     }
     if (settledIds.length > 0) {
       await FinanceModel.updateMany(
