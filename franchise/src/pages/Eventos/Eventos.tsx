@@ -95,6 +95,7 @@ type FormData = {
   paymentProofData: string;
   contractPdfData: string;
   depositValue: string;
+  depositDate: string;
   pixKey: string;
   estimatedPizzas: string;
   actualPizzas: string;
@@ -139,6 +140,7 @@ const emptyForm: FormData = {
   paymentProofData: '',
   contractPdfData: '',
   depositValue: '',
+  depositDate: '',
   pixKey: '',
   estimatedPizzas: '',
   actualPizzas: '',
@@ -373,6 +375,7 @@ const [showModal, setShowModal] = useState(false);
       paymentProofData: ev.paymentProofData || '',
       contractPdfData: ev.contractPdfData || '',
       depositValue: ev.depositValue ? formatBudget(String(Math.round(ev.depositValue * 100))) : '',
+      depositDate: ev.depositDate || '',
       pixKey: ev.pixKey || '',
       estimatedPizzas: ev.estimatedPizzas ? String(ev.estimatedPizzas) : '',
       actualPizzas: ev.actualPizzas ? String(ev.actualPizzas) : '',
@@ -489,6 +492,7 @@ const [showModal, setShowModal] = useState(false);
       paymentProofData: form.paymentProofData || undefined,
       contractPdfData: form.contractPdfData || undefined,
       depositValue: Number(form.depositValue.replace(/[R$\s.]/g, '').replace(',', '.')) || undefined,
+      depositDate: form.depositDate || undefined,
       pixKey: form.pixKey || undefined,
       estimatedPizzas: Number(form.estimatedPizzas) || undefined,
       actualPizzas: Number(form.actualPizzas) || undefined,
@@ -853,7 +857,7 @@ return (
                     <input className={styles.input} value={form.travelCost} onChange={(e) => setForm({ ...form, travelCost: formatBudget(e.target.value) })} placeholder="R$ 0,00" />
                   </div>
                 </div>
-                <div className={styles.formGrid2}>
+                <div className={styles.formGrid3}>
                   <div className={styles.formGroup}>
                     <label className={styles.label}>Valor Final (R$)</label>
                     <input className={styles.input} value={form.finalValue} onChange={(e) => setForm({ ...form, finalValue: formatBudget(e.target.value) })} placeholder="R$ 0,00" />
@@ -861,6 +865,10 @@ return (
                   <div className={styles.formGroup}>
                     <label className={styles.label}>Sinal Recebido (R$)</label>
                     <input className={styles.input} value={form.depositValue} onChange={(e) => setForm({ ...form, depositValue: formatBudget(e.target.value) })} placeholder="R$ 0,00" />
+                  </div>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>Data do Sinal</label>
+                    <input type="date" className={styles.input} value={form.depositDate} onChange={(e) => setForm({ ...form, depositDate: e.target.value })} />
                   </div>
                 </div>
                 <div className={styles.formGrid2}>
