@@ -1,17 +1,43 @@
 import { Router } from 'express';
+import { randomUUID } from 'node:crypto';
 import mongoose from 'mongoose';
 import { getTenantUnit } from '../middleware/tenant';
 import { validate } from '../middleware/validate';
-import { createFinanceSchema, updateFinanceSchema } from '../schemas/finances';
+import { createFinanceSchema, createSettlementSchema, importOfxSchema, previewOfxSchema, updateFinanceSchema } from '../schemas/finances';
 import { logAudit } from '../utils/audit';
+import { buildBankImportPayload, buildManualFinancePayload, buildSettlementRecord, getClassificationStatusForCategory, resolveFinanceStatusChange } from '../services/financeCommands';
+import { buildOfxSuggestions, parseOfxTransactions, type OfxTransaction } from '../services/ofx';
+import {
+  calculateSettlementStatus,
+  getEffectiveSettlements,
+  getFinanceAmountCents,
+  getSettledCents,
+} from '../../shared/financePolicy';
+import { toCents } from '../../shared/money';
+import { fromCents } from '../../shared/money';
+import { buildFinanceSummary } from '../../shared/financeSummary';
+
+const FinanceSettlementSchema = new mongoose.Schema({
+  id: { type: String, required: true },
+  amountCents: { type: Number, required: true, min: 1 },
+  externalId: { type: String, maxlength: 300 },
+  settledOn: { type: String, required: true },
+  settledAt: { type: String, required: true },
+  paymentMethod: String,
+  settledBy: String,
+  reason: String,
+  idempotencyKey: { type: String, required: true },
+}, { _id: false });
 
 const FinanceSchema = new mongoose.Schema(
   {
     eventId: { type: String, default: '' },
     type: { type: String, enum: ['revenue', 'cost'], required: true },
     category: { type: String, required: true },
+    classificationStatus: { type: String, enum: ['classified', 'unclassified'], default: 'classified' },
     description: { type: String, default: '' },
     amount: { type: Number, required: true },
+    amountCents: { type: Number, min: 1 },
     date: { type: String, required: true },
     status: { type: String, enum: ['pending', 'paid', 'received'], default: 'pending' },
     autoEventBudget: { type: Boolean, default: false },
@@ -21,6 +47,8 @@ const FinanceSchema = new mongoose.Schema(
     paymentMethod: String,
     dueDate: String,
     settledAt: String,
+    settledCents: { type: Number, default: 0, min: 0 },
+    settlements: { type: [FinanceSettlementSchema], default: [] },
     settlementStatus: { type: String, enum: ['open', 'partial', 'settled', 'cancelled'], default: 'open' },
     automatic: { type: Boolean, default: false },
     reversedAt: String,
@@ -48,8 +76,10 @@ const FranchiseFinanceSchema = new mongoose.Schema(
     eventId: { type: String, default: '' },
     type: { type: String, enum: ['revenue', 'cost'], required: true },
     category: { type: String, required: true },
+    classificationStatus: { type: String, enum: ['classified', 'unclassified'], default: 'classified' },
     description: { type: String, default: '' },
     amount: { type: Number, required: true },
+    amountCents: { type: Number, min: 1 },
     date: { type: String, required: true },
     status: { type: String, enum: ['pending', 'paid', 'received'], default: 'pending' },
     autoEventBudget: { type: Boolean, default: false },
@@ -59,6 +89,8 @@ const FranchiseFinanceSchema = new mongoose.Schema(
     paymentMethod: String,
     dueDate: String,
     settledAt: String,
+    settledCents: { type: Number, default: 0, min: 0 },
+    settlements: { type: [FinanceSettlementSchema], default: [] },
     settlementStatus: { type: String, enum: ['open', 'partial', 'settled', 'cancelled'], default: 'open' },
     automatic: { type: Boolean, default: false },
     reversedAt: String,
@@ -86,8 +118,10 @@ const FactoryFinanceSchema = new mongoose.Schema(
     eventId: { type: String, default: '' },
     type: { type: String, enum: ['revenue', 'cost'], required: true },
     category: { type: String, required: true },
+    classificationStatus: { type: String, enum: ['classified', 'unclassified'], default: 'classified' },
     description: { type: String, default: '' },
     amount: { type: Number, required: true },
+    amountCents: { type: Number, min: 1 },
     date: { type: String, required: true },
     status: { type: String, enum: ['pending', 'paid', 'received'], default: 'pending' },
     autoEventBudget: { type: Boolean, default: false },
@@ -97,6 +131,8 @@ const FactoryFinanceSchema = new mongoose.Schema(
     paymentMethod: String,
     dueDate: String,
     settledAt: String,
+    settledCents: { type: Number, default: 0, min: 0 },
+    settlements: { type: [FinanceSettlementSchema], default: [] },
     settlementStatus: { type: String, enum: ['open', 'partial', 'settled', 'cancelled'], default: 'open' },
     automatic: { type: Boolean, default: false },
     reversedAt: String,
@@ -123,14 +159,17 @@ FinanceSchema.index({ source: 1, date: -1 });
 FinanceSchema.index({ eventId: 1 });
 FinanceSchema.index({ eventId: 1, kind: 1, automatic: 1 });
 FinanceSchema.index({ externalId: 1 }, { unique: true, sparse: true });
+FinanceSchema.index({ 'settlements.externalId': 1 }, { unique: true, sparse: true });
 FranchiseFinanceSchema.index({ source: 1, date: -1 });
 FranchiseFinanceSchema.index({ eventId: 1 });
 FranchiseFinanceSchema.index({ eventId: 1, kind: 1, automatic: 1 });
 FranchiseFinanceSchema.index({ externalId: 1 }, { unique: true, sparse: true });
+FranchiseFinanceSchema.index({ 'settlements.externalId': 1 }, { unique: true, sparse: true });
 FactoryFinanceSchema.index({ source: 1, date: -1 });
 FactoryFinanceSchema.index({ eventId: 1 });
 FactoryFinanceSchema.index({ eventId: 1, kind: 1, automatic: 1 });
 FactoryFinanceSchema.index({ externalId: 1 }, { unique: true, sparse: true });
+FactoryFinanceSchema.index({ 'settlements.externalId': 1 }, { unique: true, sparse: true });
 
 export const Finance = mongoose.models.Finance || mongoose.model('Finance', FinanceSchema);
 export const FranchiseFinance = mongoose.models.FranchiseFinance || mongoose.model('FranchiseFinance', FranchiseFinanceSchema);
@@ -139,100 +178,300 @@ export const FactoryFinance = mongoose.models.FactoryFinance || mongoose.model('
 function isFromFranchise(req: any): boolean { return getTenantUnit(req) === 'franchise'; }
 function isFromFactory(req: any): boolean { return getTenantUnit(req) === 'factory'; }
 
-async function findFinanceInBothCollections(id: string) {
-  const doc = await Finance.findById(id);
-  if (doc) return { doc, model: Finance };
-  const fdoc = await FranchiseFinance.findById(id);
-  if (fdoc) return { doc: fdoc, model: FranchiseFinance };
-  const factDoc = await FactoryFinance.findById(id);
-  if (factDoc) return { doc: factDoc, model: FactoryFinance };
+export function getFinanceModelForUnit(unit: string) {
+  if (unit === 'factory') return FactoryFinance;
+  if (unit === 'franchise') return FranchiseFinance;
+  return Finance;
+}
+
+export function getFinanceModelsForRequest(req: any, scope: string) {
+  const tenantUnit = getTenantUnit(req);
+  if (!req.user?.isAdmin) return [getFinanceModelForUnit(tenantUnit)];
+  if (scope === 'combined') return [Finance, FranchiseFinance, FactoryFinance];
+  return [getFinanceModelForUnit(scope)];
+}
+
+export function getFinanceReverseError(entry: { automatic?: boolean; reversedAt?: string }): string | undefined {
+  if (entry.reversedAt) return 'Lançamento já estornado';
+  if (entry.automatic) return 'Altere o evento ou pedido de origem para estornar este lançamento automático';
+  return undefined;
+}
+
+async function findFinanceForRequest(req: any, id: string) {
+  const model = getFinanceModelForUnit(getTenantUnit(req));
+  const doc = await model.findById(id);
+  if (doc) return { doc, model };
   return null;
+}
+
+export function serializeFinanceEntry(entry: any) {
+  const raw = entry?.toJSON ? entry.toJSON() : entry;
+  const settlementStatus = calculateSettlementStatus(raw);
+  const settledCents = getSettledCents(raw);
+  return {
+    ...raw,
+    amountCents: getFinanceAmountCents(raw),
+    settledCents,
+    settlements: getEffectiveSettlements(raw),
+    settlementStatus,
+    status: settlementStatus === 'settled' ? (raw.type === 'revenue' ? 'received' : 'paid') : 'pending',
+  };
+}
+
+function getAuthenticatedUserId(req: any): string {
+  return req.user?._id?.toString() || req.user?.id || 'system';
+}
+
+async function appendSettlementToFinance(model: any, document: any, settlement: any) {
+  let entry = document?.toJSON ? document.toJSON() : document;
+  const existing = Array.isArray(entry.settlements)
+    ? entry.settlements.find((item: any) => item.idempotencyKey === settlement.idempotencyKey || (settlement.externalId && item.externalId === settlement.externalId))
+    : undefined;
+  if (existing) return { kind: 'duplicate' as const, finance: document };
+  if (calculateSettlementStatus(entry) === 'cancelled') {
+    return { kind: 'error' as const, status: 409, error: 'Não é possível liquidar um lançamento cancelado' };
+  }
+  if (entry.settlementStatus === 'partial' && (!Array.isArray(entry.settlements) || entry.settlements.length === 0)) {
+    return { kind: 'error' as const, status: 409, error: 'Lançamento legado parcial precisa ser reconciliado antes de nova baixa' };
+  }
+
+  const amountCents = getFinanceAmountCents(entry);
+  const settledCents = getSettledCents(entry);
+  if (settlement.amountCents + settledCents > amountCents) {
+    return { kind: 'error' as const, status: 422, error: 'A baixa excede o valor em aberto do lançamento' };
+  }
+  if (!Number.isSafeInteger(entry.amountCents)) {
+    await model.findByIdAndUpdate(entry._id, { $set: { amountCents, settledCents } });
+    entry = { ...entry, amountCents, settledCents };
+  }
+
+  const query: Record<string, unknown> = {
+    _id: entry._id,
+    settlementStatus: { $ne: 'cancelled' },
+    'settlements.idempotencyKey': { $ne: settlement.idempotencyKey },
+    $expr: {
+      $lte: [
+        { $add: [{ $ifNull: ['$settledCents', 0] }, settlement.amountCents] },
+        '$amountCents',
+      ],
+    },
+  };
+  if (settlement.externalId) query['settlements.externalId'] = { $ne: settlement.externalId };
+  const updated = await model.findOneAndUpdate(
+    query,
+    [
+      {
+        $set: {
+          settlements: { $concatArrays: [{ $ifNull: ['$settlements', []] }, [settlement]] },
+          settledCents: { $add: [{ $ifNull: ['$settledCents', 0] }, settlement.amountCents] },
+          settledAt: settlement.settledAt,
+        },
+      },
+      {
+        $set: {
+          settlementStatus: { $cond: [{ $gte: ['$settledCents', '$amountCents'] }, 'settled', 'partial'] },
+          status: { $cond: [{ $gte: ['$settledCents', '$amountCents'] }, entry.type === 'revenue' ? 'received' : 'paid', 'pending'] },
+        },
+      },
+    ],
+    { new: true },
+  );
+  if (updated) return { kind: 'created' as const, finance: updated };
+
+  const latest = await model.findById(entry._id);
+  const duplicated = latest?.toJSON?.().settlements?.some((item: any) => (
+    item.idempotencyKey === settlement.idempotencyKey || (settlement.externalId && item.externalId === settlement.externalId)
+  ));
+  if (duplicated) return { kind: 'duplicate' as const, finance: latest };
+  return { kind: 'error' as const, status: 409, error: 'Não foi possível registrar a baixa; atualize e tente novamente' };
+}
+
+async function linkOfxTransaction(model: any, transaction: OfxTransaction, financeId: string, settledBy: string) {
+  const document = await model.findById(financeId);
+  if (!document) return { kind: 'error' as const, status: 404, error: 'Previsão financeira não encontrada' };
+  const preview = buildOfxSuggestions([transaction], [document.toJSON()])[0];
+  if (preview.decision === 'duplicate') return { kind: 'duplicate' as const, finance: document };
+  if (preview.decision !== 'link' || preview.financeId !== financeId) {
+    return { kind: 'error' as const, status: 409, error: 'A previsão não está mais disponível para esta conciliação' };
+  }
+  const settlement = buildSettlementRecord({
+    amount: transaction.amount,
+    settledOn: transaction.date,
+    paymentMethod: 'bank',
+    reason: `Conciliado pelo extrato OFX: ${transaction.description}`,
+    idempotencyKey: transaction.externalId,
+    externalId: transaction.externalId,
+  }, settledBy);
+  return appendSettlementToFinance(model, document, settlement);
 }
 
 const router = Router();
 
 router.get('/', async (req, res) => {
-  if (isFromFactory(req)) {
-    const items = await FactoryFinance.find({ source: 'factory', reversedAt: { $exists: false } }).sort({ date: -1 });
-    return res.json(items);
-  }
-  if (isFromFranchise(req)) {
-    const items = await FranchiseFinance.find({ source: 'franchise', reversedAt: { $exists: false } }).sort({ date: -1 });
-    return res.json(items);
-  }
-  const items = await Finance.find({ source: 'main', reversedAt: { $exists: false } }).sort({ date: -1 });
-  res.json(items);
+  const source = getTenantUnit(req);
+  const model = getFinanceModelForUnit(source);
+  const items = await model.find({
+    source,
+    reversedAt: { $exists: false },
+    settlementStatus: { $ne: 'cancelled' },
+  }).sort({ date: -1 });
+  res.json(items.map(serializeFinanceEntry));
 });
 
 router.get('/summary', async (req, res) => {
-  const scope = String(req.query.scope || getTenantUnit(req));
-  const models = scope === 'combined'
-    ? [Finance, FranchiseFinance, FactoryFinance]
-    : scope === 'franchise'
-      ? [FranchiseFinance]
-      : scope === 'factory'
-        ? [FactoryFinance]
-        : [Finance];
+  const requestedScope = String(req.query.scope || '');
+  const isAdmin = (req as any).user?.isAdmin === true;
+  const scope = isAdmin && ['main', 'franchise', 'factory', 'combined'].includes(requestedScope)
+    ? requestedScope
+    : getTenantUnit(req);
+  const view = req.query.view === 'competence' ? 'competence' : 'cash';
+  const requestedReportingUnit = typeof req.query.reportingUnit === 'string' ? req.query.reportingUnit : '';
+  const reportingUnit = ['main', 'franchise', 'factory'].includes(requestedReportingUnit)
+    ? requestedReportingUnit as 'main' | 'franchise' | 'factory'
+    : (scope === 'combined' ? undefined : scope as 'main' | 'franchise' | 'factory');
+  const models = isAdmin && reportingUnit === 'main'
+    ? [Finance, FranchiseFinance]
+    : getFinanceModelsForRequest(req, scope);
   const start = typeof req.query.start === 'string' ? req.query.start : '';
   const end = typeof req.query.end === 'string' ? req.query.end : '';
-  const date = start || end ? { ...(start ? { $gte: start } : {}), ...(end ? { $lte: end } : {}) } : undefined;
-  const query = { reversedAt: { $exists: false }, ...(date ? { date } : {}) };
-  const groups = await Promise.all(models.map((model) => model.find(query).lean()));
+  const groups = await Promise.all(models.map((model) => model.find({ reversedAt: { $exists: false } }).lean()));
   const entries = groups.flat() as any[];
-  const isSettled = (entry: any) => entry.settlementStatus === 'settled' || entry.status === 'received' || entry.status === 'paid';
-  const active = entries.filter((entry) => entry.settlementStatus !== 'cancelled');
-  const revenues = active.filter((entry) => entry.type === 'revenue');
-  const costs = active.filter((entry) => entry.type === 'cost');
-  const realizedIncome = revenues.filter(isSettled).reduce((sum, entry) => sum + entry.amount, 0);
-  const projectedIncome = revenues.filter((entry) => !isSettled(entry)).reduce((sum, entry) => sum + entry.amount, 0);
-  const realizedExpense = costs.filter(isSettled).reduce((sum, entry) => sum + entry.amount, 0);
-  const projectedExpense = costs.filter((entry) => !isSettled(entry)).reduce((sum, entry) => sum + entry.amount, 0);
-
-  const byPaymentMethod = Array.from(revenues.filter(isSettled).reduce((map, entry) => {
-    const key = entry.paymentMethod || 'nao-informado';
-    const current = map.get(key) || { method: key, amount: 0, count: 0 };
-    current.amount += entry.amount;
-    current.count += 1;
-    map.set(key, current);
-    return map;
-  }, new Map<string, { method: string; amount: number; count: number }>()).values());
-
-  const byEvent = Array.from(active.filter((entry) => entry.eventId).reduce((map, entry) => {
-    const current = map.get(entry.eventId) || { eventId: entry.eventId, received: 0, receivable: 0, costs: 0 };
-    if (entry.type === 'cost') current.costs += entry.amount;
-    else if (isSettled(entry)) current.received += entry.amount;
-    else current.receivable += entry.amount;
-    map.set(entry.eventId, current);
-    return map;
-  }, new Map<string, { eventId: string; received: number; receivable: number; costs: number }>()).values());
+  const summary = buildFinanceSummary(entries.map((entry) => ({
+    ...entry,
+    id: entry.id || entry._id?.toString(),
+  })), { view, start, end, reportingUnit });
 
   res.json({
-    totalIncome: realizedIncome + projectedIncome,
-    totalExpense: realizedExpense + projectedExpense,
-    realizedIncome,
-    projectedIncome,
-    realizedExpense,
-    projectedExpense,
-    openReceivables: projectedIncome,
-    netRealized: realizedIncome - realizedExpense,
-    byPaymentMethod,
-    byEvent,
+    view,
+    period: { start: start || undefined, end: end || undefined },
+    reportingUnit,
+    totalIncome: fromCents(summary.totalIncomeCents),
+    totalExpense: fromCents(summary.totalExpenseCents),
+    realizedIncome: fromCents(summary.realizedIncomeCents),
+    projectedIncome: fromCents(summary.projectedIncomeCents),
+    realizedExpense: fromCents(summary.realizedExpenseCents),
+    projectedExpense: fromCents(summary.projectedExpenseCents),
+    openReceivables: fromCents(summary.openReceivablesCents),
+    netRealized: fromCents(summary.netRealizedCents),
+    byPaymentMethod: summary.byPaymentMethod.map((item) => ({ ...item, amount: fromCents(item.amountCents) })),
+    byEvent: summary.byEvent.map((item) => ({
+      eventId: item.eventId,
+      received: fromCents(item.receivedCents),
+      receivable: fromCents(item.receivableCents),
+      costs: fromCents(item.costsCents),
+    })),
+    excludedCancelled: summary.excludedCancelled,
+  });
+});
+
+router.post('/ofx/preview', validate(previewOfxSchema), async (req, res) => {
+  const source = getTenantUnit(req);
+  const model = getFinanceModelForUnit(source);
+  const parsed = parseOfxTransactions(req.body.ofxText);
+  const finances = await model.find({ source, reversedAt: { $exists: false } }).lean();
+  const suggestions = buildOfxSuggestions(parsed.transactions, finances as any[]);
+  res.json({
+    bankAccount: parsed.bankAccount,
+    statementBalance: parsed.statementBalance,
+    suggestions,
+  });
+});
+
+router.post('/ofx/import', validate(importOfxSchema), async (req, res) => {
+  const source = getTenantUnit(req) as 'main' | 'franchise' | 'factory';
+  const model = getFinanceModelForUnit(source);
+  const parsed = parseOfxTransactions(req.body.ofxText);
+  const finances = await model.find({ source, reversedAt: { $exists: false } }).lean();
+  const suggestions = buildOfxSuggestions(parsed.transactions, finances as any[]);
+  const selections = new Map(req.body.selections.map((selection: any) => [selection.externalId, selection]));
+  const importBatchId = `ofx-${randomUUID()}`;
+  const settledBy = getAuthenticatedUserId(req);
+  const results: Array<Record<string, unknown>> = [];
+
+  for (const suggestion of suggestions) {
+    const selection = selections.get(suggestion.externalId) as { category?: string; financeId?: string } | undefined;
+    if (!selection) continue;
+    if (suggestion.decision === 'duplicate') {
+      results.push({ externalId: suggestion.externalId, action: 'ignored_duplicate', financeId: suggestion.financeId });
+      continue;
+    }
+    if (suggestion.decision === 'ambiguous' && !selection.financeId) {
+      results.push({ externalId: suggestion.externalId, action: 'needs_decision' });
+      continue;
+    }
+
+    if (suggestion.decision === 'link' || selection.financeId) {
+      const financeId = selection.financeId || suggestion.financeId;
+      if (!financeId) {
+        results.push({ externalId: suggestion.externalId, action: 'needs_decision' });
+        continue;
+      }
+      const outcome = await linkOfxTransaction(model, suggestion, financeId, settledBy);
+      if (outcome.kind === 'error') {
+        results.push({ externalId: suggestion.externalId, action: 'conflict', error: outcome.error });
+        continue;
+      }
+      if (outcome.kind === 'created') {
+        await logAudit({
+          req,
+          action: 'update',
+          resource: 'finances',
+          resourceId: outcome.finance.id,
+          description: `Conciliou extrato OFX em ${suggestion.date}: ${outcome.finance.description}`,
+        });
+      }
+      results.push({ externalId: suggestion.externalId, action: outcome.kind === 'created' ? 'linked' : 'ignored_duplicate', financeId: outcome.finance.id });
+      continue;
+    }
+
+    const existing = await model.exists({
+      $or: [
+        { externalId: suggestion.externalId },
+        { 'settlements.externalId': suggestion.externalId },
+      ],
+    });
+    if (existing) {
+      results.push({ externalId: suggestion.externalId, action: 'ignored_duplicate' });
+      continue;
+    }
+    try {
+      const finance = await model.create(buildBankImportPayload(suggestion, {
+        source,
+        bankAccount: parsed.bankAccount,
+        bankStatementBalance: parsed.statementBalance,
+        importBatchId,
+        settledBy,
+        category: selection.category,
+      }));
+      await logAudit({
+        req,
+        action: 'create',
+        resource: 'finances',
+        resourceId: finance.id,
+        description: `Importou movimento OFX: ${finance.description}`,
+      });
+      results.push({ externalId: suggestion.externalId, action: 'created_unclassified', financeId: finance.id });
+    } catch (error: any) {
+      if (error?.code === 11000) {
+        results.push({ externalId: suggestion.externalId, action: 'ignored_duplicate' });
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  res.status(201).json({
+    bankAccount: parsed.bankAccount,
+    statementBalance: parsed.statementBalance,
+    importBatchId,
+    results,
   });
 });
 
 router.post('/', validate(createFinanceSchema), async (req, res) => {
-  const normalized = {
-    ...req.body,
-    origin: req.body.origin || 'manual',
-    kind: req.body.kind || 'manual',
-    automatic: req.body.automatic ?? false,
-    settlementStatus: req.body.settlementStatus || (['paid', 'received'].includes(req.body.status) ? 'settled' : 'open'),
-    settledAt: req.body.settledAt || (['paid', 'received'].includes(req.body.status) ? new Date().toISOString() : undefined),
-  };
-  const Model = isFromFactory(req) ? FactoryFinance : isFromFranchise(req) ? FranchiseFinance : Finance;
-  if (normalized.externalId && await Model.exists({ externalId: normalized.externalId })) {
-    return res.status(409).json({ error: 'Este movimento bancario ja foi importado' });
-  }
+  const source = getTenantUnit(req) as 'main' | 'franchise' | 'factory';
+  const normalized = buildManualFinancePayload(req.body, source);
+  const Model = getFinanceModelForUnit(source);
   if (isFromFactory(req)) {
     const finance = await FactoryFinance.create({ ...normalized, source: 'factory' });
     await logAudit({ req, action: 'create', resource: 'finances', resourceId: finance.id, description: `Criou lançamento: ${finance.description} (R$ ${finance.amount})` });
@@ -251,41 +490,190 @@ router.post('/', validate(createFinanceSchema), async (req, res) => {
 const STATUS_LABELS: Record<string, string> = { pending: 'Pendente', paid: 'Pago', received: 'Recebido' };
 
 router.put('/:id', validate(updateFinanceSchema), async (req, res) => {
-  const found = await findFinanceInBothCollections(req.params.id);
+  const found = await findFinanceForRequest(req, req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   const oldDoc = found.doc;
-  const protectedFields = ['amount', 'type', 'category', 'eventId', 'kind', 'origin'];
-  if ((oldDoc as any).automatic && protectedFields.some((field) => Object.prototype.hasOwnProperty.call(req.body, field))) {
-    return res.status(409).json({ error: 'LanÃ§amentos automÃ¡ticos devem ser alterados pelo evento de origem' });
+
+  if (Object.prototype.hasOwnProperty.call(req.body, 'status')) {
+    const entry = oldDoc.toJSON();
+    let command;
+    try {
+      command = resolveFinanceStatusChange(entry, req.body.status, req.body, getAuthenticatedUserId(req));
+    } catch (error: any) {
+      return res.status(409).json({ error: error.message });
+    }
+
+    if (command.kind === 'settle') {
+      const amountCents = getFinanceAmountCents(entry);
+      const updated = await (found.model as any).findOneAndUpdate(
+        {
+          _id: entry._id,
+          settlementStatus: { $ne: 'cancelled' },
+          'settlements.idempotencyKey': { $ne: command.settlement.idempotencyKey },
+        },
+        [
+          {
+            $set: {
+              settlements: { $concatArrays: [{ $ifNull: ['$settlements', []] }, [command.settlement]] },
+              settledCents: { $add: [{ $ifNull: ['$settledCents', 0] }, command.settlement.amountCents] },
+              settledAt: command.settlement.settledAt,
+            },
+          },
+          {
+            $set: {
+              settlementStatus: { $cond: [{ $gte: ['$settledCents', amountCents] }, 'settled', 'partial'] },
+              status: { $cond: [{ $gte: ['$settledCents', amountCents] }, entry.type === 'revenue' ? 'received' : 'paid', 'pending'] },
+            },
+          },
+        ],
+        { new: true },
+      );
+      if (!updated) return res.status(409).json({ error: 'Não foi possível alterar o status; atualize e tente novamente' });
+      await logAudit({
+        req,
+        action: 'update',
+        resource: 'finances',
+        resourceId: req.params.id,
+        description: `Alterou status de "${STATUS_LABELS[entry.status] || entry.status}" para "${STATUS_LABELS[req.body.status] || req.body.status}": ${updated.description}`,
+      });
+      return res.json(serializeFinanceEntry(updated));
+    }
+
+    if (command.kind === 'reopen') {
+      const updated = await found.model.findByIdAndUpdate(
+        entry._id,
+        { $set: { settlementStatus: 'open', settledCents: 0, status: 'pending' }, $unset: { settledAt: 1, settlements: 1 } },
+        { new: true },
+      );
+      await logAudit({
+        req,
+        action: 'update',
+        resource: 'finances',
+        resourceId: req.params.id,
+        description: `Alterou status de "${STATUS_LABELS[entry.status] || entry.status}" para "Pendente": ${updated?.description}`,
+      });
+      return res.json(serializeFinanceEntry(updated));
+    }
+    // command.kind === 'noop': segue para o resto do corpo, se houver outros campos.
   }
-  const update = { ...req.body };
-  if (req.body.status && ['paid', 'received'].includes(req.body.status)) {
-    update.settlementStatus = 'settled';
-    update.settledAt = (oldDoc as any).settledAt || new Date().toISOString();
-  } else if (req.body.status === 'pending') {
-    update.settlementStatus = 'open';
-    update.settledAt = undefined;
+
+  if ((oldDoc as any).automatic) {
+    const protectedFields = ['amount', 'type', 'category', 'eventId', 'kind', 'origin'];
+    if (protectedFields.some((field) => Object.prototype.hasOwnProperty.call(req.body, field))) {
+      return res.status(409).json({ error: 'Lançamentos automáticos devem ser alterados pelo evento ou pedido de origem' });
+    }
+  }
+  const commandFields = ['settlementStatus', 'settledAt', 'settledCents', 'settlements', 'origin', 'kind', 'automatic', 'source', 'eventId', 'reversedAt', 'reversedBy', 'reversalReason', 'autoEventBudget'];
+  if (commandFields.some((field) => Object.prototype.hasOwnProperty.call(req.body, field))) {
+    return res.status(400).json({ error: 'Use os comandos de liquidar, cancelar ou origem vinculada para alterar a situação financeira' });
+  }
+  const allowedFields = ['category', 'description', 'amount', 'date', 'dueDate', 'paymentMethod', 'installmentGroupId', 'installmentNumber', 'installmentTotal', 'recurrenceId', 'recurrenceFrequency', 'recurrenceEndDate', 'recurrenceInterval', 'recurrenceTotal'];
+  const update = allowedFields.reduce<Record<string, unknown>>((result, field) => {
+    if (Object.prototype.hasOwnProperty.call(req.body, field)) result[field] = req.body[field];
+    return result;
+  }, {});
+  if (typeof update.category === 'string') {
+    update.classificationStatus = getClassificationStatusForCategory(update.category);
+  }
+  if (Object.keys(update).length === 0) {
+    if (Object.prototype.hasOwnProperty.call(req.body, 'status')) return res.json(serializeFinanceEntry(oldDoc));
+    return res.status(400).json({ error: 'Nenhum campo financeiro permitido foi informado' });
+  }
+  if (Object.prototype.hasOwnProperty.call(update, 'amount')) {
+    const settledCents = getSettledCents(oldDoc.toJSON());
+    if (settledCents > 0) {
+      return res.status(409).json({ error: 'Não altere o valor de um lançamento que já possui baixa' });
+    }
+    update.amountCents = toCents(update.amount as number);
   }
   const finance = await found.model.findByIdAndUpdate(req.params.id, update, { new: true });
-  // Detect status-only change to produce a specific audit message
-  const changedKeys = Object.keys(req.body);
-  let desc: string;
-  if (changedKeys.length === 1 && changedKeys[0] === 'status') {
-    const from = STATUS_LABELS[(oldDoc as any).status] || (oldDoc as any).status;
-    const to   = STATUS_LABELS[req.body.status] || req.body.status;
-    desc = `Alterou status de "${from}" para "${to}": ${finance?.description}`;
-  } else {
-    desc = `Atualizou lançamento: ${finance?.description} (R$ ${finance?.amount})`;
-  }
-  await logAudit({ req, action: 'update', resource: 'finances', resourceId: req.params.id, description: desc });
+  await logAudit({ req, action: 'update', resource: 'finances', resourceId: req.params.id, description: `Atualizou lançamento: ${finance?.description} (R$ ${finance?.amount})` });
   res.json(finance);
 });
 
+router.post('/:id/settlements', validate(createSettlementSchema), async (req, res) => {
+  const found = await findFinanceForRequest(req, req.params.id);
+  if (!found) return res.status(404).json({ error: 'Not found' });
+
+  const entry = found.doc.toJSON();
+  const existing = Array.isArray(entry.settlements)
+    ? entry.settlements.find((settlement: any) => settlement.idempotencyKey === req.body.idempotencyKey)
+    : undefined;
+  if (existing) return res.json(serializeFinanceEntry(found.doc));
+  if (calculateSettlementStatus(entry) === 'cancelled') {
+    return res.status(409).json({ error: 'Não é possível liquidar um lançamento cancelado' });
+  }
+  if (entry.settlementStatus === 'partial' && (!Array.isArray(entry.settlements) || entry.settlements.length === 0)) {
+    return res.status(409).json({ error: 'Lançamento legado parcial precisa ser reconciliado antes de nova baixa' });
+  }
+
+  const amountCents = getFinanceAmountCents(entry);
+  const settledCents = getSettledCents(entry);
+  const settlement = buildSettlementRecord(
+    req.body,
+    (req as any).user?._id?.toString() || (req as any).user?.id || 'system',
+  );
+  if (settlement.amountCents + settledCents > amountCents) {
+    return res.status(422).json({ error: 'A baixa excede o valor em aberto do lançamento' });
+  }
+
+  if (!Number.isSafeInteger(entry.amountCents)) {
+    await found.model.findByIdAndUpdate(entry._id, { $set: { amountCents, settledCents } });
+  }
+
+  const updated = await (found.model as any).findOneAndUpdate(
+    {
+      _id: entry._id,
+      settlementStatus: { $ne: 'cancelled' },
+      'settlements.idempotencyKey': { $ne: settlement.idempotencyKey },
+      $expr: {
+        $lte: [
+          { $add: [{ $ifNull: ['$settledCents', 0] }, settlement.amountCents] },
+          '$amountCents',
+        ],
+      },
+    },
+    [
+      {
+        $set: {
+          settlements: { $concatArrays: [{ $ifNull: ['$settlements', []] }, [settlement]] },
+          settledCents: { $add: [{ $ifNull: ['$settledCents', 0] }, settlement.amountCents] },
+          settledAt: settlement.settledAt,
+        },
+      },
+      {
+        $set: {
+          settlementStatus: { $cond: [{ $gte: ['$settledCents', '$amountCents'] }, 'settled', 'partial'] },
+          status: { $cond: [{ $gte: ['$settledCents', '$amountCents'] }, entry.type === 'revenue' ? 'received' : 'paid', 'pending'] },
+        },
+      },
+    ],
+    { new: true },
+  );
+
+  if (!updated) {
+    const latest = await found.model.findById(entry._id);
+    const duplicated = latest?.toJSON?.().settlements?.some((item: any) => item.idempotencyKey === settlement.idempotencyKey);
+    if (duplicated) return res.json(serializeFinanceEntry(latest));
+    return res.status(409).json({ error: 'Não foi possível registrar a baixa; atualize e tente novamente' });
+  }
+
+  await logAudit({
+    req,
+    action: 'update',
+    resource: 'finances',
+    resourceId: req.params.id,
+    description: `Liquidou ${updated.description} em ${settlement.settledOn}`,
+  });
+  res.status(201).json(serializeFinanceEntry(updated));
+});
+
 router.post('/:id/reverse', async (req, res) => {
-  const found = await findFinanceInBothCollections(req.params.id);
+  const found = await findFinanceForRequest(req, req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   // Automatic entries are reversed (not deleted) so their audit history is preserved.
-  if ((found.doc as any).automatic) (found.doc as any).automatic = false;
+  const reverseError = getFinanceReverseError(found.doc as any);
+  if (reverseError) return res.status(409).json({ error: reverseError });
   if ((found.doc as any).reversedAt) return res.status(409).json({ error: 'LanÃ§amento jÃ¡ estornado' });
   if ((found.doc as any).automatic) return res.status(409).json({ error: 'Altere o evento ou pedido de origem para estornar este lanÃ§amento automÃ¡tico' });
   const reversedAt = new Date().toISOString();
@@ -300,11 +688,16 @@ router.post('/:id/reverse', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
-  const found = await findFinanceInBothCollections(req.params.id);
+  const found = await findFinanceForRequest(req, req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   const finance = found.doc;
   if ((finance as any).automatic) return res.status(409).json({ error: 'Use o estorno para lanÃ§amentos automÃ¡ticos' });
-  await found.model.findByIdAndDelete(req.params.id);
+  await found.model.findByIdAndUpdate(req.params.id, {
+    settlementStatus: 'cancelled',
+    reversedAt: new Date().toISOString(),
+    reversedBy: (req as any).user?._id?.toString() || (req as any).user?.id || 'system',
+    reversalReason: 'Cancelamento manual',
+  });
   await logAudit({ req, action: 'delete', resource: 'finances', resourceId: req.params.id, description: `Excluiu lançamento: ${finance?.description}` });
   res.status(204).end();
 });
