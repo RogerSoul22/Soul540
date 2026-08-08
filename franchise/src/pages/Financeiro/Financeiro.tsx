@@ -1352,10 +1352,7 @@ export default function Financeiro() {
             {selectedFinancialEvent.financialStatus === 'closed' ? (
               <button className={styles.btnExport} type="button" onClick={async () => { await reopenEventFinance(selectedFinancialEvent.id); setSelectedFinancialEvent(null); }}>Reabrir financeiro</button>
             ) : (
-              <>
-                <button className={styles.btnExport} type="button" onClick={async () => { await closeEventFinance(selectedFinancialEvent.id, false); setSelectedFinancialEvent(null); }}>Fechar financeiro</button>
-                <button className={styles.btnPrimary} type="button" onClick={async () => { await closeEventFinance(selectedFinancialEvent.id, true); setSelectedFinancialEvent(null); }}>Fechar e quitar saldo</button>
-              </>
+              <button className={styles.btnExport} type="button" onClick={async () => { await closeEventFinance(selectedFinancialEvent.id); setSelectedFinancialEvent(null); }}>Fechar financeiro</button>
             )}
           </div>
         </Modal>
