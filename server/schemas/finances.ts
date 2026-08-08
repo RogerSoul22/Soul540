@@ -47,7 +47,19 @@ export const createFinanceSchema = z.object({
   bankStatementBalance: z.number().finite().optional(),
 });
 
-export const updateFinanceSchema = createFinanceSchema.partial();
+// A edição não pode reintroduzir valores default para campos omitidos pelo
+// cliente — Zod aplica `.default()` a qualquer campo ausente mesmo dentro de
+// `.partial()`, o que faria `eventId`/`autoEventBudget` sempre "aparecerem"
+// no corpo (disparando o bloqueio de commandFields em qualquer PUT) e faria
+// `status` sempre virar "pending" (reabrindo silenciosamente um lançamento já
+// liquidado sempre que só a descrição/valor fosse editado). Removendo o
+// default desses campos na edição, "ausente" volta a significar "não alterar".
+export const updateFinanceSchema = createFinanceSchema.partial().extend({
+  eventId: z.string().optional(),
+  description: z.string().optional(),
+  status: z.enum(['pending', 'paid', 'received']).optional(),
+  autoEventBudget: z.boolean().optional(),
+});
 
 export const createSettlementSchema = z.object({
   amount: moneyAmount,

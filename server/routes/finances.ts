@@ -558,8 +558,10 @@ router.put('/:id', validate(updateFinanceSchema), async (req, res) => {
     return res.json(serializeFinanceEntry(currentDoc));
   }
   if (Object.prototype.hasOwnProperty.call(update, 'amount')) {
-    const settledCents = getSettledCents(currentDoc.toJSON ? currentDoc.toJSON() : currentDoc);
-    if (settledCents > 0) {
+    const currentJson = currentDoc.toJSON ? currentDoc.toJSON() : currentDoc;
+    const settledCents = getSettledCents(currentJson);
+    const amountChanged = Math.abs(Number(currentJson.amount || 0) - (update.amount as number)) > 0.005;
+    if (settledCents > 0 && amountChanged) {
       return res.status(409).json({ error: 'Não altere o valor de um lançamento que já possui baixa' });
     }
     update.amountCents = toCents(update.amount as number);
