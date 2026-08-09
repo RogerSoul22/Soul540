@@ -68,7 +68,7 @@ test('creates an event deposit as an open receivable until it is explicitly sett
   assert.equal(deposit.dueDate, undefined);
 });
 
-test('auditably cancels never-settled automatic finances when an event is cancelled', async () => {
+test('deletes automatic finances when an event is cancelled', async () => {
   const deletedQueries: unknown[] = [];
   const updatedQueries: Array<{ query: unknown; update: unknown }> = [];
   const openEntries = [
@@ -89,17 +89,13 @@ test('auditably cancels never-settled automatic finances when an event is cancel
     constructor: { findByIdAndUpdate: async () => undefined },
   }, financeModel as any, 'main');
 
-  assert.equal(deletedQueries.length, 0);
-  assert.equal(updatedQueries.length, 1);
-  assert.deepEqual(updatedQueries[0].query, { _id: { $in: ['f-1'] } });
-  const update = updatedQueries[0].update as { $set: Record<string, unknown> };
-  assert.equal(update.$set.settlementStatus, 'cancelled');
-  assert.equal(update.$set.reversalReason, 'Evento cancelado');
-  assert.equal(typeof update.$set.reversedAt, 'string');
+  assert.equal(updatedQueries.length, 0);
+  assert.equal(deletedQueries.length, 1);
+  assert.deepEqual(deletedQueries[0], { _id: { $in: ['f-1'] } });
   assert.deepEqual(result, { cancelledCount: 1, requiresDecision: false });
 });
 
-test('does not cancel a legacy settled finance entry without an approved decision', async () => {
+test('also deletes a legacy finance entry when the event is cancelled', async () => {
   const deletedQueries: unknown[] = [];
   const updatedQueries: Array<{ query: unknown; update: unknown }> = [];
   const legacyEntries = [
@@ -121,18 +117,20 @@ test('does not cancel a legacy settled finance entry without an approved decisio
     create: async () => undefined,
   };
 
-  await syncEventFinances({
+  const result = await syncEventFinances({
     _id: 'event-2',
     id: 'event-2',
     status: 'cancelled',
     constructor: { findByIdAndUpdate: async () => undefined },
   }, financeModel as any, 'main');
 
-  assert.equal(deletedQueries.length, 0);
   assert.equal(updatedQueries.length, 0);
+  assert.equal(deletedQueries.length, 1);
+  assert.deepEqual(deletedQueries[0], { _id: { $in: ['f-legacy'] } });
+  assert.deepEqual(result, { cancelledCount: 1, requiresDecision: false });
 });
 
-test('does not alter already-settled automatic finances without an approved decision', async () => {
+test('deletes an already-settled automatic finance entry when the event is cancelled', async () => {
   const deletedQueries: unknown[] = [];
   const updatedQueries: Array<{ query: unknown; update: unknown }> = [];
   const settledEntries = [
@@ -153,9 +151,10 @@ test('does not alter already-settled automatic finances without an approved deci
     constructor: { findByIdAndUpdate: async () => undefined },
   }, financeModel as any, 'main');
 
-  assert.equal(deletedQueries.length, 0);
   assert.equal(updatedQueries.length, 0);
-  assert.deepEqual(result, { cancelledCount: 0, requiresDecision: true });
+  assert.equal(deletedQueries.length, 1);
+  assert.deepEqual(deletedQueries[0], { _id: { $in: ['f-2'] } });
+  assert.deepEqual(result, { cancelledCount: 1, requiresDecision: false });
 });
 
 test('cancels only mutable automatic commissions when employees are removed', async () => {

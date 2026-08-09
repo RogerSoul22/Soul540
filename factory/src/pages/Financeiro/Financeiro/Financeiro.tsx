@@ -126,7 +126,7 @@ const normalizeAlpha = (value: string) =>
 const compareAlpha = (a: string, b: string) => alphaCollator.compare(normalizeAlpha(a), normalizeAlpha(b));
 
 export default function Financeiro() {
-  const { events, finances, financeCategories, addFinance, updateFinance, settleFinance, deleteFinance, reverseFinance, addFinanceCategory } = useApp();
+  const { events, finances, financeCategories, addFinance, updateFinance, deleteFinance, reverseFinance, addFinanceCategory } = useApp();
   const [activeTab, setActiveTab] = useState<TabType>('geral');
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().substring(0, 7));
   const [costFilter, setCostFilter] = useState<CostFilter>('all');
@@ -501,24 +501,16 @@ export default function Financeiro() {
 
   // === HANDLERS ===
 
+  // Dropdown livre: troca o status direto, sem prompts. O backend (resolveFinanceStatusChange)
+  // já cuida de liquidar (settle) ou reabrir (reopen) o lançamento de forma consistente,
+  // inclusive para lançamentos automáticos vinculados a eventos, com registro em auditoria.
   const handleEventFinanceStatus = async (entry: (typeof finances)[number], status: FinanceStatus) => {
-    if (status === 'pending') {
-      alert('Para reabrir ou cancelar uma baixa, use o comando específico com justificativa.');
-      return;
-    }
     if (entry.status === status) return;
-    const amountText = window.prompt('Baixa financeira: informe o valor efetivamente recebido/pago.', entry.amount.toFixed(2).replace('.', ','));
-    if (amountText === null) return;
-    const amount = parseCurrency(amountText);
-    if (!Number.isFinite(amount) || amount <= 0) {
-      alert('Informe um valor de baixa válido.');
-      return;
+    try {
+      await updateFinance(entry.id, { status });
+    } catch (error: any) {
+      alert(error?.message || 'Não foi possível alterar o status do lançamento.');
     }
-    const settledOn = window.prompt('Data efetiva da baixa (AAAA-MM-DD):', entry.date);
-    if (!settledOn) return;
-    const paymentMethod = window.prompt('Método de pagamento/recebimento:', entry.paymentMethod || '');
-    const reason = window.prompt('Justificativa ou referência (opcional):', '') || undefined;
-    await settleFinance(entry.id, { amount, settledOn, paymentMethod: paymentMethod || undefined, reason });
   };
 
   const exportCSV = () => {
@@ -1667,8 +1659,8 @@ export default function Financeiro() {
                 <ul className={styles.infoList}>
                   <li><strong>Liquidação é o único estado financeiro:</strong> “Recebido” e “Pago” apenas descrevem receita e despesa depois da liquidação.</li>
                   <li>Competência usa a data prevista; caixa usa a data efetiva da liquidação. Sinais entram no mês em que foram recebidos.</li>
-                  <li>Uma liquidação pode ser parcial. Correções, estornos e cancelamentos exigem justificativa.</li>
-                  <li><strong>Evento cancelado com baixa exige decisão</strong> de reembolso, multa retida ou ajuste aprovado. Previsões sem baixa permanecem no histórico como canceladas.</li>
+                  <li>O status de um lançamento (Pendente, Pago, Recebido) pode ser alterado livremente pelo seletor, sem necessidade de justificativa.</li>
+                  <li><strong>Evento cancelado exclui automaticamente</strong> a previsão financeira vinculada, mesmo que já tenha baixa registrada.</li>
                 </ul>
               </div>
               <div className={styles.infoSection}>

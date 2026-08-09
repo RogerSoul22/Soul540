@@ -6,7 +6,7 @@ import { getTenantUnit } from '../middleware/tenant';
 import { logAudit } from '../utils/audit';
 import { getEventUnitsForRequest, type EventUnit } from '../utils/eventTenant';
 import { toCents } from '../../shared/money';
-import { canChangeForecast, getSettledCents } from '../../shared/financePolicy';
+import { canChangeForecast } from '../../shared/financePolicy';
 
 const EventSchema = new Schema({
   name: String,
@@ -311,21 +311,12 @@ export async function syncEventFinances(event: any, FinanceModel: FinanceModel, 
       $or: [{ automatic: true }, { autoEventBudget: true }],
       settlementStatus: { $ne: 'cancelled' },
     }).lean();
-    const neverSettledIds = linkedEntries.filter((entry: any) => !(getSettledCents(entry) > 0)).map((entry: any) => entry._id);
-    const settledIds = linkedEntries.filter((entry: any) => getSettledCents(entry) > 0).map((entry: any) => entry._id);
-    if (neverSettledIds.length > 0) {
-      await FinanceModel.updateMany(
-        { _id: { $in: neverSettledIds } },
-        {
-          $set: {
-            settlementStatus: 'cancelled',
-            reversedAt: new Date().toISOString(),
-            reversalReason: 'Evento cancelado',
-          },
-        },
-      );
+    // Evento cancelado sempre exclui as previsões automáticas vinculadas, mesmo as que já
+    // têm baixa registrada — não deixa o lançamento como "cancelado" no histórico, remove de fato.
+    if (linkedEntries.length > 0) {
+      await FinanceModel.deleteMany({ _id: { $in: linkedEntries.map((entry: any) => entry._id) } });
     }
-    return { cancelledCount: neverSettledIds.length, requiresDecision: settledIds.length > 0 };
+    return { cancelledCount: linkedEntries.length, requiresDecision: false };
   }
   const { deposit, travel, targetRevenue, balance } = calculateEventFinanceAmounts(event);
 
@@ -563,9 +554,8 @@ router.put('/:id', async (req, res) => {
   const found = await findEventForRequest(req, req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   const protectedFinancialFields = ['budget', 'finalValue', 'depositValue', 'depositDate', 'travelCost', 'paymentMethod', 'pixKey'];
-  if (req.body?.status === 'cancelled' && found.doc.status !== 'cancelled' && await cancellationRequiresDecision(found.doc, found.financeModel)) {
-    return res.status(409).json({ error: 'Registre reembolso, multa retida ou ajuste aprovado antes de cancelar um evento com baixa financeira' });
-  }
+  // Cancelar um evento sempre exclui as previsões financeiras automáticas vinculadas
+  // (ver syncEventFinances), mesmo que já tenham baixa registrada — não exige decisão prévia.
   if (
     !isFromFactory(req) &&
     hasMaterialFinancialChange(found.doc, req.body || {}, protectedFinancialFields) &&
@@ -594,7 +584,7 @@ router.put('/:id', async (req, res) => {
       action: 'update',
       resource: 'finances',
       resourceId: req.params.id,
-      description: `Cancelou ${syncResult.cancelledCount} previsoes automaticas nunca liquidadas do evento cancelado: ${event.name}`,
+      description: `Excluiu ${syncResult.cancelledCount} previsoes automaticas do evento cancelado: ${event.name}`,
     });
   }
   res.json(event);

@@ -2537,7 +2537,7 @@ export default function Financeiro() {
                   <li><strong>Liquidação é o único estado financeiro:</strong> ela registra uma entrada ou saída efetiva. “Recebido” e “Pago” são apenas descrições de receita e despesa liquidada.</li>
                   <li><strong>Competência</strong> usa a data prevista do lançamento; <strong>Caixa</strong> usa a data efetiva de cada liquidação. Um sinal entra no mês em que foi recebido.</li>
                   <li>Liquidações podem ser parciais. Para corrigir, estornar ou cancelar uma baixa, use o comando com justificativa; não altere o status diretamente.</li>
-                  <li><strong>Evento cancelado com baixa exige decisão</strong> de reembolso, multa retida ou ajuste aprovado. Previsões sem baixa são canceladas, mas permanecem no histórico.</li>
+                  <li><strong>Evento cancelado exclui automaticamente</strong> a previsão financeira vinculada, mesmo que já tenha baixa registrada.</li>
                   <li>O fechamento financeiro do evento apenas encerra a conferência operacional: ele não cria recebimento, pagamento ou baixa automática.</li>
                 </ul>
               </div>
