@@ -68,6 +68,8 @@ async function main() {
   const units = unitsOption();
   const requestedActions = actionsOption();
   const isStatusOnlyMigration = requestedActions?.length === 1 && requestedActions[0] === 'normalize_legacy_status';
+  const reconciliationStart = isStatusOnlyMigration ? '' : start;
+  const reconciliationEnd = isStatusOnlyMigration ? '\uffff' : end;
   const apply = hasFlag('apply');
   const backupPath = option('backup').trim();
   const rollbackPath = option('rollback').trim();
@@ -94,8 +96,8 @@ async function main() {
       const findings = reconcileFinances(
         normalizedFinances,
         eventRows.map((entry: any) => ({ id: entry.id || entry._id.toString(), status: entry.status })),
-        start,
-        end,
+        reconciliationStart,
+        reconciliationEnd,
       );
       const actionsByFinanceId = new Map<string, typeof findings[number]['action'][]>();
       for (const finding of findings) {

@@ -33,6 +33,13 @@ test('finds every legacy received status when running only the status normalizat
   assert.equal(source.includes("{ status: 'received' }"), true);
 });
 
+test('does not restrict a status-only migration to the default reporting period', () => {
+  const source = readFileSync(resolve(process.cwd(), 'server/scripts/migrate-finances.ts'), 'utf8');
+
+  assert.equal(source.includes("const reconciliationStart = isStatusOnlyMigration ? '' : start;"), true);
+  assert.equal(source.includes("const reconciliationEnd = isStatusOnlyMigration ? '\\uffff' : end;"), true);
+});
+
 test('reverts only through the generated artifact and an explicit confirmation', () => {
   const source = readFileSync(resolve(process.cwd(), 'server/scripts/revert-finance-migration.ts'), 'utf8');
 
