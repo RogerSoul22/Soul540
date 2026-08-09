@@ -66,7 +66,7 @@ function safeFormat(date: string | undefined | null, fmt: string, options?: Para
 }
 
 type FinanceType = 'revenue' | 'cost';
-type FinanceStatus = 'pending' | 'paid' | 'received';
+type FinanceStatus = 'pending' | 'paid';
 
 function formatCurrency(value: string): string {
   const digits = value.replace(/\D/g, '');
@@ -494,7 +494,7 @@ export default function Financeiro() {
   );
   const totalReceived = useMemo(
     () => eventsWithBudget
-      .filter(({ finance }) => ['paid', 'received'].includes(finance?.status ?? ''))
+      .filter(({ finance }) => finance ? isRealizedRevenue(finance) : false)
       .reduce((acc, { event }) => acc + (event.budget ?? 0), 0),
     [eventsWithBudget],
   );
@@ -515,7 +515,7 @@ export default function Financeiro() {
 
   const exportCSV = () => {
     const typeLabel: Record<string, string> = { revenue: 'Receita', cost: 'Custo' };
-    const stLabel: Record<string, string> = { pending: 'Pendente', paid: 'Pago', received: 'Recebido' };
+    const stLabel: Record<string, string> = { pending: 'Pendente', paid: 'Pago' };
     const rows = [
       ['Data', 'Tipo', 'Categoria', 'Descricao', 'Status', 'Valor (R$)'].join(';'),
       ...filtered.map((f) => [
@@ -954,13 +954,12 @@ export default function Financeiro() {
                       <span className={styles.agendamentoValue}>{formatBRL(event.budget ?? 0)}</span>
                       {finance ? (
                         <select
-                          className={`${styles.agendamentoStatus} ${finance.status === 'received' || finance.status === 'paid' ? styles.statusReceived : styles.statusPending}`}
+                          className={`${styles.agendamentoStatus} ${finance.status === 'paid' ? styles.statusReceived : styles.statusPending}`}
                           value={finance.status}
                            onChange={(e) => handleEventFinanceStatus(finance, e.target.value as FinanceStatus)}
                         >
                           <option value="pending">Pendente</option>
                           <option value="paid">Pago</option>
-                          <option value="received">Recebido</option>
                         </select>
                       ) : (
                         <span className={styles.agendamentoNoFinance}>—</span>
@@ -1237,13 +1236,12 @@ export default function Financeiro() {
                     <td>{safeFormat(entry.date, 'dd/MM/yy', { locale: ptBR })}</td>
                     <td>
                       <select
-                        className={`${styles.agendamentoStatus} ${entry.status === 'received' || entry.status === 'paid' ? styles.statusReceived : styles.statusPending}`}
+                        className={`${styles.agendamentoStatus} ${entry.status === 'paid' ? styles.statusReceived : styles.statusPending}`}
                         value={entry.status}
                         onChange={(e) => handleEventFinanceStatus(entry, e.target.value as FinanceStatus)}
                       >
                         <option value="pending">Pendente</option>
                         <option value="paid">Pago</option>
-                        <option value="received">Recebido</option>
                       </select>
                     </td>
                     <td>
@@ -1431,7 +1429,6 @@ export default function Financeiro() {
                 >
                   <option value="pending">Pendente</option>
                   <option value="paid">Pago</option>
-                  <option value="received">Recebido</option>
                 </select>
               </div>
             </div>

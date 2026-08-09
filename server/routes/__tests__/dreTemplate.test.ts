@@ -11,7 +11,7 @@ const finance = (overrides: Partial<FinanceEntry>): FinanceEntry => ({
   description: 'Evento',
   amount: 0,
   date: '2026-07-01',
-  status: 'received',
+  status: 'paid',
   ...overrides,
 });
 

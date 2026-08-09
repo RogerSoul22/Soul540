@@ -31,8 +31,8 @@ AÇÕES DISPONÍVEIS (responda SOMENTE com JSON válido, sem texto extra):
    { "action": "query_contractors", "params": { "status": "active|inactive|all" } }
 
 6. create_finance - Criar lançamento financeiro
-   { "action": "create_finance", "params": { "type": "revenue|cost", "category": "string", "description": "string", "amount": number, "date": "YYYY-MM-DD", "status": "paid|received" } }
-   IMPORTANTE: para type "cost" use status "paid", para type "revenue" use status "received". NUNCA use "pending".
+   { "action": "create_finance", "params": { "type": "revenue|cost", "category": "string", "description": "string", "amount": number, "date": "YYYY-MM-DD", "status": "paid" } }
+   IMPORTANTE: use status "paid" para lançamentos já liquidados. NUNCA use "pending".
 
 7. create_task - Criar tarefa
    { "action": "create_task", "params": { "title": "string", "description": "string", "status": "todo", "priority": "urgent|high|medium|low", "dueDate": "YYYY-MM-DD" } }
@@ -92,7 +92,7 @@ async function executeAction(action: string, params: any): Promise<any> {
       return await Contractor.find(filter).limit(20).lean();
     }
     case 'create_finance': {
-      const defaultStatus = params.type === 'revenue' ? 'received' : 'paid';
+      const defaultStatus = 'paid';
       const finance = await Finance.create({ ...params, source: 'main', status: params.status || defaultStatus });
       return finance.toJSON();
     }

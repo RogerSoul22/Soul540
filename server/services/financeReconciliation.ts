@@ -11,6 +11,7 @@ export type ReconciliationAction =
   | 'cancel_open_forecast'
   | 'review_cancelled_event_settled'
   | 'add_amount_cents'
+  | 'normalize_legacy_status'
   | 'migrate_legacy_settlement'
   | 'review_legacy_partial'
   | 'review_amount_precision'
@@ -58,6 +59,8 @@ function getProposedChange(action: ReconciliationAction): string {
       return 'Registrar decisão de reembolso, multa retida ou ajuste aprovado';
     case 'add_amount_cents':
       return 'Adicionar o valor canônico em centavos sem alterar o valor monetário';
+    case 'normalize_legacy_status':
+      return 'Substituir o status legado received por paid sem alterar as baixas';
     case 'migrate_legacy_settlement':
       return 'Criar o registro de baixa legado com data e origem revisadas';
     case 'review_legacy_partial':
@@ -160,6 +163,16 @@ export function reconcileFinances(
         source: finance.source,
         action: 'review_invalid_competence_date',
         reason: 'Data de competência ausente ou inválida',
+      });
+    }
+
+    if (finance.status === 'received') {
+      findings.push({
+        financeId: finance.id,
+        eventId: finance.eventId,
+        source: finance.source,
+        action: 'normalize_legacy_status',
+        reason: 'LanÃ§amento legado usa o status recebido, substituÃ­do pelo status pago',
       });
     }
 

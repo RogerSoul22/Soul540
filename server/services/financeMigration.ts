@@ -10,7 +10,7 @@ export interface LegacyFinanceForMigration extends FinancePolicyEntry {
 
 export interface FinanceMigrationPlan {
   financeId: string;
-  actions: Array<'add_amount_cents' | 'migrate_legacy_settlement'>;
+  actions: Array<'add_amount_cents' | 'normalize_legacy_status' | 'migrate_legacy_settlement'>;
   filter: Record<string, unknown>;
   update: { $set: Record<string, unknown> };
   before: Pick<LegacyFinanceForMigration, 'amountCents' | 'settledCents' | 'settlements' | 'settlementStatus' | 'status' | 'settledAt'>;
@@ -46,11 +46,17 @@ export function buildFinanceMigrationPlan(
   const update: Record<string, unknown> = {};
   const amountCents = getExactAmountCents(finance);
   const shouldAddAmountCents = reconciliationActions.includes('add_amount_cents') && !Number.isSafeInteger(finance.amountCents);
+  const shouldNormalizeLegacyStatus = reconciliationActions.includes('normalize_legacy_status') && finance.status === 'received';
   const shouldMigrateSettlement = reconciliationActions.includes('migrate_legacy_settlement') && !Array.isArray(finance.settlements);
 
   if (shouldAddAmountCents && amountCents !== null) {
     actions.push('add_amount_cents');
     update.amountCents = amountCents;
+  }
+
+  if (shouldNormalizeLegacyStatus) {
+    actions.push('normalize_legacy_status');
+    update.status = 'paid';
   }
 
   if (shouldMigrateSettlement && amountCents !== null) {
@@ -66,6 +72,7 @@ export function buildFinanceMigrationPlan(
   if (actions.length === 0) return null;
 
   const filter: Record<string, unknown> = { _id: finance.id };
+  if (actions.includes('normalize_legacy_status')) filter.status = 'received';
   if (actions.includes('migrate_legacy_settlement')) filter.settlements = { $exists: false };
 
   return {

@@ -68,7 +68,7 @@ export interface PizzaEvent {
 // ── Finances ─────────────────────────────────────────────────────────────────
 
 export type FinanceType = 'revenue' | 'cost';
-export type FinanceStatus = 'pending' | 'paid' | 'received';
+export type FinanceStatus = 'pending' | 'paid';
 export type FinanceOrigin = 'event' | 'manual' | 'factory_order' | 'bank_import';
 export type FinanceKind = 'balance' | 'deposit' | 'travel' | 'commission' | 'expense' | 'manual';
 export type SettlementStatus = 'open' | 'partial' | 'settled' | 'cancelled';

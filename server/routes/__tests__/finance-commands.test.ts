@@ -66,6 +66,7 @@ test('builds unmatched OFX movement as a settled but unclassified bank import', 
 
   assert.equal(payload.origin, 'bank_import');
   assert.equal(payload.classificationStatus, 'unclassified');
+  assert.equal(payload.status, 'paid');
   assert.equal(payload.settlementStatus, 'settled');
   assert.equal(payload.settlements[0].externalId, 'ofx:001:12345:credit-1');
   assert.equal(payload.settlements[0].settledOn, '2026-07-15');
@@ -103,10 +104,10 @@ test('rejects a settlement with an invalid local date', () => {
   }, 'user-1'), /Data efetiva inválida/);
 });
 
-test('turns a pending-to-received status change into a settlement for the full open amount', () => {
+test('turns a pending-to-paid status change into a settlement for the full open amount', () => {
   const command = resolveFinanceStatusChange(
     { type: 'revenue', date: '2026-08-01', amount: 100, amountCents: 10_000, settledCents: 0, settlementStatus: 'open' },
-    'received',
+    'paid',
     { settledOn: '2026-08-05', paymentMethod: 'pix' },
     'user-1',
   );
@@ -145,7 +146,7 @@ test('reopens a fully settled entry back to pending', () => {
 test('is a no-op when the requested status matches the current one', () => {
   const settled = resolveFinanceStatusChange(
     { type: 'revenue', date: '2026-08-01', amount: 100, amountCents: 10_000, settledCents: 10_000, settlementStatus: 'settled' },
-    'received',
+    'paid',
     {},
     'user-1',
   );
@@ -163,8 +164,17 @@ test('is a no-op when the requested status matches the current one', () => {
 test('rejects a status change on a cancelled entry', () => {
   assert.throws(() => resolveFinanceStatusChange(
     { type: 'revenue', date: '2026-08-01', amount: 100, amountCents: 10_000, settledCents: 0, settlementStatus: 'cancelled' },
-    'received',
+    'paid',
     {},
     'user-1',
   ), /cancelado/);
+});
+
+test('rejects the legacy received status in the status command', () => {
+  assert.throws(() => resolveFinanceStatusChange(
+    { type: 'revenue', date: '2026-08-01', amount: 100, amountCents: 10_000, settledCents: 0, settlementStatus: 'open' },
+    'received' as never,
+    {},
+    'user-1',
+  ), /Status financeiro inv/);
 });

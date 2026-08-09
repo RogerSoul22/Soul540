@@ -39,7 +39,7 @@ const FinanceSchema = new mongoose.Schema(
     amount: { type: Number, required: true },
     amountCents: { type: Number, min: 1 },
     date: { type: String, required: true },
-    status: { type: String, enum: ['pending', 'paid', 'received'], default: 'pending' },
+    status: { type: String, enum: ['pending', 'paid'], default: 'pending' },
     autoEventBudget: { type: Boolean, default: false },
     origin: { type: String, enum: ['event', 'manual', 'factory_order', 'bank_import'], default: 'manual' },
     kind: { type: String, enum: ['balance', 'deposit', 'travel', 'commission', 'expense', 'manual'], default: 'manual' },
@@ -81,7 +81,7 @@ const FranchiseFinanceSchema = new mongoose.Schema(
     amount: { type: Number, required: true },
     amountCents: { type: Number, min: 1 },
     date: { type: String, required: true },
-    status: { type: String, enum: ['pending', 'paid', 'received'], default: 'pending' },
+    status: { type: String, enum: ['pending', 'paid'], default: 'pending' },
     autoEventBudget: { type: Boolean, default: false },
     origin: { type: String, enum: ['event', 'manual', 'factory_order', 'bank_import'], default: 'manual' },
     kind: { type: String, enum: ['balance', 'deposit', 'travel', 'commission', 'expense', 'manual'], default: 'manual' },
@@ -123,7 +123,7 @@ const FactoryFinanceSchema = new mongoose.Schema(
     amount: { type: Number, required: true },
     amountCents: { type: Number, min: 1 },
     date: { type: String, required: true },
-    status: { type: String, enum: ['pending', 'paid', 'received'], default: 'pending' },
+    status: { type: String, enum: ['pending', 'paid'], default: 'pending' },
     autoEventBudget: { type: Boolean, default: false },
     origin: { type: String, enum: ['event', 'manual', 'factory_order', 'bank_import'], default: 'manual' },
     kind: { type: String, enum: ['balance', 'deposit', 'travel', 'commission', 'expense', 'manual'], default: 'manual' },
@@ -214,7 +214,7 @@ export function serializeFinanceEntry(entry: any) {
     settledCents,
     settlements: getEffectiveSettlements(raw),
     settlementStatus,
-    status: settlementStatus === 'settled' ? (raw.type === 'revenue' ? 'received' : 'paid') : 'pending',
+    status: settlementStatus === 'settled' ? 'paid' : 'pending',
   };
 }
 
@@ -270,7 +270,7 @@ async function appendSettlementToFinance(model: any, document: any, settlement: 
       {
         $set: {
           settlementStatus: { $cond: [{ $gte: ['$settledCents', '$amountCents'] }, 'settled', 'partial'] },
-          status: { $cond: [{ $gte: ['$settledCents', '$amountCents'] }, entry.type === 'revenue' ? 'received' : 'paid', 'pending'] },
+          status: { $cond: [{ $gte: ['$settledCents', '$amountCents'] }, 'paid', 'pending'] },
         },
       },
     ],
@@ -487,7 +487,7 @@ router.post('/', validate(createFinanceSchema), async (req, res) => {
   res.status(201).json(finance);
 });
 
-const STATUS_LABELS: Record<string, string> = { pending: 'Pendente', paid: 'Pago', received: 'Recebido' };
+const STATUS_LABELS: Record<string, string> = { pending: 'Pendente', paid: 'Pago' };
 
 router.put('/:id', validate(updateFinanceSchema), async (req, res) => {
   const found = await findFinanceForRequest(req, req.params.id);
@@ -624,7 +624,7 @@ router.post('/:id/settlements', validate(createSettlementSchema), async (req, re
       {
         $set: {
           settlementStatus: { $cond: [{ $gte: ['$settledCents', '$amountCents'] }, 'settled', 'partial'] },
-          status: { $cond: [{ $gte: ['$settledCents', '$amountCents'] }, entry.type === 'revenue' ? 'received' : 'paid', 'pending'] },
+          status: { $cond: [{ $gte: ['$settledCents', '$amountCents'] }, 'paid', 'pending'] },
         },
       },
     ],

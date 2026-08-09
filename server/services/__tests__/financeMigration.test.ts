@@ -59,3 +59,17 @@ test('does not overwrite an existing settlement while backfilling cents', () => 
   assert.deepEqual(plan.filter, { _id: 'finance-1' });
   assert.deepEqual(plan.update.$set, { amountCents: 10_000 });
 });
+
+test('plans normalization of a legacy received status without changing settlement data', () => {
+  const plan = buildFinanceMigrationPlan(
+    legacyFinance({ amountCents: 10_000, settlements: [{ id: 'settlement-1', amountCents: 10_000, settledOn: '2026-07-12', settledAt: '2026-07-12T14:00:00.000Z', idempotencyKey: 'settlement-1' }] }),
+    ['normalize_legacy_status'],
+    '2026-08-09T12:00:00.000Z',
+  );
+
+  assert.ok(plan);
+  assert.deepEqual(plan.actions, ['normalize_legacy_status']);
+  assert.deepEqual(plan.filter, { _id: 'finance-1', status: 'received' });
+  assert.deepEqual(plan.update.$set, { status: 'paid' });
+  assert.equal(plan.before.status, 'received');
+});

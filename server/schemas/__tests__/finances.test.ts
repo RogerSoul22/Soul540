@@ -3,9 +3,14 @@ import test from 'node:test';
 import { updateFinanceSchema } from '../finances';
 
 test('omitting eventId from an update does not reintroduce it via schema defaults', () => {
-  const result = updateFinanceSchema.safeParse({ status: 'received' });
+  const result = updateFinanceSchema.safeParse({ status: 'paid' });
   assert.equal(result.success, true);
   assert.equal(Object.prototype.hasOwnProperty.call(result.data, 'eventId'), false);
+});
+
+test('rejects the legacy received status on update', () => {
+  const result = updateFinanceSchema.safeParse({ status: 'received' });
+  assert.equal(result.success, false);
 });
 
 test('omitting autoEventBudget from an update does not reintroduce it via schema defaults', () => {

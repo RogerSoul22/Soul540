@@ -71,3 +71,10 @@ test('uses the canonical settlement state in the main finance table', () => {
   assert.equal(source.includes('<option value="paid">Pago</option>'), false);
   assert.equal(source.includes('<option value="received">Recebido</option>'), false);
 });
+
+test('offers only pending and paid as persisted status values in every finance interface', () => {
+  for (const file of financePages) {
+    const source = readFileSync(resolve(process.cwd(), file), 'utf8');
+    assert.equal(source.includes('value="received"'), false, file);
+  }
+});

@@ -61,7 +61,7 @@ function parseNFeXmlForFinance(xmlText: string): { supplier: string; date: strin
 }
 
 type FinanceType = 'revenue' | 'cost';
-type FinanceStatus = 'pending' | 'paid' | 'received';
+type FinanceStatus = 'pending' | 'paid';
 
 function formatCurrency(value: string): string {
   const digits = value.replace(/\D/g, '');
@@ -111,13 +111,11 @@ const MONTHS_PT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set'
 const statusLabels: Record<FinanceStatus, string> = {
   pending: 'Pendente',
   paid: 'Pago',
-  received: 'Recebido',
 };
 
 const statusColors: Record<FinanceStatus, 'amber' | 'green'> = {
   pending: 'amber',
   paid: 'green',
-  received: 'green',
 };
 
 const formatBRL = (v: number) => `R$ ${v.toLocaleString('pt-BR')}`;
@@ -534,7 +532,7 @@ export default function Financeiro() {
   );
   const totalReceived = useMemo(
     () => eventsWithBudget
-      .filter(({ finance }) => ['paid', 'received'].includes(finance?.status ?? ''))
+      .filter(({ finance }) => finance ? isRealizedRevenue(finance) : false)
       .reduce((acc, { event }) => acc + (event.budget ?? 0), 0),
     [eventsWithBudget],
   );
@@ -563,7 +561,7 @@ export default function Financeiro() {
 
   const exportCSV = () => {
     const typeLabel: Record<string, string> = { revenue: 'Receita', cost: 'Custo' };
-    const stLabel: Record<string, string> = { pending: 'Pendente', paid: 'Pago', received: 'Recebido' };
+    const stLabel: Record<string, string> = { pending: 'Pendente', paid: 'Pago' };
     const rows = [
       ['Data', 'Tipo', 'Categoria', 'Descricao', 'Status', 'Valor (R$)'].join(';'),
       ...filtered.map((f) => [
@@ -1506,7 +1504,6 @@ export default function Financeiro() {
                 >
                   <option value="pending">Pendente</option>
                   <option value="paid">Pago</option>
-                  <option value="received">Recebido</option>
                 </select>
               </div>
             </div>

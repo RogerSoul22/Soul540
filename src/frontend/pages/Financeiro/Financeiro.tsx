@@ -802,7 +802,7 @@ export default function Financeiro() {
 
   const exportCSV = () => {
     const typeLabel: Record<string, string> = { revenue: 'Receita', cost: 'Custo' };
-    const stLabel: Record<string, string> = { pending: 'Pendente', paid: 'Pago', received: 'Recebido' };
+    const stLabel: Record<string, string> = { pending: 'Pendente', paid: 'Pago' };
     const rows = [
       ['Data', 'Tipo', 'Categoria', 'Descrição', 'Status', 'Valor (R$)'].join(';'),
       ...filtered.map(f => [

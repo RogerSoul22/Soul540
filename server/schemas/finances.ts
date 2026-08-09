@@ -18,7 +18,7 @@ export const createFinanceSchema = z.object({
   description: z.string().optional().default(''),
   amount: moneyAmount,
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Data deve ser YYYY-MM-DD'),
-  status: z.enum(['pending', 'paid', 'received']).optional().default('pending'),
+  status: z.enum(['pending', 'paid']).optional().default('pending'),
   autoEventBudget: z.boolean().optional().default(false),
   origin: z.enum(['event', 'manual', 'factory_order', 'bank_import']).optional(),
   kind: z.enum(['balance', 'deposit', 'travel', 'commission', 'expense', 'manual']).optional(),
@@ -57,7 +57,7 @@ export const createFinanceSchema = z.object({
 export const updateFinanceSchema = createFinanceSchema.partial().extend({
   eventId: z.string().optional(),
   description: z.string().optional(),
-  status: z.enum(['pending', 'paid', 'received']).optional(),
+  status: z.enum(['pending', 'paid']).optional(),
   autoEventBudget: z.boolean().optional(),
 });
 

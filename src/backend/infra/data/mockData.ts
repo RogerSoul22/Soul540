@@ -196,8 +196,8 @@ function generateMonthlyData(): FinanceEntry[] {
 
   for (const month of months) {
     const baseRevenue = 30000 + Math.floor(Math.random() * 50000);
-    entries.push({ id: `fin-${id++}`, eventId: 'evt-1', type: 'revenue', category: 'contrato', description: `Receita eventos ${month}`, amount: baseRevenue, date: `${month}-05`, status: 'received' });
-    entries.push({ id: `fin-${id++}`, eventId: 'evt-1', type: 'revenue', category: 'adicional', description: `Receita feira ${month}`, amount: Math.floor(baseRevenue * 0.3), date: `${month}-15`, status: 'received' });
+    entries.push({ id: `fin-${id++}`, eventId: 'evt-1', type: 'revenue', category: 'contrato', description: `Receita eventos ${month}`, amount: baseRevenue, date: `${month}-05`, status: 'paid' });
+    entries.push({ id: `fin-${id++}`, eventId: 'evt-1', type: 'revenue', category: 'adicional', description: `Receita feira ${month}`, amount: Math.floor(baseRevenue * 0.3), date: `${month}-15`, status: 'paid' });
     entries.push({ id: `fin-${id++}`, eventId: 'evt-1', type: 'cost', category: 'salario', description: `Salarios ${month}`, amount: 8500, date: `${month}-05`, status: 'paid' });
     entries.push({ id: `fin-${id++}`, eventId: 'evt-1', type: 'cost', category: 'pro-labore', description: `Pro labore ${month}`, amount: 3500, date: `${month}-05`, status: 'paid' });
     entries.push({ id: `fin-${id++}`, eventId: 'evt-1', type: 'cost', category: 'aluguel', description: `Aluguel ${month}`, amount: 2200, date: `${month}-01`, status: 'paid' });
@@ -216,10 +216,10 @@ function generateMonthlyData(): FinanceEntry[] {
 
 export const mockFinances: FinanceEntry[] = [
   ...generateMonthlyData(),
-  { id: 'fin-1', eventId: 'evt-1', type: 'revenue', category: 'contrato', description: 'Contrato evento corporativo', amount: 8500, date: '2026-02-01', status: 'received' },
-  { id: 'fin-5', eventId: 'evt-2', type: 'revenue', category: 'contrato', description: 'Sinal casamento 50%', amount: 7500, date: '2026-02-15', status: 'received' },
-  { id: 'fin-9', eventId: 'evt-3', type: 'revenue', category: 'contrato', description: 'Pagamento aniversario', amount: 5500, date: '2026-02-20', status: 'received' },
-  { id: 'fin-12', eventId: 'evt-5', type: 'revenue', category: 'contrato', description: 'Happy hour StartupHub', amount: 4000, date: '2026-02-20', status: 'received' },
+  { id: 'fin-1', eventId: 'evt-1', type: 'revenue', category: 'contrato', description: 'Contrato evento corporativo', amount: 8500, date: '2026-02-01', status: 'paid' },
+  { id: 'fin-5', eventId: 'evt-2', type: 'revenue', category: 'contrato', description: 'Sinal casamento 50%', amount: 7500, date: '2026-02-15', status: 'paid' },
+  { id: 'fin-9', eventId: 'evt-3', type: 'revenue', category: 'contrato', description: 'Pagamento aniversario', amount: 5500, date: '2026-02-20', status: 'paid' },
+  { id: 'fin-12', eventId: 'evt-5', type: 'revenue', category: 'contrato', description: 'Happy hour StartupHub', amount: 4000, date: '2026-02-20', status: 'paid' },
   { id: 'fin-15', eventId: 'evt-4', type: 'revenue', category: 'contrato', description: 'Contrato festival gastronomico', amount: 25000, date: '2026-03-01', status: 'pending' },
 ];
 

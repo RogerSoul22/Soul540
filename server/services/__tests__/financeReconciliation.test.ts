@@ -31,7 +31,7 @@ test('requires human review for cancelled events with money already settled', ()
   assert.deepEqual(findings.map((item) => item.action), ['review_cancelled_event_settled']);
 });
 
-test('suggests a legacy settlement without treating settlement date difference as an error', () => {
+test('normalizes the legacy received status before migrating its settlement', () => {
   const findings = reconcileFinances([
     finance({
       amountCents: 10_000,
@@ -42,7 +42,7 @@ test('suggests a legacy settlement without treating settlement date difference a
     }),
   ], [], '2026-07-01', '2026-07-31');
 
-  assert.deepEqual(findings.map((item) => item.action), ['migrate_legacy_settlement']);
+  assert.deepEqual(findings.map((item) => item.action), ['normalize_legacy_status', 'migrate_legacy_settlement']);
 });
 
 test('adds a proposed read-only impact to every reconciliation finding', () => {

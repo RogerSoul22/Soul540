@@ -79,7 +79,7 @@ export function buildBankImportPayload(transaction: OfxTransactionInput, options
     amountCents,
     date: transaction.date,
     paymentMethod: 'bank',
-    status: transaction.type === 'revenue' ? 'received' : 'paid',
+    status: 'paid',
     settlementStatus: 'settled',
     settledCents: amountCents,
     settledAt: settlement.settledAt,
@@ -138,10 +138,14 @@ export function resolveFinanceStatusChange(
     settlementStatus?: string;
     paymentMethod?: string;
   },
-  targetStatus: 'pending' | 'paid' | 'received',
+  targetStatus: 'pending' | 'paid',
   input: { settledOn?: string; paymentMethod?: string; reason?: string },
   settledBy: string,
 ): FinanceStatusChangeCommand {
+  if (targetStatus !== 'pending' && targetStatus !== 'paid') {
+    throw new Error('Status financeiro invÃ¡lido');
+  }
+
   if (entry.settlementStatus === 'cancelled') {
     throw new Error('Não é possível alterar o status de um lançamento cancelado');
   }
@@ -149,7 +153,7 @@ export function resolveFinanceStatusChange(
   const amountCents = Number.isSafeInteger(entry.amountCents) ? (entry.amountCents as number) : toCents(entry.amount);
   const settledCents = entry.settledCents ?? 0;
   const isCurrentlySettled = amountCents > 0 && settledCents >= amountCents;
-  const wantsSettled = targetStatus === 'paid' || targetStatus === 'received';
+  const wantsSettled = targetStatus === 'paid';
 
   if (wantsSettled) {
     if (isCurrentlySettled) return { kind: 'noop' };

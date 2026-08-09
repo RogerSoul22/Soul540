@@ -1,4 +1,5 @@
 import type { FinanceEntry, PizzaEvent } from './types';
+import { isRealizedExpense, isRealizedRevenue } from './financeSettlement';
 
 export type OperationalEmployee = {
   id: string;
@@ -115,10 +116,10 @@ export function getEventFinancialClosing(event: PizzaEvent, finances: FinanceEnt
   const estimatedRevenue = event.finalValue && event.finalValue > 0 ? event.finalValue : event.budget || 0;
   const eventFinances = finances.filter((entry) => entry.eventId === event.id);
   const realizedRevenue = eventFinances
-    .filter((entry) => entry.type === 'revenue' && ['paid', 'received'].includes(entry.status))
+    .filter(isRealizedRevenue)
     .reduce((sum, entry) => sum + (entry.amount || 0), 0);
   const realizedCosts = eventFinances
-    .filter((entry) => entry.type === 'cost' && ['paid', 'received'].includes(entry.status))
+    .filter(isRealizedExpense)
     .reduce((sum, entry) => sum + (entry.amount || 0), 0);
   const realizedResult = realizedRevenue - realizedCosts;
   const difference = realizedResult - estimatedRevenue;
