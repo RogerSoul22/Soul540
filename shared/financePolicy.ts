@@ -42,7 +42,7 @@ export function isReportableInDre(entry: FinancePolicyEntry): boolean {
 }
 
 export function getEffectiveSettlements(entry: FinancePolicyEntry): FinanceSettlement[] {
-  if (Array.isArray(entry.settlements)) return entry.settlements;
+  if (Array.isArray(entry.settlements) && entry.settlements.length > 0) return entry.settlements;
   if (entry.settlementStatus !== 'settled' && entry.status !== 'paid' && entry.status !== 'received') return [];
 
   const settledOn = entry.settledAt ? getSaoPauloDate(entry.settledAt) : entry.date;

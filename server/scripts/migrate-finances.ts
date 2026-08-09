@@ -5,12 +5,17 @@ import { connectDB } from '../db';
 import { Event, FactoryEvent, FranchiseEvent } from '../routes/events';
 import { FactoryFinance, Finance, FranchiseFinance } from '../routes/finances';
 import { buildFinanceMigrationPlan } from '../services/financeMigration';
-import { reconcileFinances } from '../services/financeReconciliation';
+import { reconcileFinances, type ReconciliationAction } from '../services/financeReconciliation';
 
 type Unit = 'main' | 'franchise' | 'factory';
 
 const UNITS: Unit[] = ['main', 'franchise', 'factory'];
 const APPLY_CONFIRMATION = 'APLICAR_MIGRACAO_FINANCEIRA';
+const MIGRATABLE_ACTIONS: ReconciliationAction[] = [
+  'add_amount_cents',
+  'normalize_legacy_status',
+  'migrate_legacy_settlement',
+];
 
 function option(name: string, fallback = ''): string {
   const argument = process.argv.find((value) => value.startsWith(`--${name}=`));
@@ -27,6 +32,19 @@ function unitsOption(): Unit[] {
     .map((value) => value.trim())
     .filter((value): value is Unit => UNITS.includes(value as Unit));
   return requested.length > 0 ? requested : UNITS;
+}
+
+function actionsOption(): ReconciliationAction[] | undefined {
+  const raw = option('actions').trim();
+  if (!raw) return undefined;
+  const actions = raw
+    .split(',')
+    .map((value) => value.trim())
+    .filter((value): value is ReconciliationAction => MIGRATABLE_ACTIONS.includes(value as ReconciliationAction));
+  if (actions.length === 0) {
+    throw new Error(`Use --actions=${MIGRATABLE_ACTIONS.join(',')}`);
+  }
+  return actions;
 }
 
 function modelsForUnit(unit: Unit) {
@@ -48,6 +66,8 @@ async function main() {
   const start = option('start', '2026-06-01');
   const end = option('end', '2026-07-31');
   const units = unitsOption();
+  const requestedActions = actionsOption();
+  const isStatusOnlyMigration = requestedActions?.length === 1 && requestedActions[0] === 'normalize_legacy_status';
   const apply = hasFlag('apply');
   const backupPath = option('backup').trim();
   const rollbackPath = option('rollback').trim();
@@ -60,12 +80,14 @@ async function main() {
     const groups = await Promise.all(units.map(async (unit) => {
       const { finances, events } = modelsForUnit(unit);
       const [financeRows, eventRows] = await Promise.all([
-        finances.find({
-          $or: [
-            { date: { $gte: start, $lte: end } },
-            { 'settlements.settledOn': { $gte: start, $lte: end } },
-          ],
-        }).lean(),
+        finances.find(isStatusOnlyMigration
+          ? { status: 'received' }
+          : {
+            $or: [
+              { date: { $gte: start, $lte: end } },
+              { 'settlements.settledOn': { $gte: start, $lte: end } },
+            ],
+          }).lean(),
         events.find({ status: 'cancelled' }).lean(),
       ]);
       const normalizedFinances = financeRows.map((entry: any) => ({ ...entry, id: entry.id || entry._id.toString(), source: entry.source || unit }));
@@ -85,7 +107,13 @@ async function main() {
         unit,
         finances,
         plans: normalizedFinances
-          .map((finance) => buildFinanceMigrationPlan(finance, actionsByFinanceId.get(finance.id) || [], migratedAt))
+          .map((finance) => {
+            const actions = actionsByFinanceId.get(finance.id) || [];
+            const selectedActions = requestedActions
+              ? actions.filter((action) => requestedActions.includes(action))
+              : actions;
+            return buildFinanceMigrationPlan(finance, selectedActions, migratedAt);
+          })
           .filter((plan): plan is NonNullable<typeof plan> => plan !== null),
       };
     }));

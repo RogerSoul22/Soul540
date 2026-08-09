@@ -37,6 +37,13 @@ test('uses neutral labels before settlement and for cancelled entries', () => {
   assert.equal(getDerivedFinanceLabel({ ...entry, settlementStatus: 'cancelled' }), 'Cancelado');
 });
 
+test('keeps a legacy received entry settled when its settlement array is empty', () => {
+  const legacyReceived = { ...entry, status: 'received' as const, settlementStatus: 'open' as const, settlements: [] };
+
+  assert.equal(calculateSettlementStatus(legacyReceived), 'settled');
+  assert.equal(getOutstandingCents(legacyReceived), 0);
+});
+
 test('allows synchronization only for an open forecast with no settlement', () => {
   assert.equal(canChangeForecast({ ...entry, settlements: [] }), true);
   assert.equal(canChangeForecast({ ...entry, settlements: entry.settlements.slice(0, 1) }), false);

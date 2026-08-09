@@ -19,6 +19,20 @@ test('requires an explicit confirmation, backup reference and rollback artifact 
   assert.equal(source.includes('updateOne'), true);
 });
 
+test('allows a migration preview to limit plans to selected actions', () => {
+  const source = readFileSync(resolve(process.cwd(), 'server/scripts/migrate-finances.ts'), 'utf8');
+
+  assert.equal(source.includes('--actions='), true);
+  assert.equal(source.includes('requestedActions'), true);
+});
+
+test('finds every legacy received status when running only the status normalization', () => {
+  const source = readFileSync(resolve(process.cwd(), 'server/scripts/migrate-finances.ts'), 'utf8');
+
+  assert.equal(source.includes('isStatusOnlyMigration'), true);
+  assert.equal(source.includes("{ status: 'received' }"), true);
+});
+
 test('reverts only through the generated artifact and an explicit confirmation', () => {
   const source = readFileSync(resolve(process.cwd(), 'server/scripts/revert-finance-migration.ts'), 'utf8');
 
