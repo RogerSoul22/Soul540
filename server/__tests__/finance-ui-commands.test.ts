@@ -63,18 +63,20 @@ test('documents settlement and cancellation rules in every finance interface', (
   }
 });
 
-test('uses the canonical settlement state in the main finance table', () => {
+test('uses only the persisted status in the main finance table', () => {
   const source = readFileSync(resolve(process.cwd(), 'src/frontend/pages/Financeiro/Financeiro.tsx'), 'utf8');
 
-  assert.equal(source.includes('getDerivedFinanceLabel'), true);
-  assert.equal(source.includes('<option value="settled">Liquidado</option>'), true);
-  assert.equal(source.includes('<option value="paid">Pago</option>'), false);
-  assert.equal(source.includes('<option value="received">Recebido</option>'), false);
+  assert.equal(source.includes('value={entry.status}'), true);
+  assert.equal(source.includes('value={calculateSettlementStatus(entry)}'), false);
+  assert.equal(source.includes('<option value="pending">Pendente</option>'), true);
+  assert.equal(source.includes('<option value="paid">Pago</option>'), true);
 });
 
 test('offers only pending and paid as persisted status values in every finance interface', () => {
   for (const file of financePages) {
     const source = readFileSync(resolve(process.cwd(), file), 'utf8');
-    assert.equal(source.includes('value="received"'), false, file);
+    for (const legacyValue of ['received', 'open', 'partial', 'settled', 'cancelled']) {
+      assert.equal(source.includes(`value="${legacyValue}"`), false, `${file}: ${legacyValue}`);
+    }
   }
 });

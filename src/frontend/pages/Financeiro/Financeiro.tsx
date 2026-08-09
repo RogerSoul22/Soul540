@@ -87,7 +87,7 @@ import { apiFetch } from '@frontend/lib/api';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import type { FinanceType, DreSection, RecurrenceFrequency } from '@backend/domain/entities/Finance';
+import type { FinanceStatus, FinanceType, DreSection, RecurrenceFrequency } from '@backend/domain/entities/Finance';
 import {
   FIXED_CATEGORIES, VARIABLE_CATEGORIES, CATEGORY_LABELS as BUILTIN_CATEGORY_LABELS, CATEGORY_COLORS as BUILTIN_CATEGORY_COLORS,
   DRE_SECTIONS, groupCategoriesBySection, getCategorySection,
@@ -95,7 +95,8 @@ import {
 import type { CategoryDef } from '@backend/infra/data/financeCategories';
 import { buildDreTemplateValues, DRE_TEMPLATE_INPUT_CELLS, DRE_TEMPLATE_SHEET } from '@shared/dreTemplate';
 import { isRealizedExpense, isRealizedRevenue } from '@shared/financeSettlement';
-import { calculateSettlementStatus, getDerivedFinanceLabel } from '@shared/financePolicy';
+import { calculateSettlementStatus, getDerivedFinanceLabel, getOutstandingCents } from '@shared/financePolicy';
+import { fromCents } from '@shared/money';
 import GaugeChart from '@frontend/components/GaugeChart/GaugeChart';
 import HorizontalBarChart from '@frontend/components/HorizontalBarChart/HorizontalBarChart';
 import Badge from '@frontend/components/Badge/Badge';
@@ -777,15 +778,21 @@ export default function Financeiro() {
 
   // === HANDLERS ===
 
-  const handleEventFinanceStatus = async (entry: (typeof finances)[number], settlementStatus: 'open' | 'partial' | 'settled' | 'cancelled') => {
-    if (settlementStatus !== 'settled') {
+  const handleEventFinanceStatus = async (entry: (typeof finances)[number], status: FinanceStatus) => {
+    if (status === 'pending') {
       alert('Para reabrir ou cancelar uma baixa, use o comando específico com justificativa. A situação não é alterada por um seletor.');
       return;
     }
-    if (calculateSettlementStatus(entry) === 'settled') return;
+    const settlementStatus = calculateSettlementStatus(entry);
+    if (settlementStatus === 'cancelled') {
+      alert('NÃ£o Ã© possÃ­vel liquidar um lanÃ§amento cancelado. Use o fluxo de ajuste com justificativa.');
+      return;
+    }
+    if (entry.status === 'paid' || settlementStatus === 'settled') return;
+    const outstandingAmount = fromCents(getOutstandingCents(entry));
     const amountText = window.prompt(
       'Baixa financeira: informe o valor efetivamente recebido/pago. A competência do lançamento não será alterada.',
-      entry.amount.toFixed(2).replace('.', ','),
+      outstandingAmount.toFixed(2).replace('.', ','),
     );
     if (amountText === null) return;
     const amount = parseCurrency(amountText);
@@ -1789,15 +1796,13 @@ export default function Financeiro() {
                     <td>{safeFormatDate(entry.date, 'dd/MM/yy', { locale: ptBR })}</td>
                     <td>
                       <select
-                        className={`${styles.agendamentoStatus} ${calculateSettlementStatus(entry) === 'settled' ? styles.statusReceived : styles.statusPending}`}
-                        value={calculateSettlementStatus(entry)}
+                        className={`${styles.agendamentoStatus} ${entry.status === 'paid' ? styles.statusReceived : styles.statusPending}`}
+                        value={entry.status}
                         onClick={(event) => event.stopPropagation()}
-                        onChange={(e) => handleEventFinanceStatus(entry, e.target.value as 'open' | 'partial' | 'settled' | 'cancelled')}
+                        onChange={(e) => handleEventFinanceStatus(entry, e.target.value as FinanceStatus)}
                         >
-                          <option value="open">Pendente</option>
-                          <option value="partial">Parcial</option>
-                          <option value="settled">Liquidado</option>
-                          <option value="cancelled">Cancelado</option>
+                          <option value="pending">Pendente</option>
+                          <option value="paid">Pago</option>
                       </select>
                     </td>
                     <td>
