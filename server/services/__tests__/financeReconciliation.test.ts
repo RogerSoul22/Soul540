@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { reconcileFinances } from '../financeReconciliation';
+import { reconcileFinances, reconciliationFindingsToCsv } from '../financeReconciliation';
 
 const finance = (overrides: Record<string, unknown> = {}) => ({
   id: 'finance-1',
@@ -43,4 +43,30 @@ test('suggests a legacy settlement without treating settlement date difference a
   ], [], '2026-07-01', '2026-07-31');
 
   assert.deepEqual(findings.map((item) => item.action), ['migrate_legacy_settlement']);
+});
+
+test('adds a proposed read-only impact to every reconciliation finding', () => {
+  const [finding] = reconcileFinances([finance()], [{ id: 'event-1', status: 'cancelled' }], '2026-07-01', '2026-07-31');
+
+  assert.equal(finding.proposedChange, 'Cancelar a previsão sem baixa e preservar o histórico');
+  assert.equal(finding.affectedAmountCents, 10_000);
+  assert.equal(finding.estimatedCashImpactCents, 0);
+  assert.equal(finding.requiresApproval, true);
+});
+
+test('exports reconciliation findings as an escaped CSV report', () => {
+  const csv = reconciliationFindingsToCsv([{
+    financeId: 'finance-1',
+    eventId: 'event-1',
+    source: 'main',
+    action: 'cancel_open_forecast',
+    reason: 'Previsão, aberta',
+    proposedChange: 'Cancelar a previsão sem baixa e preservar o histórico',
+    affectedAmountCents: 10_000,
+    estimatedCashImpactCents: 0,
+    requiresApproval: true,
+  }]);
+
+  assert.equal(csv.split('\n')[0], 'financeId,eventId,source,action,reason,proposedChange,affectedAmountCents,estimatedCashImpactCents,requiresApproval');
+  assert.equal(csv.includes('"Previsão, aberta"'), true);
 });

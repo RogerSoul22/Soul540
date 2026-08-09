@@ -24,7 +24,7 @@ const entry = {
 test('derives settlement state and remaining balance from immutable settlements', () => {
   assert.equal(calculateSettlementStatus(entry), 'settled');
   assert.equal(getOutstandingCents(entry), 0);
-  assert.equal(getDerivedFinanceLabel(entry), 'Recebido');
+  assert.equal(getDerivedFinanceLabel(entry), 'Liquidado');
 });
 
 test('counts each settlement in its own cash month', () => {

@@ -1,8 +1,10 @@
 import mongoose from 'mongoose';
+import { writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { connectDB } from '../db';
 import { Event, FactoryEvent, FranchiseEvent } from '../routes/events';
 import { FactoryFinance, Finance, FranchiseFinance } from '../routes/finances';
-import { reconcileFinances } from '../services/financeReconciliation';
+import { reconcileFinances, reconciliationFindingsToCsv } from '../services/financeReconciliation';
 
 type Unit = 'main' | 'franchise' | 'factory';
 
@@ -31,6 +33,7 @@ async function main() {
   const start = option('start', '2026-06-01');
   const end = option('end', '2026-07-31');
   const units = unitsOption();
+  const csvPath = option('csv', '').trim();
 
   await connectDB();
   try {
@@ -58,13 +61,19 @@ async function main() {
       return summary;
     }, {});
 
-    process.stdout.write(`${JSON.stringify({
+    const report: Record<string, unknown> = {
       mode: 'read-only',
       period: { start, end },
       units,
       totals: { findings: findings.length, byAction },
       findings,
-    }, null, 2)}\n`);
+    };
+    if (csvPath) {
+      const absoluteCsvPath = resolve(process.cwd(), csvPath);
+      await writeFile(absoluteCsvPath, reconciliationFindingsToCsv(findings), 'utf8');
+      report.artifact = { csvPath: absoluteCsvPath, note: 'Arquivo gerado sem alterar lançamentos financeiros' };
+    }
+    process.stdout.write(`${JSON.stringify(report, null, 2)}\n`);
   } finally {
     await mongoose.disconnect();
   }

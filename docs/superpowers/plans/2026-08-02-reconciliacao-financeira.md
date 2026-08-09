@@ -309,3 +309,20 @@ Esta revisão substitui qualquer interpretação de que a Fase 0 ou os fluxos fi
 ## Ordem de execução
 
 Seguir a ordem de execução revisada acima. A ordem original permanece como divisão de fases, mas não autoriza iniciar migração histórica ou trabalho de interface antes de encerrar os bloqueios de segurança e integridade.
+
+## Revisão 3 — execução controlada
+
+### Entregue
+
+1. `server/scripts/reconcile-finances.ts` permanece somente leitura e agora pode gerar CSV com proposta, valor afetado, impacto de caixa previsto e necessidade de aprovação.
+2. `server/scripts/migrate-finances.ts` cria uma prévia idempotente para acrescentar centavos canônicos e converter baixas legadas seguras em registros de liquidação. Itens com fração de centavo, evento cancelado com baixa ou baixa parcial continuam apenas para revisão humana.
+3. A aplicação exige `--apply`, `--confirm=APLICAR_MIGRACAO_FINANCEIRA`, um `--backup` existente e `--rollback` novo. Antes de qualquer escrita, o script grava o artefato de reversão com estado anterior e estado esperado.
+4. `server/scripts/revert-finance-migration.ts` opera primeiro em prévia; a escrita exige `--apply`, `--confirm=REVERTER_MIGRACAO_FINANCEIRA` e o artefato de reversão. Ele só reverte registros que ainda correspondam ao resultado da migração.
+
+### Procedimento obrigatório
+
+1. Executar a prévia: `npm exec -- tsx server/scripts/migrate-finances.ts --start=2026-06-01 --end=2026-07-31`.
+2. Revisar e aprovar os IDs listados, especialmente todos os itens que não geram plano automático.
+3. Criar e validar um backup externo do MongoDB.
+4. Aplicar somente após aprovação operacional: `npm exec -- tsx server/scripts/migrate-finances.ts --apply --confirm=APLICAR_MIGRACAO_FINANCEIRA --backup=CAMINHO_DO_BACKUP --rollback=CAMINHO_DO_ROLLBACK.json`.
+5. Rodar novamente a reconciliação somente leitura e comparar totais. Se necessário, executar primeiro a prévia do reversor e somente depois sua confirmação explícita.

@@ -314,15 +314,18 @@ export async function syncEventFinances(event: any, FinanceModel: FinanceModel, 
     const neverSettledIds = linkedEntries.filter((entry: any) => !(getSettledCents(entry) > 0)).map((entry: any) => entry._id);
     const settledIds = linkedEntries.filter((entry: any) => getSettledCents(entry) > 0).map((entry: any) => entry._id);
     if (neverSettledIds.length > 0) {
-      await FinanceModel.deleteMany({ _id: { $in: neverSettledIds }, settledCents: { $not: { $gt: 0 } } });
-    }
-    if (settledIds.length > 0) {
       await FinanceModel.updateMany(
-        { _id: { $in: settledIds } },
-        { $set: { settlementStatus: 'cancelled', reversalReason: 'Evento cancelado' } },
+        { _id: { $in: neverSettledIds } },
+        {
+          $set: {
+            settlementStatus: 'cancelled',
+            reversedAt: new Date().toISOString(),
+            reversalReason: 'Evento cancelado',
+          },
+        },
       );
     }
-    return { deletedCount: neverSettledIds.length };
+    return { cancelledCount: neverSettledIds.length, requiresDecision: settledIds.length > 0 };
   }
   const { deposit, travel, targetRevenue, balance } = calculateEventFinanceAmounts(event);
 
@@ -339,7 +342,7 @@ export async function syncEventFinances(event: any, FinanceModel: FinanceModel, 
   } else {
     await event.constructor.findByIdAndUpdate(event._id, { financeSyncVersion: 1 });
   }
-  return { deletedCount: 0 };
+  return { cancelledCount: 0, requiresDecision: false };
 }
 
 export function calculateEventFinanceAmounts(event: any) {
@@ -356,6 +359,22 @@ export function eventCancellationRequiresDecision(finances: any[]): boolean {
   return finances.some((finance) => !canChangeForecast(finance));
 }
 
+export function hasMaterialFinancialChange(current: Record<string, any>, update: Record<string, any>, fields: string[]): boolean {
+  return fields.some((field) => {
+    if (!Object.prototype.hasOwnProperty.call(update, field)) return false;
+    const previousValue = current?.[field] ?? null;
+    const nextValue = update[field] ?? null;
+    if (previousValue === nextValue) return false;
+    if (typeof previousValue === 'number' && typeof nextValue === 'string' && nextValue.trim() !== '') {
+      return previousValue !== Number(nextValue);
+    }
+    if (typeof previousValue === 'string' && typeof nextValue === 'number' && previousValue.trim() !== '') {
+      return Number(previousValue) !== nextValue;
+    }
+    return true;
+  });
+}
+
 async function cancellationRequiresDecision(event: any, FinanceModel: FinanceModel): Promise<boolean> {
   const eventId = event.id || event._id.toString();
   const finances = await FinanceModel.find({
@@ -367,7 +386,24 @@ async function cancellationRequiresDecision(event: any, FinanceModel: FinanceMod
   return eventCancellationRequiresDecision(finances);
 }
 
-async function syncEventCommissions(event: any, FinanceModel: FinanceModel, source: string) {
+async function cancelMutableAutomaticFinances(FinanceModel: FinanceModel, query: Record<string, unknown>, reversalReason: string) {
+  const activeFinances = await FinanceModel.find(query).lean();
+  const mutableIds = activeFinances
+    .filter((finance: any) => canChangeForecast(finance))
+    .map((finance: any) => finance._id);
+  if (mutableIds.length === 0) return;
+
+  await FinanceModel.updateMany(
+    { _id: { $in: mutableIds } },
+    { $set: { reversedAt: new Date().toISOString(), reversalReason, settlementStatus: 'cancelled' } },
+  );
+}
+
+export function canSyncAutomaticCommission(existing: any): boolean {
+  return !existing || canChangeForecast(typeof existing.toJSON === 'function' ? existing.toJSON() : existing);
+}
+
+export async function syncEventCommissions(event: any, FinanceModel: FinanceModel, source: string) {
   const employeeModel = source === 'franchise' ? FranchiseEmployee : Employee;
   const employeeIds = Array.from(new Set([
     ...(Array.isArray(event.selectedEmployeeIds) ? event.selectedEmployeeIds : []),
@@ -377,7 +413,7 @@ async function syncEventCommissions(event: any, FinanceModel: FinanceModel, sour
   const activeQuery = { eventId, kind: 'commission', automatic: true, reversedAt: { $exists: false } };
 
   if (employeeIds.length === 0) {
-    await FinanceModel.updateMany(activeQuery, { $set: { reversedAt: new Date().toISOString(), reversalReason: 'Equipe removida do evento', settlementStatus: 'cancelled' } });
+    await cancelMutableAutomaticFinances(FinanceModel, activeQuery, 'Equipe removida do evento');
     return;
   }
 
@@ -385,22 +421,26 @@ async function syncEventCommissions(event: any, FinanceModel: FinanceModel, sour
   const { targetRevenue } = calculateEventFinanceAmounts(event);
   const eligibleIds = employees.map((employee) => employee._id.toString());
 
-  await FinanceModel.updateMany(
+  await cancelMutableAutomaticFinances(
+    FinanceModel,
     { ...activeQuery, employeeId: { $nin: eligibleIds } },
-    { $set: { reversedAt: new Date().toISOString(), reversalReason: 'ComissÃ£o deixou de ser aplicÃ¡vel', settlementStatus: 'cancelled' } },
+    'Comissao deixou de ser aplicavel',
   );
 
   for (const employee of employees) {
     const amount = calculateCommissionAmount(targetRevenue, Number(employee.commissionRate));
     if (amount <= 0) continue;
+    const commissionQuery = { ...activeQuery, employeeId: employee._id.toString() };
+    const existingCommission = await FinanceModel.findOne(commissionQuery);
+    if (!canSyncAutomaticCommission(existingCommission)) continue;
     await FinanceModel.findOneAndUpdate(
-      { ...activeQuery, employeeId: employee._id.toString() },
+      commissionQuery,
       {
         eventId,
         employeeId: employee._id.toString(),
         type: 'cost',
         category: 'comissoes',
-        description: `ComissÃ£o ${employee.commissionRate}% - ${employee.name} - ${event.name}`,
+        description: `Comissao ${employee.commissionRate}% - ${employee.name} - ${event.name}`,
         amount,
         date: event.date,
         dueDate: event.date,
@@ -509,10 +549,12 @@ router.post('/:id/financial-reopen', async (req, res) => {
     $set: { financialStatus, financialCloseStatus: 'open' },
     $unset: { financiallyClosedAt: 1, financiallyClosedBy: 1 },
   }, { new: true });
-  await found.financeModel.updateMany(
-    { eventId: found.doc.id, kind: 'commission', automatic: true, reversedAt: { $exists: false } },
-    { $set: { reversedAt: new Date().toISOString(), reversalReason: 'Financeiro do evento reaberto', settlementStatus: 'cancelled' } },
-  );
+  await cancelMutableAutomaticFinances(found.financeModel, {
+    eventId: found.doc.id,
+    kind: 'commission',
+    automatic: true,
+    reversedAt: { $exists: false },
+  }, 'Financeiro do evento reaberto');
   await logAudit({ req, action: 'update', resource: 'events', resourceId: req.params.id, description: `Reabriu financeiro do evento: ${found.doc.name}` });
   res.json(event);
 });
@@ -520,10 +562,17 @@ router.post('/:id/financial-reopen', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const found = await findEventForRequest(req, req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
+  const protectedFinancialFields = ['budget', 'finalValue', 'depositValue', 'depositDate', 'travelCost', 'paymentMethod', 'pixKey'];
   if (req.body?.status === 'cancelled' && found.doc.status !== 'cancelled' && await cancellationRequiresDecision(found.doc, found.financeModel)) {
     return res.status(409).json({ error: 'Registre reembolso, multa retida ou ajuste aprovado antes de cancelar um evento com baixa financeira' });
   }
-  const protectedFinancialFields = ['budget', 'finalValue', 'depositValue', 'depositDate', 'travelCost', 'paymentMethod', 'pixKey'];
+  if (
+    !isFromFactory(req) &&
+    hasMaterialFinancialChange(found.doc, req.body || {}, protectedFinancialFields) &&
+    await cancellationRequiresDecision(found.doc, found.financeModel)
+  ) {
+    return res.status(409).json({ error: 'Registre um ajuste financeiro aprovado antes de alterar valores de um evento com baixa financeira' });
+  }
   if (
     (found.doc.financialCloseStatus === 'closed' || found.doc.financialStatus === 'closed') &&
     !isFromFactory(req) &&
@@ -539,13 +588,13 @@ router.put('/:id', async (req, res) => {
   if (!event) return res.status(404).json({ error: 'Not found' });
   const syncResult = isFromFactory(req) ? undefined : await syncEventFinances(event, found.financeModel, found.financeSource);
   await logAudit({ req, action: 'update', resource: 'events', resourceId: req.params.id, description: `Atualizou evento: ${event.name}` });
-  if (syncResult && syncResult.deletedCount > 0) {
+  if (syncResult && syncResult.cancelledCount > 0) {
     await logAudit({
       req,
-      action: 'delete',
+      action: 'update',
       resource: 'finances',
       resourceId: req.params.id,
-      description: `Excluiu ${syncResult.deletedCount} lançamento(s) automático(s) nunca liquidado(s) do evento cancelado: ${event.name}`,
+      description: `Cancelou ${syncResult.cancelledCount} previsoes automaticas nunca liquidadas do evento cancelado: ${event.name}`,
     });
   }
   res.json(event);

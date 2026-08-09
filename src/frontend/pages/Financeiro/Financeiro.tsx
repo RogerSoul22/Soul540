@@ -87,14 +87,15 @@ import { apiFetch } from '@frontend/lib/api';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import type { FinanceType, FinanceStatus, DreSection, RecurrenceFrequency } from '@backend/domain/entities/Finance';
+import type { FinanceType, DreSection, RecurrenceFrequency } from '@backend/domain/entities/Finance';
 import {
   FIXED_CATEGORIES, VARIABLE_CATEGORIES, CATEGORY_LABELS as BUILTIN_CATEGORY_LABELS, CATEGORY_COLORS as BUILTIN_CATEGORY_COLORS,
   DRE_SECTIONS, groupCategoriesBySection, getCategorySection,
 } from '@backend/infra/data/financeCategories';
 import type { CategoryDef } from '@backend/infra/data/financeCategories';
 import { buildDreTemplateValues, DRE_TEMPLATE_INPUT_CELLS, DRE_TEMPLATE_SHEET } from '@shared/dreTemplate';
-import { isRealizedRevenue } from '@shared/financeSettlement';
+import { isRealizedExpense, isRealizedRevenue } from '@shared/financeSettlement';
+import { calculateSettlementStatus, getDerivedFinanceLabel } from '@shared/financePolicy';
 import GaugeChart from '@frontend/components/GaugeChart/GaugeChart';
 import HorizontalBarChart from '@frontend/components/HorizontalBarChart/HorizontalBarChart';
 import Badge from '@frontend/components/Badge/Badge';
@@ -147,18 +148,6 @@ type FilterType = 'all' | 'revenue' | 'cost';
 type CostFilter = 'all' | 'fixed' | 'variable';
 
 const MONTHS_PT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-
-const statusLabels: Record<FinanceStatus, string> = {
-  pending: 'Pendente',
-  paid: 'Pago',
-  received: 'Recebido',
-};
-
-const statusColors: Record<FinanceStatus, 'amber' | 'green'> = {
-  pending: 'amber',
-  paid: 'green',
-  received: 'green',
-};
 
 const formatBRL = (v: number) => `R$ ${v.toLocaleString('pt-BR')}`;
 const alphaCollator = new Intl.Collator('pt-BR', { sensitivity: 'base', numeric: true });
@@ -218,7 +207,6 @@ export default function Financeiro() {
   const [formDescription, setFormDescription] = useState('');
   const [formAmount, setFormAmount] = useState('');
   const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0]);
-  const [formStatus, setFormStatus] = useState<FinanceStatus>('pending');
   const [formPaymentMethod, setFormPaymentMethod] = useState('');
 
   // Parcelamento
@@ -532,7 +520,7 @@ export default function Financeiro() {
   const margin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
   const realizedIncome = useMemo(() => pageMonthFinances.filter((entry) => entry.type === 'revenue' && isRealizedRevenue(entry)).reduce((sum, entry) => sum + entry.amount, 0), [pageMonthFinances]);
   const projectedIncome = totalRevenue - realizedIncome;
-  const realizedExpense = useMemo(() => pageMonthFinances.filter((entry) => entry.type === 'cost' && entry.status === 'paid').reduce((sum, entry) => sum + entry.amount, 0), [pageMonthFinances]);
+  const realizedExpense = useMemo(() => pageMonthFinances.filter(isRealizedExpense).reduce((sum, entry) => sum + entry.amount, 0), [pageMonthFinances]);
   const projectedExpense = totalCosts - realizedExpense;
 
   const expenseCategorySummary = useMemo(() => {
@@ -575,7 +563,7 @@ export default function Financeiro() {
   // já liquidados (receitas recebidas − custos pagos), independente do filtro de mês.
   const wallet = useMemo(() => {
     const received = pageMonthFinances.filter((f) => f.type === 'revenue' && isRealizedRevenue(f)).reduce((acc, f) => acc + f.amount, 0);
-    const paid = pageMonthFinances.filter((f) => f.type === 'cost' && f.status === 'paid').reduce((acc, f) => acc + f.amount, 0);
+    const paid = pageMonthFinances.filter(isRealizedExpense).reduce((acc, f) => acc + f.amount, 0);
     return { received, paid, balance: received - paid };
   }, [pageMonthFinances]);
   const walletBalance = wallet.balance;
@@ -602,7 +590,7 @@ export default function Financeiro() {
   const saldoEmAberto = faturamentoTotal - faturamentoRecebido;
   const paymentMethodSummary = useMemo(() => {
     const grouped = new Map<string, { method: string; amount: number; count: number }>();
-    for (const entry of pageMonthFinances.filter((item) => item.type === 'revenue' && item.status === 'received')) {
+    for (const entry of pageMonthFinances.filter(isRealizedRevenue)) {
       const method = entry.paymentMethod || 'nao-informado';
       const current = grouped.get(method) || { method, amount: 0, count: 0 };
       current.amount += entry.amount;
@@ -771,7 +759,7 @@ export default function Financeiro() {
   );
   const totalReceived = useMemo(
     () => eventsWithBudget
-      .filter(({ finance }) => ['paid', 'received'].includes(finance?.status ?? ''))
+      .filter(({ finance }) => finance && isRealizedRevenue(finance))
       .reduce((acc, { event }) => acc + event.budget, 0),
     [eventsWithBudget],
   );
@@ -789,12 +777,12 @@ export default function Financeiro() {
 
   // === HANDLERS ===
 
-  const handleEventFinanceStatus = async (entry: (typeof finances)[number], status: FinanceStatus) => {
-    if (status === 'pending') {
+  const handleEventFinanceStatus = async (entry: (typeof finances)[number], settlementStatus: 'open' | 'partial' | 'settled' | 'cancelled') => {
+    if (settlementStatus !== 'settled') {
       alert('Para reabrir ou cancelar uma baixa, use o comando específico com justificativa. A situação não é alterada por um seletor.');
       return;
     }
-    if (entry.status === status) return;
+    if (calculateSettlementStatus(entry) === 'settled') return;
     const amountText = window.prompt(
       'Baixa financeira: informe o valor efetivamente recebido/pago. A competência do lançamento não será alterada.',
       entry.amount.toFixed(2).replace('.', ','),
@@ -957,7 +945,6 @@ export default function Financeiro() {
     setFormDescription('');
     setFormAmount('');
     setFormDate(new Date().toISOString().split('T')[0]);
-    setFormStatus('pending');
     setFormPaymentMethod('');
     setFormInstallments('1');
     setFormRecurring(false);
@@ -977,7 +964,6 @@ export default function Financeiro() {
     setFormDescription(entry.description);
     setFormAmount(entry.amount ? formatCurrency(String(Math.round(entry.amount * 100))) : '');
     setFormDate(entry.date);
-    setFormStatus(entry.status);
     setFormPaymentMethod(entry.paymentMethod || '');
     setFormInstallments('1');
     setFormRecurring(false);
@@ -1024,7 +1010,7 @@ export default function Financeiro() {
       description: formDescription,
       amount: parseCurrency(formAmount),
       date: formDate,
-      status: formStatus,
+      status: 'pending' as const,
       paymentMethod: formPaymentMethod || undefined,
     };
 
@@ -1045,7 +1031,7 @@ export default function Financeiro() {
           ...base,
           description: formDescription ? `${formDescription} (${i + 1}/${installments})` : `Parcela ${i + 1}/${installments}`,
           date: addMonths(formDate, i),
-          status: i === 0 ? formStatus : 'pending',
+          status: 'pending' as const,
           installmentGroupId: groupId,
           installmentNumber: i + 1,
           installmentTotal: installments,
@@ -1061,7 +1047,7 @@ export default function Financeiro() {
         await addFinance({
           ...base,
           date: current,
-          status: i === 0 ? formStatus : 'pending',
+          status: 'pending' as const,
           recurrenceId,
           recurrenceFrequency: formRecurrenceFrequency,
           recurrenceEndDate: endDate,
@@ -1803,13 +1789,15 @@ export default function Financeiro() {
                     <td>{safeFormatDate(entry.date, 'dd/MM/yy', { locale: ptBR })}</td>
                     <td>
                       <select
-                        className={`${styles.agendamentoStatus} ${entry.status === 'received' || entry.status === 'paid' ? styles.statusReceived : styles.statusPending}`}
-                        value={entry.status}
+                        className={`${styles.agendamentoStatus} ${calculateSettlementStatus(entry) === 'settled' ? styles.statusReceived : styles.statusPending}`}
+                        value={calculateSettlementStatus(entry)}
                         onClick={(event) => event.stopPropagation()}
-                          onChange={(e) => handleEventFinanceStatus(entry, e.target.value as FinanceStatus)}
+                        onChange={(e) => handleEventFinanceStatus(entry, e.target.value as 'open' | 'partial' | 'settled' | 'cancelled')}
                         >
-                          <option value="pending">Pendente</option>
-                          <option value={entry.type === 'revenue' ? 'received' : 'paid'}>{entry.type === 'revenue' ? 'Recebido' : 'Pago'}</option>
+                          <option value="open">Pendente</option>
+                          <option value="partial">Parcial</option>
+                          <option value="settled">Liquidado</option>
+                          <option value="cancelled">Cancelado</option>
                       </select>
                     </td>
                     <td>
@@ -2053,7 +2041,7 @@ export default function Financeiro() {
               <div><span className={styles.eventDetailLabel}>Tipo</span><strong className={selectedFinance.type === 'revenue' ? styles.green : styles.red}>{selectedFinance.type === 'revenue' ? 'Receita' : 'Custo'}</strong></div>
               <div><span className={styles.eventDetailLabel}>Valor</span><strong className={selectedFinance.type === 'revenue' ? styles.green : styles.red}>{selectedFinance.type === 'revenue' ? '+' : '-'} {formatBRL(selectedFinance.amount)}</strong></div>
               <div><span className={styles.eventDetailLabel}>Data</span><strong>{safeFormatDate(selectedFinance.date, 'dd/MM/yyyy', { locale: ptBR })}</strong></div>
-              <div><span className={styles.eventDetailLabel}>Status</span><strong>{statusLabels[selectedFinance.status]}</strong></div>
+              <div><span className={styles.eventDetailLabel}>Status</span><strong>{getDerivedFinanceLabel(selectedFinance)}</strong></div>
               <div><span className={styles.eventDetailLabel}>Categoria</span><strong>{categoryLabels[selectedFinance.category] || selectedFinance.category}</strong></div>
               <div><span className={styles.eventDetailLabel}>Origem</span><strong>{originLabel}</strong></div>
               <div><span className={styles.eventDetailLabel}>Evento</span><strong>{linkedEvent?.name || 'Não vinculado'}</strong></div>
@@ -2254,16 +2242,8 @@ export default function Financeiro() {
                 />
               </div>
               <div className={styles.formField}>
-                <label className={styles.formLabel}>Status</label>
-                <select
-                  className={styles.formSelect}
-                  value={formStatus}
-                  onChange={(e) => setFormStatus(e.target.value as FinanceStatus)}
-                >
-                  <option value="pending">Pendente</option>
-                  <option value="paid">Pago</option>
-                  <option value="received">Recebido</option>
-                </select>
+                <label className={styles.formLabel}>Situação inicial</label>
+                <p className={styles.formHint}>Pendente. Registre a liquidação depois, com valor e data efetiva.</p>
               </div>
             </div>
 
@@ -2550,6 +2530,24 @@ export default function Financeiro() {
                   <li>Pendente ainda não possui baixa, Parcial possui baixa incompleta e Cancelado não compõe os totais.</li>
                   <li>Clique em <strong>Salvar</strong> para confirmar.</li>
                 </ol>
+              </div>
+              <div className={styles.infoSection}>
+                <p className={styles.infoSectionTitle}>Regras financeiras</p>
+                <ul className={styles.infoList}>
+                  <li><strong>Liquidação é o único estado financeiro:</strong> ela registra uma entrada ou saída efetiva. “Recebido” e “Pago” são apenas descrições de receita e despesa liquidada.</li>
+                  <li><strong>Competência</strong> usa a data prevista do lançamento; <strong>Caixa</strong> usa a data efetiva de cada liquidação. Um sinal entra no mês em que foi recebido.</li>
+                  <li>Liquidações podem ser parciais. Para corrigir, estornar ou cancelar uma baixa, use o comando com justificativa; não altere o status diretamente.</li>
+                  <li><strong>Evento cancelado com baixa exige decisão</strong> de reembolso, multa retida ou ajuste aprovado. Previsões sem baixa são canceladas, mas permanecem no histórico.</li>
+                  <li>O fechamento financeiro do evento apenas encerra a conferência operacional: ele não cria recebimento, pagamento ou baixa automática.</li>
+                </ul>
+              </div>
+              <div className={styles.infoSection}>
+                <p className={styles.infoSectionTitle}>DRE, extratos e unidades</p>
+                <ul className={styles.infoList}>
+                  <li>O DRE considera lançamentos classificados. Movimentos OFX não classificados ficam fora do DRE até receberem uma categoria.</li>
+                  <li>A importação OFX é revisada no servidor: duplicidades são ignoradas e vínculos ambíguos exigem escolha manual.</li>
+                  <li>A partir de agosto de 2026, Campinas passa a compor Sorocaba nos relatórios gerenciais; a unidade de origem do lançamento é preservada.</li>
+                </ul>
               </div>
               <div className={styles.infoSection}>
                 <p className={styles.infoSectionTitle}>Abas disponíveis</p>

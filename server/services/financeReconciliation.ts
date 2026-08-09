@@ -22,7 +22,16 @@ export interface ReconciliationFinding {
   source?: string;
   action: ReconciliationAction;
   reason: string;
+  proposedChange: string;
+  affectedAmountCents: number | null;
+  estimatedCashImpactCents: number;
+  requiresApproval: boolean;
 }
+
+type ReconciliationFindingDraft = Omit<
+  ReconciliationFinding,
+  'proposedChange' | 'affectedAmountCents' | 'estimatedCashImpactCents' | 'requiresApproval'
+>;
 
 interface ReconciliationFinance extends FinancePolicyEntry {
   id: string;
@@ -41,6 +50,63 @@ function isWithinPeriod(entry: ReconciliationFinance, start: string, end: string
   return getEffectiveSettlements(entry).some((settlement) => settlement.settledOn >= start && settlement.settledOn <= end);
 }
 
+function getProposedChange(action: ReconciliationAction): string {
+  switch (action) {
+    case 'cancel_open_forecast':
+      return 'Cancelar a previsão sem baixa e preservar o histórico';
+    case 'review_cancelled_event_settled':
+      return 'Registrar decisão de reembolso, multa retida ou ajuste aprovado';
+    case 'add_amount_cents':
+      return 'Adicionar o valor canônico em centavos sem alterar o valor monetário';
+    case 'migrate_legacy_settlement':
+      return 'Criar o registro de baixa legado com data e origem revisadas';
+    case 'review_legacy_partial':
+      return 'Revisar as baixas parciais antes de criar os registros de liquidação';
+    case 'review_amount_precision':
+      return 'Aprovar o arredondamento antes de converter o valor para centavos';
+    case 'review_invalid_competence_date':
+      return 'Definir uma data de competência válida antes de qualquer ajuste';
+  }
+}
+
+function getAffectedAmountCents(finance: ReconciliationFinance, action: ReconciliationAction): number | null {
+  if (action === 'review_cancelled_event_settled') return getSettledCents(finance);
+  if (Number.isSafeInteger(finance.amountCents)) return finance.amountCents!;
+  if (Number.isFinite(finance.amount)) return Math.round(Number(finance.amount) * 100);
+  return null;
+}
+
+function withReadOnlyImpact(finding: ReconciliationFindingDraft, finance: ReconciliationFinance): ReconciliationFinding {
+  return {
+    ...finding,
+    proposedChange: getProposedChange(finding.action),
+    affectedAmountCents: getAffectedAmountCents(finance, finding.action),
+    estimatedCashImpactCents: 0,
+    requiresApproval: true,
+  };
+}
+
+function escapeCsv(value: unknown): string {
+  const text = value === undefined || value === null ? '' : String(value);
+  return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+export function reconciliationFindingsToCsv(findings: ReconciliationFinding[]): string {
+  const columns = [
+    'financeId',
+    'eventId',
+    'source',
+    'action',
+    'reason',
+    'proposedChange',
+    'affectedAmountCents',
+    'estimatedCashImpactCents',
+    'requiresApproval',
+  ] as const;
+  const rows = findings.map((finding) => columns.map((column) => escapeCsv(finding[column])).join(','));
+  return [columns.join(','), ...rows].join('\n');
+}
+
 export function reconcileFinances(
   finances: ReconciliationFinance[],
   events: ReconciliationEvent[],
@@ -48,7 +114,7 @@ export function reconcileFinances(
   end: string,
 ): ReconciliationFinding[] {
   const eventById = new Map(events.map((event) => [event.id, event]));
-  const findings: ReconciliationFinding[] = [];
+  const findings: ReconciliationFindingDraft[] = [];
 
   for (const finance of finances) {
     if (!isWithinPeriod(finance, start, end)) continue;
@@ -120,5 +186,6 @@ export function reconcileFinances(
     }
   }
 
-  return findings;
+  const financeById = new Map(finances.map((finance) => [finance.id, finance]));
+  return findings.map((finding) => withReadOnlyImpact(finding, financeById.get(finding.financeId)!));
 }

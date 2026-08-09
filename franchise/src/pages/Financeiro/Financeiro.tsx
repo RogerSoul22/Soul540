@@ -1730,6 +1730,15 @@ export default function Financeiro() {
                 </ol>
               </div>
               <div className={styles.infoSection}>
+                <p className={styles.infoSectionTitle}>Regras financeiras</p>
+                <ul className={styles.infoList}>
+                  <li><strong>Liquidação é o único estado financeiro:</strong> “Recebido” e “Pago” apenas descrevem receita e despesa depois da liquidação.</li>
+                  <li>Competência usa a data prevista; caixa usa a data efetiva da liquidação. Sinais entram no mês em que foram recebidos.</li>
+                  <li>Uma liquidação pode ser parcial. Correções, estornos e cancelamentos exigem justificativa.</li>
+                  <li><strong>Evento cancelado com baixa exige decisão</strong> de reembolso, multa retida ou ajuste aprovado. Previsões sem baixa permanecem no histórico como canceladas.</li>
+                </ul>
+              </div>
+              <div className={styles.infoSection}>
                 <p className={styles.infoSectionTitle}>Abas disponíveis</p>
                 <ul className={styles.infoList}>
                   <li><strong>Geral</strong> — indicadores de saúde financeira e gráfico de receitas vs despesas.</li>

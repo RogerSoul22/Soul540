@@ -89,3 +89,10 @@ Tornar o financeiro confiável, auditável e compreensível. A visão padrão se
 - Cálculos de liquidação existem no servidor, no módulo compartilhado, nas telas e no DRE, com regras divergentes.
 - `date` e `dueDate` são duplicados em eventos automáticos; `kind: balance` e `autoEventBudget` também.
 - Existem schemas financeiros e telas de finanças duplicados, inclusive uma tela legada não carregada da Fábrica.
+
+## Revisão 3 — estado implementado
+
+- O estado financeiro canônico exibido é `Pendente`, `Parcial`, `Liquidado` ou `Cancelado`. Os valores legados `paid` e `received` são aceitos apenas para compatibilidade e não são oferecidos na criação de lançamentos da interface principal.
+- Eventos cancelados preservam lançamentos. Previsões sem baixa recebem cancelamento auditável; qualquer lançamento já liquidado exige decisão explícita de reembolso, multa ou ajuste antes do cancelamento ou da alteração de valores do evento.
+- A ajuda contextual das interfaces principal, Campinas e Fábrica descreve liquidação, Caixa, Competência e cancelamento; a interface principal também explica DRE, OFX e a consolidação Campinas → Sorocaba em agosto de 2026.
+- A migração histórica permanece pendente de prévia revisada, backup externo e aprovação operacional por ID. Nenhum script de migração é executado automaticamente pelo servidor.

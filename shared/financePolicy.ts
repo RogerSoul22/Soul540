@@ -79,7 +79,7 @@ export function getDerivedFinanceLabel(entry: FinancePolicyEntry): string {
   const status = calculateSettlementStatus(entry);
   if (status === 'cancelled') return 'Cancelado';
   if (status === 'partial') return 'Parcial';
-  if (status === 'settled') return entry.type === 'revenue' ? 'Recebido' : 'Pago';
+  if (status === 'settled') return 'Liquidado';
   return 'Pendente';
 }
 

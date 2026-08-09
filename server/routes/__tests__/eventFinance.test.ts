@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { calculateCommissionAmount, calculateEventFinanceAmounts, eventCancellationRequiresDecision, syncEventFinances } from '../events';
+import { calculateCommissionAmount, calculateEventFinanceAmounts, canSyncAutomaticCommission, eventCancellationRequiresDecision, hasMaterialFinancialChange, syncEventCommissions, syncEventFinances } from '../events';
 
 test('separates deposit, balance and travel without double counting revenue', () => {
   const result = calculateEventFinanceAmounts({
@@ -68,7 +68,7 @@ test('creates an event deposit as an open receivable until it is explicitly sett
   assert.equal(deposit.dueDate, undefined);
 });
 
-test('deletes never-settled automatic finances when an event is cancelled', async () => {
+test('auditably cancels never-settled automatic finances when an event is cancelled', async () => {
   const deletedQueries: unknown[] = [];
   const updatedQueries: Array<{ query: unknown; update: unknown }> = [];
   const openEntries = [
@@ -89,12 +89,17 @@ test('deletes never-settled automatic finances when an event is cancelled', asyn
     constructor: { findByIdAndUpdate: async () => undefined },
   }, financeModel as any, 'main');
 
-  assert.equal(deletedQueries.length, 1);
-  assert.deepEqual(deletedQueries[0], { _id: { $in: ['f-1'] }, settledCents: { $not: { $gt: 0 } } });
-  assert.deepEqual(result, { deletedCount: 1 });
+  assert.equal(deletedQueries.length, 0);
+  assert.equal(updatedQueries.length, 1);
+  assert.deepEqual(updatedQueries[0].query, { _id: { $in: ['f-1'] } });
+  const update = updatedQueries[0].update as { $set: Record<string, unknown> };
+  assert.equal(update.$set.settlementStatus, 'cancelled');
+  assert.equal(update.$set.reversalReason, 'Evento cancelado');
+  assert.equal(typeof update.$set.reversedAt, 'string');
+  assert.deepEqual(result, { cancelledCount: 1, requiresDecision: false });
 });
 
-test('soft-cancels a legacy settled finance entry that predates the settledCents field', async () => {
+test('does not cancel a legacy settled finance entry without an approved decision', async () => {
   const deletedQueries: unknown[] = [];
   const updatedQueries: Array<{ query: unknown; update: unknown }> = [];
   const legacyEntries = [
@@ -124,14 +129,10 @@ test('soft-cancels a legacy settled finance entry that predates the settledCents
   }, financeModel as any, 'main');
 
   assert.equal(deletedQueries.length, 0);
-  assert.equal(updatedQueries.length, 1);
-  assert.deepEqual(updatedQueries[0].query, { _id: { $in: ['f-legacy'] } });
-  assert.deepEqual(updatedQueries[0].update, {
-    $set: { settlementStatus: 'cancelled', reversalReason: 'Evento cancelado' },
-  });
+  assert.equal(updatedQueries.length, 0);
 });
 
-test('keeps already-settled automatic finances marked as cancelled instead of deleting them', async () => {
+test('does not alter already-settled automatic finances without an approved decision', async () => {
   const deletedQueries: unknown[] = [];
   const updatedQueries: Array<{ query: unknown; update: unknown }> = [];
   const settledEntries = [
@@ -153,12 +154,50 @@ test('keeps already-settled automatic finances marked as cancelled instead of de
   }, financeModel as any, 'main');
 
   assert.equal(deletedQueries.length, 0);
-  assert.equal(updatedQueries.length, 1);
-  assert.deepEqual(updatedQueries[0].query, { _id: { $in: ['f-2'] } });
-  assert.deepEqual(updatedQueries[0].update, {
-    $set: { settlementStatus: 'cancelled', reversalReason: 'Evento cancelado' },
-  });
-  assert.deepEqual(result, { deletedCount: 0 });
+  assert.equal(updatedQueries.length, 0);
+  assert.deepEqual(result, { cancelledCount: 0, requiresDecision: true });
+});
+
+test('cancels only mutable automatic commissions when employees are removed', async () => {
+  const updates: Array<{ query: unknown; update: unknown }> = [];
+  const commissions = [
+    { _id: 'commission-open', amount: 100, amountCents: 10_000, settlements: [] },
+    {
+      _id: 'commission-settled',
+      amount: 100,
+      amountCents: 10_000,
+      settlements: [{ id: 'settlement-1', amountCents: 10_000, settledOn: '2026-07-01', settledAt: '2026-07-01T12:00:00.000Z', idempotencyKey: 'settlement-1' }],
+    },
+  ];
+  const financeModel = {
+    find: () => ({ lean: async () => commissions }),
+    updateMany: async (query: unknown, update: unknown) => { updates.push({ query, update }); },
+  };
+
+  await syncEventCommissions({ _id: 'event-commission', id: 'event-commission' }, financeModel as any, 'main');
+
+  assert.equal(updates.length, 1);
+  assert.deepEqual(updates[0].query, { _id: { $in: ['commission-open'] } });
+  const update = updates[0].update as { $set: Record<string, unknown> };
+  assert.equal(update.$set.settlementStatus, 'cancelled');
+  assert.equal(update.$set.reversalReason, 'Equipe removida do evento');
+});
+
+test('does not overwrite a settled automatic commission during synchronization', () => {
+  assert.equal(canSyncAutomaticCommission(null), true);
+  assert.equal(canSyncAutomaticCommission({ amount: 100, amountCents: 10_000, settlements: [] }), true);
+  assert.equal(canSyncAutomaticCommission({
+    amount: 100,
+    amountCents: 10_000,
+    settlements: [{ id: 'settlement-1', amountCents: 10_000, settledOn: '2026-07-01', settledAt: '2026-07-01T12:00:00.000Z', idempotencyKey: 'settlement-1' }],
+  }), false);
+});
+
+test('requires an adjustment flow only when an event financial value truly changes', () => {
+  const event = { budget: 1_000, depositValue: 300, paymentMethod: 'pix' };
+  assert.equal(hasMaterialFinancialChange(event, { budget: 1_000 }, ['budget', 'depositValue']), false);
+  assert.equal(hasMaterialFinancialChange(event, { budget: 1_100 }, ['budget', 'depositValue']), true);
+  assert.equal(hasMaterialFinancialChange(event, { paymentMethod: 'card' }, ['paymentMethod']), true);
 });
 
 test('excludes already-cancelled linked entries from the cancelled-event cleanup query', async () => {
