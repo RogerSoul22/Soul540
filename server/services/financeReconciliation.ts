@@ -13,6 +13,7 @@ export type ReconciliationAction =
   | 'add_amount_cents'
   | 'normalize_legacy_status'
   | 'migrate_legacy_settlement'
+  | 'settle_automatic_deposit'
   | 'review_legacy_partial'
   | 'review_amount_precision'
   | 'review_invalid_competence_date';
@@ -38,6 +39,8 @@ interface ReconciliationFinance extends FinancePolicyEntry {
   id: string;
   eventId?: string;
   source?: string;
+  kind?: string;
+  automatic?: boolean;
   settlements?: FinanceSettlement[];
 }
 
@@ -49,6 +52,32 @@ interface ReconciliationEvent {
 function isWithinPeriod(entry: ReconciliationFinance, start: string, end: string): boolean {
   if (entry.date >= start && entry.date <= end) return true;
   return getEffectiveSettlements(entry).some((settlement) => settlement.settledOn >= start && settlement.settledOn <= end);
+}
+
+function getExactAmountCents(finance: ReconciliationFinance): number | null {
+  if (!Number.isFinite(finance.amount)) return null;
+  const amountCents = Math.round(finance.amount * 100);
+  return Math.abs(finance.amount * 100 - amountCents) < 0.000001 ? amountCents : null;
+}
+
+function needsCanonicalAmountCents(finance: ReconciliationFinance): boolean {
+  const amountCents = getExactAmountCents(finance);
+  return amountCents !== null && finance.amountCents !== amountCents;
+}
+
+function requiresAutomaticDepositCanonicalization(finance: ReconciliationFinance, event: ReconciliationEvent | undefined): boolean {
+  return event?.status !== 'cancelled'
+    && finance.kind === 'deposit'
+    && finance.automatic === true
+    && (finance.status === 'pending' || finance.status === 'paid')
+    && !isCancelledFinance(finance)
+    && isDateOnly(finance.date)
+    && getExactAmountCents(finance) !== null
+    && (
+      !Array.isArray(finance.settlements)
+      || finance.settlements.length === 0
+      || needsCanonicalAmountCents(finance)
+    );
 }
 
 function getProposedChange(action: ReconciliationAction): string {
@@ -63,6 +92,8 @@ function getProposedChange(action: ReconciliationAction): string {
       return 'Substituir o status legado received por paid sem alterar as baixas';
     case 'migrate_legacy_settlement':
       return 'Criar o registro de baixa legado com data e origem revisadas';
+    case 'settle_automatic_deposit':
+      return 'Registrar o sinal autom\u00e1tico como pago na data do lan\u00e7amento';
     case 'review_legacy_partial':
       return 'Revisar as baixas parciais antes de criar os registros de liquidação';
     case 'review_amount_precision':
@@ -74,8 +105,9 @@ function getProposedChange(action: ReconciliationAction): string {
 
 function getAffectedAmountCents(finance: ReconciliationFinance, action: ReconciliationAction): number | null {
   if (action === 'review_cancelled_event_settled') return getSettledCents(finance);
+  const exactAmountCents = getExactAmountCents(finance);
+  if (exactAmountCents !== null) return exactAmountCents;
   if (Number.isSafeInteger(finance.amountCents)) return finance.amountCents!;
-  if (Number.isFinite(finance.amount)) return Math.round(Number(finance.amount) * 100);
   return null;
 }
 
@@ -122,6 +154,17 @@ export function reconcileFinances(
   for (const finance of finances) {
     if (!isWithinPeriod(finance, start, end)) continue;
     const event = finance.eventId ? eventById.get(finance.eventId) : undefined;
+    const automaticDepositRequiresCanonicalization = requiresAutomaticDepositCanonicalization(finance, event);
+
+    if (automaticDepositRequiresCanonicalization) {
+      findings.push({
+        financeId: finance.id,
+        eventId: finance.eventId,
+        source: finance.source,
+        action: 'settle_automatic_deposit',
+        reason: 'Sinal autom\u00e1tico de evento sem registro can\u00f4nico de baixa',
+      });
+    }
 
     if (event?.status === 'cancelled' && !isCancelledFinance(finance)) {
       const settledCents = getSettledCents(finance);
@@ -185,6 +228,8 @@ export function reconcileFinances(
         reason: 'Lançamento parcial legado sem detalhes das baixas',
       });
     } else if (
+      !automaticDepositRequiresCanonicalization
+      &&
       !Array.isArray(finance.settlements)
       && !isCancelledFinance(finance)
       && (finance.status === 'paid' || finance.status === 'received' || finance.settlementStatus === 'settled')

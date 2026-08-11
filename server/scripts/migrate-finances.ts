@@ -15,6 +15,7 @@ const MIGRATABLE_ACTIONS: ReconciliationAction[] = [
   'add_amount_cents',
   'normalize_legacy_status',
   'migrate_legacy_settlement',
+  'settle_automatic_deposit',
 ];
 
 function option(name: string, fallback = ''): string {
@@ -65,11 +66,13 @@ async function assertApplySafeguards(backupPath: string, rollbackPath: string) {
 async function main() {
   const start = option('start', '2026-06-01');
   const end = option('end', '2026-07-31');
-  const units = unitsOption();
   const requestedActions = actionsOption();
   const isStatusOnlyMigration = requestedActions?.length === 1 && requestedActions[0] === 'normalize_legacy_status';
-  const reconciliationStart = isStatusOnlyMigration ? '' : start;
-  const reconciliationEnd = isStatusOnlyMigration ? '\uffff' : end;
+  const isAutomaticDepositOnlyMigration = requestedActions?.length === 1 && requestedActions[0] === 'settle_automatic_deposit';
+  const isGlobalMigration = isStatusOnlyMigration || isAutomaticDepositOnlyMigration;
+  const units: Unit[] = isAutomaticDepositOnlyMigration ? ['main', 'franchise'] : unitsOption();
+  const reconciliationStart = isGlobalMigration ? '' : start;
+  const reconciliationEnd = isGlobalMigration ? '\uffff' : end;
   const apply = hasFlag('apply');
   const backupPath = option('backup').trim();
   const rollbackPath = option('rollback').trim();
@@ -82,14 +85,18 @@ async function main() {
     const groups = await Promise.all(units.map(async (unit) => {
       const { finances, events } = modelsForUnit(unit);
       const [financeRows, eventRows] = await Promise.all([
-        finances.find(isStatusOnlyMigration
-          ? { status: 'received' }
-          : {
-            $or: [
-              { date: { $gte: start, $lte: end } },
-              { 'settlements.settledOn': { $gte: start, $lte: end } },
-            ],
-          }).lean(),
+        finances.find(
+          isStatusOnlyMigration
+            ? { status: 'received' }
+            : isAutomaticDepositOnlyMigration
+              ? { kind: 'deposit', automatic: true, status: { $in: ['pending', 'paid'] }, settlementStatus: { $ne: 'cancelled' } }
+              : {
+                $or: [
+                  { date: { $gte: start, $lte: end } },
+                  { 'settlements.settledOn': { $gte: start, $lte: end } },
+                ],
+              },
+        ).lean(),
         events.find({ status: 'cancelled' }).lean(),
       ]);
       const normalizedFinances = financeRows.map((entry: any) => ({ ...entry, id: entry.id || entry._id.toString(), source: entry.source || unit }));

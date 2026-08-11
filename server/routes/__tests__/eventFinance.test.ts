@@ -39,7 +39,7 @@ test('calculates employee commission with currency rounding and safe limits', ()
   assert.equal(calculateCommissionAmount(1000, -5), 0);
 });
 
-test('creates an event deposit as an open receivable until it is explicitly settled', async () => {
+test('creates an event deposit as paid with a settlement on its recorded date', async () => {
   const created: any[] = [];
   const financeModel = {
     findOne: async () => null,
@@ -54,6 +54,7 @@ test('creates an event deposit as an open receivable until it is explicitly sett
     id: 'event-1',
     name: 'Evento teste',
     date: '2026-07-10',
+    depositDate: '2026-07-02',
     budget: 1_000,
     depositValue: 300,
     constructor: { findByIdAndUpdate: async () => undefined },
@@ -62,10 +63,57 @@ test('creates an event deposit as an open receivable until it is explicitly sett
   await syncEventFinances(event, financeModel as any, 'main');
 
   const deposit = created.find((entry) => entry.kind === 'deposit');
-  assert.equal(deposit.status, 'pending');
-  assert.equal(deposit.settlementStatus, 'open');
-  assert.equal(deposit.settledAt, undefined);
+  assert.equal(deposit.status, 'paid');
+  assert.equal(deposit.settlementStatus, 'settled');
+  assert.equal(deposit.settledCents, 30_000);
+  assert.equal(deposit.settlements.length, 1);
+  assert.equal(deposit.settlements[0].amountCents, 30_000);
+  assert.equal(deposit.settlements[0].settledOn, '2026-07-02');
+  assert.equal(deposit.settlements[0].idempotencyKey, 'event-deposit:event-1');
+  assert.equal(typeof deposit.settledAt, 'string');
   assert.equal(deposit.dueDate, undefined);
+
+  const balance = created.find((entry) => entry.kind === 'balance');
+  assert.equal(balance.status, 'pending');
+  assert.equal(balance.settlementStatus, 'open');
+  assert.deepEqual(balance.settlements, []);
+});
+
+test('does not rewrite an already settled event deposit during synchronization', async () => {
+  const created: any[] = [];
+  const updated: Array<{ id: string; payload: unknown }> = [];
+  const settledDeposit = {
+    _id: 'deposit-1',
+    amount: 300,
+    toJSON: () => ({
+      type: 'revenue' as const,
+      amount: 300,
+      amountCents: 30_000,
+      date: '2026-07-02',
+      settlements: [{ id: 'settlement-1', amountCents: 30_000, settledOn: '2026-07-02', settledAt: '2026-07-02T12:00:00.000Z', idempotencyKey: 'event-deposit:event-1' }],
+    }),
+  };
+  const financeModel = {
+    findOne: async (query: { kind?: string }) => query.kind === 'deposit' ? settledDeposit : null,
+    create: async (payload: any) => { created.push(payload); return payload; },
+    findByIdAndUpdate: async (id: string, payload: unknown) => { updated.push({ id, payload }); },
+    find: () => ({ sort: async () => [] }),
+  };
+  const event = {
+    _id: 'event-1',
+    id: 'event-1',
+    name: 'Evento teste',
+    date: '2026-07-10',
+    depositDate: '2026-07-02',
+    budget: 1_000,
+    depositValue: 300,
+    constructor: { findByIdAndUpdate: async () => undefined },
+  };
+
+  await syncEventFinances(event, financeModel as any, 'main');
+
+  assert.equal(created.some((entry) => entry.kind === 'deposit'), false);
+  assert.equal(updated.some((entry) => entry.id === 'deposit-1'), false);
 });
 
 test('deletes automatic finances when an event is cancelled', async () => {

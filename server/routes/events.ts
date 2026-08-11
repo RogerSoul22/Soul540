@@ -7,6 +7,7 @@ import { logAudit } from '../utils/audit';
 import { getEventUnitsForRequest, type EventUnit } from '../utils/eventTenant';
 import { toCents } from '../../shared/money';
 import { canChangeForecast } from '../../shared/financePolicy';
+import { buildSettlementRecord } from '../services/financeCommands';
 
 const EventSchema = new Schema({
   name: String,
@@ -264,31 +265,42 @@ async function upsertAutomaticEventFinance(
   const isDeposit = kind === 'deposit';
   const isTravel = kind === 'travel';
   const amountChanged = !!existing && Math.abs(Number(existing.amount || 0) - amount) > 0.005;
+  const financeDate = isDeposit && event.depositDate ? event.depositDate : event.date;
+  const amountCents = toCents(amount);
+  const depositSettlement = isDeposit
+    ? buildSettlementRecord({
+      amount,
+      settledOn: financeDate,
+      paymentMethod: event.paymentMethod,
+      reason: 'Sinal informado no evento',
+      idempotencyKey: `event-deposit:${eventId}`,
+    }, 'system')
+    : undefined;
   const payload = {
     eventId,
     type: isTravel ? 'cost' : 'revenue',
     category: isDeposit ? 'sinal-evento' : isTravel ? 'deslocamento-evento' : 'contrato',
     description: `${isDeposit ? 'Sinal' : isTravel ? 'Deslocamento' : 'Saldo'} - ${event.name}`,
     amount,
-    amountCents: toCents(amount),
-    date: isDeposit && event.depositDate ? event.depositDate : event.date,
+    amountCents,
+    date: financeDate,
     paymentMethod: event.paymentMethod || undefined,
     origin: 'event',
     kind,
     automatic: true,
     autoEventBudget: kind === 'balance',
     source,
-    settledCents: 0,
-    settlements: [],
+    settledCents: isDeposit ? amountCents : 0,
+    settlements: depositSettlement ? [depositSettlement] : [],
     reversedAt: undefined,
-    settlementStatus: amountChanged ? 'open' : existing?.settlementStatus || 'open',
-    status: amountChanged ? 'pending' : existing?.status || 'pending',
-    settledAt: amountChanged ? undefined : existing?.settledAt,
+    settlementStatus: isDeposit ? 'settled' : amountChanged ? 'open' : existing?.settlementStatus || 'open',
+    status: isDeposit ? 'paid' : amountChanged ? 'pending' : existing?.status || 'pending',
+    settledAt: isDeposit ? depositSettlement?.settledAt : amountChanged ? undefined : existing?.settledAt,
   };
 
   if (existing) {
     await FinanceModel.findByIdAndUpdate(existing._id, amountChanged
-      ? { $set: payload, $unset: { dueDate: 1, settledAt: 1 } }
+      ? { $set: payload, $unset: isDeposit ? { dueDate: 1 } : { dueDate: 1, settledAt: 1 } }
       : { $set: payload, $unset: { dueDate: 1 } });
   }
   else await FinanceModel.create(payload);

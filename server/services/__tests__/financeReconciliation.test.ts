@@ -45,6 +45,88 @@ test('normalizes the legacy received status before migrating its settlement', ()
   assert.deepEqual(findings.map((item) => item.action), ['normalize_legacy_status', 'migrate_legacy_settlement']);
 });
 
+test('proposes settling an automatic event deposit that remains pending', () => {
+  const findings = reconcileFinances([
+    finance({
+      amountCents: 10_000,
+      kind: 'deposit',
+      automatic: true,
+    }),
+  ], [], '2026-07-01', '2026-07-31');
+
+  assert.deepEqual(findings.map((item) => item.action), ['settle_automatic_deposit']);
+  assert.equal(findings[0].proposedChange, 'Registrar o sinal autom\u00e1tico como pago na data do lan\u00e7amento');
+});
+
+test('does not propose settlement for a manual deposit', () => {
+  const findings = reconcileFinances([
+    finance({
+      amountCents: 10_000,
+      kind: 'deposit',
+      automatic: false,
+    }),
+  ], [], '2026-07-01', '2026-07-31');
+
+  assert.deepEqual(findings, []);
+});
+
+test('proposes a canonical settlement for a paid automatic deposit without settlement data', () => {
+  const findings = reconcileFinances([
+    finance({
+      amountCents: 10_000,
+      kind: 'deposit',
+      automatic: true,
+      status: 'paid',
+      settlementStatus: 'settled',
+    }),
+  ], [], '2026-07-01', '2026-07-31');
+
+  assert.deepEqual(findings.map((item) => item.action), ['settle_automatic_deposit']);
+});
+
+test('proposes canonicalizing an automatic deposit that has a settlement but lacks amount cents', () => {
+  const findings = reconcileFinances([
+    finance({
+      kind: 'deposit',
+      automatic: true,
+      status: 'paid',
+      settlementStatus: 'settled',
+      settlements: [{ id: 'settlement-1', amountCents: 10_000, settledOn: '2026-07-10', settledAt: '2026-07-10T12:00:00.000Z', idempotencyKey: 'settlement-1' }],
+    }),
+  ], [], '2026-07-01', '2026-07-31');
+
+  assert.equal(findings.some((item) => item.action === 'settle_automatic_deposit'), true);
+});
+
+test('proposes canonicalizing an automatic deposit with incorrect amount cents', () => {
+  const findings = reconcileFinances([
+    finance({
+      amountCents: 9_999,
+      kind: 'deposit',
+      automatic: true,
+      status: 'paid',
+      settlementStatus: 'settled',
+      settlements: [{ id: 'settlement-1', amountCents: 10_000, settledOn: '2026-07-10', settledAt: '2026-07-10T12:00:00.000Z', idempotencyKey: 'settlement-1' }],
+    }),
+  ], [], '2026-07-01', '2026-07-31');
+
+  assert.equal(findings.some((item) => item.action === 'settle_automatic_deposit'), true);
+});
+
+test('does not propose automatic settlement for a deposit with a fraction of a cent', () => {
+  const findings = reconcileFinances([
+    finance({
+      amount: 10.235,
+      amountCents: 1_024,
+      kind: 'deposit',
+      automatic: true,
+      settlements: [],
+    }),
+  ], [], '2026-07-01', '2026-07-31');
+
+  assert.deepEqual(findings.map((item) => item.action), ['review_amount_precision']);
+});
+
 test('adds a proposed read-only impact to every reconciliation finding', () => {
   const [finding] = reconcileFinances([finance()], [{ id: 'event-1', status: 'cancelled' }], '2026-07-01', '2026-07-31');
 
