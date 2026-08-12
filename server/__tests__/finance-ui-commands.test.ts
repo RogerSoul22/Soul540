@@ -80,3 +80,23 @@ test('offers only pending and paid as persisted status values in every finance i
     }
   }
 });
+
+test('uses one shared Conta Azul-style period filter in every finance interface', () => {
+  for (const file of financePages) {
+    const source = readFileSync(resolve(process.cwd(), file), 'utf8');
+    assert.equal(source.includes('FinancePeriodFilter'), true, file);
+    assert.equal(source.includes('matchesFinancePeriod'), true, file);
+    assert.equal(source.includes('pageMonth'), false, file);
+    assert.equal(source.includes('filterMonth'), false, file);
+    assert.equal(source.includes('selectedMonth'), false, file);
+  }
+});
+
+test('waits for authentication before loading protected data in every portal', () => {
+  for (const file of contextFiles) {
+    const source = readFileSync(resolve(process.cwd(), file), 'utf8');
+    assert.equal(source.includes('useAuth'), true, file);
+    assert.equal(source.includes('const { authenticated } = useAuth();'), true, file);
+    assert.equal(source.includes('if (!authenticated) return;'), true, file);
+  }
+});

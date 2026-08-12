@@ -6,6 +6,7 @@ import type { Invoice } from '@backend/domain/entities/Invoice';
 import type { Task } from '@backend/domain/entities/Task';
 import type { TaskHistoryEntry } from '@shared/types';
 import { apiFetch } from '@frontend/lib/api';
+import { useAuth } from '@frontend/hooks/useAuth';
 
 interface AppContextData {
   events: PizzaEvent[];
@@ -43,6 +44,7 @@ interface AppContextData {
 const AppContext = createContext<AppContextData>({} as AppContextData);
 
 export function AppProvider({ children }: { children: ReactNode }) {
+  const { authenticated } = useAuth();
   const [events, setEvents] = useState<PizzaEvent[]>([]);
   const [finances, setFinances] = useState<FinanceEntry[]>([]);
   const [financeCategories, setFinanceCategories] = useState<FinanceCategoryEntry[]>([]);
@@ -62,10 +64,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (!authenticated) return;
     loadData();
     window.addEventListener('soul540:refresh', loadData);
     return () => window.removeEventListener('soul540:refresh', loadData);
-  }, [loadData]);
+  }, [authenticated, loadData]);
 
   const buildHeaders = (withBody = false): HeadersInit => {
     return {

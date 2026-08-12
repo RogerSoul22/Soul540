@@ -97,6 +97,8 @@ import { buildDreTemplateValues, DRE_TEMPLATE_INPUT_CELLS, DRE_TEMPLATE_SHEET } 
 import { isRealizedExpense, isRealizedRevenue } from '@shared/financeSettlement';
 import { calculateSettlementStatus, getDerivedFinanceLabel, getOutstandingCents } from '@shared/financePolicy';
 import { fromCents } from '@shared/money';
+import FinancePeriodFilter from '@shared/FinancePeriodFilter';
+import { getInitialFinancePeriod, matchesFinancePeriod } from '@shared/financePeriod';
 import GaugeChart from '@frontend/components/GaugeChart/GaugeChart';
 import HorizontalBarChart from '@frontend/components/HorizontalBarChart/HorizontalBarChart';
 import Badge from '@frontend/components/Badge/Badge';
@@ -168,7 +170,6 @@ export default function Financeiro() {
   const { events, finances, financeCategories, addFinance, updateFinance, settleFinance, deleteFinance, reverseFinance, addFinanceCategory, deleteEvent, closeEventFinance, reopenEventFinance, refreshFinances } = useApp();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabType>('geral');
-  const [selectedMonth, setSelectedMonth] = useState(() => new Date().toISOString().substring(0, 7));
   const [costFilter, setCostFilter] = useState<CostFilter>('all');
   const [dataScope, setDataScope] = useState<DataScope>('main');
   const [franchiseFinances, setFranchiseFinances] = useState<typeof finances>([]);
@@ -177,18 +178,10 @@ export default function Financeiro() {
   const [factoryEvents, setFactoryEvents] = useState<typeof events>([]);
   const [directEvents, setDirectEvents] = useState<typeof events>([]);
 
-  // Page-level month filter (shared by geral / despesas / valores tabs)
-  const [pageMonth, setPageMonth] = useState<string>('all');
-  const [generalFilterMode, setGeneralFilterMode] = useState<'month' | 'period'>('month');
-  const [generalDateFrom, setGeneralDateFrom] = useState('');
-  const [generalDateTo, setGeneralDateTo] = useState('');
+  const [financePeriod, setFinancePeriod] = useState(() => getInitialFinancePeriod());
 
   // Table filters
   const [filterType, setFilterType] = useState<FilterType>('all');
-  const [filterMonth, setFilterMonth] = useState<string>('all');
-  const [useCustomRange, setUseCustomRange] = useState(false);
-  const [filterDateFrom, setFilterDateFrom] = useState('');
-  const [filterDateTo, setFilterDateTo] = useState('');
   const [search, setSearch] = useState('');
   const [lancamentosPage, setLancamentosPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
@@ -494,47 +487,41 @@ export default function Financeiro() {
 
   // === DATA COMPUTATIONS ===
 
-  // Finances / events filtered by the page-level month selector
-  const pageMonthFinances = useMemo(
-    () => {
-      if (activeTab === 'geral' && generalFilterMode === 'period') {
-        return activeFinances.filter((finance) =>
-          finance.date &&
-          (!generalDateFrom || finance.date >= generalDateFrom) &&
-          (!generalDateTo || finance.date <= generalDateTo),
-        );
-      }
-      return pageMonth === 'all' ? activeFinances : activeFinances.filter((finance) => finance.date && finance.date.startsWith(pageMonth));
-    },
-    [activeFinances, activeTab, generalFilterMode, generalDateFrom, generalDateTo, pageMonth],
+  const periodFinances = useMemo(
+    () => activeFinances.filter((finance) => matchesFinancePeriod(finance.date, financePeriod)),
+    [activeFinances, financePeriod],
+  );
+  const periodEvents = useMemo(
+    () => activeEvents.filter((event) => matchesFinancePeriod(event.date, financePeriod)),
+    [activeEvents, financePeriod],
   );
 
   const totalRevenue = useMemo(
-    () => pageMonthFinances.filter((f) => f.type === 'revenue').reduce((acc, f) => acc + f.amount, 0),
-    [pageMonthFinances],
+    () => periodFinances.filter((f) => f.type === 'revenue').reduce((acc, f) => acc + f.amount, 0),
+    [periodFinances],
   );
   const totalCosts = useMemo(
-    () => pageMonthFinances.filter((f) => f.type === 'cost').reduce((acc, f) => acc + f.amount, 0),
-    [pageMonthFinances],
+    () => periodFinances.filter((f) => f.type === 'cost').reduce((acc, f) => acc + f.amount, 0),
+    [periodFinances],
   );
   const profit = totalRevenue - totalCosts;
   const margin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
-  const realizedIncome = useMemo(() => pageMonthFinances.filter((entry) => entry.type === 'revenue' && isRealizedRevenue(entry)).reduce((sum, entry) => sum + entry.amount, 0), [pageMonthFinances]);
+  const realizedIncome = useMemo(() => periodFinances.filter((entry) => entry.type === 'revenue' && isRealizedRevenue(entry)).reduce((sum, entry) => sum + entry.amount, 0), [periodFinances]);
   const projectedIncome = totalRevenue - realizedIncome;
-  const realizedExpense = useMemo(() => pageMonthFinances.filter(isRealizedExpense).reduce((sum, entry) => sum + entry.amount, 0), [pageMonthFinances]);
+  const realizedExpense = useMemo(() => periodFinances.filter(isRealizedExpense).reduce((sum, entry) => sum + entry.amount, 0), [periodFinances]);
   const projectedExpense = totalCosts - realizedExpense;
 
   const expenseCategorySummary = useMemo(() => {
     const grouped = new Map<string, number>();
-    for (const entry of pageMonthFinances.filter((item) => item.type === 'cost')) {
+    for (const entry of periodFinances.filter((item) => item.type === 'cost')) {
       grouped.set(entry.category, (grouped.get(entry.category) || 0) + entry.amount);
     }
     return [...grouped.entries()].map(([category, amount]) => ({ category, amount })).sort((a, b) => b.amount - a.amount);
-  }, [pageMonthFinances]);
+  }, [periodFinances]);
 
   const revenueByEvent = useMemo(() => {
     const grouped = new Map<string, number>();
-    for (const entry of pageMonthFinances.filter((item) => item.type === 'revenue' && item.eventId)) {
+    for (const entry of periodFinances.filter((item) => item.type === 'revenue' && item.eventId)) {
       grouped.set(entry.eventId, (grouped.get(entry.eventId) || 0) + entry.amount);
     }
     return [...grouped.entries()].map(([eventId, amount]) => ({
@@ -542,11 +529,11 @@ export default function Financeiro() {
       name: activeEvents.find((event) => event.id === eventId)?.name || 'Evento não encontrado',
       amount,
     })).sort((a, b) => b.amount - a.amount);
-  }, [pageMonthFinances, activeEvents]);
+  }, [periodFinances, activeEvents]);
 
   const revenueByOrigin = useMemo(() => {
     const grouped = new Map<string, { amount: number; count: number }>();
-    for (const entry of pageMonthFinances.filter((item) => item.type === 'revenue')) {
+    for (const entry of periodFinances.filter((item) => item.type === 'revenue')) {
       const origin = entry.origin || 'manual';
       const current = grouped.get(origin) || { amount: 0, count: 0 };
       current.amount += entry.amount;
@@ -554,23 +541,22 @@ export default function Financeiro() {
       grouped.set(origin, current);
     }
     return [...grouped.entries()].map(([origin, values]) => ({ origin, ...values })).sort((a, b) => b.amount - a.amount);
-  }, [pageMonthFinances]);
+  }, [periodFinances]);
 
-  const commissionSummary = useMemo(() => pageMonthFinances
+  const commissionSummary = useMemo(() => periodFinances
     .filter((entry) => entry.type === 'cost' && entry.kind === 'commission')
-    .sort((a, b) => b.amount - a.amount), [pageMonthFinances]);
+    .sort((a, b) => b.amount - a.amount), [periodFinances]);
 
-  // Carteira: saldo calculado automaticamente a partir de TODOS os lançamentos
-  // já liquidados (receitas recebidas − custos pagos), independente do filtro de mês.
+  // Saldo: lançamentos liquidados dentro do período selecionado.
   const wallet = useMemo(() => {
-    const received = pageMonthFinances.filter((f) => f.type === 'revenue' && isRealizedRevenue(f)).reduce((acc, f) => acc + f.amount, 0);
-    const paid = pageMonthFinances.filter(isRealizedExpense).reduce((acc, f) => acc + f.amount, 0);
+    const received = periodFinances.filter((f) => f.type === 'revenue' && isRealizedRevenue(f)).reduce((acc, f) => acc + f.amount, 0);
+    const paid = periodFinances.filter(isRealizedExpense).reduce((acc, f) => acc + f.amount, 0);
     return { received, paid, balance: received - paid };
-  }, [pageMonthFinances]);
+  }, [periodFinances]);
   const walletBalance = wallet.balance;
   const bankWallet = useMemo(() => {
     const latestByAccount = new Map<string, { date: string; balance: number }>();
-    for (const entry of activeFinances) {
+    for (const entry of periodFinances) {
       if (entry.origin !== 'bank_import' || !entry.bankAccount || !Number.isFinite(entry.bankStatementBalance)) continue;
       const marker = entry.settledAt || entry.date;
       const current = latestByAccount.get(entry.bankAccount);
@@ -580,18 +566,18 @@ export default function Financeiro() {
       accounts: [...latestByAccount.entries()],
       balance: [...latestByAccount.values()].reduce((sum, account) => sum + account.balance, 0),
     };
-  }, [activeFinances]);
+  }, [periodFinances]);
 
   // Faturamento (tudo que foi vendido/contratado, mesmo pendente) x Recebido x Saldo em Aberto
   const faturamentoTotal = totalRevenue;
   const faturamentoRecebido = useMemo(
-    () => pageMonthFinances.filter((f) => f.type === 'revenue' && isRealizedRevenue(f)).reduce((acc, f) => acc + f.amount, 0),
-    [pageMonthFinances],
+    () => periodFinances.filter((f) => f.type === 'revenue' && isRealizedRevenue(f)).reduce((acc, f) => acc + f.amount, 0),
+    [periodFinances],
   );
   const saldoEmAberto = faturamentoTotal - faturamentoRecebido;
   const paymentMethodSummary = useMemo(() => {
     const grouped = new Map<string, { method: string; amount: number; count: number }>();
-    for (const entry of pageMonthFinances.filter(isRealizedRevenue)) {
+    for (const entry of periodFinances.filter(isRealizedRevenue)) {
       const method = entry.paymentMethod || 'nao-informado';
       const current = grouped.get(method) || { method, amount: 0, count: 0 };
       current.amount += entry.amount;
@@ -599,15 +585,15 @@ export default function Financeiro() {
       grouped.set(method, current);
     }
     return [...grouped.values()].sort((a, b) => b.amount - a.amount);
-  }, [pageMonthFinances]);
+  }, [periodFinances]);
   const paymentMethodTotal = useMemo(
     () => paymentMethodSummary.reduce((sum, item) => sum + item.amount, 0),
     [paymentMethodSummary],
   );
 
-  // Monthly chart data — filtered by pageMonth when a specific month is selected
+  // Chart data is limited to the selected financial interval.
   const monthlyData = useMemo(() => {
-    const source = pageMonthFinances;
+    const source = periodFinances;
     const map = new Map<string, { month: string; receita: number; despesa: number }>();
     for (const f of source) {
       if (!f.date) continue;
@@ -618,30 +604,10 @@ export default function Financeiro() {
       else entry.despesa += f.amount;
     }
     return [...map.values()].sort((a, b) => a.month.localeCompare(b.month));
-  }, [pageMonthFinances]);
+  }, [periodFinances]);
 
-  // Available months for selector
-  const availableMonths = useMemo(() => {
-    const set = new Set<string>();
-    for (const f of activeFinances) {
-      if (f.date && /^\d{4}-\d{2}/.test(f.date)) set.add(f.date.substring(0, 7));
-    }
-    const currentMonth = new Date().toISOString().substring(0, 7);
-    return [...set].sort((a, b) => a === currentMonth ? -1 : b === currentMonth ? 1 : b.localeCompare(a));
-  }, [activeFinances]);
-
-  // Auto-select most recent month when finances load
-  useEffect(() => {
-    if (availableMonths.length > 0 && !availableMonths.includes(selectedMonth)) {
-      setSelectedMonth(availableMonths[0]);
-    }
-  }, [availableMonths]);
-
-  // Monthly detail data
-  const monthFinances = useMemo(
-    () => activeFinances.filter((f) => f.date && f.date.startsWith(selectedMonth)),
-    [activeFinances, selectedMonth],
-  );
+  // Detail panel data follows the same period selected for the page.
+  const monthFinances = periodFinances;
 
   const monthRevenue = useMemo(
     () => monthFinances.filter((f) => f.type === 'revenue').reduce((acc, f) => acc + f.amount, 0),
@@ -689,18 +655,18 @@ export default function Financeiro() {
 
   // Gauge values for page-level month filter (used in Visão Geral)
   const insumosRatio = useMemo(() => {
-    const insumos = pageMonthFinances
+    const insumos = periodFinances
       .filter((f) => f.type === 'cost' && f.category === 'insumos')
       .reduce((acc, f) => acc + f.amount, 0);
     return totalRevenue > 0 ? (insumos / totalRevenue) * 100 : 0;
-  }, [pageMonthFinances, totalRevenue]);
+  }, [periodFinances, totalRevenue]);
 
   const maoObraRatio = useMemo(() => {
-    const mo = pageMonthFinances
+    const mo = periodFinances
       .filter((f) => f.type === 'cost' && (f.category === 'salario' || f.category === 'pro-labore'))
       .reduce((acc, f) => acc + f.amount, 0);
     return totalRevenue > 0 ? (mo / totalRevenue) * 100 : 0;
-  }, [pageMonthFinances, totalRevenue]);
+  }, [periodFinances, totalRevenue]);
 
   // Gauge values for selected month (used in Painel Mensal)
   const insumosRatioMensal = useMemo(() => {
@@ -719,14 +685,8 @@ export default function Financeiro() {
 
   // Table filter
   const filtered = useMemo(() => {
-    return activeFinances.filter((f) => {
+    return periodFinances.filter((f) => {
       if (!f.date) return false;
-      if (useCustomRange) {
-        if (filterDateFrom && f.date < filterDateFrom) return false;
-        if (filterDateTo && f.date > filterDateTo) return false;
-      } else if (filterMonth !== 'all' && !f.date.startsWith(filterMonth)) {
-        return false;
-      }
       if (filterType !== 'all' && f.type !== filterType) return false;
       if (search) {
         const q = search.toLowerCase();
@@ -739,12 +699,12 @@ export default function Financeiro() {
       }
       return true;
     }).sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
-  }, [activeFinances, filterType, filterMonth, useCustomRange, filterDateFrom, filterDateTo, search, activeEvents]);
+  }, [periodFinances, filterType, search, activeEvents]);
 
-  // Events with budget joined with their finance entry — filtered by pageMonth
+  // Events with budget joined with their finance entry follow the selected interval.
   const eventsWithBudget = useMemo(() => {
-    return activeEvents
-      .filter((e) => e.budget > 0 && (pageMonth === 'all' || e.date.startsWith(pageMonth)))
+    return periodEvents
+      .filter((e) => e.budget > 0)
       .map((e) => ({
         event: e,
         finance: activeFinances.find(
@@ -752,7 +712,7 @@ export default function Financeiro() {
         ),
       }))
       .sort((a, b) => b.event.date.localeCompare(a.event.date));
-  }, [activeEvents, activeFinances, pageMonth]);
+  }, [periodEvents, activeFinances]);
 
   const totalContracted = useMemo(
     () => eventsWithBudget.reduce((acc, { event }) => acc + event.budget, 0),
@@ -766,10 +726,10 @@ export default function Financeiro() {
   );
 
   const eventsWithFinalValue = useMemo(
-    () => activeEvents
-      .filter((e) => (e.finalValue ?? 0) > 0 && (pageMonth === 'all' || e.date.startsWith(pageMonth)))
+    () => periodEvents
+      .filter((e) => (e.finalValue ?? 0) > 0)
       .sort((a, b) => b.date.localeCompare(a.date)),
-    [activeEvents, pageMonth],
+    [periodEvents],
   );
   const totalFinalValue = useMemo(
     () => eventsWithFinalValue.reduce((acc, e) => acc + (e.finalValue || 0), 0),
@@ -825,7 +785,7 @@ export default function Financeiro() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `financeiro-${filterMonth === 'all' ? 'todos' : filterMonth}.csv`;
+    a.download = `financeiro-${financePeriod.start || 'todos'}_a_${financePeriod.end || 'todos'}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -833,14 +793,15 @@ export default function Financeiro() {
   // Exportação no padrão do arquivo "DRE 2026 - SOUL PIZZA.xlsx": meses em coluna,
   // categorias agrupadas por seção do DRE, totais por seção e linhas de resultado.
   const exportDRELegacy = () => {
-    if (availableMonths.length === 0) {
+    const availablePeriodMonths = [...new Set(periodFinances.map((finance) => finance.date?.slice(0, 7)).filter(Boolean) as string[])].sort();
+    if (availablePeriodMonths.length === 0) {
       alert('Nenhum lançamento financeiro para exportar.');
       return;
     }
-    const months = [...availableMonths].sort();
+    const months = availablePeriodMonths;
     const fmt = (v: number) => v.toFixed(2).replace('.', ',');
     const monthAmount = (categoryKey: string, type: FinanceType, month: string) =>
-      activeFinances
+      periodFinances
         .filter((f) => f.type === type && f.category === categoryKey && f.date && f.date.startsWith(month))
         .reduce((acc, f) => acc + f.amount, 0);
 
@@ -907,7 +868,7 @@ export default function Financeiro() {
   };
 
   const exportDRE = async () => {
-    const dreValues = buildDreTemplateValues(activeFinances, financeCategories);
+    const dreValues = buildDreTemplateValues(periodFinances, financeCategories);
     if (dreValues.size === 0) {
       alert('Nenhum lançamento entre julho e dezembro de 2026 para exportar.');
       return;
@@ -1136,7 +1097,7 @@ export default function Financeiro() {
         {([
           ['geral', 'Visão Geral'],
           ['despesas', 'Painel Despesas'],
-          ['mensal', 'Painel Mensal'],
+          ['mensal', 'Painel do Período'],
           ['lancamentos', 'Lançamentos'],
           ['valores', 'Financeiro dos Eventos'],
         ] as [TabType, string][]).map(([key, label]) => (
@@ -1150,45 +1111,7 @@ export default function Financeiro() {
         ))}
       </div>
 
-      {/* ===== MONTH FILTER BAR (Geral / Despesas / Valores) ===== */}
-      {['geral', 'despesas', 'valores'].includes(activeTab) && (
-        <div className={styles.pageMonthFilter}>
-          {activeTab === 'geral' && (
-            <div className={styles.filterGroup}>
-              <button className={`${styles.filterBtn} ${generalFilterMode === 'month' ? styles.filterBtnActive : ''}`} onClick={() => setGeneralFilterMode('month')}>Mês</button>
-              <button className={`${styles.filterBtn} ${generalFilterMode === 'period' ? styles.filterBtnActive : ''}`} onClick={() => setGeneralFilterMode('period')}>Período</button>
-            </div>
-          )}
-          {activeTab !== 'geral' || generalFilterMode === 'month' ? (
-            <>
-              <div className={styles.pageMonthField}>
-                <label className={styles.pageMonthLabel}>Filtrar mês</label>
-                <select className={styles.pageMonthSelect} value={pageMonth} onChange={(e) => setPageMonth(e.target.value)}>
-                  <option value="all">Todos os meses</option>
-                  {availableMonths.map((m) => <option key={m} value={m}>{formatMonth(m)}</option>)}
-                </select>
-              </div>
-              {pageMonth !== 'all' && <button className={styles.pageMonthClear} onClick={() => setPageMonth('all')}>Limpar</button>}
-            </>
-          ) : (
-            <>
-              <div className={styles.pageMonthField}>
-                <label className={styles.pageMonthLabel}>Data inicial</label>
-                <input type="date" className={styles.pageMonthSelect} value={generalDateFrom} max={generalDateTo || undefined} onChange={(event) => setGeneralDateFrom(event.target.value)} />
-              </div>
-              <div className={styles.pageMonthField}>
-                <label className={styles.pageMonthLabel}>Data final</label>
-                <input type="date" className={styles.pageMonthSelect} value={generalDateTo} min={generalDateFrom || undefined} onChange={(event) => setGeneralDateTo(event.target.value)} />
-              </div>
-              {(generalDateFrom || generalDateTo) && (
-                <button className={styles.pageMonthClear} onClick={() => { setGeneralDateFrom(''); setGeneralDateTo(''); }}>
-                  Limpar período
-                </button>
-              )}
-            </>
-          )}
-        </div>
-      )}
+      <FinancePeriodFilter period={financePeriod} onChange={setFinancePeriod} accentColor="#f5a000" />
 
       {/* ===== TAB: VISAO GERAL ===== */}
       {activeTab === 'geral' && (
@@ -1535,7 +1458,7 @@ export default function Financeiro() {
               const totals = cats
                 .map((cat) => ({
                   cat,
-                  total: pageMonthFinances.filter((f) => f.type === 'cost' && f.category === cat).reduce((a, f) => a + f.amount, 0),
+                  total: periodFinances.filter((f) => f.type === 'cost' && f.category === cat).reduce((a, f) => a + f.amount, 0),
                 }))
                 .filter(({ total }) => total > 0)
                 .sort((a, b) => b.total - a.total);
@@ -1543,7 +1466,7 @@ export default function Financeiro() {
               if (totals.length === 0) return (
                 <div className={styles.emptyStateBox}>
                   <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#64748b', marginBottom: 8 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                  <p className={styles.emptyStateTitle}>Nenhuma despesa{pageMonth !== 'all' ? ` em ${formatMonth(pageMonth)}` : ''}</p>
+                  <p className={styles.emptyStateTitle}>Nenhuma despesa no período selecionado.</p>
                   <p className={styles.emptyStateHint}>Registre despesas clicando em <strong>+ Novo Lançamento</strong> e escolhendo o tipo <strong>Custo</strong>.</p>
                 </div>
               );
@@ -1566,25 +1489,10 @@ export default function Financeiro() {
         </div>
       )}
 
-      {/* ===== TAB: PAINEL MENSAL ===== */}
+      {/* ===== TAB: PAINEL DO PERÍODO ===== */}
       {activeTab === 'mensal' && (
         <div className={styles.tabContent}>
-          {/* Month selector */}
-          <div className={styles.monthSelector}>
-            <label className={styles.monthSelectLabel} htmlFor="finance-month-select">Período</label>
-            <select
-              id="finance-month-select"
-              className={styles.monthSelect}
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              disabled={availableMonths.length === 0}
-            >
-              {availableMonths.length === 0 && <option value={selectedMonth}>Nenhum período disponível</option>}
-              {availableMonths.map((m) => <option key={m} value={m}>{formatMonth(m)}</option>)}
-            </select>
-          </div>
-
-          {/* Monthly summary bar */}
+          {/* Period summary bar */}
           <div className={styles.monthSummary}>
             <div className={`${styles.monthSummaryItem} ${styles.monthRevenue}`}>
               <span className={styles.monthSummaryLabel}>Receita</span>
@@ -1669,64 +1577,6 @@ export default function Financeiro() {
                 </button>
               ))}
             </div>
-            <div className={styles.filterGroup}>
-              <button
-                className={`${styles.filterBtn} ${!useCustomRange ? styles.filterBtnActive : ''}`}
-                onClick={() => { setUseCustomRange(false); setLancamentosPage(1); }}
-              >
-                Mês
-              </button>
-              <button
-                className={`${styles.filterBtn} ${useCustomRange ? styles.filterBtnActive : ''}`}
-                onClick={() => { setUseCustomRange(true); setLancamentosPage(1); }}
-              >
-                Período
-              </button>
-            </div>
-            {!useCustomRange ? (
-              <select
-                className={styles.searchInput}
-                value={filterMonth}
-                onChange={(e) => { setFilterMonth(e.target.value); setLancamentosPage(1); }}
-              >
-                <option value="all">Todos os meses</option>
-                {availableMonths.map((m) => (
-                  <option key={m} value={m}>{formatMonth(m)}</option>
-                ))}
-              </select>
-            ) : (
-              <>
-                <input
-                  type="date"
-                  className={styles.searchInput}
-                  value={filterDateFrom}
-                  onChange={(e) => { setFilterDateFrom(e.target.value); setLancamentosPage(1); }}
-                  title="Data inicial"
-                />
-                <input
-                  type="date"
-                  className={styles.searchInput}
-                  value={filterDateTo}
-                  onChange={(e) => { setFilterDateTo(e.target.value); setLancamentosPage(1); }}
-                  title="Data final"
-                />
-                {(filterDateFrom || filterDateTo) && (
-                  <button
-                    type="button"
-                    className={styles.btnExport}
-                    onClick={() => {
-                      setFilterDateFrom('');
-                      setFilterDateTo('');
-                      setLancamentosPage(1);
-                    }}
-                    title="Limpar data inicial e final"
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
-                    Limpar período
-                  </button>
-                )}
-              </>
-            )}
             <input
               type="text"
               className={styles.searchInput}
@@ -1866,7 +1716,7 @@ export default function Financeiro() {
         const eventsWithValues = activeEvents
           .filter((e) =>
             (e.budget > 0 || (e.travelCost ?? 0) > 0 || (e.depositValue ?? 0) > 0 || (e.finalValue ?? 0) > 0) &&
-            (pageMonth === 'all' || e.date.startsWith(pageMonth)),
+            matchesFinancePeriod(e.date, financePeriod),
           )
           .sort((a, b) => b.date.localeCompare(a.date));
         const totalEstimado = eventsWithValues.reduce((acc, e) => acc + (e.budget || 0), 0);
