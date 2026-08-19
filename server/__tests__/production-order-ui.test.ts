@@ -7,6 +7,10 @@ const pageSource = readFileSync(
   resolve(process.cwd(), 'factory/src/pages/Tarefas/Tarefas/Tarefas.tsx'),
   'utf8',
 );
+const styleSource = readFileSync(
+  resolve(process.cwd(), 'factory/src/pages/Tarefas/Tarefas/Tarefas.module.scss'),
+  'utf8',
+);
 
 test('requires a commercial value when creating a production order', () => {
   assert.equal(pageSource.includes('Valor de venda (R$)'), true);
@@ -31,4 +35,11 @@ test('offers numeric ordering and two ways to find an order', () => {
   assert.equal(pageSource.includes('sortOrdersAlphabetically'), true);
   assert.equal(pageSource.includes('Limpar filtros'), true);
   assert.equal(pageSource.includes('handleClearOrderFilters'), true);
+});
+
+test('keeps order controls usable on narrow screens', () => {
+  assert.equal(pageSource.includes('styles.headerActions'), true);
+  assert.equal(styleSource.includes('.headerActions'), true);
+  assert.equal(styleSource.includes('.orderFilterBar {\n    flex-wrap: wrap;'), true);
+  assert.equal(styleSource.includes('.finalizedItem {\n    flex-direction: column;'), true);
 });
