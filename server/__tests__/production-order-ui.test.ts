@@ -18,9 +18,13 @@ test('allows commercial value to be supplied for delivered legacy orders', () =>
   assert.equal(pageSource.includes('/api/production-orders/${pricingOrder.id}'), true);
 });
 
-test('offers an order selector and sorts order lists by their number', () => {
+test('offers numeric ordering and two ways to find an order', () => {
   assert.equal(pageSource.includes('Localizar pedido'), true);
-  assert.equal(pageSource.includes('Todos os pedidos'), true);
+  assert.equal(pageSource.includes('Digitar'), true);
+  assert.equal(pageSource.includes('Lista alfabÃ©tica'), true);
+  assert.equal(pageSource.includes('Digite o nÃºmero ou filial'), true);
   assert.equal(pageSource.includes('selectedOrderId'), true);
+  assert.equal(pageSource.includes('orderSearchMode'), true);
   assert.equal(pageSource.includes('sortOrdersByNumber'), true);
+  assert.equal(pageSource.includes('sortOrdersAlphabetically'), true);
 });

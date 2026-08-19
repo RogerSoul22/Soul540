@@ -47,6 +47,7 @@ function formatQty(n: number) {
 }
 
 type PedidoStatus = 'a_preparar' | 'a_enviar' | 'entregue';
+type OrderSearchMode = 'typing' | 'alphabetical';
 type Pedido = {
   id: string;
   orderNumber?: number;
@@ -70,6 +71,11 @@ function sortOrdersByNumber(firstOrder: Pedido, secondOrder: Pedido) {
   if (Number.isFinite(firstOrderNumber)) return -1;
   if (Number.isFinite(secondOrderNumber)) return 1;
   return (secondOrder.createdAt || '').localeCompare(firstOrder.createdAt || '');
+}
+
+function sortOrdersAlphabetically(firstOrder: Pedido, secondOrder: Pedido) {
+  const filialComparison = firstOrder.filial.localeCompare(secondOrder.filial, 'pt-BR');
+  return filialComparison || sortOrdersByNumber(firstOrder, secondOrder);
 }
 
 const ALL_STATUSES: { id: PedidoStatus; label: string }[] = [
@@ -234,6 +240,8 @@ export default function Pedidos() {
   const [commercialValueDraft, setCommercialValueDraft] = useState('');
   const [commercialValueError, setCommercialValueError] = useState('');
   const [savingCommercialValue, setSavingCommercialValue] = useState(false);
+  const [orderSearchMode, setOrderSearchMode] = useState<OrderSearchMode>('typing');
+  const [orderSearchTerm, setOrderSearchTerm] = useState('');
   const [selectedOrderId, setSelectedOrderId] = useState('');
 
   useEffect(() => {
@@ -294,18 +302,35 @@ export default function Pedidos() {
     { id: 'a_enviar', label: 'A enviar' },
   ];
 
+  const filteredOrders = useMemo(() => {
+    if (orderSearchMode === 'alphabetical') {
+      return selectedOrderId ? pedidos.filter(pedido => pedido.id === selectedOrderId) : pedidos;
+    }
+
+    const normalizedSearchTerm = orderSearchTerm.trim().replace(/^#/, '').toLocaleLowerCase('pt-BR');
+    if (!normalizedSearchTerm) return pedidos;
+
+    return pedidos.filter(pedido =>
+      String(pedido.orderNumber ?? '').includes(normalizedSearchTerm)
+      || pedido.filial.toLocaleLowerCase('pt-BR').includes(normalizedSearchTerm));
+  }, [orderSearchMode, orderSearchTerm, pedidos, selectedOrderId]);
+
   const pedidosByStatus = useMemo(() => {
     const map: Record<PedidoStatus, Pedido[]> = { a_preparar: [], a_enviar: [], entregue: [] };
-    pedidos
-      .filter(pedido => !selectedOrderId || pedido.id === selectedOrderId)
-      .forEach(pedido => map[pedido.status].push(pedido));
+    filteredOrders.forEach(pedido => map[pedido.status].push(pedido));
     (Object.keys(map) as PedidoStatus[]).forEach(k => {
       map[k].sort(sortOrdersByNumber);
     });
     return map;
-  }, [pedidos, selectedOrderId]);
+  }, [filteredOrders]);
 
-  const ordersForSelection = useMemo(() => [...pedidos].sort(sortOrdersByNumber), [pedidos]);
+  const ordersForAlphabeticalSelection = useMemo(() => [...pedidos].sort(sortOrdersAlphabetically), [pedidos]);
+
+  const handleOrderSearchModeChange = (mode: OrderSearchMode) => {
+    setOrderSearchMode(mode);
+    setOrderSearchTerm('');
+    setSelectedOrderId('');
+  };
 
   const handleCreatePedido = async (pedido: Pedido) => {
     const res = await apiFetch('/api/production-orders', {
@@ -391,20 +416,40 @@ export default function Pedidos() {
       </div>
 
       <div className={styles.orderFilterBar}>
-        <label className={styles.orderFilterLabel} htmlFor="order-selector">Localizar pedido</label>
+        <label className={styles.orderFilterLabel} htmlFor="order-search-mode">Localizar pedido</label>
         <select
-          id="order-selector"
-          className={styles.orderFilterSelect}
-          value={selectedOrderId}
-          onChange={event => setSelectedOrderId(event.target.value)}
+          id="order-search-mode"
+          className={styles.orderFilterMode}
+          value={orderSearchMode}
+          onChange={event => handleOrderSearchModeChange(event.target.value as OrderSearchMode)}
         >
-          <option value="">Todos os pedidos</option>
-          {ordersForSelection.map(pedido => (
-            <option key={pedido.id} value={pedido.id}>
-              #{pedido.orderNumber ?? 'Sem nÃºmero'} â€” {pedido.filial}
-            </option>
-          ))}
+          <option value="typing">Digitar</option>
+          <option value="alphabetical">Lista alfabÃ©tica</option>
         </select>
+        {orderSearchMode === 'typing' ? (
+          <input
+            className={styles.orderFilterInput}
+            type="search"
+            value={orderSearchTerm}
+            onChange={event => setOrderSearchTerm(event.target.value)}
+            placeholder="Digite o nÃºmero ou filial"
+            aria-label="Digite o nÃºmero ou filial"
+          />
+        ) : (
+          <select
+            className={styles.orderFilterSelect}
+            value={selectedOrderId}
+            onChange={event => setSelectedOrderId(event.target.value)}
+            aria-label="Selecionar pedido por ordem alfabÃ©tica"
+          >
+            <option value="">Todos os pedidos</option>
+            {ordersForAlphabeticalSelection.map(pedido => (
+              <option key={pedido.id} value={pedido.id}>
+                {pedido.filial} â€” #{pedido.orderNumber ?? 'Sem nÃºmero'}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Kanban (A preparar + A enviar) */}

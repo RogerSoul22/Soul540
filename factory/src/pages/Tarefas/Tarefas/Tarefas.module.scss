@@ -47,9 +47,9 @@
   white-space: nowrap;
 }
 
-.orderFilterSelect {
-  flex: 1;
-  min-width: 0;
+.orderFilterMode,
+.orderFilterSelect,
+.orderFilterInput {
   background: $bg-input;
   border: 1px solid $border;
   border-radius: $radius-sm;
@@ -61,6 +61,18 @@
   &:focus { outline: none; border-color: $border-accent; }
   option { background: $bg-secondary; }
 }
+
+.orderFilterMode {
+  flex: 0 0 160px;
+}
+
+.orderFilterSelect,
+.orderFilterInput {
+  flex: 1;
+  min-width: 0;
+}
+
+.orderFilterInput::placeholder { color: $text-muted; }
 
 .saveStatus {
   display: flex;
