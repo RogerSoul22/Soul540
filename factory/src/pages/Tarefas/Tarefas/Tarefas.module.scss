@@ -74,6 +74,29 @@
 
 .orderFilterInput::placeholder { color: $text-muted; }
 
+.orderFilterClear {
+  padding: 9px 12px;
+  background: transparent;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  color: $text-secondary;
+  font-family: inherit;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    border-color: $border-accent;
+    color: $text-primary;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
 .saveStatus {
   display: flex;
   align-items: center;

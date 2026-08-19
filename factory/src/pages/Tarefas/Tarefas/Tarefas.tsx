@@ -332,6 +332,15 @@ export default function Pedidos() {
     setSelectedOrderId('');
   };
 
+  const handleClearOrderFilters = () => {
+    setOrderSearchTerm('');
+    setSelectedOrderId('');
+  };
+
+  const hasActiveOrderFilter = orderSearchMode === 'typing'
+    ? Boolean(orderSearchTerm.trim())
+    : Boolean(selectedOrderId);
+
   const handleCreatePedido = async (pedido: Pedido) => {
     const res = await apiFetch('/api/production-orders', {
       method: 'POST',
@@ -424,7 +433,7 @@ export default function Pedidos() {
           onChange={event => handleOrderSearchModeChange(event.target.value as OrderSearchMode)}
         >
           <option value="typing">Digitar</option>
-          <option value="alphabetical">Lista alfabÃ©tica</option>
+          <option value="alphabetical">Lista alfabética</option>
         </select>
         {orderSearchMode === 'typing' ? (
           <input
@@ -432,24 +441,32 @@ export default function Pedidos() {
             type="search"
             value={orderSearchTerm}
             onChange={event => setOrderSearchTerm(event.target.value)}
-            placeholder="Digite o nÃºmero ou filial"
-            aria-label="Digite o nÃºmero ou filial"
+            placeholder="Digite o número ou filial"
+            aria-label="Digite o número ou filial"
           />
         ) : (
           <select
             className={styles.orderFilterSelect}
             value={selectedOrderId}
             onChange={event => setSelectedOrderId(event.target.value)}
-            aria-label="Selecionar pedido por ordem alfabÃ©tica"
+            aria-label="Selecionar pedido por ordem alfabética"
           >
             <option value="">Todos os pedidos</option>
             {ordersForAlphabeticalSelection.map(pedido => (
               <option key={pedido.id} value={pedido.id}>
-                {pedido.filial} â€” #{pedido.orderNumber ?? 'Sem nÃºmero'}
+                {pedido.filial} — #{pedido.orderNumber ?? 'Sem número'}
               </option>
             ))}
           </select>
         )}
+        <button
+          type="button"
+          className={styles.orderFilterClear}
+          onClick={handleClearOrderFilters}
+          disabled={!hasActiveOrderFilter}
+        >
+          Limpar filtros
+        </button>
       </div>
 
       {/* Kanban (A preparar + A enviar) */}
