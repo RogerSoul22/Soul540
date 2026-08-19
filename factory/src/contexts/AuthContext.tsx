@@ -18,17 +18,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const cached = Storage.getUser<User>();
-    if (cached) {
-      setUser(cached);
-      setLoading(false);
-      return;
-    }
+    let active = true;
+
     apiFetch('/api/auth/me')
       .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data?.user) { Storage.setUser(data.user); setUser(data.user); } })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      .then(data => {
+        if (!active) return;
+        if (data?.user) {
+          Storage.setUser(data.user);
+          setUser(data.user);
+          return;
+        }
+        Storage.clear();
+        setUser(null);
+      })
+      .catch(() => {
+        if (!active) return;
+        Storage.clear();
+        setUser(null);
+      })
+      .finally(() => { if (active) setLoading(false); });
+
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    const endSession = () => {
+      Storage.clear();
+      setUser(null);
+    };
+
+    window.addEventListener('soul540:unauthorized', endSession);
+    return () => window.removeEventListener('soul540:unauthorized', endSession);
   }, []);
 
   const login = async (email: string, password: string) => {

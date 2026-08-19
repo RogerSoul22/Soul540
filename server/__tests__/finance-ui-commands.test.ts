@@ -96,7 +96,10 @@ test('waits for authentication before loading protected data in every portal', (
   for (const file of contextFiles) {
     const source = readFileSync(resolve(process.cwd(), file), 'utf8');
     assert.equal(source.includes('useAuth'), true, file);
-    assert.equal(source.includes('const { authenticated } = useAuth();'), true, file);
-    assert.equal(source.includes('if (!authenticated) return;'), true, file);
+    assert.equal(
+      source.includes('if (!authenticated) return;') || source.includes('if (loading || !authenticated) return;'),
+      true,
+      file,
+    );
   }
 });
