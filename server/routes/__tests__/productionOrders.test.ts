@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as productionOrders from '../production-orders';
 
-test('does not create financial revenue for an internal production transfer', () => {
+test('creates a pending revenue for a delivered order with commercial value', () => {
   const getProductionOrderFinanceState = (productionOrders as any).getProductionOrderFinanceState as ((order: unknown) => string) | undefined;
 
   assert.equal(typeof getProductionOrderFinanceState, 'function');
@@ -10,6 +10,16 @@ test('does not create financial revenue for an internal production transfer', ()
     status: 'entregue',
     accountingTreatment: 'internal_transfer',
     commercialValue: 1_000,
+  }), 'open');
+});
+
+test('does not create financial revenue for a delivered order without commercial value', () => {
+  const getProductionOrderFinanceState = (productionOrders as any).getProductionOrderFinanceState as ((order: unknown) => string) | undefined;
+
+  assert.equal(getProductionOrderFinanceState?.({
+    status: 'entregue',
+    accountingTreatment: 'internal_transfer',
+    commercialValue: 0,
   }), 'none');
 });
 

@@ -60,7 +60,6 @@ function getDateOnly(value?: string) {
 }
 
 export function getProductionOrderFinanceState(order: any): 'none' | 'open' {
-  if (order.accountingTreatment !== 'external_sale') return 'none';
   if (order.status !== 'entregue') return 'none';
   if (Number(order.commercialValue) <= 0) return 'none';
   return 'open';
@@ -84,7 +83,7 @@ async function syncFinanceForProductionOrder(doc: any, req?: any) {
   if (getProductionOrderFinanceState(doc) === 'none') {
     await FactoryFinance.updateMany(
     { eventId, source: 'factory', reversedAt: { $exists: false }, settlementStatus: 'open' },
-      { $set: { reversedAt: new Date().toISOString(), reversalReason: 'Pedido sem receita externa ativa', settlementStatus: 'cancelled' } },
+      { $set: { reversedAt: new Date().toISOString(), reversalReason: 'Pedido sem receita ativa', settlementStatus: 'cancelled' } },
     );
     return;
   }

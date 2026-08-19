@@ -29,6 +29,39 @@
   margin-top: 6px;
 }
 
+.orderFilterBar {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-xl;
+  padding: $spacing-md $spacing-lg;
+  background: $bg-secondary;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+}
+
+.orderFilterLabel {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  white-space: nowrap;
+}
+
+.orderFilterSelect {
+  flex: 1;
+  min-width: 0;
+  background: $bg-input;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 9px 12px;
+  color: $text-primary;
+  font-family: inherit;
+  font-size: $font-size-sm;
+
+  &:focus { outline: none; border-color: $border-accent; }
+  option { background: $bg-secondary; }
+}
+
 .saveStatus {
   display: flex;
   align-items: center;
@@ -667,6 +700,27 @@
   white-space: nowrap;
 }
 
+.finalizedRevenue {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: #4ade80;
+  white-space: nowrap;
+}
+
+.finalizedValueButton {
+  padding: 6px 10px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: $radius-xs;
+  color: $accent;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover { background: rgba(245, 158, 11, 0.2); }
+}
+
 // Kanban
 .kanban {
   display: grid;
@@ -978,6 +1032,27 @@
   cursor: pointer;
 
   &:hover { color: $text-primary; }
+}
+
+.modalDescription {
+  margin: 0;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  line-height: 1.5;
+}
+
+.formError {
+  display: block;
+  margin-top: 6px;
+  color: #f87171;
+  font-size: $font-size-xs;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: $spacing-sm;
 }
 
 // Modal

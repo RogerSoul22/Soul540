@@ -54,9 +54,23 @@ type Pedido = {
   itens: Array<{ id: string; nome: string; measure: string; quantidade: number }>;
   ingredients: PedidoIngredient[];
   totalCost: number;
+  commercialValue?: number;
   status: PedidoStatus;
   createdAt?: string;
 };
+
+function sortOrdersByNumber(firstOrder: Pedido, secondOrder: Pedido) {
+  const firstOrderNumber = Number(firstOrder.orderNumber);
+  const secondOrderNumber = Number(secondOrder.orderNumber);
+
+  if (Number.isFinite(firstOrderNumber) && Number.isFinite(secondOrderNumber) && firstOrderNumber !== secondOrderNumber) {
+    return secondOrderNumber - firstOrderNumber;
+  }
+
+  if (Number.isFinite(firstOrderNumber)) return -1;
+  if (Number.isFinite(secondOrderNumber)) return 1;
+  return (secondOrder.createdAt || '').localeCompare(firstOrder.createdAt || '');
+}
 
 const ALL_STATUSES: { id: PedidoStatus; label: string }[] = [
   { id: 'a_preparar', label: 'A preparar' },
@@ -77,6 +91,7 @@ function NovoPedidoForm({
   const [itens, setItens] = useState<Array<{ id: string; nome: string; measure: string; quantidade: number }>>([]);
   const [itemKey, setItemKey] = useState('');
   const [itemQtd, setItemQtd] = useState(0);
+  const [commercialValue, setCommercialValue] = useState<number | ''>('');
 
   const allItems = useMemo(() => [
     ...ingredients.filter(i => i.name.trim()).map(i => ({
@@ -114,7 +129,8 @@ function NovoPedidoForm({
     <form
       onSubmit={async e => {
         e.preventDefault();
-        if (!filial.trim() || itens.length === 0) return;
+        const numericCommercialValue = Number(commercialValue);
+        if (!filial.trim() || itens.length === 0 || !Number.isFinite(numericCommercialValue) || numericCommercialValue <= 0) return;
         const pedidoIngredients = itens.map(item => ({
           id: item.id,
           name: item.nome,
@@ -129,6 +145,7 @@ function NovoPedidoForm({
           itens,
           ingredients: pedidoIngredients,
           totalCost,
+          commercialValue: numericCommercialValue,
           status: 'a_preparar',
         });
       }}
@@ -136,6 +153,20 @@ function NovoPedidoForm({
       <div className={styles.formGroup}>
         <label className={styles.label}>Filial</label>
         <input className={styles.input} value={filial} onChange={e => setFilial(e.target.value)} placeholder="Nome da filial" required />
+      </div>
+
+      <div className={styles.formGroup}>
+        <label className={styles.label}>Valor de venda (R$)</label>
+        <input
+          className={styles.input}
+          type="number"
+          min="0.01"
+          step="0.01"
+          value={commercialValue}
+          onChange={event => setCommercialValue(event.target.value === '' ? '' : Number(event.target.value))}
+          placeholder="0,00"
+          required
+        />
       </div>
 
       <div className={styles.formGroup}>
@@ -184,7 +215,7 @@ function NovoPedidoForm({
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
-        <button type="submit" className={styles.btnPrimary} disabled={!filial.trim() || itens.length === 0 || allItems.length === 0}>Criar Pedido</button>
+        <button type="submit" className={styles.btnPrimary} disabled={!filial.trim() || itens.length === 0 || allItems.length === 0 || commercialValue === '' || commercialValue <= 0}>Criar Pedido</button>
       </div>
     </form>
   );
@@ -199,6 +230,11 @@ export default function Pedidos() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [showNovoPedido, setShowNovoPedido] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [pricingOrder, setPricingOrder] = useState<Pedido | null>(null);
+  const [commercialValueDraft, setCommercialValueDraft] = useState('');
+  const [commercialValueError, setCommercialValueError] = useState('');
+  const [savingCommercialValue, setSavingCommercialValue] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState('');
 
   useEffect(() => {
     Promise.all([
@@ -260,12 +296,16 @@ export default function Pedidos() {
 
   const pedidosByStatus = useMemo(() => {
     const map: Record<PedidoStatus, Pedido[]> = { a_preparar: [], a_enviar: [], entregue: [] };
-    pedidos.forEach(p => map[p.status].push(p));
+    pedidos
+      .filter(pedido => !selectedOrderId || pedido.id === selectedOrderId)
+      .forEach(pedido => map[pedido.status].push(pedido));
     (Object.keys(map) as PedidoStatus[]).forEach(k => {
-      map[k].sort((a, b) => a.filial.localeCompare(b.filial, 'pt'));
+      map[k].sort(sortOrdersByNumber);
     });
     return map;
-  }, [pedidos]);
+  }, [pedidos, selectedOrderId]);
+
+  const ordersForSelection = useMemo(() => [...pedidos].sort(sortOrdersByNumber), [pedidos]);
 
   const handleCreatePedido = async (pedido: Pedido) => {
     const res = await apiFetch('/api/production-orders', {
@@ -292,6 +332,41 @@ export default function Pedidos() {
     setPedidos(ps => ps.filter(p => p.id !== pedidoId));
   };
 
+  const openCommercialValueForm = (pedido: Pedido) => {
+    setPricingOrder(pedido);
+    setCommercialValueDraft(Number(pedido.commercialValue) > 0 ? String(pedido.commercialValue) : '');
+    setCommercialValueError('');
+  };
+
+  const handleSaveCommercialValue = async () => {
+    if (!pricingOrder) return;
+
+    const commercialValue = Number(commercialValueDraft);
+    if (!Number.isFinite(commercialValue) || commercialValue <= 0) {
+      setCommercialValueError('Informe um valor de venda maior que zero.');
+      return;
+    }
+
+    setSavingCommercialValue(true);
+    setCommercialValueError('');
+    try {
+      const response = await apiFetch(`/api/production-orders/${pricingOrder.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ commercialValue }),
+      });
+      if (!response.ok) throw new Error('NÃ£o foi possÃ­vel atualizar o pedido.');
+
+      const updatedPedido: Pedido = await response.json();
+      setPedidos(currentPedidos => currentPedidos.map(pedido => pedido.id === updatedPedido.id ? updatedPedido : pedido));
+      setPricingOrder(null);
+      setCommercialValueDraft('');
+    } catch {
+      setCommercialValueError('NÃ£o foi possÃ­vel salvar o valor de venda. Tente novamente.');
+    } finally {
+      setSavingCommercialValue(false);
+    }
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -313,6 +388,23 @@ export default function Pedidos() {
             {saved && <span className={styles.saveLabelOk}>✓ Salvo</span>}
           </div>
         </div>
+      </div>
+
+      <div className={styles.orderFilterBar}>
+        <label className={styles.orderFilterLabel} htmlFor="order-selector">Localizar pedido</label>
+        <select
+          id="order-selector"
+          className={styles.orderFilterSelect}
+          value={selectedOrderId}
+          onChange={event => setSelectedOrderId(event.target.value)}
+        >
+          <option value="">Todos os pedidos</option>
+          {ordersForSelection.map(pedido => (
+            <option key={pedido.id} value={pedido.id}>
+              #{pedido.orderNumber ?? 'Sem nÃºmero'} â€” {pedido.filial}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Kanban (A preparar + A enviar) */}
@@ -427,7 +519,14 @@ export default function Pedidos() {
                   </span>
                 </div>
                 <div className={styles.finalizedRight}>
-                  <span className={styles.finalizedCost}>R$ {formatR$(pedido.totalCost)}</span>
+                  <span className={styles.finalizedCost}>Custo: R$ {formatR$(pedido.totalCost)}</span>
+                  {Number(pedido.commercialValue) > 0 ? (
+                    <span className={styles.finalizedRevenue}>Venda: R$ {formatR$(Number(pedido.commercialValue))}</span>
+                  ) : (
+                    <button className={styles.finalizedValueButton} onClick={() => openCommercialValueForm(pedido)}>
+                      Informar valor de venda
+                    </button>
+                  )}
                   <button className={styles.taskDelete} onClick={() => setDeleteConfirmId(pedido.id)} title="Excluir">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                   </button>
@@ -458,6 +557,51 @@ export default function Pedidos() {
                 }}
               />
             </div>
+          </div>
+        </div>
+      )}
+
+      {pricingOrder && (
+        <div className={styles.overlay} onClick={() => !savingCommercialValue && setPricingOrder(null)}>
+          <div className={styles.modal} onClick={event => event.stopPropagation()} style={{ maxWidth: 420 }}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Informar valor de venda</h2>
+              <button className={styles.modalClose} onClick={() => setPricingOrder(null)} disabled={savingCommercialValue}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <form
+              className={styles.modalBody}
+              onSubmit={event => {
+                event.preventDefault();
+                void handleSaveCommercialValue();
+              }}
+            >
+              <p className={styles.modalDescription}>
+                O pedido #{pricingOrder.orderNumber || pricingOrder.id} estÃ¡ entregue. Ao salvar, o valor serÃ¡ lanÃ§ado como receita pendente no Financeiro da FÃ¡brica, na data de criaÃ§Ã£o do pedido.
+              </p>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Valor de venda (R$)</label>
+                <input
+                  className={styles.input}
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  value={commercialValueDraft}
+                  onChange={event => setCommercialValueDraft(event.target.value)}
+                  placeholder="0,00"
+                  autoFocus
+                  required
+                />
+                {commercialValueError && <span className={styles.formError}>{commercialValueError}</span>}
+              </div>
+              <div className={styles.modalActions}>
+                <button type="button" className={styles.btnCancel} onClick={() => setPricingOrder(null)} disabled={savingCommercialValue}>Cancelar</button>
+                <button type="submit" className={styles.btnPrimary} disabled={savingCommercialValue}>
+                  {savingCommercialValue ? 'Salvando...' : 'Salvar e gerar receita'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
