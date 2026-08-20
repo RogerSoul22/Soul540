@@ -109,7 +109,7 @@ function IconAlertTriangle() {
 function EventModal({ event, onClose, onUpdate, onDelete }: {
   event: PizzaEvent;
   onClose: () => void;
-  onUpdate: (id: string, data: Partial<PizzaEvent>) => void;
+  onUpdate: (id: string, data: Partial<PizzaEvent>) => Promise<void>;
   onDelete: (id: string) => void;
 }) {
   const [mode, setMode] = useState<'view' | 'edit' | 'delete'>('view');
@@ -117,9 +117,13 @@ function EventModal({ event, onClose, onUpdate, onDelete }: {
 
   const c = getEventColor(event);
 
-  const handleSave = () => {
-    onUpdate(event.id, form);
-    onClose();
+  const handleSave = async () => {
+    try {
+      await onUpdate(event.id, form);
+      onClose();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Falha ao atualizar evento');
+    }
   };
 
   const handleDelete = () => {

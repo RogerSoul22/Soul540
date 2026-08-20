@@ -247,6 +247,32 @@ test('requires an adjustment flow only when an event financial value truly chang
   assert.equal(hasMaterialFinancialChange(event, { paymentMethod: 'card' }, ['paymentMethod']), true);
 });
 
+test('allows changing the final value when only the event deposit is settled', () => {
+  const settledDeposit = {
+    kind: 'deposit',
+    type: 'revenue',
+    amount: 300,
+    amountCents: 30_000,
+    date: '2026-07-01',
+    settlements: [{ id: 'settlement-1', amountCents: 30_000, settledOn: '2026-07-01', settledAt: '2026-07-01T12:00:00.000Z', idempotencyKey: 'deposit-1' }],
+  };
+
+  assert.equal(eventCancellationRequiresDecision([settledDeposit], ['finalValue']), false);
+});
+
+test('requires an adjustment when changing the final value would alter a settled balance', () => {
+  const settledBalance = {
+    kind: 'balance',
+    type: 'revenue',
+    amount: 700,
+    amountCents: 70_000,
+    date: '2026-07-10',
+    settlements: [{ id: 'settlement-2', amountCents: 70_000, settledOn: '2026-07-10', settledAt: '2026-07-10T12:00:00.000Z', idempotencyKey: 'balance-1' }],
+  };
+
+  assert.equal(eventCancellationRequiresDecision([settledBalance], ['finalValue']), true);
+});
+
 test('excludes already-cancelled linked entries from the cancelled-event cleanup query', async () => {
   const findQueries: unknown[] = [];
   const financeModel = {

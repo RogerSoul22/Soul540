@@ -497,12 +497,16 @@ const [showModal, setShowModal] = useState(false);
       estimatedPizzas: Number(form.estimatedPizzas) || undefined,
       actualPizzas: Number(form.actualPizzas) || undefined,
     };
-    if (editingId) {
-      await updateEvent(editingId, data);
-    } else {
-      await addEvent(data);
+    try {
+      if (editingId) {
+        await updateEvent(editingId, data);
+      } else {
+        await addEvent(data);
+      }
+      closeModal();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Falha ao salvar evento');
     }
-    closeModal();
   };
 
   const handleDelete = (id: string) => { setDeleteTargetId(id); };

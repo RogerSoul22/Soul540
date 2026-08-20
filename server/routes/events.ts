@@ -358,8 +358,28 @@ export function calculateEventFinanceAmounts(event: any) {
   return { budget, finalValue, deposit, travel, targetRevenue, balance };
 }
 
-export function eventCancellationRequiresDecision(finances: any[]): boolean {
-  return finances.some((finance) => !canChangeForecast(finance));
+const FINANCE_KINDS_AFFECTED_BY_EVENT_FIELD: Record<string, string[]> = {
+  budget: ['balance', 'commission'],
+  finalValue: ['balance', 'commission'],
+  depositValue: ['deposit', 'balance'],
+  depositDate: ['deposit'],
+  travelCost: ['travel'],
+  paymentMethod: ['deposit'],
+  pixKey: [],
+};
+
+function getAutomaticFinanceKind(finance: any): string | undefined {
+  return finance.kind || (finance.autoEventBudget ? 'balance' : undefined);
+}
+
+export function eventCancellationRequiresDecision(finances: any[], changedFields?: string[]): boolean {
+  if (!changedFields) return finances.some((finance) => !canChangeForecast(finance));
+
+  const affectedKinds = new Set(changedFields.flatMap((field) => FINANCE_KINDS_AFFECTED_BY_EVENT_FIELD[field] || []));
+  return finances.some((finance) => {
+    const financeKind = getAutomaticFinanceKind(finance);
+    return financeKind !== undefined && affectedKinds.has(financeKind) && !canChangeForecast(finance);
+  });
 }
 
 export function hasMaterialFinancialChange(current: Record<string, any>, update: Record<string, any>, fields: string[]): boolean {
@@ -378,7 +398,7 @@ export function hasMaterialFinancialChange(current: Record<string, any>, update:
   });
 }
 
-async function cancellationRequiresDecision(event: any, FinanceModel: FinanceModel): Promise<boolean> {
+async function cancellationRequiresDecision(event: any, FinanceModel: FinanceModel, changedFields?: string[]): Promise<boolean> {
   const eventId = event.id || event._id.toString();
   const finances = await FinanceModel.find({
     eventId,
@@ -386,7 +406,7 @@ async function cancellationRequiresDecision(event: any, FinanceModel: FinanceMod
     reversedAt: { $exists: false },
     settlementStatus: { $ne: 'cancelled' },
   }).lean();
-  return eventCancellationRequiresDecision(finances);
+  return eventCancellationRequiresDecision(finances, changedFields);
 }
 
 async function cancelMutableAutomaticFinances(FinanceModel: FinanceModel, query: Record<string, unknown>, reversalReason: string) {
@@ -566,19 +586,20 @@ router.put('/:id', async (req, res) => {
   const found = await findEventForRequest(req, req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   const protectedFinancialFields = ['budget', 'finalValue', 'depositValue', 'depositDate', 'travelCost', 'paymentMethod', 'pixKey'];
+  const changedFinancialFields = protectedFinancialFields.filter((field) => hasMaterialFinancialChange(found.doc, req.body || {}, [field]));
   // Cancelar um evento sempre exclui as previsões financeiras automáticas vinculadas
   // (ver syncEventFinances), mesmo que já tenham baixa registrada — não exige decisão prévia.
   if (
     !isFromFactory(req) &&
-    hasMaterialFinancialChange(found.doc, req.body || {}, protectedFinancialFields) &&
-    await cancellationRequiresDecision(found.doc, found.financeModel)
+    changedFinancialFields.length > 0 &&
+    await cancellationRequiresDecision(found.doc, found.financeModel, changedFinancialFields)
   ) {
     return res.status(409).json({ error: 'Registre um ajuste financeiro aprovado antes de alterar valores de um evento com baixa financeira' });
   }
   if (
     (found.doc.financialCloseStatus === 'closed' || found.doc.financialStatus === 'closed') &&
     !isFromFactory(req) &&
-    protectedFinancialFields.some((field) => Object.prototype.hasOwnProperty.call(req.body, field))
+    changedFinancialFields.length > 0
   ) {
     return res.status(409).json({ error: 'Reabra o financeiro do evento antes de alterar valores financeiros' });
   }

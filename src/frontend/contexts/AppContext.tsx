@@ -211,7 +211,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       headers: buildHeaders(true),
       body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error('Falha ao atualizar evento');
+    if (!res.ok) {
+      const payload = await res.json().catch(() => null);
+      throw new Error(payload?.error || 'Falha ao atualizar evento');
+    }
     const updated: PizzaEvent = await res.json();
     setEvents((prev) => prev.map((e) => (e.id === id ? updated : e)));
     refreshFinances();

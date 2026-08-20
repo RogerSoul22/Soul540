@@ -108,7 +108,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const updateEvent = useCallback(async (id: string, data: Partial<PizzaEvent>) => {
     const res = await apiFetch(`/api/events/${id}`, { method: 'PUT', body: JSON.stringify(data) });
-    if (!res.ok) throw new Error(`Erro ao atualizar evento: ${res.status}`);
+    if (!res.ok) {
+      const payload = await res.json().catch(() => null);
+      throw new Error(payload?.error || `Erro ao atualizar evento: ${res.status}`);
+    }
     const updated: PizzaEvent = await res.json();
     setEvents((prev) => prev.map((e) => (e.id === id ? updated : e)));
     refreshFinances();
