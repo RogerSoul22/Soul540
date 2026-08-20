@@ -2,34 +2,43 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import * as productionOrders from '../production-orders';
 
-test('creates a pending revenue for a delivered order with commercial value', () => {
+test('creates a financial entry for a delivered order with production cost', () => {
   const getProductionOrderFinanceState = (productionOrders as any).getProductionOrderFinanceState as ((order: unknown) => string) | undefined;
 
   assert.equal(typeof getProductionOrderFinanceState, 'function');
   assert.equal(getProductionOrderFinanceState?.({
     status: 'entregue',
-    accountingTreatment: 'internal_transfer',
-    commercialValue: 1_000,
+    totalCost: 1_000,
   }), 'open');
 });
 
-test('does not create financial revenue for a delivered order without commercial value', () => {
+test('does not create a financial entry before the order is delivered', () => {
+  const getProductionOrderFinanceState = (productionOrders as any).getProductionOrderFinanceState as ((order: unknown) => string) | undefined;
+
+  assert.equal(getProductionOrderFinanceState?.({
+    status: 'a_preparar',
+    totalCost: 1_000,
+    commercialValue: 1_000,
+  }), 'none');
+});
+
+test('does not create a financial entry for a delivered order without production cost', () => {
   const getProductionOrderFinanceState = (productionOrders as any).getProductionOrderFinanceState as ((order: unknown) => string) | undefined;
 
   assert.equal(getProductionOrderFinanceState?.({
     status: 'entregue',
-    accountingTreatment: 'internal_transfer',
-    commercialValue: 0,
+    totalCost: 0,
+    commercialValue: 1_000,
   }), 'none');
 });
 
-test('creates only an open receivable for an external sale after delivery', () => {
+test('uses production cost regardless of the previous accounting treatment', () => {
   const getProductionOrderFinanceState = (productionOrders as any).getProductionOrderFinanceState as ((order: unknown) => string) | undefined;
 
   assert.equal(getProductionOrderFinanceState?.({
     status: 'entregue',
     accountingTreatment: 'external_sale',
-    commercialValue: 1_000,
+    totalCost: 1_000,
   }), 'open');
 });
 

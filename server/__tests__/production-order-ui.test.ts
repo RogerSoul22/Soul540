@@ -11,15 +11,19 @@ const styleSource = readFileSync(
   resolve(process.cwd(), 'factory/src/pages/Tarefas/Tarefas/Tarefas.module.scss'),
   'utf8',
 );
+const routeSource = readFileSync(
+  resolve(process.cwd(), 'server/routes/production-orders.ts'),
+  'utf8',
+);
 
-test('requires a commercial value when creating a production order', () => {
-  assert.equal(pageSource.includes('Valor de venda (R$)'), true);
-  assert.equal(pageSource.includes('commercialValue <= 0'), true);
-});
-
-test('allows commercial value to be supplied for delivered legacy orders', () => {
-  assert.equal(pageSource.includes('Informar valor de venda'), true);
-  assert.equal(pageSource.includes('/api/production-orders/${pricingOrder.id}'), true);
+test('keeps the appointment link separate from sales price', () => {
+  assert.equal(pageSource.includes('Valor de venda (R$)'), false);
+  assert.equal(pageSource.includes('Informar valor de venda'), false);
+  assert.equal(pageSource.includes('Agendamento vinculado'), true);
+  assert.equal(pageSource.includes('/api/production-orders/available-events'), true);
+  assert.equal(routeSource.includes("router.get('/available-events'"), true);
+  assert.equal(routeSource.includes('commercialValue'), false);
+  assert.equal(routeSource.includes('eventSource'), true);
 });
 
 test('offers numeric ordering and two ways to find an order', () => {
@@ -42,4 +46,14 @@ test('keeps order controls usable on narrow screens', () => {
   assert.equal(styleSource.includes('.headerActions'), true);
   assert.equal(styleSource.includes('.orderFilterBar {\n    flex-wrap: wrap;'), true);
   assert.equal(styleSource.includes('.finalizedItem {\n    flex-direction: column;'), true);
+});
+
+test('keeps finalized orders in a bounded scrollable list', () => {
+  assert.equal(styleSource.includes('max-height: 480px;'), true);
+  assert.equal(styleSource.includes('overflow-y: auto;'), true);
+});
+
+test('keeps the finalized list focused on the production cost', () => {
+  assert.equal(pageSource.includes('Custo: R$'), true);
+  assert.equal(pageSource.includes('Venda: R$'), false);
 });

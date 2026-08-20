@@ -764,6 +764,8 @@
 .finalizedList {
   display: flex;
   flex-direction: column;
+  max-height: 480px;
+  overflow-y: auto;
 }
 
 .finalizedItem {
@@ -809,27 +811,6 @@
   font-weight: $font-weight-medium;
   color: $text-secondary;
   white-space: nowrap;
-}
-
-.finalizedRevenue {
-  font-size: $font-size-sm;
-  font-weight: $font-weight-semibold;
-  color: #4ade80;
-  white-space: nowrap;
-}
-
-.finalizedValueButton {
-  padding: 6px 10px;
-  background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  border-radius: $radius-xs;
-  color: $accent;
-  font-size: $font-size-xs;
-  font-weight: $font-weight-medium;
-  cursor: pointer;
-  white-space: nowrap;
-
-  &:hover { background: rgba(245, 158, 11, 0.2); }
 }
 
 // Kanban

@@ -52,12 +52,23 @@ type Pedido = {
   id: string;
   orderNumber?: number;
   filial: string;
+  eventId?: string;
+  eventSource?: 'main' | 'franchise';
+  eventName?: string;
+  eventDate?: string;
   itens: Array<{ id: string; nome: string; measure: string; quantidade: number }>;
   ingredients: PedidoIngredient[];
   totalCost: number;
-  commercialValue?: number;
   status: PedidoStatus;
   createdAt?: string;
+};
+
+type AvailableEvent = {
+  id: string;
+  source: 'main' | 'franchise';
+  name: string;
+  date: string;
+  city?: string;
 };
 
 function sortOrdersByNumber(firstOrder: Pedido, secondOrder: Pedido) {
@@ -88,16 +99,18 @@ function NovoPedidoForm({
   onSave,
   ingredients,
   insumos,
+  events,
 }: {
   onSave: (pedido: Pedido) => Promise<void> | void;
   ingredients: Ingredient[];
   insumos: Insumo[];
+  events: AvailableEvent[];
 }) {
   const [filial, setFilial] = useState('');
   const [itens, setItens] = useState<Array<{ id: string; nome: string; measure: string; quantidade: number }>>([]);
   const [itemKey, setItemKey] = useState('');
   const [itemQtd, setItemQtd] = useState(0);
-  const [commercialValue, setCommercialValue] = useState<number | ''>('');
+  const [selectedEventId, setSelectedEventId] = useState('');
 
   const allItems = useMemo(() => [
     ...ingredients.filter(i => i.name.trim()).map(i => ({
@@ -131,12 +144,17 @@ function NovoPedidoForm({
 
   const removeItem = (idx: number) => setItens(prev => prev.filter((_, i) => i !== idx));
 
+  const handleEventChange = (eventId: string) => {
+    setSelectedEventId(eventId);
+    const selectedEvent = events.find((event) => event.id === eventId);
+    if (selectedEvent?.city) setFilial(selectedEvent.city);
+  };
+
   return (
     <form
       onSubmit={async e => {
         e.preventDefault();
-        const numericCommercialValue = Number(commercialValue);
-        if (!filial.trim() || itens.length === 0 || !Number.isFinite(numericCommercialValue) || numericCommercialValue <= 0) return;
+        if (!filial.trim() || itens.length === 0) return;
         const pedidoIngredients = itens.map(item => ({
           id: item.id,
           name: item.nome,
@@ -151,28 +169,29 @@ function NovoPedidoForm({
           itens,
           ingredients: pedidoIngredients,
           totalCost,
-          commercialValue: numericCommercialValue,
+          ...(selectedEventId ? {
+            eventId: selectedEventId,
+            eventSource: events.find((event) => event.id === selectedEventId)?.source,
+          } : {}),
           status: 'a_preparar',
         });
       }}
     >
       <div className={styles.formGroup}>
-        <label className={styles.label}>Filial</label>
-        <input className={styles.input} value={filial} onChange={e => setFilial(e.target.value)} placeholder="Nome da filial" required />
+        <label className={styles.label}>Agendamento vinculado</label>
+        <select className={styles.input} value={selectedEventId} onChange={event => handleEventChange(event.target.value)}>
+          <option value="">Pedido avulso (sem agendamento)</option>
+          {events.map((event) => (
+            <option key={`${event.source}:${event.id}`} value={event.id}>
+              {event.date} - {event.name}{event.city ? ` (${event.city})` : ''}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className={styles.formGroup}>
-        <label className={styles.label}>Valor de venda (R$)</label>
-        <input
-          className={styles.input}
-          type="number"
-          min="0.01"
-          step="0.01"
-          value={commercialValue}
-          onChange={event => setCommercialValue(event.target.value === '' ? '' : Number(event.target.value))}
-          placeholder="0,00"
-          required
-        />
+        <label className={styles.label}>Filial</label>
+        <input className={styles.input} value={filial} onChange={e => setFilial(e.target.value)} placeholder="Nome da filial" required />
       </div>
 
       <div className={styles.formGroup}>
@@ -221,7 +240,7 @@ function NovoPedidoForm({
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
-        <button type="submit" className={styles.btnPrimary} disabled={!filial.trim() || itens.length === 0 || allItems.length === 0 || commercialValue === '' || commercialValue <= 0}>Criar Pedido</button>
+        <button type="submit" className={styles.btnPrimary} disabled={!filial.trim() || itens.length === 0 || allItems.length === 0}>Criar Pedido</button>
       </div>
     </form>
   );
@@ -229,6 +248,7 @@ function NovoPedidoForm({
 
 export default function Pedidos() {
   const [recipe, setRecipe] = useState<Recipe>({ ingredients: [], insumos: [] });
+  const [availableEvents, setAvailableEvents] = useState<AvailableEvent[]>([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -236,10 +256,6 @@ export default function Pedidos() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [showNovoPedido, setShowNovoPedido] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [pricingOrder, setPricingOrder] = useState<Pedido | null>(null);
-  const [commercialValueDraft, setCommercialValueDraft] = useState('');
-  const [commercialValueError, setCommercialValueError] = useState('');
-  const [savingCommercialValue, setSavingCommercialValue] = useState(false);
   const [orderSearchMode, setOrderSearchMode] = useState<OrderSearchMode>('typing');
   const [orderSearchTerm, setOrderSearchTerm] = useState('');
   const [selectedOrderId, setSelectedOrderId] = useState('');
@@ -253,6 +269,10 @@ export default function Pedidos() {
         setRecipe({ ingredients: recipeData.ingredients || [], insumos: recipeData.insumos || [] });
         setPedidos(pedidosData);
       })
+      .catch(() => {});
+    apiFetch('/api/production-orders/available-events')
+      .then((response) => response.ok ? response.json() as Promise<AvailableEvent[]> : [])
+      .then((events) => setAvailableEvents(Array.isArray(events) ? events : []))
       .catch(() => {});
   }, []);
 
@@ -364,41 +384,6 @@ export default function Pedidos() {
   const handleDeletePedido = async (pedidoId: string) => {
     await apiFetch(`/api/production-orders/${pedidoId}`, { method: 'DELETE' });
     setPedidos(ps => ps.filter(p => p.id !== pedidoId));
-  };
-
-  const openCommercialValueForm = (pedido: Pedido) => {
-    setPricingOrder(pedido);
-    setCommercialValueDraft(Number(pedido.commercialValue) > 0 ? String(pedido.commercialValue) : '');
-    setCommercialValueError('');
-  };
-
-  const handleSaveCommercialValue = async () => {
-    if (!pricingOrder) return;
-
-    const commercialValue = Number(commercialValueDraft);
-    if (!Number.isFinite(commercialValue) || commercialValue <= 0) {
-      setCommercialValueError('Informe um valor de venda maior que zero.');
-      return;
-    }
-
-    setSavingCommercialValue(true);
-    setCommercialValueError('');
-    try {
-      const response = await apiFetch(`/api/production-orders/${pricingOrder.id}`, {
-        method: 'PUT',
-        body: JSON.stringify({ commercialValue }),
-      });
-      if (!response.ok) throw new Error('NÃ£o foi possÃ­vel atualizar o pedido.');
-
-      const updatedPedido: Pedido = await response.json();
-      setPedidos(currentPedidos => currentPedidos.map(pedido => pedido.id === updatedPedido.id ? updatedPedido : pedido));
-      setPricingOrder(null);
-      setCommercialValueDraft('');
-    } catch {
-      setCommercialValueError('NÃ£o foi possÃ­vel salvar o valor de venda. Tente novamente.');
-    } finally {
-      setSavingCommercialValue(false);
-    }
   };
 
   return (
@@ -582,13 +567,6 @@ export default function Pedidos() {
                 </div>
                 <div className={styles.finalizedRight}>
                   <span className={styles.finalizedCost}>Custo: R$ {formatR$(pedido.totalCost)}</span>
-                  {Number(pedido.commercialValue) > 0 ? (
-                    <span className={styles.finalizedRevenue}>Venda: R$ {formatR$(Number(pedido.commercialValue))}</span>
-                  ) : (
-                    <button className={styles.finalizedValueButton} onClick={() => openCommercialValueForm(pedido)}>
-                      Informar valor de venda
-                    </button>
-                  )}
                   <button className={styles.taskDelete} onClick={() => setDeleteConfirmId(pedido.id)} title="Excluir">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                   </button>
@@ -613,57 +591,13 @@ export default function Pedidos() {
               <NovoPedidoForm
                 ingredients={recipe.ingredients}
                 insumos={recipe.insumos}
+                events={availableEvents}
                 onSave={async pedido => {
                   await handleCreatePedido(pedido);
                   setShowNovoPedido(false);
                 }}
               />
             </div>
-          </div>
-        </div>
-      )}
-
-      {pricingOrder && (
-        <div className={styles.overlay} onClick={() => !savingCommercialValue && setPricingOrder(null)}>
-          <div className={styles.modal} onClick={event => event.stopPropagation()} style={{ maxWidth: 420 }}>
-            <div className={styles.modalHeader}>
-              <h2 className={styles.modalTitle}>Informar valor de venda</h2>
-              <button className={styles.modalClose} onClick={() => setPricingOrder(null)} disabled={savingCommercialValue}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-              </button>
-            </div>
-            <form
-              className={styles.modalBody}
-              onSubmit={event => {
-                event.preventDefault();
-                void handleSaveCommercialValue();
-              }}
-            >
-              <p className={styles.modalDescription}>
-                O pedido #{pricingOrder.orderNumber || pricingOrder.id} estÃ¡ entregue. Ao salvar, o valor serÃ¡ lanÃ§ado como receita pendente no Financeiro da FÃ¡brica, na data de criaÃ§Ã£o do pedido.
-              </p>
-              <div className={styles.formGroup}>
-                <label className={styles.label}>Valor de venda (R$)</label>
-                <input
-                  className={styles.input}
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  value={commercialValueDraft}
-                  onChange={event => setCommercialValueDraft(event.target.value)}
-                  placeholder="0,00"
-                  autoFocus
-                  required
-                />
-                {commercialValueError && <span className={styles.formError}>{commercialValueError}</span>}
-              </div>
-              <div className={styles.modalActions}>
-                <button type="button" className={styles.btnCancel} onClick={() => setPricingOrder(null)} disabled={savingCommercialValue}>Cancelar</button>
-                <button type="submit" className={styles.btnPrimary} disabled={savingCommercialValue}>
-                  {savingCommercialValue ? 'Salvando...' : 'Salvar e gerar receita'}
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}
