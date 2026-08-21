@@ -691,7 +691,7 @@ export default function Pedidos() {
             <span className={styles.blockSub}>materiais e embalagens</span>
           </div>
 
-          <div className={styles.tableWrap}>
+          <div className={`${styles.tableWrap} ${styles.insumosTableWrap}`}>
             <table className={styles.table}>
               <thead>
                 <tr>

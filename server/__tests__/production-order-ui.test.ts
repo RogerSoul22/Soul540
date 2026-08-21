@@ -53,6 +53,11 @@ test('keeps finalized orders in a bounded scrollable list', () => {
   assert.equal(styleSource.includes('overflow-y: auto;'), true);
 });
 
+test('keeps the supplies table in a bounded scrollable area', () => {
+  assert.equal(pageSource.includes('styles.insumosTableWrap'), true);
+  assert.equal(styleSource.includes('.insumosTableWrap {\n  max-height: 480px;\n  overflow-y: auto;'), true);
+});
+
 test('keeps the finalized list focused on the production cost', () => {
   assert.equal(pageSource.includes('Custo: R$'), true);
   assert.equal(pageSource.includes('Venda: R$'), false);

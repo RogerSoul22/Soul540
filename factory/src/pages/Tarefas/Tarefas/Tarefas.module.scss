@@ -234,6 +234,11 @@
   flex: 1;
 }
 
+.insumosTableWrap {
+  max-height: 480px;
+  overflow-y: auto;
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
