@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { resolve } from 'node:path';
-import { calculateCommissionAmount, calculateEventFinanceAmounts, canSyncAutomaticCommission, eventCancellationRequiresDecision, hasMaterialFinancialChange, syncEventCommissions, syncEventFinances } from '../events';
+import { calculateCommissionAmount, calculateEventFinanceAmounts, canSyncAutomaticCommission, syncEventCommissions, syncEventFinances } from '../events';
 
 const eventRouteSource = readFileSync(
   resolve(process.cwd(), 'server/routes/events.ts'),
@@ -86,7 +86,7 @@ test('creates an event deposit as paid with a settlement on its recorded date', 
   assert.deepEqual(balance.settlements, []);
 });
 
-test('does not rewrite an already settled event deposit during synchronization', async () => {
+test('rewrites an already settled event deposit during synchronization', async () => {
   const created: any[] = [];
   const updated: Array<{ id: string; payload: unknown }> = [];
   const settledDeposit = {
@@ -111,16 +111,23 @@ test('does not rewrite an already settled event deposit during synchronization',
     id: 'event-1',
     name: 'Evento teste',
     date: '2026-07-10',
-    depositDate: '2026-07-02',
+    depositDate: '2026-07-05',
     budget: 1_000,
-    depositValue: 300,
+    depositValue: 450,
     constructor: { findByIdAndUpdate: async () => undefined },
   };
 
   await syncEventFinances(event, financeModel as any, 'main');
 
   assert.equal(created.some((entry) => entry.kind === 'deposit'), false);
-  assert.equal(updated.some((entry) => entry.id === 'deposit-1'), false);
+  const depositUpdate = updated.find((entry) => entry.id === 'deposit-1');
+  assert.ok(depositUpdate);
+  assert.equal((depositUpdate.payload as any).$set.amount, 450);
+  assert.equal((depositUpdate.payload as any).$set.amountCents, 45_000);
+  assert.equal((depositUpdate.payload as any).$set.date, '2026-07-05');
+  assert.equal((depositUpdate.payload as any).$set.status, 'paid');
+  assert.equal((depositUpdate.payload as any).$set.settlementStatus, 'settled');
+  assert.equal((depositUpdate.payload as any).$set.settlements[0].amountCents, 45_000);
 });
 
 test('deletes automatic finances when an event is cancelled', async () => {
@@ -247,41 +254,10 @@ test('does not overwrite a settled automatic commission during synchronization',
   }), false);
 });
 
-test('requires an adjustment flow only when an event financial value truly changes', () => {
-  const event = { budget: 1_000, depositValue: 300, paymentMethod: 'pix' };
-  assert.equal(hasMaterialFinancialChange(event, { budget: 1_000 }, ['budget', 'depositValue']), false);
-  assert.equal(hasMaterialFinancialChange(event, { budget: 1_100 }, ['budget', 'depositValue']), true);
-  assert.equal(hasMaterialFinancialChange(event, { paymentMethod: 'card' }, ['paymentMethod']), true);
-});
-
-test('allows changing the final value when only the event deposit is settled', () => {
-  const settledDeposit = {
-    kind: 'deposit',
-    type: 'revenue',
-    amount: 300,
-    amountCents: 30_000,
-    date: '2026-07-01',
-    settlements: [{ id: 'settlement-1', amountCents: 30_000, settledOn: '2026-07-01', settledAt: '2026-07-01T12:00:00.000Z', idempotencyKey: 'deposit-1' }],
-  };
-
-  assert.equal(eventCancellationRequiresDecision([settledDeposit], ['finalValue']), false);
-});
-
-test('identifies a settled balance affected by a final-value change', () => {
-  const settledBalance = {
-    kind: 'balance',
-    type: 'revenue',
-    amount: 700,
-    amountCents: 70_000,
-    date: '2026-07-10',
-    settlements: [{ id: 'settlement-2', amountCents: 70_000, settledOn: '2026-07-10', settledAt: '2026-07-10T12:00:00.000Z', idempotencyKey: 'balance-1' }],
-  };
-
-  assert.equal(eventCancellationRequiresDecision([settledBalance], ['finalValue']), true);
-});
-
-test('allows direct editing of event values after a financial settlement', () => {
+test('allows editing and deleting an event despite financial status', () => {
   assert.equal(eventRouteSource.includes('Registre um ajuste financeiro aprovado antes de alterar valores de um evento com baixa financeira'), false);
+  assert.equal(eventRouteSource.includes('Reabra o financeiro do evento antes de alterar valores financeiros'), false);
+  assert.equal(eventRouteSource.includes('Registre reembolso, multa retida ou ajuste aprovado antes de excluir um evento com baixa financeira'), false);
 });
 
 test('excludes already-cancelled linked entries from the cancelled-event cleanup query', async () => {
@@ -354,19 +330,4 @@ test('falls back to the event date when no deposit date is set', async () => {
 
   const deposit = created.find((entry) => entry.kind === 'deposit');
   assert.equal(deposit.date, '2026-07-10');
-});
-
-test('requires a refund, fee or approved adjustment decision before cancelling a settled event', () => {
-  assert.equal(eventCancellationRequiresDecision([
-    { type: 'revenue', amount: 100, amountCents: 10_000, date: '2026-07-01', settlements: [] },
-  ]), false);
-  assert.equal(eventCancellationRequiresDecision([
-    {
-      type: 'revenue',
-      amount: 100,
-      amountCents: 10_000,
-      date: '2026-07-01',
-      settlements: [{ id: 's-1', amountCents: 10_000, settledOn: '2026-07-01', settledAt: '2026-07-01T12:00:00.000Z', idempotencyKey: 'one' }],
-    },
-  ]), true);
 });

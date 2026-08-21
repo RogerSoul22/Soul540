@@ -167,7 +167,7 @@ const compareAlpha = (a: string, b: string) => alphaCollator.compare(normalizeAl
 type DataScope = 'main' | 'franchise' | 'factory' | 'combined';
 
 export default function Financeiro() {
-  const { events, finances, financeCategories, addFinance, updateFinance, settleFinance, deleteFinance, reverseFinance, addFinanceCategory, deleteEvent, closeEventFinance, reopenEventFinance, refreshFinances } = useApp();
+  const { events, finances, financeCategories, addFinance, updateFinance, settleFinance, deleteFinance, addFinanceCategory, deleteEvent, closeEventFinance, reopenEventFinance, refreshFinances } = useApp();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabType>('geral');
   const [costFilter, setCostFilter] = useState<CostFilter>('all');
@@ -939,10 +939,6 @@ export default function Financeiro() {
   };
 
   const handleFinanceEditAction = (entry: (typeof finances)[number]) => {
-    if (entry.automatic && entry.eventId) {
-      window.location.href = `/eventos?edit=${encodeURIComponent(entry.eventId)}`;
-      return;
-    }
     openEditFinance(entry);
   };
 
@@ -955,11 +951,7 @@ export default function Financeiro() {
     if (!financePendingDelete || deletingFinance) return;
     setDeletingFinance(true);
     try {
-      if (financePendingDelete.automatic) {
-        await reverseFinance(financePendingDelete.id, 'Exclusão solicitada pelo financeiro');
-      } else {
-        await deleteFinance(financePendingDelete.id);
-      }
+      await deleteFinance(financePendingDelete.id);
       setFinancePendingDelete(null);
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Não foi possível excluir o lançamento.');
@@ -1665,14 +1657,14 @@ export default function Financeiro() {
                         <button
                           className={styles.actionBtn}
                           onClick={(event) => { event.stopPropagation(); handleFinanceEditAction(entry); }}
-                          title={entry.automatic ? 'Editar evento de origem' : 'Editar lançamento'}
+                          title="Editar lançamento"
                         >
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                         </button>
                         <button
                           className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
                           onClick={(event) => { event.stopPropagation(); requestFinanceDelete(entry); }}
-                          title={entry.automatic ? 'Estornar lançamento' : 'Excluir lançamento'}
+                          title="Excluir lançamento"
                         >
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                         </button>
@@ -1914,7 +1906,7 @@ export default function Financeiro() {
               <button
                 className={styles.btnExport}
                 type="button"
-                title={selectedFinance.automatic ? 'Editar evento de origem' : 'Editar lançamento'}
+                title="Editar lançamento"
                 onClick={() => { const entry = selectedFinance; setSelectedFinance(null); handleFinanceEditAction(entry); }}
               >
                 Editar
@@ -1922,10 +1914,10 @@ export default function Financeiro() {
               <button
                 className={styles.btnDanger}
                 type="button"
-                title={selectedFinance.automatic ? 'Estornar lançamento' : 'Excluir lançamento'}
+                title="Excluir lançamento"
                 onClick={() => requestFinanceDelete(selectedFinance)}
               >
-                {selectedFinance.automatic ? 'Estornar' : 'Excluir'}
+                Excluir
               </button>
             </div>
           </Modal>
@@ -1934,15 +1926,13 @@ export default function Financeiro() {
 
       {financePendingDelete && (
         <Modal
-          title={financePendingDelete.automatic ? 'Confirmar estorno' : 'Confirmar exclusão'}
+          title="Confirmar exclusão"
           size="sm"
           onClose={() => { if (!deletingFinance) setFinancePendingDelete(null); }}
         >
           <div className={styles.confirmDeleteContent}>
             <p>
-              {financePendingDelete.automatic
-                ? 'Este lançamento foi criado automaticamente. Ele será estornado e permanecerá no histórico de auditoria.'
-                : 'Tem certeza de que deseja excluir este lançamento? Esta ação não pode ser desfeita.'}
+              Tem certeza de que deseja excluir este lançamento? Esta ação não pode ser desfeita.
             </p>
             <div className={styles.confirmDeleteSummary}>
               <strong>{financePendingDelete.description || 'Sem descrição'}</strong>
@@ -1953,7 +1943,7 @@ export default function Financeiro() {
             <div className={styles.eventDetailActions}>
               <button className={styles.btnExport} type="button" disabled={deletingFinance} onClick={() => setFinancePendingDelete(null)}>Cancelar</button>
               <button className={styles.btnDanger} type="button" disabled={deletingFinance} onClick={confirmFinanceDelete}>
-                {deletingFinance ? 'Processando...' : financePendingDelete.automatic ? 'Confirmar estorno' : 'Confirmar exclusão'}
+                {deletingFinance ? 'Processando...' : 'Confirmar exclusão'}
               </button>
             </div>
           </div>

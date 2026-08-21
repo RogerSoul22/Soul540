@@ -81,6 +81,16 @@ test('offers only pending and paid as persisted status values in every finance i
   }
 });
 
+test('allows direct editing and deletion of automatic entries in every finance interface', () => {
+  for (const file of financePages) {
+    const source = readFileSync(resolve(process.cwd(), file), 'utf8');
+    assert.equal(source.includes('disabled={entry.automatic}'), false, file);
+  }
+
+  const mainSource = readFileSync(resolve(process.cwd(), financePages[0]), 'utf8');
+  assert.equal(mainSource.includes("window.location.href = `/eventos?edit=${encodeURIComponent(entry.eventId)}`"), false);
+});
+
 test('uses one shared Conta Azul-style period filter in every finance interface', () => {
   for (const file of financePages) {
     const source = readFileSync(resolve(process.cwd(), file), 'utf8');

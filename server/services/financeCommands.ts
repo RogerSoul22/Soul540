@@ -146,10 +146,6 @@ export function resolveFinanceStatusChange(
     throw new Error('Status financeiro invÃ¡lido');
   }
 
-  if (entry.settlementStatus === 'cancelled') {
-    throw new Error('Não é possível alterar o status de um lançamento cancelado');
-  }
-
   const amountCents = Number.isSafeInteger(entry.amountCents) ? (entry.amountCents as number) : toCents(entry.amount);
   const settledCents = entry.settledCents ?? 0;
   const isCurrentlySettled = amountCents > 0 && settledCents >= amountCents;

@@ -193,7 +193,6 @@ export function getFinanceModelsForRequest(req: any, scope: string) {
 
 export function getFinanceReverseError(entry: { automatic?: boolean; reversedAt?: string }): string | undefined {
   if (entry.reversedAt) return 'Lançamento já estornado';
-  if (entry.automatic) return 'Altere o evento ou pedido de origem para estornar este lançamento automático';
   return undefined;
 }
 
@@ -228,13 +227,6 @@ async function appendSettlementToFinance(model: any, document: any, settlement: 
     ? entry.settlements.find((item: any) => item.idempotencyKey === settlement.idempotencyKey || (settlement.externalId && item.externalId === settlement.externalId))
     : undefined;
   if (existing) return { kind: 'duplicate' as const, finance: document };
-  if (calculateSettlementStatus(entry) === 'cancelled') {
-    return { kind: 'error' as const, status: 409, error: 'Não é possível liquidar um lançamento cancelado' };
-  }
-  if (entry.settlementStatus === 'partial' && (!Array.isArray(entry.settlements) || entry.settlements.length === 0)) {
-    return { kind: 'error' as const, status: 409, error: 'Lançamento legado parcial precisa ser reconciliado antes de nova baixa' };
-  }
-
   const amountCents = getFinanceAmountCents(entry);
   const settledCents = getSettledCents(entry);
   if (settlement.amountCents + settledCents > amountCents) {
@@ -247,7 +239,6 @@ async function appendSettlementToFinance(model: any, document: any, settlement: 
 
   const query: Record<string, unknown> = {
     _id: entry._id,
-    settlementStatus: { $ne: 'cancelled' },
     'settlements.idempotencyKey': { $ne: settlement.idempotencyKey },
     $expr: {
       $lte: [
@@ -519,7 +510,7 @@ router.put('/:id', validate(updateFinanceSchema), async (req, res) => {
       currentDoc = outcome.finance;
     } else if (command.kind === 'reopen') {
       const updated = await found.model.findOneAndUpdate(
-        { _id: entry._id, settlementStatus: { $ne: 'cancelled' } },
+        { _id: entry._id },
         { $set: { settlementStatus: 'open', settledCents: 0, status: 'pending' }, $unset: { settledAt: 1, settlements: 1 } },
         { new: true },
       );
@@ -536,12 +527,6 @@ router.put('/:id', validate(updateFinanceSchema), async (req, res) => {
     // command.kind === 'noop': currentDoc segue sendo oldDoc; continua para os outros campos abaixo, se houver.
   }
 
-  if ((oldDoc as any).automatic) {
-    const protectedFields = ['amount', 'type', 'category', 'eventId', 'kind', 'origin'];
-    if (protectedFields.some((field) => Object.prototype.hasOwnProperty.call(req.body, field))) {
-      return res.status(409).json({ error: 'Lançamentos automáticos devem ser alterados pelo evento ou pedido de origem' });
-    }
-  }
   const commandFields = ['settlementStatus', 'settledAt', 'settledCents', 'settlements', 'origin', 'kind', 'automatic', 'source', 'eventId', 'reversedAt', 'reversedBy', 'reversalReason', 'autoEventBudget'];
   if (commandFields.some((field) => Object.prototype.hasOwnProperty.call(req.body, field))) {
     return res.status(400).json({ error: 'Use os comandos de liquidar, cancelar ou origem vinculada para alterar a situação financeira' });
@@ -558,12 +543,6 @@ router.put('/:id', validate(updateFinanceSchema), async (req, res) => {
     return res.json(serializeFinanceEntry(currentDoc));
   }
   if (Object.prototype.hasOwnProperty.call(update, 'amount')) {
-    const currentJson = currentDoc.toJSON ? currentDoc.toJSON() : currentDoc;
-    const settledCents = getSettledCents(currentJson);
-    const amountChanged = Math.abs(Number(currentJson.amount || 0) - (update.amount as number)) > 0.005;
-    if (settledCents > 0 && amountChanged) {
-      return res.status(409).json({ error: 'Não altere o valor de um lançamento que já possui baixa' });
-    }
     update.amountCents = toCents(update.amount as number);
   }
   const finance = await found.model.findByIdAndUpdate(req.params.id, update, { new: true });
@@ -580,13 +559,6 @@ router.post('/:id/settlements', validate(createSettlementSchema), async (req, re
     ? entry.settlements.find((settlement: any) => settlement.idempotencyKey === req.body.idempotencyKey)
     : undefined;
   if (existing) return res.json(serializeFinanceEntry(found.doc));
-  if (calculateSettlementStatus(entry) === 'cancelled') {
-    return res.status(409).json({ error: 'Não é possível liquidar um lançamento cancelado' });
-  }
-  if (entry.settlementStatus === 'partial' && (!Array.isArray(entry.settlements) || entry.settlements.length === 0)) {
-    return res.status(409).json({ error: 'Lançamento legado parcial precisa ser reconciliado antes de nova baixa' });
-  }
-
   const amountCents = getFinanceAmountCents(entry);
   const settledCents = getSettledCents(entry);
   const settlement = buildSettlementRecord(
@@ -604,7 +576,6 @@ router.post('/:id/settlements', validate(createSettlementSchema), async (req, re
   const updated = await (found.model as any).findOneAndUpdate(
     {
       _id: entry._id,
-      settlementStatus: { $ne: 'cancelled' },
       'settlements.idempotencyKey': { $ne: settlement.idempotencyKey },
       $expr: {
         $lte: [
@@ -651,11 +622,9 @@ router.post('/:id/settlements', validate(createSettlementSchema), async (req, re
 router.post('/:id/reverse', async (req, res) => {
   const found = await findFinanceForRequest(req, req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
-  // Automatic entries are reversed (not deleted) so their audit history is preserved.
   const reverseError = getFinanceReverseError(found.doc as any);
   if (reverseError) return res.status(409).json({ error: reverseError });
   if ((found.doc as any).reversedAt) return res.status(409).json({ error: 'LanÃ§amento jÃ¡ estornado' });
-  if ((found.doc as any).automatic) return res.status(409).json({ error: 'Altere o evento ou pedido de origem para estornar este lanÃ§amento automÃ¡tico' });
   const reversedAt = new Date().toISOString();
   const finance = await found.model.findByIdAndUpdate(req.params.id, {
     reversedAt,
@@ -671,7 +640,6 @@ router.delete('/:id', async (req, res) => {
   const found = await findFinanceForRequest(req, req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
   const finance = found.doc;
-  if ((finance as any).automatic) return res.status(409).json({ error: 'Use o estorno para lanÃ§amentos automÃ¡ticos' });
   await found.model.findByIdAndUpdate(req.params.id, {
     settlementStatus: 'cancelled',
     reversedAt: new Date().toISOString(),

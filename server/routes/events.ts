@@ -249,8 +249,6 @@ async function upsertAutomaticEventFinance(
     existing = await FinanceModel.findOne({ eventId, autoEventBudget: true, reversedAt: { $exists: false }, settlementStatus: { $ne: 'cancelled' } });
   }
 
-  if (existing && !canChangeForecast(existing.toJSON())) return;
-
   if (amount <= 0) {
     if (existing) {
       await FinanceModel.findByIdAndUpdate(existing._id, {
@@ -356,57 +354,6 @@ export function calculateEventFinanceAmounts(event: any) {
   const targetRevenue = finalValue > 0 ? finalValue : budget;
   const balance = Math.max(targetRevenue - deposit, 0);
   return { budget, finalValue, deposit, travel, targetRevenue, balance };
-}
-
-const FINANCE_KINDS_AFFECTED_BY_EVENT_FIELD: Record<string, string[]> = {
-  budget: ['balance', 'commission'],
-  finalValue: ['balance', 'commission'],
-  depositValue: ['deposit', 'balance'],
-  depositDate: ['deposit'],
-  travelCost: ['travel'],
-  paymentMethod: ['deposit'],
-  pixKey: [],
-};
-
-function getAutomaticFinanceKind(finance: any): string | undefined {
-  return finance.kind || (finance.autoEventBudget ? 'balance' : undefined);
-}
-
-export function eventCancellationRequiresDecision(finances: any[], changedFields?: string[]): boolean {
-  if (!changedFields) return finances.some((finance) => !canChangeForecast(finance));
-
-  const affectedKinds = new Set(changedFields.flatMap((field) => FINANCE_KINDS_AFFECTED_BY_EVENT_FIELD[field] || []));
-  return finances.some((finance) => {
-    const financeKind = getAutomaticFinanceKind(finance);
-    return financeKind !== undefined && affectedKinds.has(financeKind) && !canChangeForecast(finance);
-  });
-}
-
-export function hasMaterialFinancialChange(current: Record<string, any>, update: Record<string, any>, fields: string[]): boolean {
-  return fields.some((field) => {
-    if (!Object.prototype.hasOwnProperty.call(update, field)) return false;
-    const previousValue = current?.[field] ?? null;
-    const nextValue = update[field] ?? null;
-    if (previousValue === nextValue) return false;
-    if (typeof previousValue === 'number' && typeof nextValue === 'string' && nextValue.trim() !== '') {
-      return previousValue !== Number(nextValue);
-    }
-    if (typeof previousValue === 'string' && typeof nextValue === 'number' && previousValue.trim() !== '') {
-      return Number(previousValue) !== nextValue;
-    }
-    return true;
-  });
-}
-
-async function cancellationRequiresDecision(event: any, FinanceModel: FinanceModel, changedFields?: string[]): Promise<boolean> {
-  const eventId = event.id || event._id.toString();
-  const finances = await FinanceModel.find({
-    eventId,
-    $or: [{ automatic: true }, { autoEventBudget: true }],
-    reversedAt: { $exists: false },
-    settlementStatus: { $ne: 'cancelled' },
-  }).lean();
-  return eventCancellationRequiresDecision(finances, changedFields);
 }
 
 async function cancelMutableAutomaticFinances(FinanceModel: FinanceModel, query: Record<string, unknown>, reversalReason: string) {
@@ -585,17 +532,8 @@ router.post('/:id/financial-reopen', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const found = await findEventForRequest(req, req.params.id);
   if (!found) return res.status(404).json({ error: 'Not found' });
-  const protectedFinancialFields = ['budget', 'finalValue', 'depositValue', 'depositDate', 'travelCost', 'paymentMethod', 'pixKey'];
-  const changedFinancialFields = protectedFinancialFields.filter((field) => hasMaterialFinancialChange(found.doc, req.body || {}, [field]));
   // Cancelar um evento sempre exclui as previsões financeiras automáticas vinculadas
   // (ver syncEventFinances), mesmo que já tenham baixa registrada — não exige decisão prévia.
-  if (
-    (found.doc.financialCloseStatus === 'closed' || found.doc.financialStatus === 'closed') &&
-    !isFromFactory(req) &&
-    changedFinancialFields.length > 0
-  ) {
-    return res.status(409).json({ error: 'Reabra o financeiro do evento antes de alterar valores financeiros' });
-  }
   const updateData = isFromFactory(req) ? pickFactoryOperationalUpdate(req.body) : req.body;
   if (isFromFactory(req) && Object.keys(updateData).length === 0) {
     return res.status(403).json({ error: 'Factory can only update operational production fields' });
@@ -622,9 +560,6 @@ router.delete('/:id', async (req, res) => {
   }
   const found = await findEventForRequest(req, req.params.id);
   if (!found) return res.status(204).end();
-  if (await cancellationRequiresDecision(found.doc, found.financeModel)) {
-    return res.status(409).json({ error: 'Registre reembolso, multa retida ou ajuste aprovado antes de excluir um evento com baixa financeira' });
-  }
   const eventName = found.doc?.name || req.params.id;
   await found.model.findByIdAndDelete(req.params.id);
   await found.financeModel.updateMany(

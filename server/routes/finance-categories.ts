@@ -2,7 +2,6 @@ import { Router } from 'express';
 import mongoose from 'mongoose';
 import { getTenantUnit } from '../middleware/tenant';
 import { logAudit } from '../utils/audit';
-import { Finance, FranchiseFinance, FactoryFinance } from './finances';
 
 const DRE_SECTION_KEYS = [
   'faturamentos',
@@ -42,13 +41,6 @@ function getModel(req: any) {
   if (unit === 'factory') return FactoryFinanceCategory;
   if (unit === 'franchise') return FranchiseFinanceCategory;
   return FinanceCategory;
-}
-
-function getFinanceModel(req: any) {
-  const unit = getTenantUnit(req);
-  if (unit === 'factory') return FactoryFinance;
-  if (unit === 'franchise') return FranchiseFinance;
-  return Finance;
 }
 
 function canManageFinanceCategories(req: any) {
@@ -101,12 +93,6 @@ router.delete('/:id', async (req, res) => {
   const Model = getModel(req);
   const doc = await Model.findById(req.params.id);
   if (!doc) return res.status(404).json({ error: 'Not found' });
-
-  const inUse = await getFinanceModel(req).countDocuments({
-    category: (doc as any).key,
-    source: getTenantUnit(req),
-  });
-  if (inUse > 0) return res.status(409).json({ error: 'category_in_use', count: inUse });
 
   await Model.findByIdAndDelete(req.params.id);
   await logAudit({ req, action: 'delete', resource: 'finance-categories', resourceId: req.params.id, description: `Excluiu categoria financeira: ${(doc as any).label}` });

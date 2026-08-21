@@ -161,13 +161,15 @@ test('is a no-op when the requested status matches the current one', () => {
   assert.deepEqual(open, { kind: 'noop' });
 });
 
-test('rejects a status change on a cancelled entry', () => {
-  assert.throws(() => resolveFinanceStatusChange(
+test('allows a status change on a cancelled entry', () => {
+  const command = resolveFinanceStatusChange(
     { type: 'revenue', date: '2026-08-01', amount: 100, amountCents: 10_000, settledCents: 0, settlementStatus: 'cancelled' },
     'paid',
     {},
     'user-1',
-  ), /cancelado/);
+  );
+
+  assert.equal(command.kind, 'settle');
 });
 
 test('rejects the legacy received status in the status command', () => {
