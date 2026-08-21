@@ -590,13 +590,6 @@ router.put('/:id', async (req, res) => {
   // Cancelar um evento sempre exclui as previsões financeiras automáticas vinculadas
   // (ver syncEventFinances), mesmo que já tenham baixa registrada — não exige decisão prévia.
   if (
-    !isFromFactory(req) &&
-    changedFinancialFields.length > 0 &&
-    await cancellationRequiresDecision(found.doc, found.financeModel, changedFinancialFields)
-  ) {
-    return res.status(409).json({ error: 'Registre um ajuste financeiro aprovado antes de alterar valores de um evento com baixa financeira' });
-  }
-  if (
     (found.doc.financialCloseStatus === 'closed' || found.doc.financialStatus === 'closed') &&
     !isFromFactory(req) &&
     changedFinancialFields.length > 0

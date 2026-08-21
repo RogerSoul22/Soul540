@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import test from 'node:test';
+import { resolve } from 'node:path';
 import { calculateCommissionAmount, calculateEventFinanceAmounts, canSyncAutomaticCommission, eventCancellationRequiresDecision, hasMaterialFinancialChange, syncEventCommissions, syncEventFinances } from '../events';
+
+const eventRouteSource = readFileSync(
+  resolve(process.cwd(), 'server/routes/events.ts'),
+  'utf8',
+);
 
 test('separates deposit, balance and travel without double counting revenue', () => {
   const result = calculateEventFinanceAmounts({
@@ -260,7 +267,7 @@ test('allows changing the final value when only the event deposit is settled', (
   assert.equal(eventCancellationRequiresDecision([settledDeposit], ['finalValue']), false);
 });
 
-test('requires an adjustment when changing the final value would alter a settled balance', () => {
+test('identifies a settled balance affected by a final-value change', () => {
   const settledBalance = {
     kind: 'balance',
     type: 'revenue',
@@ -271,6 +278,10 @@ test('requires an adjustment when changing the final value would alter a settled
   };
 
   assert.equal(eventCancellationRequiresDecision([settledBalance], ['finalValue']), true);
+});
+
+test('allows direct editing of event values after a financial settlement', () => {
+  assert.equal(eventRouteSource.includes('Registre um ajuste financeiro aprovado antes de alterar valores de um evento com baixa financeira'), false);
 });
 
 test('excludes already-cancelled linked entries from the cancelled-event cleanup query', async () => {
