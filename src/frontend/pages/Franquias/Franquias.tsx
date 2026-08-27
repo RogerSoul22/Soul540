@@ -12,6 +12,7 @@ type Franchise = {
   createdAt: string;
 };
 import Badge from '@frontend/components/Badge/Badge';
+import { apiFetch } from '@frontend/lib/api';
 import styles from './Franquias.module.scss';
 import ConfirmModal from '@frontend/components/ConfirmModal/ConfirmModal';
 
@@ -106,10 +107,10 @@ function PortalCard({ system, defaultUrl }: { system: PortalSystem; defaultUrl: 
 
       // Local API with X-System header (used when portal is same-origin or unreachable)
       const responses = await Promise.all([
-        fetch('/api/events/count', { headers: localHeaders }),
-        fetch('/api/tasks', { headers: localHeaders }),
-        fetch('/api/employees', { headers: localHeaders }),
-        fetch('/api/finances', { headers: localHeaders }),
+        apiFetch('/api/events/count', { headers: localHeaders }),
+        apiFetch('/api/tasks', { headers: localHeaders }),
+        apiFetch('/api/employees', { headers: localHeaders }),
+        apiFetch('/api/finances', { headers: localHeaders }),
       ]);
       if (!responses[0].ok) throw new Error('local api error');
       setStats(await parseAll(responses));
@@ -217,7 +218,7 @@ export default function Franquias() {
   const [franchises, setFranchises] = useState<Franchise[]>([]);
 
   useEffect(() => {
-    fetch('/api/franchises').then(r => r.json()).then(setFranchises).catch(() => {});
+    apiFetch('/api/franchises').then(r => r.json()).then(setFranchises).catch(() => {});
   }, []);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -254,11 +255,11 @@ export default function Franquias() {
       monthlyFee: Number(form.monthlyFee) || 0, status: form.status, openDate: form.openDate,
     };
     if (editingId) {
-      const res = await fetch(`/api/franchises/${editingId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const res = await apiFetch(`/api/franchises/${editingId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       const updated: Franchise = await res.json();
       setFranchises((prev) => prev.map((f) => f.id === editingId ? updated : f));
     } else {
-      const res = await fetch('/api/franchises', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const res = await apiFetch('/api/franchises', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       const created: Franchise = await res.json();
       setFranchises((prev) => [created, ...prev]);
     }
@@ -268,7 +269,7 @@ export default function Franquias() {
   const handleDelete = (id: string) => { setDeleteTargetId(id); };
   const confirmDelete = async () => {
     if (deleteTargetId) {
-      await fetch(`/api/franchises/${deleteTargetId}`, { method: 'DELETE' });
+      await apiFetch(`/api/franchises/${deleteTargetId}`, { method: 'DELETE' });
       setFranchises((prev) => prev.filter((f) => f.id !== deleteTargetId));
     }
     setDeleteTargetId(null);
@@ -290,7 +291,7 @@ export default function Franquias() {
           status: data.status || 'em_implantacao',
           openDate: data.openDate || new Date().toISOString().split('T')[0],
         };
-        const res = await fetch('/api/franchises', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const res = await apiFetch('/api/franchises', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
         const created: Franchise = await res.json();
         setFranchises((prev) => [created, ...prev]);
         alert('Franquia importada com sucesso!');

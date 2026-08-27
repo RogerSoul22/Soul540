@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useApp } from '@frontend/contexts/AppContext';
+import { apiFetch } from '@frontend/lib/api';
 import styles from './Cardapios.module.scss';
 import ConfirmModal from '@frontend/components/ConfirmModal/ConfirmModal';
 import { SOUL540_MENUS, type StaticMenu, type StaticCategory } from '@frontend/data/soul540Menus';
@@ -106,7 +107,7 @@ export default function Cardapios() {
   const [menus, setMenus] = useState<Menu[]>([]);
 
   useEffect(() => {
-    fetch('/api/menus').then(r => r.json()).then(setMenus).catch(() => {});
+    apiFetch('/api/menus').then(r => r.json()).then(setMenus).catch(() => {});
   }, []);
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -161,11 +162,11 @@ export default function Cardapios() {
     if (!formName) return;
     const data = { name: formName, eventId: formEventId || '', headerText: formHeaderText, footerText: formFooterText, categories: formCategories };
     if (editingId) {
-      const res = await fetch(`/api/menus/${editingId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const res = await apiFetch(`/api/menus/${editingId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       const updated: Menu = await res.json();
       setMenus((prev) => prev.map((m) => m.id === editingId ? updated : m));
     } else {
-      const res = await fetch('/api/menus', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const res = await apiFetch('/api/menus', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       const created: Menu = await res.json();
       setMenus((prev) => [created, ...prev]);
     }
@@ -174,7 +175,7 @@ export default function Cardapios() {
 
   const handleDelete = (id: string) => { setDeleteTargetId(id); };
   const confirmDelete = async () => {
-    if (deleteTargetId) { await fetch(`/api/menus/${deleteTargetId}`, { method: 'DELETE' }); setMenus((prev) => prev.filter((m) => m.id !== deleteTargetId)); }
+    if (deleteTargetId) { await apiFetch(`/api/menus/${deleteTargetId}`, { method: 'DELETE' }); setMenus((prev) => prev.filter((m) => m.id !== deleteTargetId)); }
     setDeleteTargetId(null);
   };
 

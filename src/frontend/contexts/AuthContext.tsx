@@ -3,6 +3,7 @@ import { createContext, useCallback, useEffect, useState } from 'react';
 import type { User } from '@backend/domain/entities/User';
 import { AuthRepository } from '@backend/infra/repositories/AuthRepository';
 import { LoginUseCase } from '@backend/usecases/LoginUseCase';
+import { TokenStorage } from '@backend/infra/storage/TokenStorage';
 
 interface AuthContextData {
   user: User | null;
@@ -40,6 +41,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    const endSession = () => {
+      TokenStorage.clear();
+      setUser(null);
+    };
+
+    window.addEventListener('soul540:unauthorized', endSession);
+    return () => window.removeEventListener('soul540:unauthorized', endSession);
+  }, []);
+
   const login = useCallback(async (email: string, password: string) => {
     setLoading(true);
     try {
@@ -51,8 +62,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(async () => {
-    await authRepository.logout();
-    setUser(null);
+    try {
+      await authRepository.logout();
+    } finally {
+      TokenStorage.clear();
+      setUser(null);
+    }
   }, []);
 
   return (

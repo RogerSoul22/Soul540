@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import type { Employee } from '@backend/infra/data/mockData';
 import Badge from '@frontend/components/Badge/Badge';
 import ConfirmModal from '@frontend/components/ConfirmModal/ConfirmModal';
+import { apiFetch } from '@frontend/lib/api';
 import styles from './Funcionarios.module.scss';
 
 const DAYS = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'];
@@ -73,7 +74,7 @@ export default function Funcionarios() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/employees')
+    apiFetch('/api/employees')
       .then(r => r.json())
       .then(setEmployees)
       .finally(() => setLoading(false));
@@ -157,13 +158,13 @@ export default function Funcionarios() {
       skills: form.skills.length > 0 ? form.skills : undefined,
     };
     if (editingId) {
-      const res = await fetch(`/api/employees/${editingId}`, {
+      const res = await apiFetch(`/api/employees/${editingId}`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
       });
       const updated = await res.json();
       setEmployees((prev) => prev.map((e) => e.id === editingId ? updated : e));
     } else {
-      const res = await fetch('/api/employees', {
+      const res = await apiFetch('/api/employees', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data),
       });
       const created = await res.json();
@@ -174,7 +175,7 @@ export default function Funcionarios() {
 
   const confirmDelete = async () => {
     if (deleteTargetId) {
-      await fetch(`/api/employees/${deleteTargetId}`, { method: 'DELETE' });
+      await apiFetch(`/api/employees/${deleteTargetId}`, { method: 'DELETE' });
       setEmployees((prev) => prev.filter((e) => e.id !== deleteTargetId));
     }
     setDeleteTargetId(null);

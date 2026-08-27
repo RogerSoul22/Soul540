@@ -380,20 +380,20 @@ export default function Financeiro() {
     }
     if (dataScope === 'franchise' || dataScope === 'combined') {
       const h: HeadersInit = { 'X-System': 'franchise' };
-      fetch('/api/finances', { headers: h, credentials: 'include' }).then(r => r.json()).then(d => Array.isArray(d) && setFranchiseFinances(d)).catch(() => {});
-      fetch('/api/events',   { headers: h, credentials: 'include' }).then(r => r.json()).then(d => Array.isArray(d) && setFranchiseEvents(d)).catch(() => {});
+      apiFetch('/api/finances', { headers: h, credentials: 'include' }).then(r => r.json()).then(d => Array.isArray(d) && setFranchiseFinances(d)).catch(() => {});
+      apiFetch('/api/events',   { headers: h, credentials: 'include' }).then(r => r.json()).then(d => Array.isArray(d) && setFranchiseEvents(d)).catch(() => {});
     }
     if (dataScope === 'factory' || dataScope === 'combined') {
       const h: HeadersInit = { 'X-System': 'factory' };
-      fetch('/api/finances', { headers: h, credentials: 'include' }).then(r => r.json()).then(d => Array.isArray(d) && setFactoryFinances(d)).catch(() => {});
-      fetch('/api/events',   { headers: h, credentials: 'include' }).then(r => r.json()).then(d => Array.isArray(d) && setFactoryEvents(d)).catch(() => {});
+      apiFetch('/api/finances', { headers: h, credentials: 'include' }).then(r => r.json()).then(d => Array.isArray(d) && setFactoryFinances(d)).catch(() => {});
+      apiFetch('/api/events',   { headers: h, credentials: 'include' }).then(r => r.json()).then(d => Array.isArray(d) && setFactoryEvents(d)).catch(() => {});
     }
   }, [dataScope]);
 
   // Ensure events are available for the form regardless of AppContext state
   useEffect(() => {
     if (!showForm) return;
-    fetch('/api/events', { credentials: 'include', headers: { 'Content-Type': 'application/json', 'X-System': 'main' } })
+    apiFetch('/api/events', { credentials: 'include', headers: { 'Content-Type': 'application/json', 'X-System': 'main' } })
       .then(r => r.json())
       .then(d => { if (Array.isArray(d)) setDirectEvents(d); })
       .catch(() => {});
@@ -745,7 +745,7 @@ export default function Financeiro() {
     }
     const settlementStatus = calculateSettlementStatus(entry);
     if (settlementStatus === 'cancelled') {
-      alert('NÃ£o Ã© possÃ­vel liquidar um lanÃ§amento cancelado. Use o fluxo de ajuste com justificativa.');
+      alert('Não é possível liquidar um lançamento cancelado. Use o fluxo de ajuste com justificativa.');
       return;
     }
     if (entry.status === 'paid' || settlementStatus === 'settled') return;

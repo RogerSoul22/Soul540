@@ -31,8 +31,8 @@ test('offers numeric ordering and two ways to find an order', () => {
   assert.equal(pageSource.includes('Digitar'), true);
   assert.equal(pageSource.includes('Lista alfabética'), true);
   assert.equal(pageSource.includes('Digite o número ou filial'), true);
-  assert.equal(pageSource.includes('Lista alfabÃ©tica'), false);
-  assert.equal(pageSource.includes('Digite o nÃºmero ou filial'), false);
+  assert.equal(pageSource.includes('Lista alfab\u00c3\u00a9tica'), false);
+  assert.equal(pageSource.includes('Digite o n\u00c3\u00bamero ou filial'), false);
   assert.equal(pageSource.includes('selectedOrderId'), true);
   assert.equal(pageSource.includes('orderSearchMode'), true);
   assert.equal(pageSource.includes('sortOrdersByNumber'), true);

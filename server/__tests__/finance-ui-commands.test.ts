@@ -102,6 +102,22 @@ test('uses one shared Conta Azul-style period filter in every finance interface'
   }
 });
 
+test('paginates factory and Campinas finance tables beyond the first fifty entries', () => {
+  const paginatedFinancePages = [
+    'factory/src/pages/Financeiro/Financeiro/Financeiro.tsx',
+    'franchise/src/pages/Financeiro/Financeiro.tsx',
+  ];
+
+  for (const file of paginatedFinancePages) {
+    const source = readFileSync(resolve(process.cwd(), file), 'utf8');
+
+    assert.equal(source.includes('const [lancamentosPage, setLancamentosPage] = useState(1);'), true, file);
+    assert.equal(source.includes('filtered.slice((lancamentosPage - 1) * 50, lancamentosPage * 50)'), true, file);
+    assert.equal(source.includes('Página {lancamentosPage} de {Math.ceil(filtered.length / 50)}'), true, file);
+    assert.equal(source.includes('Próxima'), true, file);
+  }
+});
+
 test('waits for authentication before loading protected data in every portal', () => {
   for (const file of contextFiles) {
     const source = readFileSync(resolve(process.cwd(), file), 'utf8');

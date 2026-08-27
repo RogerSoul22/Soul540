@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import Badge from '@frontend/components/Badge/Badge';
+import { apiFetch } from '@frontend/lib/api';
 
 type XmlImportItem = {
   id: string;
@@ -110,8 +111,8 @@ export default function EstoqueInsumos() {
   const [categories, setCategories] = useState<string[]>([]);
 
   useEffect(() => {
-    fetch('/api/supplies').then(r => r.json()).then(setSupplies).finally(() => setLoading(false));
-    fetch('/api/supply-categories').then(r => r.json()).then(setCategories).catch(() => {});
+    apiFetch('/api/supplies').then(r => r.json()).then(setSupplies).finally(() => setLoading(false));
+    apiFetch('/api/supply-categories').then(r => r.json()).then(setCategories).catch(() => {});
   }, []);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showCatModal, setShowCatModal] = useState(false);
@@ -162,7 +163,7 @@ export default function EstoqueInsumos() {
       const min = 0;
       const status = calcStatus(qty, min, it.expirationDate || undefined);
       const data = { name: it.name, category: it.category, measureUnit: it.measureUnit, quantity: qty, minStock: min, costPerUnit: it.costPerUnit, supplier: it.supplier, expirationDate: it.expirationDate || undefined, status };
-      const res = await fetch('/api/supplies', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const res = await apiFetch('/api/supplies', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       const created = await res.json();
       setSupplies((prev) => [...prev, created]);
     }
@@ -204,11 +205,11 @@ export default function EstoqueInsumos() {
       expirationDate: form.expirationDate || undefined, status,
     };
     if (editingId) {
-      const res = await fetch(`/api/supplies/${editingId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const res = await apiFetch(`/api/supplies/${editingId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       const updated = await res.json();
       setSupplies((prev) => prev.map((s) => s.id === editingId ? updated : s));
     } else {
-      const res = await fetch('/api/supplies', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const res = await apiFetch('/api/supplies', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       const created = await res.json();
       setSupplies((prev) => [...prev, created]);
     }
@@ -218,7 +219,7 @@ export default function EstoqueInsumos() {
   const addCategory = async () => {
     const trimmed = newCategory.trim();
     if (trimmed && !categories.map(c => c.toLowerCase()).includes(trimmed.toLowerCase())) {
-      await fetch('/api/supply-categories', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: trimmed }) });
+      await apiFetch('/api/supply-categories', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: trimmed }) });
       setCategories((prev) => [...prev, trimmed].sort((a, b) => a.localeCompare(b, 'pt-BR')));
     }
     setNewCategory('');
@@ -228,7 +229,7 @@ export default function EstoqueInsumos() {
   const handleDelete = (id: string) => { setDeleteTargetId(id); };
   const confirmDelete = async () => {
     if (deleteTargetId) {
-      await fetch(`/api/supplies/${deleteTargetId}`, { method: 'DELETE' });
+      await apiFetch(`/api/supplies/${deleteTargetId}`, { method: 'DELETE' });
       setSupplies((prev) => prev.filter((s) => s.id !== deleteTargetId));
     }
     setDeleteTargetId(null);
@@ -469,7 +470,7 @@ export default function EstoqueInsumos() {
           message={<>Tem certeza que deseja remover a categoria <strong>{deleteCatTarget}</strong>?</>}
           confirmLabel="Remover"
           variant="danger"
-          onConfirm={async () => { await fetch('/api/supply-categories', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: deleteCatTarget }) }); setCategories((prev) => prev.filter((c) => c !== deleteCatTarget)); setDeleteCatTarget(null); }}
+          onConfirm={async () => { await apiFetch('/api/supply-categories', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: deleteCatTarget }) }); setCategories((prev) => prev.filter((c) => c !== deleteCatTarget)); setDeleteCatTarget(null); }}
           onClose={() => setDeleteCatTarget(null)}
         />
       )}

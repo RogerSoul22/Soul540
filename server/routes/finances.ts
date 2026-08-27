@@ -624,7 +624,7 @@ router.post('/:id/reverse', async (req, res) => {
   if (!found) return res.status(404).json({ error: 'Not found' });
   const reverseError = getFinanceReverseError(found.doc as any);
   if (reverseError) return res.status(409).json({ error: reverseError });
-  if ((found.doc as any).reversedAt) return res.status(409).json({ error: 'LanÃ§amento jÃ¡ estornado' });
+  if ((found.doc as any).reversedAt) return res.status(409).json({ error: 'Lançamento já estornado' });
   const reversedAt = new Date().toISOString();
   const finance = await found.model.findByIdAndUpdate(req.params.id, {
     reversedAt,
@@ -632,7 +632,7 @@ router.post('/:id/reverse', async (req, res) => {
     reversalReason: req.body?.reason || 'Estorno manual',
     settlementStatus: 'cancelled',
   }, { new: true });
-  await logAudit({ req, action: 'update', resource: 'finances', resourceId: req.params.id, description: `Estornou lanÃ§amento: ${(found.doc as any).description}` });
+  await logAudit({ req, action: 'update', resource: 'finances', resourceId: req.params.id, description: `Estornou lançamento: ${(found.doc as any).description}` });
   res.json(finance);
 });
 

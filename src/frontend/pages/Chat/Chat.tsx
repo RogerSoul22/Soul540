@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, type FormEvent } from 'react';
 import { useApp } from '@frontend/contexts/AppContext';
+import { apiFetch } from '@frontend/lib/api';
 import styles from './Chat.module.scss';
 
 interface Message {
@@ -47,7 +48,7 @@ export default function Chat() {
     try {
       const token = localStorage.getItem('soul540_token');
       const history = newMessages.slice(-10).map(m => ({ role: m.role, content: m.content }));
-      const res = await fetch('/api/chat', {
+      const res = await apiFetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,7 +85,7 @@ export default function Chat() {
     try {
       const token = localStorage.getItem('soul540_token');
       const history = newMessages.slice(-10).map(m => ({ role: m.role, content: m.content }));
-      const res = await fetch('/api/chat', {
+      const res = await apiFetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

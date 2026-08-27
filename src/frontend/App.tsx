@@ -23,6 +23,7 @@ import EstoqueInsumos from '@frontend/pages/EstoqueInsumos/EstoqueInsumos';
 import EstoqueUtensilios from '@frontend/pages/EstoqueUtensilios/EstoqueUtensilios';
 import Chat from '@frontend/pages/Chat/Chat';
 import Permissoes from '@frontend/pages/Permissoes/Permissoes';
+import ErrorBoundary from '@frontend/components/ErrorBoundary/ErrorBoundary';
 
 function AppLoading() {
   return (
@@ -54,6 +55,7 @@ function PublicRoute() {
 
 export default function App() {
   return (
+    <ErrorBoundary>
     <BrowserRouter>
       <ThemeProvider>
         <AuthProvider>
@@ -117,5 +119,6 @@ export default function App() {
         </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>
+    </ErrorBoundary>
   );
 }

@@ -19,6 +19,7 @@ import MinhaConta from '@/pages/MinhaConta/MinhaConta';
 import Cardapios from '@/pages/Cardapios/Cardapios';
 import Contratos from '@/pages/Contratos/Contratos';
 import Auditoria from '@/pages/Auditoria/Auditoria';
+import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
 
 function AppLoading() {
   return (
@@ -50,6 +51,7 @@ function PublicRoute() {
 
 export default function App() {
   return (
+    <ErrorBoundary>
     <BrowserRouter basename="/campinas">
       <ThemeProvider>
       <AuthProvider>
@@ -104,5 +106,6 @@ export default function App() {
       </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>
+    </ErrorBoundary>
   );
 }

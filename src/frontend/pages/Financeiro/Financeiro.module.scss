@@ -1307,6 +1307,7 @@
 .chartContainer { min-height: 300px; }
 @media (max-width: 900px) { .page { padding: 20px 18px 36px; } .header { align-items: flex-start; } .headerActions { width: 100%; justify-content: flex-start; } .summaryBar { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 560px) { .page { padding: 16px 12px 28px; } .summaryBar { grid-template-columns: 1fr; } .pageMonthFilter { align-items: stretch; flex-direction: column; } .pageMonthField, .pageMonthSelect, .searchInput, .btnExport, .btnXml { width: 100%; } .headerActions > button, .headerActions > .scopeToggle { width: 100%; } .scopeToggle { overflow-x: auto; } .scopeBtn { flex: 1 0 auto; } }
+@media (max-width: 700px) { .eventDetailGrid { grid-template-columns: 1fr; } }
 
 /* Dense receivables-style workspace inspired by Conta Azul. */
 .page { padding: 20px 26px 40px; }

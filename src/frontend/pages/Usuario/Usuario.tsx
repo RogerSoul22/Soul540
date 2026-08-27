@@ -2,6 +2,7 @@ import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { useAuth } from '@frontend/hooks/useAuth';
 import { useTheme } from '@frontend/contexts/ThemeContext';
+import { apiFetch } from '@frontend/lib/api';
 import Button from '@frontend/components/Button/Button';
 import styles from './Usuario.module.scss';
 
@@ -25,7 +26,7 @@ export default function Usuario() {
     if (!newPassword.trim() || newPassword.length < 6) return;
     setChangingPassword(true);
     try {
-      await fetch(`/api/users/${(user as any)?.id}`, {
+      await apiFetch(`/api/users/${(user as any)?.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: newPassword }),

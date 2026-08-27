@@ -3,6 +3,7 @@ import type { Utensil } from '@backend/infra/data/mockData';
 import Badge from '@frontend/components/Badge/Badge';
 import styles from './EstoqueUtensilios.module.scss';
 import ConfirmModal from '@frontend/components/ConfirmModal/ConfirmModal';
+import { apiFetch } from '@frontend/lib/api';
 
 function formatCurrency(value: string): string {
   const digits = value.replace(/\D/g, '');
@@ -40,8 +41,8 @@ export default function EstoqueUtensilios() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/utensils').then(r => r.json()).then(setUtensils).finally(() => setLoading(false));
-    fetch('/api/utensil-categories').then(r => r.json()).then(setCategories).catch(() => {});
+    apiFetch('/api/utensils').then(r => r.json()).then(setUtensils).finally(() => setLoading(false));
+    apiFetch('/api/utensil-categories').then(r => r.json()).then(setCategories).catch(() => {});
   }, []);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -88,11 +89,11 @@ export default function EstoqueUtensilios() {
       name: form.name, category: form.category, quantity: Number(form.quantity) || 1, unitValue: parseCurrency(form.unitValue) || undefined, location: form.location, status: form.status,
     };
     if (editingId) {
-      const res = await fetch(`/api/utensils/${editingId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const res = await apiFetch(`/api/utensils/${editingId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       const updated = await res.json();
       setUtensils((prev) => prev.map((u) => u.id === editingId ? updated : u));
     } else {
-      const res = await fetch('/api/utensils', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const res = await apiFetch('/api/utensils', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       const created = await res.json();
       setUtensils((prev) => [...prev, created]);
     }
@@ -102,7 +103,7 @@ export default function EstoqueUtensilios() {
   const addCategory = async () => {
     const trimmed = newCategory.trim();
     if (trimmed && !categories.map(c => c.toLowerCase()).includes(trimmed.toLowerCase())) {
-      await fetch('/api/utensil-categories', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: trimmed }) });
+      await apiFetch('/api/utensil-categories', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: trimmed }) });
       setCategories((prev) => [...prev, trimmed].sort((a, b) => a.localeCompare(b, 'pt-BR')));
     }
     setNewCategory('');
@@ -112,7 +113,7 @@ export default function EstoqueUtensilios() {
   const handleDelete = (id: string) => { setDeleteTargetId(id); };
   const confirmDelete = async () => {
     if (deleteTargetId) {
-      await fetch(`/api/utensils/${deleteTargetId}`, { method: 'DELETE' });
+      await apiFetch(`/api/utensils/${deleteTargetId}`, { method: 'DELETE' });
       setUtensils((prev) => prev.filter((u) => u.id !== deleteTargetId));
     }
     setDeleteTargetId(null);
@@ -322,7 +323,7 @@ export default function EstoqueUtensilios() {
           confirmLabel="Remover"
           variant="danger"
           onConfirm={async () => {
-            await fetch('/api/utensil-categories', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: deleteCatTarget }) });
+            await apiFetch('/api/utensil-categories', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: deleteCatTarget }) });
             setCategories((prev) => prev.filter((c) => c !== deleteCatTarget));
             setDeleteCatTarget(null);
           }}

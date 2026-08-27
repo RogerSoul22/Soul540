@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useApp } from '@frontend/contexts/AppContext';
+import { apiFetch } from '@frontend/lib/api';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { PizzaEvent } from '@backend/domain/entities/Event';
@@ -268,8 +269,8 @@ export default function Eventos() {
   }, [events, searchParams, setSearchParams]);
 
   useEffect(() => {
-    fetch('/api/employees').then(r => r.json()).then(setEmployees).catch(() => {});
-    fetch('/api/menus').then(r => r.json()).then((data: { name: string }[]) => {
+    apiFetch('/api/employees').then(r => r.json()).then(setEmployees).catch(() => {});
+    apiFetch('/api/menus').then(r => r.json()).then((data: { name: string }[]) => {
       if (Array.isArray(data)) {
         const apiNames = data.map(m => m.name).filter(n => !STATIC_MENU_NAMES.includes(n));
         setAvailableMenus([...STATIC_MENU_NAMES, ...apiNames]);

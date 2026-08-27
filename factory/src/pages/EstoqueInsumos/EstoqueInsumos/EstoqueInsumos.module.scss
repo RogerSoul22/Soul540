@@ -72,7 +72,7 @@
 .modalBody { padding: $spacing-xl; display: flex; flex-direction: column; gap: $spacing-md; }
 .modalFooter { @include flex-between; padding: $spacing-md $spacing-xl; border-top: 1px solid $border; }
 
-.viewGrid { display: grid; grid-template-columns: 1fr 1fr; gap: $spacing-md; }
+.viewGrid { display: grid; grid-template-columns: 1fr 1fr; gap: $spacing-md; @include mobile { grid-template-columns: 1fr; } }
 .viewField { display: flex; flex-direction: column; gap: 4px; background: $bg-tertiary; border: 1px solid $border; border-radius: $radius-sm; padding: $spacing-sm $spacing-md; }
 .viewLabel { font-size: 11px; font-weight: $font-weight-semibold; color: $text-muted; text-transform: uppercase; letter-spacing: 0.5px; }
 .viewValue { font-size: $font-size-sm; color: $text-primary; }

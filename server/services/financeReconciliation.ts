@@ -215,7 +215,7 @@ export function reconcileFinances(
         eventId: finance.eventId,
         source: finance.source,
         action: 'normalize_legacy_status',
-        reason: 'LanÃ§amento legado usa o status recebido, substituÃ­do pelo status pago',
+        reason: 'Lançamento legado usa o status recebido, substituído pelo status pago',
       });
     }
 

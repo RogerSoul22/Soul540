@@ -84,7 +84,7 @@ export function getInitialFinancePeriod(today = getSaoPauloDate()): FinancePerio
 
 export function createMonthRangePeriod(startMonth: string, endMonth: string): FinancePeriod {
   if (!isYearMonth(startMonth) || !isYearMonth(endMonth) || startMonth > endMonth) {
-    throw new Error('Intervalo mensal invÃ¡lido');
+    throw new Error('Intervalo mensal inválido');
   }
 
   const endMonthStart = `${endMonth}-01`;

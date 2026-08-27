@@ -117,7 +117,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const reverseFinance = useCallback(async (id: string, reason = 'Estorno manual') => {
     const res = await apiFetch(`/api/finances/${id}/reverse`, { method: 'POST', headers: buildHeaders(true), body: JSON.stringify({ reason }) });
-    if (!res.ok) throw new Error('Falha ao estornar lanÃ§amento financeiro');
+    if (!res.ok) throw new Error('Falha ao estornar lançamento financeiro');
     setFinances((prev) => prev.filter((f) => f.id !== id));
   }, []);
 

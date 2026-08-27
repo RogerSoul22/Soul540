@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@frontend/hooks/useAuth';
+import { apiFetch } from '@frontend/lib/api';
 import styles from './Permissoes.module.scss';
 
 type AppUser = {
@@ -98,7 +99,7 @@ export default function Permissoes() {
   const handleChangePassword = async () => {
     if (!changePwTarget || !newPassword.trim()) return;
     setChangePwSaving(true);
-    const res = await fetch(`/api/users/${changePwTarget.id}`, {
+    const res = await apiFetch(`/api/users/${changePwTarget.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password: newPassword }),
@@ -111,7 +112,7 @@ export default function Permissoes() {
   };
 
   useEffect(() => {
-    fetch('/api/users').then(r => r.json()).then(setUsers);
+    apiFetch('/api/users').then(r => r.json()).then(setUsers);
   }, []);
 
   const selectUser = (u: AppUser) => {
@@ -136,7 +137,7 @@ export default function Permissoes() {
     if (!selected) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/users/${selected.id}`, {
+      const res = await apiFetch(`/api/users/${selected.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ permissions: draftPerms, isAdmin: draftIsAdmin }),
@@ -156,7 +157,7 @@ export default function Permissoes() {
 
   const createUser = async () => {
     if (!form.name.trim() || !form.email.trim() || !form.password) return;
-    const res = await fetch('/api/users', {
+    const res = await apiFetch('/api/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...form, unit: form.unit, permissions: form.isAdmin ? ALL_KEYS : [] }),
@@ -173,7 +174,7 @@ export default function Permissoes() {
   };
 
   const deleteUser = async (u: AppUser) => {
-    await fetch(`/api/users/${u.id}`, { method: 'DELETE' });
+    await apiFetch(`/api/users/${u.id}`, { method: 'DELETE' });
     setUsers(prev => prev.filter(x => x.id !== u.id));
     if (selected?.id === u.id) setSelected(null);
     setDeleteTarget(null);

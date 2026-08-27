@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useApp } from '@frontend/contexts/AppContext';
+import { apiFetch } from '@frontend/lib/api';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import styles from './Contratos.module.scss';
@@ -69,7 +70,7 @@ export default function Contratos() {
   const [contracts, setContracts] = useState<Contract[]>([]);
 
   useEffect(() => {
-    fetch('/api/contracts').then(r => r.json()).then(setContracts).catch(() => {});
+    apiFetch('/api/contracts').then(r => r.json()).then(setContracts).catch(() => {});
   }, []);
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
@@ -170,11 +171,11 @@ export default function Contratos() {
       additionalServicesObservation: form.additionalServicesObservation,
     };
     if (editingId) {
-      const res = await fetch(`/api/contracts/${editingId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const res = await apiFetch(`/api/contracts/${editingId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       const updated: Contract = await res.json();
       setContracts((prev) => prev.map((c) => c.id === editingId ? updated : c));
     } else {
-      const res = await fetch('/api/contracts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const res = await apiFetch('/api/contracts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
       const created: Contract = await res.json();
       setContracts((prev) => [created, ...prev]);
     }
@@ -184,7 +185,7 @@ export default function Contratos() {
   const handleDelete = (id: string) => { setDeleteTargetId(id); };
   const confirmDelete = async () => {
     if (deleteTargetId) {
-      await fetch(`/api/contracts/${deleteTargetId}`, { method: 'DELETE' });
+      await apiFetch(`/api/contracts/${deleteTargetId}`, { method: 'DELETE' });
       setContracts((prev) => prev.filter((c) => c.id !== deleteTargetId));
     }
     setDeleteTargetId(null);

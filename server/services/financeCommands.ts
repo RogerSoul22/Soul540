@@ -143,7 +143,7 @@ export function resolveFinanceStatusChange(
   settledBy: string,
 ): FinanceStatusChangeCommand {
   if (targetStatus !== 'pending' && targetStatus !== 'paid') {
-    throw new Error('Status financeiro invÃ¡lido');
+    throw new Error('Status financeiro inválido');
   }
 
   const amountCents = Number.isSafeInteger(entry.amountCents) ? (entry.amountCents as number) : toCents(entry.amount);

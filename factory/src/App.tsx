@@ -17,6 +17,7 @@ import Tarefas from '@/pages/Tarefas/Tarefas/Tarefas';
 import ChecklistEnvio from '@/pages/ChecklistEnvio/ChecklistEnvio/ChecklistEnvio';
 import MinhaConta from '@/pages/MinhaConta/MinhaConta';
 import Auditoria from '@/pages/Auditoria/Auditoria/Auditoria';
+import ErrorBoundary from '@/components/ErrorBoundary/ErrorBoundary';
 
 function AppLoading() {
   return (
@@ -48,6 +49,7 @@ function PublicRoute() {
 
 export default function App() {
   return (
+    <ErrorBoundary>
     <BrowserRouter basename="/fabrica">
       <ThemeProvider>
       <AuthProvider>
@@ -94,5 +96,6 @@ export default function App() {
       </AuthProvider>
       </ThemeProvider>
     </BrowserRouter>
+    </ErrorBoundary>
   );
 }

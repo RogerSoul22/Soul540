@@ -564,7 +564,7 @@ router.delete('/:id', async (req, res) => {
   await found.model.findByIdAndDelete(req.params.id);
   await found.financeModel.updateMany(
     { eventId: req.params.id, $or: [{ automatic: true }, { autoEventBudget: true }] },
-    { $set: { reversedAt: new Date().toISOString(), reversalReason: 'Evento excluÃ­do' } },
+    { $set: { reversedAt: new Date().toISOString(), reversalReason: 'Evento excluído' } },
   );
   await logAudit({ req, action: 'delete', resource: 'events', resourceId: req.params.id, description: `Excluiu evento: ${eventName}` });
   res.status(204).end();

@@ -4,9 +4,7 @@ import { FactoryFinance } from './finances';
 import { Event, FranchiseEvent } from './events';
 import { getTenantUnit } from '../middleware/tenant';
 import { logAudit } from '../utils/audit';
-import { buildSettlementRecord } from '../services/financeCommands';
 import { canChangeForecast } from '../../shared/financePolicy';
-import { toCents } from '../../shared/money';
 
 const PedidoItemSchema = new Schema({
   id: { type: String, required: true },
@@ -113,7 +111,40 @@ function getProductionOrderFinanceDescription(doc: any) {
   return `Pedido #${doc.orderNumber || doc.id} - ${doc.filial}${appointment}`;
 }
 
-async function syncFinanceForProductionOrder(doc: any, req?: any) {
+function getProductionOrderRevenueAmount(value: unknown) {
+  const amount = Number(value);
+  if (!Number.isFinite(amount) || amount <= 0) throw new Error('Valor do pedido inválido para o financeiro');
+
+  const amountCents = Math.round(amount * 100);
+  return { amount: amountCents / 100, amountCents };
+}
+
+export function buildProductionOrderFinanceForecast(doc: any) {
+  const unit = doc.unit || 'factory';
+  const { amount, amountCents } = getProductionOrderRevenueAmount(doc.totalCost);
+  return {
+    eventId: getProductionOrderFinanceEventId(unit, doc.id),
+    type: 'revenue',
+    category: 'ingredientes',
+    description: getProductionOrderFinanceDescription(doc),
+    amount,
+    amountCents,
+    date: getDateOnly(doc.createdAt),
+    status: 'pending',
+    settlementStatus: 'open',
+    settledCents: 0,
+    settlements: [],
+    autoEventBudget: false,
+    automatic: true,
+    origin: 'factory_order',
+    kind: 'manual',
+    source: 'factory',
+  };
+}
+
+type ProductionOrderFinanceSyncResult = 'created' | 'updated' | 'preserved' | 'cancelled' | 'not_eligible';
+
+async function syncFinanceForProductionOrder(doc: any, req?: any): Promise<ProductionOrderFinanceSyncResult> {
   const eventId = getProductionOrderFinanceEventId(doc.unit, doc.id);
   const existing = await FactoryFinance.findOne({
     eventId,
@@ -122,48 +153,24 @@ async function syncFinanceForProductionOrder(doc: any, req?: any) {
     settlementStatus: { $ne: 'cancelled' },
   }).lean();
 
-  if (existing && !canSynchronizeOrderForecast(existing)) return;
+  if (existing && !canSynchronizeOrderForecast(existing)) return 'preserved';
 
   if (getProductionOrderFinanceState(doc) === 'none') {
     await FactoryFinance.updateMany(
       { eventId, source: 'factory', reversedAt: { $exists: false }, settlementStatus: 'open' },
       { $set: { reversedAt: new Date().toISOString(), reversalReason: 'Pedido deixou de estar concluído', settlementStatus: 'cancelled' } },
     );
-    return;
+    return existing ? 'cancelled' : 'not_eligible';
   }
 
-  const settledAt = new Date().toISOString();
-  const amountCents = toCents(doc.totalCost);
-  const settlement = buildSettlementRecord({
-    amount: doc.totalCost,
-    settledOn: getDateOnly(doc.createdAt),
-    reason: 'Pedido entregue',
-    idempotencyKey: `factory-order:${doc.unit}:${doc.id}`,
-  }, req?.user?._id?.toString() || req?.user?.id || 'system', settledAt);
-
+  const forecast = buildProductionOrderFinanceForecast(doc);
   const finance = await FactoryFinance.findOneAndUpdate(
     { eventId, source: 'factory', settlementStatus: { $ne: 'cancelled' } },
     {
       $set: {
-        eventId,
-        type: 'revenue',
-        category: 'ingredientes',
-        description: getProductionOrderFinanceDescription(doc),
-        amount: doc.totalCost,
-        amountCents,
-        date: getDateOnly(doc.createdAt),
-        status: 'paid',
-        settlementStatus: 'settled',
-        settledCents: amountCents,
-        settledAt,
-        settlements: [settlement],
-        autoEventBudget: false,
-        automatic: true,
-        origin: 'factory_order',
-        kind: 'manual',
-        source: 'factory',
+        ...forecast,
       },
-      $unset: { reversedAt: 1, reversedBy: 1, reversalReason: 1 },
+      $unset: { reversedAt: 1, reversedBy: 1, reversalReason: 1, settledAt: 1 },
     },
     { new: true, upsert: true, setDefaultsOnInsert: true },
   );
@@ -177,6 +184,8 @@ async function syncFinanceForProductionOrder(doc: any, req?: any) {
       description: `Gerou receita do pedido finalizado: ${finance.description} (R$ ${finance.amount})`,
     });
   }
+
+  return existing ? 'updated' : 'created';
 }
 
 router.get('/', async (req, res) => {
@@ -188,6 +197,28 @@ router.get('/', async (req, res) => {
 router.get('/available-events', async (req, res) => {
   if (getTenantUnit(req) !== 'factory') return res.status(403).json({ error: 'Apenas a fábrica pode consultar agendamentos de produção' });
   res.json(await listAvailableProductionEvents());
+});
+
+router.post('/reconcile-finances', async (req, res) => {
+  const unit = getTenantUnit(req);
+  if (unit !== 'factory') return res.status(403).json({ error: 'Apenas a fábrica pode reconciliar receitas de pedidos' });
+
+  const orders = await ProductionOrderModel.find({ unit }).sort({ createdAt: -1 });
+  const results = await Promise.all(orders.map((order) => syncFinanceForProductionOrder(order)));
+  const summary = results.reduce<Record<ProductionOrderFinanceSyncResult, number>>((counts, result) => {
+    counts[result] += 1;
+    return counts;
+  }, { created: 0, updated: 0, preserved: 0, cancelled: 0, not_eligible: 0 });
+
+  await logAudit({
+    req,
+    action: 'update',
+    resource: 'finances',
+    resourceId: 'factory-order-reconciliation',
+    description: `Reconciliação de pedidos da fábrica: ${summary.created} receitas criadas e ${summary.updated} previsões atualizadas`,
+  });
+
+  res.json({ orders: orders.length, ...summary });
 });
 
 router.post('/', async (req, res) => {
@@ -235,7 +266,7 @@ router.delete('/:id', async (req, res) => {
   if (!doc) return res.status(404).json({ error: 'Pedido não encontrado' });
   await FactoryFinance.updateMany(
     { eventId: getProductionOrderFinanceEventId(unit, doc.id), source: 'factory', reversedAt: { $exists: false } },
-    { $set: { reversedAt: new Date().toISOString(), reversalReason: 'Pedido excluÃ­do', settlementStatus: 'cancelled' } },
+    { $set: { reversedAt: new Date().toISOString(), reversalReason: 'Pedido excluído', settlementStatus: 'cancelled' } },
   );
   res.status(204).end();
 });
