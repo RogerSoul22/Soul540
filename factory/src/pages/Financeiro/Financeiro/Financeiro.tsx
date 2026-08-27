@@ -110,7 +110,7 @@ function advanceRecurrence(date: string, frequency: RecurrenceFrequency, interva
 }
 
 type TabType = 'geral' | 'despesas' | 'mensal' | 'lancamentos';
-type FilterType = 'all' | 'revenue' | 'cost';
+type FilterType = 'all' | 'revenue' | 'cost' | 'pending';
 type CostFilter = 'all' | 'fixed' | 'variable';
 
 const MONTHS_PT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
@@ -423,7 +423,8 @@ export default function Financeiro() {
   const filtered = useMemo(() => {
     return periodFinances.filter((f) => {
       if (!f.date) return false;
-      if (filterType !== 'all' && f.type !== filterType) return false;
+      if (filterType === 'pending' && f.status !== 'pending') return false;
+      if (filterType !== 'all' && filterType !== 'pending' && f.type !== filterType) return false;
       if (search) {
         const q = search.toLowerCase();
         const event = events.find((e) => e.id === f.eventId);
@@ -1048,13 +1049,13 @@ export default function Financeiro() {
           {/* Filters */}
           <div className={styles.filterRow}>
             <div className={styles.filterGroup}>
-              {(['all', 'revenue', 'cost'] as FilterType[]).map((type) => (
+              {(['all', 'revenue', 'cost', 'pending'] as FilterType[]).map((type) => (
                 <button
                   key={type}
                   className={`${styles.filterBtn} ${filterType === type ? styles.filterBtnActive : ''}`}
                   onClick={() => { setFilterType(type); setLancamentosPage(1); }}
                 >
-                  {type === 'all' ? 'Todos' : type === 'revenue' ? 'Receitas' : 'Custos'}
+                  {type === 'all' ? 'Todos' : type === 'revenue' ? 'Receitas' : type === 'pending' ? 'Pendentes' : 'Custos'}
                 </button>
               ))}
             </div>

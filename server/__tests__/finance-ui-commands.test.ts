@@ -102,6 +102,17 @@ test('uses one shared Conta Azul-style period filter in every finance interface'
   }
 });
 
+test('filters pending financial entries in every finance interface', () => {
+  for (const file of financePages) {
+    const source = readFileSync(resolve(process.cwd(), file), 'utf8');
+
+    assert.equal(source.includes("type FilterType = 'all' | 'revenue' | 'cost' | 'pending';"), true, file);
+    assert.equal(source.includes("(['all', 'revenue', 'cost', 'pending'] as FilterType[])"), true, file);
+    assert.equal(source.includes("filterType === 'pending' && f.status !== 'pending'"), true, file);
+    assert.equal(source.includes("type === 'pending' ? 'Pendentes'"), true, file);
+  }
+});
+
 test('paginates factory and Campinas finance tables beyond the first fifty entries', () => {
   const paginatedFinancePages = [
     'factory/src/pages/Financeiro/Financeiro/Financeiro.tsx',
