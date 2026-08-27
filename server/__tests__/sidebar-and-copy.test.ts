@@ -63,6 +63,22 @@ test('uses accented user-facing labels in financial screens and navigation', () 
   assert.equal(read(portals[1].sidebar).includes("label: 'Fábrica'"), true, portals[1].sidebar);
 });
 
+test('limits the height of financial transaction tables while keeping internal scrolling', () => {
+  const financeStyles = [
+    'src/frontend/pages/Financeiro/Financeiro.module.scss',
+    'factory/src/pages/Financeiro/Financeiro/Financeiro.module.scss',
+    'franchise/src/pages/Financeiro/Financeiro.module.scss',
+  ];
+
+  for (const file of financeStyles) {
+    const styles = read(file);
+
+    assert.equal(styles.includes('overflow-y: auto;'), true, file);
+    assert.equal(styles.includes('max-height: 380px;'), true, file);
+    assert.equal(styles.includes('max-height: 320px;'), true, file);
+  }
+});
+
 test('uses accented labels in shared operational screens', () => {
   const files = [
     'src/frontend/pages/Auditoria/Auditoria.tsx',

@@ -460,13 +460,13 @@
 .tableWrap {
   overflow-x: auto;
   overflow-y: auto;
-  max-height: 520px;
+  max-height: 380px;
   -webkit-overflow-scrolling: touch;
   border-radius: $radius-lg;
 
   @include mobile {
     border-radius: 0;
-    max-height: 400px;
+    max-height: 320px;
   }
 }
 
