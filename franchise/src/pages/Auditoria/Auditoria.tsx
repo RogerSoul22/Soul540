@@ -17,7 +17,7 @@ interface AuditEntry {
 const RESOURCE_LABELS: Record<string, string> = {
   finances: 'Financeiro',
   events: 'Eventos',
-  users: 'Usuarios',
+  users: 'Usuários',
   invoices: 'Notas Fiscais',
   contractors: 'Contratantes',
   contracts: 'Contratos',
@@ -31,9 +31,9 @@ const UNIT_LABELS: Record<string, string> = {
 };
 
 const ACTION_LABELS: Record<string, string> = {
-  create: 'Criacao',
-  update: 'Atualizacao',
-  delete: 'Exclusao',
+  create: 'Criação',
+  update: 'Atualização',
+  delete: 'Exclusão',
 };
 
 const ACTION_COLORS: Record<string, string> = {
@@ -73,7 +73,7 @@ export default function Auditoria() {
   const exportCSV = () => {
     const escape = (value: string) => `"${value.replace(/"/g, '""')}"`;
     const rows = [
-      ['Data/Hora', 'Usuario', 'Sistema', 'Acao', 'Recurso', 'Descricao'].map(escape).join(';'),
+      ['Data/Hora', 'Usuário', 'Sistema', 'Ação', 'Recurso', 'Descrição'].map(escape).join(';'),
       ...items.map((entry) => [
         formatDate(entry.timestamp),
         entry.userName,
@@ -130,7 +130,7 @@ export default function Auditoria() {
                 <th>Sistema</th>
                 <th>Acao</th>
                 <th>Recurso</th>
-                <th>Descricao</th>
+                  <th>Descrição</th>
               </tr>
             </thead>
             <tbody>

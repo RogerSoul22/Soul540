@@ -480,7 +480,7 @@ export default function Financeiro() {
     const typeLabel: Record<string, string> = { revenue: 'Receita', cost: 'Custo' };
     const stLabel: Record<string, string> = { pending: 'Pendente', paid: 'Pago' };
     const rows = [
-      ['Data', 'Tipo', 'Categoria', 'Descricao', 'Status', 'Valor (R$)'].join(';'),
+      ['Data', 'Tipo', 'Categoria', 'Descrição', 'Status', 'Valor (R$)'].join(';'),
       ...filtered.map((f) => [
         f.date,
         typeLabel[f.type] || f.type,
@@ -697,17 +697,17 @@ export default function Financeiro() {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="12" y2="12"/><line x1="15" y1="15" x2="12" y2="12"/></svg>
             Importar XML
           </button>
-          <Button onClick={() => { resetForm(); setShowForm(true); }}>+ Novo Lancamento</Button>
+        <Button onClick={() => { resetForm(); setShowForm(true); }}>+ Novo Lançamento</Button>
         </div>
       </div>
 
       {/* Tabs */}
       <div className={styles.tabs}>
         {([
-          ['geral', 'Visao Geral'],
+          ['geral', 'Visão Geral'],
           ['despesas', 'Painel Despesas'],
           ['mensal', 'Painel do Período'],
-          ['lancamentos', 'Lancamentos'],
+        ['lancamentos', 'Lançamentos'],
         ] as [TabType, string][]).map(([key, label]) => (
           <button
             key={key}
@@ -1062,11 +1062,11 @@ export default function Financeiro() {
             <input
               type="text"
               className={styles.searchInput}
-              placeholder="Buscar por descricao, categoria..."
+              placeholder="Buscar por descrição, categoria..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setLancamentosPage(1); }}
             />
-            <button className={styles.btnExport} onClick={exportCSV} title="Exportar lancamentos filtrados para CSV">
+            <button className={styles.btnExport} onClick={exportCSV} title="Exportar lançamentos filtrados para CSV">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Exportar CSV
             </button>
@@ -1078,14 +1078,14 @@ export default function Financeiro() {
 
           {/* Table */}
           {filtered.length === 0 ? (
-            <div className={styles.emptyState}>Nenhum lancamento encontrado.</div>
+            <div className={styles.emptyState}>Nenhum lançamento encontrado.</div>
           ) : (
             <div className={styles.tableWrap}>
             <table className={styles.table}>
               <thead>
                 <tr>
                   <th>Tipo</th>
-                  <th>Descricao</th>
+                  <th>Descrição</th>
                   <th>Categoria</th>
                   <th>Data</th>
                   <th>Status</th>
@@ -1180,7 +1180,7 @@ export default function Financeiro() {
 
       {/* Form Modal */}
       {showForm && (
-        <Modal title={editingId ? 'Editar Lancamento Financeiro' : 'Novo Lancamento Financeiro'} size="lg" onClose={() => { resetForm(); setShowForm(false); }}>
+        <Modal title={editingId ? 'Editar Lançamento Financeiro' : 'Novo Lançamento Financeiro'} size="lg" onClose={() => { resetForm(); setShowForm(false); }}>
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.formRow}>
               <div className={styles.formField}>
@@ -1296,13 +1296,13 @@ export default function Financeiro() {
             </div>
 
             <div className={styles.formField}>
-              <label className={styles.formLabel}>Descricao</label>
+              <label className={styles.formLabel}>Descrição</label>
               <input
                 type="text"
                 className={styles.formInput}
                 value={formDescription}
                 onChange={(e) => setFormDescription(e.target.value)}
-                placeholder="Descreva o lancamento"
+                placeholder="Descreva o lançamento"
               />
             </div>
 
@@ -1334,11 +1334,11 @@ export default function Financeiro() {
               <div className={styles.formField}>
                 <label className={styles.formLabel}>Forma de pagamento</label>
                 <select className={styles.formSelect} value={formPaymentMethod} onChange={(e) => setFormPaymentMethod(e.target.value)}>
-                  <option value="">Nao informada</option>
+                  <option value="">Não informada</option>
                   <option value="pix">Pix</option>
                   <option value="money">Dinheiro</option>
-                  <option value="debit">Cartao de debito</option>
-                  <option value="credit">Cartao de credito</option>
+                  <option value="debit">Cartão de débito</option>
+                  <option value="credit">Cartão de crédito</option>
                   <option value="transfer">Transferencia</option>
                   <option value="other">Outro</option>
                 </select>

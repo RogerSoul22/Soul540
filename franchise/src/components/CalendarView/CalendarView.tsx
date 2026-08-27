@@ -353,7 +353,7 @@ function EventModal({ event, onClose, onUpdate, onDelete }: {
                 <div className={styles.formField}>
                   <label className={styles.formLabel}>Fora da cidade</label>
                   <select className={styles.formInput} value={form.outOfCity ? 'yes' : 'no'} onChange={(e) => updateForm({ outOfCity: e.target.value === 'yes' })}>
-                    <option value="no">Nao</option>
+                    <option value="no">Não</option>
                     <option value="yes">Sim</option>
                   </select>
                 </div>
@@ -394,7 +394,7 @@ function EventModal({ event, onClose, onUpdate, onDelete }: {
                   <select className={styles.formInput} value={form.paymentMethod ?? ''} onChange={(e) => updateForm({ paymentMethod: e.target.value })}>
                     <option value="">Selecionar</option>
                     <option value="pix_parcelado">Pix - 30% na reserva e restante ate o dia</option>
-                    <option value="cartao">Cartao - ate 2x sem juros na reserva</option>
+                    <option value="cartao">Cartão - até 2x sem juros na reserva</option>
                     <option value="pix_total">Pix - valor total</option>
                     <option value="outro">Outro</option>
                   </select>

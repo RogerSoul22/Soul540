@@ -177,7 +177,7 @@ export default function Usuario() {
           </div>
 
           <div className={styles.formActions}>
-            <Button type="submit">Salvar Alteracoes</Button>
+            <Button type="submit">Salvar Alterações</Button>
           </div>
         </form>
       </div>

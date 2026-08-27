@@ -12,7 +12,7 @@ const statusLabels: Record<TaskStatus, string> = {
   backlog: 'Backlog',
   todo: 'A Fazer',
   in_progress: 'Em Andamento',
-  review: 'Revisao',
+  review: 'Revisão',
   done: 'Concluido',
 };
 
@@ -42,7 +42,7 @@ const COLUMNS: { id: TaskStatus; label: string }[] = [
   { id: 'backlog', label: 'Backlog' },
   { id: 'todo', label: 'A Fazer' },
   { id: 'in_progress', label: 'Em Andamento' },
-  { id: 'review', label: 'Revisao' },
+  { id: 'review', label: 'Revisão' },
   { id: 'done', label: 'Concluido' },
 ];
 

@@ -439,7 +439,7 @@ export default function Eventos() {
                       <span className={styles.detailLabel}>Forma de Pagamento</span>
                       <span className={styles.detailValue}>
                         {ev.paymentMethod === 'pix_parcelado' ? 'Pix - 30% na reserva e restante ate o dia'
-                          : ev.paymentMethod === 'cartao' ? 'Cartao - ate 2x sem juros na reserva'
+            : ev.paymentMethod === 'cartao' ? 'Cartão - até 2x sem juros na reserva'
                           : ev.paymentMethod === 'pix_total' ? 'Pix - valor total'
                           : ev.paymentMethod}
                       </span>
@@ -577,8 +577,8 @@ export default function Eventos() {
                       <input className={styles.input} type="number" value={productionForm.actualPizzas} onChange={(e) => setProductionForm((prev) => ({ ...prev, actualPizzas: e.target.value }))} />
                     </div>
                   </div>
-                  <textarea className={styles.textarea} value={productionForm.factoryProductionNotes} onChange={(e) => setProductionForm((prev) => ({ ...prev, factoryProductionNotes: e.target.value }))} placeholder="Observacoes internas da producao" />
-                  <button className={styles.btnPrimary} type="button" onClick={saveProduction}>Salvar producao</button>
+            <textarea className={styles.textarea} value={productionForm.factoryProductionNotes} onChange={(e) => setProductionForm((prev) => ({ ...prev, factoryProductionNotes: e.target.value }))} placeholder="Observações internas da produção" />
+            <button className={styles.btnPrimary} type="button" onClick={saveProduction}>Salvar produção</button>
                 </div>
               )}
 

@@ -1573,7 +1573,7 @@ export default function Financeiro() {
             <input
               type="text"
               className={styles.searchInput}
-              placeholder="Buscar por descricao, categoria..."
+              placeholder="Buscar por descrição, categoria..."
               value={search}
               onChange={(e) => { setSearch(e.target.value); setLancamentosPage(1); }}
             />
@@ -1596,7 +1596,7 @@ export default function Financeiro() {
               <thead>
                 <tr>
                   <th>Tipo</th>
-                  <th>Descricao</th>
+                  <th>Descrição</th>
                   <th>Categoria</th>
                   <th>Origem</th>
                   <th>Data</th>
@@ -2066,7 +2066,7 @@ export default function Financeiro() {
             </div>
 
             <div className={styles.formField}>
-              <label className={styles.formLabel}>Descricao</label>
+              <label className={styles.formLabel}>Descrição</label>
               <input
                 type="text"
                 className={styles.formInput}
@@ -2100,8 +2100,8 @@ export default function Financeiro() {
                   <option value="">Não informada</option>
                   <option value="pix">Pix</option>
                   <option value="money">Dinheiro</option>
-                  <option value="debit">Cartao de debito</option>
-                  <option value="credit">Cartao de credito</option>
+                    <option value="debit">Cartão de débito</option>
+                    <option value="credit">Cartão de crédito</option>
                   <option value="transfer">Transferencia</option>
                   <option value="other">Outro</option>
                 </select>

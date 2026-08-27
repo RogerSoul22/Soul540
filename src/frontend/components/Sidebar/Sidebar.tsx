@@ -16,6 +16,11 @@ type NavGroup = {
   items: NavItem[];
 };
 
+type SidebarProps = {
+  collapsed: boolean;
+  onToggle: () => void;
+};
+
 const navGroups: NavGroup[] = [
   {
     label: 'Sorocaba',
@@ -253,7 +258,7 @@ const navGroups: NavGroup[] = [
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, isAdmin, permissions } = useAuth();
@@ -264,7 +269,18 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className={styles.sidebar}>
+    <aside className={`${styles.sidebar} ${collapsed ? styles.sidebarCollapsed : ''}`}>
+      <button
+        type="button"
+        className={styles.collapseButton}
+        onClick={onToggle}
+        aria-label={collapsed ? 'Expandir menu lateral' : 'Recolher menu lateral'}
+        aria-pressed={collapsed}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points={collapsed ? '9 18 15 12 9 6' : '15 18 9 12 15 6'} />
+        </svg>
+      </button>
       <div className={styles.logoWrap}>
         <img src="/logo.png" alt="Soul540" className={styles.logoImg} />
       </div>
@@ -286,6 +302,7 @@ export default function Sidebar() {
                     key={item.path}
                     className={`${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
                     onClick={() => item.external ? (window.location.href = item.path) : navigate(item.path)}
+                    title={collapsed ? item.label : undefined}
                   >
                     {isActive && <span className={styles.activeIndicator} />}
                     <span className={styles.navIcon}>{item.icon}</span>
@@ -304,7 +321,7 @@ export default function Sidebar() {
             {user?.name?.charAt(0) || 'U'}
           </div>
           <div className={styles.userDetails} onClick={() => navigate(ROUTES.USUARIO)} style={{ cursor: 'pointer' }}>
-            <p className={styles.userName}>{user?.name || 'Usuario'}</p>
+            <p className={styles.userName}>{user?.name || 'Usuário'}</p>
             <p className={styles.userRole}>{user?.role || 'admin'}</p>
           </div>
           <button className={styles.logoutBtn} onClick={handleLogout} title="Sair">

@@ -21,7 +21,7 @@ function parseCurrency(value: string): number {
 const statusConfig: Record<Utensil['status'], { label: string; color: 'green' | 'blue' | 'amber' | 'gray' }> = {
   disponivel: { label: 'Disponivel', color: 'green' },
   em_uso: { label: 'Em Uso', color: 'blue' },
-  manutencao: { label: 'Manutencao', color: 'amber' },
+  manutencao: { label: 'Manutenção', color: 'amber' },
   descartado: { label: 'Descartado', color: 'gray' },
 };
 
@@ -186,7 +186,7 @@ export default function EstoqueUtensilios() {
           <option value="all">Todos os status</option>
           <option value="disponivel">Disponivel</option>
           <option value="em_uso">Em Uso</option>
-          <option value="manutencao">Manutencao</option>
+              <option value="manutencao">Manutenção</option>
           <option value="descartado">Descartado</option>
         </select>
       </div>
@@ -271,7 +271,7 @@ export default function EstoqueUtensilios() {
               </div>
               <div className={styles.formGrid2}>
                 <div className={styles.formGroup}>
-                  <label className={styles.label}>Localizacao</label>
+              <label className={styles.label}>Localização</label>
                   <input className={styles.input} value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="Ex: Deposito" />
                 </div>
                 <div className={styles.formGroup}>
@@ -279,7 +279,7 @@ export default function EstoqueUtensilios() {
                   <select className={styles.input} value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as Utensil['status'] })}>
                     <option value="disponivel">Disponivel</option>
                     <option value="em_uso">Em Uso</option>
-                    <option value="manutencao">Manutencao</option>
+                  <option value="manutencao">Manutenção</option>
                     <option value="descartado">Descartado</option>
                   </select>
                 </div>

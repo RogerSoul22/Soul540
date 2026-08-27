@@ -11,10 +11,19 @@
   margin-left: 260px;
   min-height: 100vh;
   animation: fadeIn 0.3s ease;
+  transition: margin-left $transition-base;
 
   @include mobile {
     margin-left: 0;
     padding-bottom: 72px;
     overflow-x: hidden;
+  }
+}
+
+.mainCollapsed {
+  margin-left: 76px;
+
+  @include mobile {
+    margin-left: 0;
   }
 }

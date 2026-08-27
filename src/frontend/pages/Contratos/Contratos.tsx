@@ -207,7 +207,7 @@ export default function Contratos() {
       <div className={styles.controls}>
         <div className={styles.searchWrap}>
           <svg className={styles.searchIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input className={styles.searchInput} placeholder="Buscar por cliente ou descricao..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          <input className={styles.searchInput} placeholder="Buscar por cliente ou descrição..." value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
       </div>
 
@@ -216,10 +216,10 @@ export default function Contratos() {
       ) : (
         <div className={styles.tableWrap}>
           <div className={styles.tableHead}>
-            <span className={styles.thCell}>Cliente / Descricao</span>
+            <span className={styles.thCell}>Cliente / Descrição</span>
             <span className={styles.thCell}>Evento / Vigencia</span>
             <span className={styles.thCell}>Valor</span>
-            <span className={styles.thCell} style={{ textAlign: 'right' }}>Acoes</span>
+            <span className={styles.thCell} style={{ textAlign: 'right' }}>Ações</span>
           </div>
 
           {filtered.map((c) => (
@@ -313,7 +313,7 @@ export default function Contratos() {
                   <input className={styles.input} type="date" value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} />
                 </div>
                 <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-                  <label className={styles.label}>Descricao do Servico</label>
+                  <label className={styles.label}>Descrição do Serviço</label>
                   <input className={styles.input} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Ex: formatura do colégio, aniversário de 15 anos..." />
                 </div>
               </div>
@@ -524,7 +524,7 @@ export default function Contratos() {
       {deleteTargetId && (
         <ConfirmModal
           title="Excluir Contrato"
-          message={<>Tem certeza que deseja excluir o contrato de <strong>{contracts.find((c) => c.id === deleteTargetId)?.clientName}</strong>? Esta acao nao pode ser desfeita.</>}
+          message={<>Tem certeza que deseja excluir o contrato de <strong>{contracts.find((c) => c.id === deleteTargetId)?.clientName}</strong>? Esta ação não pode ser desfeita.</>}
           confirmLabel="Excluir"
           variant="danger"
           onConfirm={confirmDelete}

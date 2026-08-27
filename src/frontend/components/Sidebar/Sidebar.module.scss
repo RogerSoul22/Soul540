@@ -11,6 +11,7 @@
   border-right: 1px solid $border;
   @include flex-column;
   z-index: 100;
+  transition: width $transition-base;
 
   // Subtle amber atmospheric glow at top
   &::before {
@@ -40,6 +41,43 @@
     -webkit-backdrop-filter: blur(12px);
 
     &::before { display: none; }
+  }
+}
+
+.collapseButton {
+  position: absolute;
+  top: $spacing-lg;
+  right: -16px;
+  z-index: 1;
+  display: flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid $border;
+  border-radius: $radius-full;
+  background: $bg-card;
+  color: $text-secondary;
+  box-shadow: $shadow-card;
+  cursor: pointer;
+
+  &:hover { color: $accent; border-color: $border-accent; }
+  &:focus-visible { @include focus-ring; }
+
+  @include mobile { display: none; }
+}
+
+.sidebarCollapsed {
+  @media (min-width: #{$mobile + 1px}) {
+    width: 76px;
+
+    .logoWrap { padding: $spacing-md; }
+    .logoImg { width: 44px; height: 44px; }
+    .nav { padding-right: $spacing-sm; padding-left: $spacing-sm; }
+    .navGroupLabel, .navLabel, .userDetails, .logoutBtn { display: none; }
+    .navItem, .userInfo { justify-content: center; }
+    .navItem { padding: 10px; }
+    .footer { padding: $spacing-md $spacing-sm; }
   }
 }
 

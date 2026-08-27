@@ -190,7 +190,7 @@ export default function Permissoes() {
           <p className={styles.listTitle}>Usuários ({filteredUsers.length}/{users.length})</p>
           <div className={styles.searchWrap}>
             <svg className={styles.searchIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input className={styles.searchInput} placeholder="Buscar usuarios..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          <input className={styles.searchInput} placeholder="Buscar usuários..." value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
           {filteredUsers.map(u => (
             <div

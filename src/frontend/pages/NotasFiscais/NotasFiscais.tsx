@@ -239,7 +239,7 @@ export default function NotasFiscais() {
         <input
           type="text"
           className={styles.searchInput}
-          placeholder="Buscar por cliente, evento, numero..."
+              placeholder="Buscar por cliente, evento, número..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -630,7 +630,7 @@ export default function NotasFiscais() {
                       className={styles.formInput}
                       value={item.description}
                       onChange={(e) => updateItem(index, 'description', e.target.value)}
-                      placeholder="Descricao do item"
+                placeholder="Descrição do item"
                     />
                   </div>
                   <div className={styles.formField}>
@@ -815,4 +815,3 @@ export default function NotasFiscais() {
     </div>
   );
 }
-        

@@ -18,7 +18,7 @@ import ConfirmModal from '@frontend/components/ConfirmModal/ConfirmModal';
 
 const statusConfig: Record<Franchise['status'], { label: string; color: 'green' | 'blue' | 'amber' | 'gray' }> = {
   ativa: { label: 'Ativa', color: 'green' },
-  em_implantacao: { label: 'Em Implantacao', color: 'blue' },
+  em_implantacao: { label: 'Em Implantação', color: 'blue' },
   suspensa: { label: 'Suspensa', color: 'amber' },
   encerrada: { label: 'Encerrada', color: 'gray' },
 };
@@ -355,7 +355,7 @@ export default function Franquias() {
                   <label className={styles.label}>Status</label>
                   <select className={styles.input} value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value as Franchise['status'] })}>
                     <option value="ativa">Ativa</option>
-                    <option value="em_implantacao">Em Implantacao</option>
+                  <option value="em_implantacao">Em Implantação</option>
                     <option value="suspensa">Suspensa</option>
                     <option value="encerrada">Encerrada</option>
                   </select>

@@ -73,7 +73,7 @@ export default function Auditoria() {
   const exportCSV = () => {
     const escape = (value: string) => `"${value.replace(/"/g, '""')}"`;
     const rows = [
-      ['Data/Hora', 'Usuario', 'Sistema', 'Acao', 'Recurso', 'Descricao'].map(escape).join(';'),
+      ['Data/Hora', 'Usuário', 'Sistema', 'Ação', 'Recurso', 'Descrição'].map(escape).join(';'),
       ...items.map((entry) => [
         formatDate(entry.timestamp),
         entry.userName,

@@ -417,7 +417,7 @@ export default function Cardapios() {
                           className={`${styles.itemInput} ${styles.itemDesc}`}
                           value={item.description}
                           onChange={(e) => updateItem(cat.id, item.id, 'description', e.target.value)}
-                          placeholder="Descricao"
+                          placeholder="Descrição"
                         />
                         <input
                           className={`${styles.itemInput} ${styles.itemPrice}`}
