@@ -129,6 +129,20 @@ test('paginates factory and Campinas finance tables beyond the first fifty entri
   }
 });
 
+test('calculates factory and Campinas input indicators from CMV and packaging', () => {
+  const inputPages = [
+    'src/frontend/pages/Financeiro/Financeiro.tsx',
+    'factory/src/pages/Financeiro/Financeiro/Financeiro.tsx',
+    'franchise/src/pages/Financeiro/Financeiro.tsx',
+  ];
+
+  for (const file of inputPages) {
+    const source = readFileSync(resolve(process.cwd(), file), 'utf8');
+    assert.equal(source.includes('sumFinanceAmountsByCategory'), true, file);
+    assert.equal(source.includes("['cmv', 'embalagens']"), true, file);
+  }
+});
+
 test('waits for authentication before loading protected data in every portal', () => {
   for (const file of contextFiles) {
     const source = readFileSync(resolve(process.cwd(), file), 'utf8');

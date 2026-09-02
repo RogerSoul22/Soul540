@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { buildFinanceSummary } from '../financeSummary';
+import * as financeSummary from '../financeSummary';
 
 test('summarizes cash from individual settlements and keeps partial forecasts separate', () => {
   const summary = buildFinanceSummary([
@@ -46,4 +47,16 @@ test('uses reporting unit by settlement date for Campinas cash consolidation', (
   }], { view: 'cash', start: '2026-08-01', end: '2026-08-31', reportingUnit: 'main' });
 
   assert.equal(summary.realizedIncomeCents, 10_000);
+});
+
+test('sums CMV and packaging as factory input costs', () => {
+  const sumFinanceAmountsByCategory = (financeSummary as any).sumFinanceAmountsByCategory;
+
+  assert.equal(typeof sumFinanceAmountsByCategory, 'function');
+  assert.equal(sumFinanceAmountsByCategory([
+    { type: 'cost', category: 'cmv', amount: 125 },
+    { type: 'cost', category: 'embalagens', amount: 25 },
+    { type: 'cost', category: 'insumos', amount: 50 },
+    { type: 'revenue', category: 'cmv', amount: 1_000 },
+  ], ['cmv', 'embalagens']), 150);
 });

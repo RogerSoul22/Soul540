@@ -95,6 +95,7 @@ import {
 import type { CategoryDef } from '@backend/infra/data/financeCategories';
 import { buildDreTemplateValues, DRE_TEMPLATE_INPUT_CELLS, DRE_TEMPLATE_SHEET } from '@shared/dreTemplate';
 import { isRealizedExpense, isRealizedRevenue } from '@shared/financeSettlement';
+import { sumFinanceAmountsByCategory } from '@shared/financeSummary';
 import { calculateSettlementStatus, getDerivedFinanceLabel, getOutstandingCents } from '@shared/financePolicy';
 import { fromCents } from '@shared/money';
 import FinancePeriodFilter from '@shared/FinancePeriodFilter';
@@ -655,9 +656,7 @@ export default function Financeiro() {
 
   // Gauge values for page-level month filter (used in Visão Geral)
   const insumosRatio = useMemo(() => {
-    const insumos = periodFinances
-      .filter((f) => f.type === 'cost' && f.category === 'insumos')
-      .reduce((acc, f) => acc + f.amount, 0);
+    const insumos = sumFinanceAmountsByCategory(periodFinances, ['cmv', 'embalagens']);
     return totalRevenue > 0 ? (insumos / totalRevenue) * 100 : 0;
   }, [periodFinances, totalRevenue]);
 
@@ -670,9 +669,7 @@ export default function Financeiro() {
 
   // Gauge values for selected month (used in Painel Mensal)
   const insumosRatioMensal = useMemo(() => {
-    const insumos = monthFinances
-      .filter((f) => f.type === 'cost' && f.category === 'insumos')
-      .reduce((acc, f) => acc + f.amount, 0);
+    const insumos = sumFinanceAmountsByCategory(monthFinances, ['cmv', 'embalagens']);
     return monthRevenue > 0 ? (insumos / monthRevenue) * 100 : 0;
   }, [monthFinances, monthRevenue]);
 

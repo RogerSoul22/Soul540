@@ -14,6 +14,22 @@ type SummaryEntry = FinancePolicyEntry & {
   source?: ReportingUnit;
 };
 
+type FinanceCategoryAmountEntry = {
+  type: 'revenue' | 'cost';
+  category: string;
+  amount: number;
+};
+
+export function sumFinanceAmountsByCategory(
+  entries: FinanceCategoryAmountEntry[],
+  categories: readonly string[],
+): number {
+  const categorySet = new Set(categories);
+  return entries
+    .filter((entry) => entry.type === 'cost' && categorySet.has(entry.category))
+    .reduce((total, entry) => total + entry.amount, 0);
+}
+
 export type FinanceSummaryOptions = {
   view: FinanceReportingView;
   start?: string;

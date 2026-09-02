@@ -6,6 +6,7 @@ import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { isRealizedRevenue } from '@shared/financeSettlement';
+import { sumFinanceAmountsByCategory } from '@shared/financeSummary';
 import type { DreSection, RecurrenceFrequency } from '@shared/types';
 import {
   FIXED_CATEGORIES, VARIABLE_CATEGORIES, CATEGORY_LABELS as BUILTIN_CATEGORY_LABELS, CATEGORY_COLORS as BUILTIN_CATEGORY_COLORS,
@@ -427,9 +428,7 @@ export default function Financeiro() {
 
   // Gauge values for page-level month (used in Visão Geral)
   const insumosRatio = useMemo(() => {
-    const insumos = periodFinances
-      .filter((f) => f.type === 'cost' && f.category === 'insumos')
-      .reduce((acc, f) => acc + f.amount, 0);
+    const insumos = sumFinanceAmountsByCategory(periodFinances, ['cmv', 'embalagens']);
     return totalRevenue > 0 ? (insumos / totalRevenue) * 100 : 0;
   }, [periodFinances, totalRevenue]);
 
@@ -442,9 +441,7 @@ export default function Financeiro() {
 
   // Gauge values for selected month (used in Painel Mensal)
   const insumosRatioMensal = useMemo(() => {
-    const insumos = monthFinances
-      .filter((f) => f.type === 'cost' && f.category === 'insumos')
-      .reduce((acc, f) => acc + f.amount, 0);
+    const insumos = sumFinanceAmountsByCategory(monthFinances, ['cmv', 'embalagens']);
     return monthRevenue > 0 ? (insumos / monthRevenue) * 100 : 0;
   }, [monthFinances, monthRevenue]);
 
