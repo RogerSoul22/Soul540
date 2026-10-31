@@ -1,8 +1,8 @@
 import { format, isValid, parseISO } from 'date-fns';
 import type { useApp } from '../../../contexts/AppContext';
 import type { RecurrenceFrequency } from '../../../../../../shared/contracts/types';
-import { getNfeEmissionDate as formatNFeDate } from '@soul540/domain';
-import type { EventModality } from '@soul540/contracts';
+import { getNfeEmissionDate as formatNFeDate } from '../../../../../../packages/domain/src/index';
+import type { EventModality } from '../../../../../../packages/contracts/src/index';
 import type { FinanceModalityFilter } from '../support/finance-modalities';
 
 export type FinanceType = 'revenue' | 'cost';

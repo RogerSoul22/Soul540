@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useApp } from '../../../contexts/AppContext';
 import type { Task, TaskPriority, TaskStatus } from '../../../../../../shared/contracts/types';
-import { taskColumns as columns } from '@soul540/screens';
+import { taskColumns as columns } from '../../../../../../packages/screens/src/index';
 import { EMPTY_TASK_FORM, type TaskFormData, type ViewMode, type TaskGroups } from '../types/task-types';
 
 export function useTarefasController() {

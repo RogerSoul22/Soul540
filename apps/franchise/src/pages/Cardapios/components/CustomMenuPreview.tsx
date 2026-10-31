@@ -1,4 +1,4 @@
-import type { MenuRecord as Menu } from '@soul540/screens';
+import type { MenuRecord as Menu } from '../../../../../../packages/screens/src/index';
 import styles from '../styles/Cardapios.module.scss';
 
 export default function CustomMenuPreview({

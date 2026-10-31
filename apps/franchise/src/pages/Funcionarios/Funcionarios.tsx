@@ -1,4 +1,4 @@
-import { EmployeeDirectoryScreen } from '@soul540/screens';
+import { EmployeeDirectoryScreen } from '../../../../../packages/screens/src/index';
 import { apiFetch } from '../../lib/api';
 
 export default function Funcionarios() {

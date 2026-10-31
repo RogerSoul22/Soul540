@@ -1,9 +1,9 @@
 import type { useFinanceiroController } from '../hooks/use-financeiro-controller';
 type Controller = ReturnType<typeof useFinanceiroController>;
 type Props = { controller: Controller };
-import { Badge } from '@soul540/ui';
+import { Badge } from '../../../../../../packages/ui/src/index';
 import { ptBR } from 'date-fns/locale';
-import { formatCurrencyPtBr as formatBRL } from '@soul540/domain';
+import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
 import styles from '../styles/Financeiro.module.scss';
 import { getFinanceModalityLabel } from '../support/finance-modalities';
 type FinanceStatus = 'pending' | 'paid';

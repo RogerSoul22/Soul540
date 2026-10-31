@@ -3,7 +3,7 @@ import {
   advanceFinanceRecurrence as advanceRecurrence,
   formatCurrencyInput as formatCurrency,
   parseCurrencyInput as parseCurrency,
-} from '@soul540/domain';
+} from '../../../../../../packages/domain/src/index';
 import type { FinanceEntry } from '../types/finance-controller-types';
 import type { FranchiseFinanceState } from './use-franchise-finance-state';
 

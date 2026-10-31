@@ -1,4 +1,4 @@
-import { Button, Input } from '@soul540/ui';
+import { Button, Input } from '../../../../../../packages/ui/src/index';
 import type { AppUser } from '../types/permissions-types';
 import styles from '../styles/Permissoes.module.scss';
 

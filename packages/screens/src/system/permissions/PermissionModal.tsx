@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Button } from '@soul540/ui';
+import { Button } from '../../../../ui/src/index';
 import type { StyleMap } from './permission-types';
 
 export default function PermissionModal({

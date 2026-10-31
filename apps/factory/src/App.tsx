@@ -1,24 +1,26 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AppProvider } from './contexts/AppContext';
-import { ThemeProvider } from '@soul540/ui';
+import { ThemeProvider } from '../../../packages/ui/src/index';
 import { ROUTES } from './routes';
 import Login from './pages/Login/Login';
 import Layout from './components/Layout/Layout';
-import Dashboard from './pages/Dashboard/Dashboard';
-import Funcionarios from './pages/Funcionarios/Funcionarios';
-import Contratantes from './pages/Contratantes/Contratantes';
-import Eventos from './pages/Eventos/Eventos';
-import EstoqueInsumos from './pages/EstoqueInsumos/EstoqueInsumos';
-import EstoqueUtensilios from './pages/EstoqueUtensilios/EstoqueUtensilios';
-import Permissoes from './pages/Permissoes/Permissoes';
-import Financeiro from './pages/Financeiro/Financeiro';
-import Tarefas from './pages/Tarefas/Tarefas';
-import ChecklistEnvio from './pages/ChecklistEnvio/ChecklistEnvio';
-import MinhaConta from './pages/MinhaConta/MinhaConta';
-import Auditoria from './pages/Auditoria/Auditoria';
-import { ErrorBoundary } from '@soul540/ui';
+import { ErrorBoundary } from '../../../packages/ui/src/index';
 import { getFactoryBasePath } from './factory-path';
+
+const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
+const Funcionarios = lazy(() => import('./pages/Funcionarios/Funcionarios'));
+const Contratantes = lazy(() => import('./pages/Contratantes/Contratantes'));
+const Eventos = lazy(() => import('./pages/Eventos/Eventos'));
+const EstoqueInsumos = lazy(() => import('./pages/EstoqueInsumos/EstoqueInsumos'));
+const EstoqueUtensilios = lazy(() => import('./pages/EstoqueUtensilios/EstoqueUtensilios'));
+const Permissoes = lazy(() => import('./pages/Permissoes/Permissoes'));
+const Financeiro = lazy(() => import('./pages/Financeiro/Financeiro'));
+const Tarefas = lazy(() => import('./pages/Tarefas/Tarefas'));
+const ChecklistEnvio = lazy(() => import('./pages/ChecklistEnvio/ChecklistEnvio'));
+const MinhaConta = lazy(() => import('./pages/MinhaConta/MinhaConta'));
+const Auditoria = lazy(() => import('./pages/Auditoria/Auditoria'));
 
 function AppLoading() {
   return (
@@ -72,6 +74,7 @@ export default function App() {
         <ThemeProvider>
           <AuthProvider>
             <AppProvider>
+              <Suspense fallback={<AppLoading />}>
               <Routes>
                 <Route element={<PublicRoute />}>
                   <Route path={ROUTES.LOGIN} element={<Login />} />
@@ -110,6 +113,7 @@ export default function App() {
                 </Route>
                 <Route path="*" element={<Navigate to={ROUTES.LOGIN} replace />} />
               </Routes>
+              </Suspense>
             </AppProvider>
           </AuthProvider>
         </ThemeProvider>

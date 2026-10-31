@@ -1,5 +1,5 @@
-import { notifyFeedback } from '@soul540/api-client';
-import { Button, Input } from '@soul540/ui';
+import { notifyFeedback } from '../../../../api-client/src/index';
+import { Button, Input } from '../../../../ui/src/index';
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import type { ApiFetch, AppUser, NewUserForm, StyleMap } from './permission-types';
 import PermissionModal from './PermissionModal';

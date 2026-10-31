@@ -1,5 +1,5 @@
 import { SOUL540_MENUS } from '../../../data/soul540Menus/index';
-import { maskCpf, maskCurrency, maskPhone, maskRg } from '@soul540/screens';
+import { maskCpf, maskCurrency, maskPhone, maskRg } from '../../../../../../packages/screens/src/index';
 import type { ContractEvents, FormData } from '../types/contract-types';
 import styles from '../styles/Contratos.module.scss';
 import ContractDynamicFields from './ContractDynamicFields';

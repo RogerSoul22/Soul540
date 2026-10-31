@@ -1,7 +1,7 @@
 import { ptBR } from 'date-fns/locale';
 import { buildWhatsAppUrl } from './calendar-utils';
 import { safeFormat, WHATSAPP_ICON_PATH } from './calendar-event-factory-utils';
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../packages/contracts/src/index';
 import styles from './styles/CalendarView.module.scss';
 
 export function FactoryCalendarEventView({ event, onClose }: { event: PizzaEvent; onClose: () => void }) {

@@ -1,4 +1,4 @@
-import { ConfirmModal } from '@soul540/ui';
+import { ConfirmModal } from '../../../../../packages/ui/src/index';
 import styles from './styles/Eventos.module.scss';
 import EventDetailsModal from './components/EventDetailsModal';
 import EventosFilters from './components/EventosFilters';

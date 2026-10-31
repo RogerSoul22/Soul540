@@ -1,5 +1,5 @@
 import { ROUTES } from '../../routes';
-import { ConfirmModal } from '@soul540/ui';
+import { ConfirmModal } from '../../../../../packages/ui/src/index';
 import styles from './styles/Tarefas.module.scss';
 import NewProductionOrderForm from './components/NewProductionOrderForm';
 import ProductionOrderFilters from './components/ProductionOrderFilters';

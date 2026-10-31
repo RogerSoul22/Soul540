@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
-import type { PizzaEvent } from '@soul540/contracts';
-import type { FinanceEntry, FinanceCategoryEntry } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
+import type { FinanceEntry, FinanceCategoryEntry } from '../../../../../../packages/contracts/src/index';
 import {
   CATEGORY_COLORS as BUILTIN_CATEGORY_COLORS,
   CATEGORY_LABELS as BUILTIN_CATEGORY_LABELS,
   groupCategoriesBySection,
 } from '../../../../../../shared/finance/financeCategories';
-import type { FinanceType } from '@soul540/contracts';
-import { compareTextPtBr as compareAlpha } from '@soul540/domain';
+import type { FinanceType } from '../../../../../../packages/contracts/src/index';
+import { compareTextPtBr as compareAlpha } from '../../../../../../packages/domain/src/index';
 
 type FinanceScope = 'main' | 'franchise' | 'factory' | 'combined';
 

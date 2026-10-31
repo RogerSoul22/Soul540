@@ -1,8 +1,8 @@
-import { notifyFeedback } from '@soul540/api-client';
-import type { FinanceType } from '@soul540/contracts';
+import { notifyFeedback } from '../../../../../../packages/api-client/src/index';
+import type { FinanceType } from '../../../../../../packages/contracts/src/index';
 import { DRE_SECTIONS, type CategoryDef } from '../../../../../../shared/finance/financeCategories';
 import type { DreSection } from '../../../../../../shared/contracts/types';
-import type { FinanceEntry } from '@soul540/contracts';
+import type { FinanceEntry } from '../../../../../../packages/contracts/src/index';
 
 export type GroupedCategories = Array<{
   section: { key: DreSection };

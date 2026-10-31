@@ -1,5 +1,10 @@
-import type { EventModality, FinanceEntry, FinanceType, RecurrenceFrequency } from '@soul540/contracts';
-import type { PizzaEvent } from '@soul540/contracts';
+import type {
+  EventModality,
+  FinanceEntry,
+  FinanceType,
+  RecurrenceFrequency,
+} from '../../../../../../packages/contracts/src/index';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
 import type { useApp } from '../../../contexts/AppContext';
 type Setter<T> = (value: T) => void;
 export type FinanceFormDependencies = Pick<

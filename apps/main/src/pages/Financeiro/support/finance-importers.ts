@@ -1,5 +1,5 @@
-import type { FinanceType } from '@soul540/contracts';
-import { getNfeEmissionDate as formatNFeDate } from '@soul540/domain';
+import type { FinanceType } from '../../../../../../packages/contracts/src/index';
+import { getNfeEmissionDate as formatNFeDate } from '../../../../../../packages/domain/src/index';
 
 export type FinanceXmlItem = {
   id: string;

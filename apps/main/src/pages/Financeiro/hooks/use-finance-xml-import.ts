@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { notifyFeedback } from '@soul540/api-client';
+import { notifyFeedback } from '../../../../../../packages/api-client/src/index';
 import type { useApp } from '../../../contexts/AppContext';
 import { parseNFeXmlForFinance, type FinanceXmlItem as XmlFinanceItem } from '../support/finance-importers';
 

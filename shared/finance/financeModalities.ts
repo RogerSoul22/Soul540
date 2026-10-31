@@ -1,5 +1,5 @@
-import { getEventModalityLabel, normalizeEventModality } from '@soul540/domain';
-import type { EventModality, FinanceEntry } from '@soul540/contracts';
+import { getEventModalityLabel, normalizeEventModality } from '../../packages/domain/src/index';
+import type { EventModality, FinanceEntry } from '../../packages/contracts/src/index';
 
 export type FinanceModalityFilter = 'all' | EventModality;
 

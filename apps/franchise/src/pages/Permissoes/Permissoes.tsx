@@ -1,4 +1,8 @@
-import { PermissionDirectoryScreen, portalConfigs, type PermissionDirectoryConfig } from '@soul540/screens';
+import {
+  PermissionDirectoryScreen,
+  portalConfigs,
+  type PermissionDirectoryConfig,
+} from '../../../../../packages/screens/src/index';
 import { useAuth } from '../../contexts/AuthContext';
 import { apiFetch } from '../../lib/api';
 import styles from './styles/Permissoes.module.scss';

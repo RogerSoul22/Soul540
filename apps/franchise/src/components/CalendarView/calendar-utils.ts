@@ -10,7 +10,7 @@ import {
 } from 'date-fns';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { buildEventWhatsAppUrl as buildSharedEventWhatsAppUrl } from '@soul540/domain';
+import { buildEventWhatsAppUrl as buildSharedEventWhatsAppUrl } from '../../../../../packages/domain/src/index';
 import type { PizzaEvent } from '../../types/Event';
 
 export const EVENT_COLOR = {

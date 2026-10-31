@@ -5,7 +5,7 @@ import type {
   PizzaEvent,
   Task,
   TaskHistoryEntry,
-} from '@soul540/contracts';
+} from '../../../../packages/contracts/src/index';
 
 export interface AppContextData {
   events: PizzaEvent[];

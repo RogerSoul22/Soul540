@@ -1,4 +1,4 @@
-import { notifyFeedback } from '@soul540/api-client';
+import { notifyFeedback } from '../../../../../../packages/api-client/src/index';
 import { useRef, useState, type ChangeEvent, type Dispatch, type SetStateAction } from 'react';
 import { apiFetch } from '../../../lib/api';
 import { calcStatus, parseNFeXml, type Supply, type XmlImportItem } from '../types/supply-types';

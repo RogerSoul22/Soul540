@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
-import type { PizzaEvent } from '@soul540/contracts';
-import { normalizeEventModality, normalizeTextPtBr as normalizeStr } from '@soul540/domain';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
+import { normalizeEventModality, normalizeTextPtBr as normalizeStr } from '../../../../../../packages/domain/src/index';
 import type { EventGroups } from '../support/event-listing';
 
 export function useEventFilters(events: PizzaEvent[]) {

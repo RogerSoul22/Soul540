@@ -1,6 +1,6 @@
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { buildEventWhatsAppUrl as buildSharedEventWhatsAppUrl } from '@soul540/domain';
+import { buildEventWhatsAppUrl as buildSharedEventWhatsAppUrl } from '../../../../../../packages/domain/src/index';
 import EventCardActions from './EventCardActions';
 import type { PizzaEvent } from '../../../types/Event';
 import styles from '../styles/Eventos.module.scss';

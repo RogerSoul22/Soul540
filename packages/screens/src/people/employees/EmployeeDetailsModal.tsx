@@ -1,4 +1,4 @@
-import { Badge } from '@soul540/ui';
+import { Badge } from '../../../../ui/src/index';
 import EmployeeModalFrame from './EmployeeModalFrame';
 import frameStyles from './styles/EmployeeModalFrame.module.scss';
 import { dayLabels, days, employeeStatusConfig, roleLabels, type Employee } from './employee-types';

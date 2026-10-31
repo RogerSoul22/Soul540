@@ -1,6 +1,6 @@
-import type { FinanceEntry } from '@soul540/contracts';
+import type { FinanceEntry } from '../../../../../../packages/contracts/src/index';
 import { FIXED_CATEGORIES, VARIABLE_CATEGORIES } from '../../../../../../shared/finance/financeCategories';
-import { formatCurrencyPtBr as formatBRL } from '@soul540/domain';
+import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
 import styles from '../styles/Financeiro.module.scss';
 
 type CostFilter = 'all' | 'fixed' | 'variable';

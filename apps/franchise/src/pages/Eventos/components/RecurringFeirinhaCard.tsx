@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { getModalityLabel, getUpcomingFeirinhaOccurrences } from '../support/event-modalities';
-import { notifyFeedback } from '@soul540/api-client';
+import { notifyFeedback } from '../../../../../../packages/api-client/src/index';
 import type { PizzaEvent } from '../../../types/Event';
 import styles from '../styles/Eventos.module.scss';
 

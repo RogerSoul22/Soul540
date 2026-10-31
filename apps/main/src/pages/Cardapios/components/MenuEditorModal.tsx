@@ -1,4 +1,4 @@
-import type { MenuCategory, MenuItem } from '@soul540/screens';
+import type { MenuCategory, MenuItem } from '../../../../../../packages/screens/src/index';
 import styles from '../styles/Cardapios.module.scss';
 import MenuCategoryEditorFields from './MenuCategoryEditorFields';
 

@@ -1,4 +1,4 @@
-import { ContractorDirectoryScreen } from '@soul540/screens';
+import { ContractorDirectoryScreen } from '../../../../../packages/screens/src/index';
 import { apiFetch } from '../../lib/api';
 
 export default function Contratantes() {

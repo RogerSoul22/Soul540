@@ -1,4 +1,4 @@
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
 import styles from '../styles/Eventos.module.scss';
 
 export default function EventDetailsDocuments({ event }: { event: PizzaEvent }) {

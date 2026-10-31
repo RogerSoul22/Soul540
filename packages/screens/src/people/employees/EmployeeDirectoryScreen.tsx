@@ -1,4 +1,4 @@
-import { ConfirmModal } from '@soul540/ui';
+import { ConfirmModal } from '../../../../ui/src/index';
 import EmployeeDetailsModal from './EmployeeDetailsModal';
 import EmployeeDirectoryHeader from './EmployeeDirectoryHeader';
 import EmployeeDirectoryList from './EmployeeDirectoryList';

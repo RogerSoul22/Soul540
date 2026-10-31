@@ -1,7 +1,7 @@
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
 import FinanceOfxItemsList from './FinanceOfxItemsList';
 import styles from '../styles/Financeiro.module.scss';
-import { formatCurrencyPtBr as formatBRL } from '@soul540/domain';
+import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
 
 export default function FinanceOfxImportModal({ controller }: { controller: FinanceiroController }) {
   const {

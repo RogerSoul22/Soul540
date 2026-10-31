@@ -1,9 +1,9 @@
 import { useState, type MouseEvent } from 'react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../packages/contracts/src/index';
 import styles from './styles/CalendarView.module.scss';
-import { buildEventWhatsAppUrl as buildSharedEventWhatsAppUrl } from '@soul540/domain';
+import { buildEventWhatsAppUrl as buildSharedEventWhatsAppUrl } from '../../../../../packages/domain/src/index';
 import { FactoryCalendarEventDelete } from './FactoryCalendarEventDelete';
 import { FactoryCalendarEventEdit } from './FactoryCalendarEventEdit';
 import { FactoryCalendarEventView } from './FactoryCalendarEventView';

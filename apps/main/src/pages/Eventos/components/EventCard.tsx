@@ -1,9 +1,9 @@
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { buildEventWhatsAppUrl as buildSharedEventWhatsAppUrl } from '@soul540/domain';
-import { getEventModalityLabel } from '@soul540/domain';
+import { buildEventWhatsAppUrl as buildSharedEventWhatsAppUrl } from '../../../../../../packages/domain/src/index';
+import { getEventModalityLabel } from '../../../../../../packages/domain/src/index';
 import EventCardActions from './EventCardActions';
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
 import styles from '../styles/Eventos.module.scss';
 function safeFormat(date: string | undefined | null, fmt: string, options?: Parameters<typeof format>[2]): string {
   if (!date) return '—';

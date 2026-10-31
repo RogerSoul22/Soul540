@@ -1,4 +1,4 @@
-import { ConfirmModal } from '@soul540/ui';
+import { ConfirmModal } from '../../../../../packages/ui/src/index';
 import TaskBoard from './components/TaskBoard';
 import TaskCreateModal from './components/TaskCreateModal';
 import TaskHistory from './components/TaskHistory';

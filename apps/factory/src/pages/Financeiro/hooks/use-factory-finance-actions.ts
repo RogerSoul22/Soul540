@@ -2,8 +2,8 @@ import {
   formatCurrencyInput as formatCurrency,
   formatCurrencyPtBr as formatBRL,
   parseCurrencyInput as parseCurrency,
-} from '@soul540/domain';
-import { notifyFeedback } from '@soul540/api-client';
+} from '../../../../../../packages/domain/src/index';
+import { notifyFeedback } from '../../../../../../packages/api-client/src/index';
 import { exportFactoryFinanceCsv, exportFactoryFinanceDre } from '../support/finance-export-actions';
 import { useFactoryFinanceFormActions } from './use-factory-finance-form-actions';
 import type { FactoryFinanceState } from './use-factory-finance-state';

@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
-import { PortalLayout } from '@soul540/ui';
-import { ApiFeedback } from '@soul540/ui';
+import { PortalLayout } from '../../../../../packages/ui/src/index';
+import { ApiFeedback } from '../../../../../packages/ui/src/index';
 import Sidebar from '../Sidebar/Sidebar';
 
 export default function Layout() {

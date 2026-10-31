@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import { PortalLayout } from '@soul540/ui';
+import { PortalLayout } from '../../../../../packages/ui/src/index';
 import ApiFeedback from '../ApiFeedback/ApiFeedback';
 import Sidebar from '../Sidebar/Sidebar';
 

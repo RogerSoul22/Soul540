@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useEffect, useState } from 'react';
-import type { User } from '@soul540/contracts';
+import type { User } from '../../../../packages/contracts/src/index';
 import { AuthRepository } from '../auth/auth-repository';
 import { validateLoginCredentials } from '../auth/credentials';
 import { tokenStorage } from '../auth/token-storage';

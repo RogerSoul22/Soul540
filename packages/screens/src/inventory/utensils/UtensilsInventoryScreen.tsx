@@ -1,4 +1,4 @@
-import { ConfirmModal } from '@soul540/ui';
+import { ConfirmModal } from '../../../../ui/src/index';
 import CategoryEditorModal from './CategoryEditorModal';
 import InventoryInfoModal from './InventoryInfoModal';
 import UtensilDetailsModal from './UtensilDetailsModal';

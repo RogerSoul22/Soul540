@@ -1,1 +1,1 @@
-export * from '@soul540/ui';
+export * from '../../../../packages/ui/src/index';

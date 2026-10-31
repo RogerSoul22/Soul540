@@ -1,7 +1,7 @@
-import type { FinanceEntry } from '@soul540/contracts';
-import { GaugeChart } from '@soul540/ui';
-import { HorizontalBarChart } from '@soul540/ui';
-import { formatCurrencyPtBr as formatBRL } from '@soul540/domain';
+import type { FinanceEntry } from '../../../../../../packages/contracts/src/index';
+import { GaugeChart } from '../../../../../../packages/ui/src/index';
+import { HorizontalBarChart } from '../../../../../../packages/ui/src/index';
+import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
 import styles from '../styles/Financeiro.module.scss';
 
 type CostSummary = Array<{ label: string; value: number; color: string }>;

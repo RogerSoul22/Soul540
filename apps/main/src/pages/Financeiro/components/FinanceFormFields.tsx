@@ -1,5 +1,5 @@
-import { formatCurrencyInput as formatCurrency } from '@soul540/domain';
-import type { FinanceType } from '@soul540/contracts';
+import { formatCurrencyInput as formatCurrency } from '../../../../../../packages/domain/src/index';
+import type { FinanceType } from '../../../../../../packages/contracts/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
 import FinanceEventField from './FinanceEventField';
 import styles from '../styles/Financeiro.module.scss';

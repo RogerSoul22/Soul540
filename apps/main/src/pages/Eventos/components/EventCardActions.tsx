@@ -1,4 +1,4 @@
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
 import { whatsappIconPath } from '../support/event-icons';
 import styles from '../styles/Eventos.module.scss';
 

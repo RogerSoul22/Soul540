@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { formatCurrencyPtBr as formatBRL } from '@soul540/domain';
-import type { RecurrenceFrequency } from '@soul540/contracts';
+import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
+import type { RecurrenceFrequency } from '../../../../../../packages/contracts/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
 import styles from '../styles/Financeiro.module.scss';
 export default function FinanceRecurrenceFields({

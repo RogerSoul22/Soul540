@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { compareTextPtBr as compareAlpha } from '@soul540/domain';
+import { compareTextPtBr as compareAlpha } from '../../../../../../packages/domain/src/index';
 import {
   CATEGORY_COLORS,
   CATEGORY_LABELS,

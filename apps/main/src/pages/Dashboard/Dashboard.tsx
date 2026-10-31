@@ -16,7 +16,7 @@ import {
   formatDashboardEventDate as formatEventDate,
   getDashboardGreeting as getGreeting,
   parseDashboardEventDate as parseEventDate,
-} from '@soul540/screens';
+} from '../../../../../packages/screens/src/index';
 import DashboardHeader from './components/DashboardHeader';
 import DashboardCalendarHeader from './components/DashboardCalendarHeader';
 import DashboardOperationalPanels from './components/DashboardOperationalPanels';

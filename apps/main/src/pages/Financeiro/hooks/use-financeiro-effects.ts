@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import type { FinanceType } from '@soul540/contracts';
+import type { FinanceType } from '../../../../../../packages/contracts/src/index';
 import { apiFetch } from '../../../lib/api';
 import type { FinanceiroState } from './use-financeiro-state';
 type FinanceiroEffectsState = Pick<

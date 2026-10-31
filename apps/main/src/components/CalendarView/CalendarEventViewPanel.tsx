@@ -1,7 +1,7 @@
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { ReactNode } from 'react';
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../packages/contracts/src/index';
 import styles from './styles/CalendarView.module.scss';
 import { buildWhatsAppUrl } from './calendar-utils';
 

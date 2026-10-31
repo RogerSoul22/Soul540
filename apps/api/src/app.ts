@@ -1,6 +1,7 @@
 import 'express-async-errors';
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import path from 'path';
 import 'dotenv/config';
@@ -51,6 +52,7 @@ app.use(
     allowedHeaders: ['Content-Type', 'Authorization', 'X-System', 'X-Franchise-Id'],
   }),
 );
+app.use(compression());
 app.use(express.json({ limit: '8mb' }));
 app.use(cookieParser());
 app.use(optionalAuth);

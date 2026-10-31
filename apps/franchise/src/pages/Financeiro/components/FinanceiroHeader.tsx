@@ -2,7 +2,7 @@ import type { useFinanceiroController } from '../hooks/use-financeiro-controller
 
 type Controller = ReturnType<typeof useFinanceiroController>;
 type Props = { controller: Controller };
-import { Button } from '@soul540/ui';
+import { Button } from '../../../../../../packages/ui/src/index';
 import FinancePeriodFilter from '../../../../../../shared/finance/components/FinancePeriodFilter';
 import styles from '../styles/Financeiro.module.scss';
 type TabType = 'geral' | 'despesas' | 'mensal' | 'lancamentos' | 'valores';

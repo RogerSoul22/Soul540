@@ -1,8 +1,11 @@
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { Task, TaskStatus } from '../../../../../../shared/contracts/types';
-import { Badge } from '@soul540/ui';
-import { taskPriorityLabels as priorityLabels, taskStatusLabels as statusLabels } from '@soul540/screens';
+import { Badge } from '../../../../../../packages/ui/src/index';
+import {
+  taskPriorityLabels as priorityLabels,
+  taskStatusLabels as statusLabels,
+} from '../../../../../../packages/screens/src/index';
 import TaskCard, { TaskMoveControls } from './TaskCard';
 import { PRIORITY_COLORS, STATUS_COLORS, type TaskGroups, type ViewMode } from '../types/task-types';
 import styles from '../styles/Tarefas.module.scss';

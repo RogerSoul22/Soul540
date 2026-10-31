@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
-import type { DreSection, FinanceType, RecurrenceFrequency } from '@soul540/contracts';
-import { advanceFinanceRecurrence as advanceRecurrence } from '@soul540/domain';
-import type { EventModality } from '@soul540/contracts';
+import type { DreSection, FinanceType, RecurrenceFrequency } from '../../../../../../packages/contracts/src/index';
+import { advanceFinanceRecurrence as advanceRecurrence } from '../../../../../../packages/domain/src/index';
+import type { EventModality } from '../../../../../../packages/contracts/src/index';
 
 export function useFinanceFormState() {
   const [formType, setFormType] = useState<FinanceType>('cost');

@@ -1,4 +1,4 @@
-import type { TaskPriority } from '@soul540/contracts';
+import type { TaskPriority } from '../../../../../../packages/contracts/src/index';
 import type { TaskFormData } from '../types/task-types';
 import styles from '../styles/Tarefas.module.scss';
 

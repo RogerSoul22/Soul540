@@ -1,6 +1,6 @@
 import { format, isValid, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
 
 export function safeFormatDate(
   date: string | undefined | null,

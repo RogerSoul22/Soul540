@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { apiFetch } from '../lib/api';
-import type { Invoice } from '@soul540/contracts';
+import type { Invoice } from '../../../../packages/contracts/src/index';
 import type { AppDataState } from './app-context-types';
 
 const headers = { 'X-System': 'main' };

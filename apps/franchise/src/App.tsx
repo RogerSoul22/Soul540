@@ -6,7 +6,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { ROUTES } from './routes';
 import Login from './pages/Login/Login';
 import Layout from './components/Layout/Layout';
-import { ErrorBoundary } from '@soul540/ui';
+import { ErrorBoundary } from '../../../packages/ui/src/index';
 import { FranchiseProvider } from './franchise-context';
 import { getFranchiseBasePath } from './franchise-path';
 

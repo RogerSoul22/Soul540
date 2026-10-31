@@ -1,4 +1,4 @@
-import { createApiFetch } from '@soul540/api-client';
+import { createApiFetch } from '../../../../packages/api-client/src/index';
 
 export type PortalSystem = 'factory' | 'franchise';
 

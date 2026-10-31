@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
-import type { Contract as SharedContract } from '@soul540/screens';
+import type { Contract as SharedContract } from '../../../../../../packages/screens/src/index';
 
 export type Contract = SharedContract;
 

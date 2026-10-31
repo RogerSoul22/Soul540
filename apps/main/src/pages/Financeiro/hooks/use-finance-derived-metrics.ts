@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import type { PizzaEvent } from '@soul540/contracts';
-import type { FinanceEntry } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
+import type { FinanceEntry } from '../../../../../../packages/contracts/src/index';
 import { isRealizedExpense, isRealizedRevenue } from '../../../../../../shared/finance/financeSettlement';
 import type { FinancePeriod } from '../../../../../../shared/finance/financePeriod';
 import { matchesFinancePeriod } from '../../../../../../shared/finance/financePeriod';

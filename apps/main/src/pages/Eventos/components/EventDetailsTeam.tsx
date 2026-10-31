@@ -1,4 +1,4 @@
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
 import styles from '../styles/Eventos.module.scss';
 type Props = { event: PizzaEvent; employeeMap: Record<string, string> };
 export default function EventDetailsTeam({ event, employeeMap }: Props) {

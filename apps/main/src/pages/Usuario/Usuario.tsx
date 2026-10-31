@@ -2,7 +2,7 @@ import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { apiFetch } from '../../lib/api';
-import { Button, Input, useTheme } from '@soul540/ui';
+import { Button, Input, useTheme } from '../../../../../packages/ui/src/index';
 import styles from './styles/Usuario.module.scss';
 
 export default function Usuario() {

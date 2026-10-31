@@ -1,5 +1,5 @@
 import { useCardapiosController } from './hooks/use-cardapios-controller';
-import { ConfirmModal } from '@soul540/ui';
+import { ConfirmModal } from '../../../../../packages/ui/src/index';
 import { SOUL540_MENUS } from '../../data/soul540Menus';
 import MenuEditorModal from './components/MenuEditorModal';
 import CustomMenuList from './components/CustomMenuList';

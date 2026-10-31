@@ -1,4 +1,4 @@
-import { notifyFeedback } from '@soul540/api-client';
+import { notifyFeedback } from '../../../../../../packages/api-client/src/index';
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import type { PizzaEvent } from '../../../types/Event';
 import type { EventFormData } from '../types/event-form-types';

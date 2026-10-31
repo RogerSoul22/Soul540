@@ -1,4 +1,4 @@
-import type { ContractForm, Contract as SharedContract } from '@soul540/screens';
+import type { ContractForm, Contract as SharedContract } from '../../../../../../packages/screens/src/index';
 
 export type Contract = SharedContract;
 export type FormData = ContractForm;

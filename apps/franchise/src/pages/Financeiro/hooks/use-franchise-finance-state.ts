@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '../../../contexts/AppContext';
-import { advanceFinanceRecurrence as advanceRecurrence } from '@soul540/domain';
+import { advanceFinanceRecurrence as advanceRecurrence } from '../../../../../../packages/domain/src/index';
 import { getInitialFinancePeriod } from '../../../../../../shared/finance/financePeriod';
 import type { DreSection, RecurrenceFrequency } from '../../../../../../shared/contracts/types';
 import { useFranchiseFinanceImport } from './use-franchise-finance-import';

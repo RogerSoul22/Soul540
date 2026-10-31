@@ -2,8 +2,8 @@ import type { useFinanceiroController } from '../hooks/use-financeiro-controller
 
 type Controller = ReturnType<typeof useFinanceiroController>;
 type Props = { controller: Controller };
-import { Badge } from '@soul540/ui';
-import { formatCurrencyPtBr as formatBRL } from '@soul540/domain';
+import { Badge } from '../../../../../../packages/ui/src/index';
+import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
 import styles from '../styles/Financeiro.module.scss';
 import FinanceiroEntriesTable from './FinanceiroEntriesTable';
 import type { FilterType } from '../types/finance-controller-types';

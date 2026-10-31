@@ -1,4 +1,4 @@
-import { Button, Input, Modal } from '@soul540/ui';
+import { Button, Input, Modal } from '../../../../../../packages/ui/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
 import styles from '../styles/Financeiro.module.scss';
 

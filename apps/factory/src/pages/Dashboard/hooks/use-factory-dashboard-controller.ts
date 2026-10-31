@@ -8,7 +8,10 @@ import {
 } from '../../../../../../shared/events/eventOperations';
 import { getUpcomingOperationalAlerts } from '../../../../../../shared/events/eventInsights';
 import { apiFetch } from '../../../lib/api';
-import { getDashboardGreeting as getGreeting, parseDashboardEventDate as parseEventDate } from '@soul540/screens';
+import {
+  getDashboardGreeting as getGreeting,
+  parseDashboardEventDate as parseEventDate,
+} from '../../../../../../packages/screens/src/index';
 import type { ProductionOrder } from '../types/dashboard-types';
 
 export function useFactoryDashboardController() {

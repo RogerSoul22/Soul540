@@ -1,6 +1,6 @@
-import { notifyFeedback } from '@soul540/api-client';
+import { notifyFeedback } from '../../../../../packages/api-client/src/index';
 import { useState, type MouseEvent } from 'react';
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../packages/contracts/src/index';
 import styles from './styles/CalendarView.module.scss';
 import CalendarEventDeletePanel from './CalendarEventDeletePanel';
 import CalendarEventEditPanel from './CalendarEventEditPanel';

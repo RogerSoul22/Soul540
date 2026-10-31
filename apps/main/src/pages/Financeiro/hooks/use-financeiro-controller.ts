@@ -1,4 +1,4 @@
-import { notifyFeedback } from '@soul540/api-client';
+import { notifyFeedback } from '../../../../../../packages/api-client/src/index';
 import { useFinanceDerivedFilters } from './use-finance-derived-filters';
 import { useFinanceExportActions } from './use-finance-export-actions';
 import { useFinanceFormActions } from './use-finance-form-actions';

@@ -1,5 +1,5 @@
 import { ptBR } from 'date-fns/locale';
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
 import { safeFormat } from './event-formatters';
 
 export type EventGroups = {

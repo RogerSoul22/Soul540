@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useApp } from '../../../contexts/AppContext';
 import type { Employee } from '../../../domain/Employee';
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
 import { getAvailabilityConflicts, getEventSupplyForecast } from '../../../../../../shared/events/eventOperations';
 import { emptyEventForm, formatBudget, formatPhone, roleLabels } from '../support/event-formatters';
 import type { EventFormData } from '../types/event-form-types';

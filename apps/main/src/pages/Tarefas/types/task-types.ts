@@ -1,4 +1,4 @@
-import type { Task, TaskPriority, TaskStatus } from '@soul540/contracts';
+import type { Task, TaskPriority, TaskStatus } from '../../../../../../packages/contracts/src/index';
 
 export type ViewMode = 'kanban' | 'list';
 

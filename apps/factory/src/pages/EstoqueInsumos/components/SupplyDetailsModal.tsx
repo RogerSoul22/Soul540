@@ -1,4 +1,4 @@
-import { Badge } from '@soul540/ui';
+import { Badge } from '../../../../../../packages/ui/src/index';
 import type { SuppliesController } from '../hooks/use-supplies-controller';
 import { isExpiringSoon, statusConfig } from '../types/supply-types';
 import styles from '../styles/EstoqueInsumos.module.scss';

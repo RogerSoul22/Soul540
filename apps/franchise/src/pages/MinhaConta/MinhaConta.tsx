@@ -1,4 +1,4 @@
-import { AccountScreen } from '@soul540/screens';
+import { AccountScreen } from '../../../../../packages/screens/src/index';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { apiFetch } from '../../lib/api';

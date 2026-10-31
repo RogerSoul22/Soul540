@@ -1,4 +1,4 @@
-import { AuditLogScreen } from '@soul540/screens';
+import { AuditLogScreen } from '../../../../../packages/screens/src/index';
 import { apiFetch } from '../../lib/api';
 import styles from './styles/Auditoria.module.scss';
 

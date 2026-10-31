@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { FinanceEntry, PizzaEvent } from '@soul540/contracts';
+import type { FinanceEntry, PizzaEvent } from '../../../../../../packages/contracts/src/index';
 import { isRealizedRevenue } from '../../../../../../shared/finance/financeSettlement';
 import type { FinancePeriod } from '../../../../../../shared/finance/financePeriod';
 import { useFinanceDerivedMetrics } from './use-finance-derived-metrics';
@@ -7,7 +7,7 @@ import { useFinancePeriodCharts } from './use-finance-period-charts';
 import { useFinanceFinalValueSummary } from './use-finance-final-value-summary';
 import { useFinanceEventBudgetSummary } from './use-finance-event-budget-summary';
 import { useFinancePeriodInsights } from './use-finance-period-insights';
-import { normalizeEventModality } from '@soul540/domain';
+import { normalizeEventModality } from '../../../../../../packages/domain/src/index';
 import type { FinanceModalityFilter } from '../support/finance-modalities';
 type FinancePeriodDerivationsInput = {
   activeFinances: FinanceEntry[];

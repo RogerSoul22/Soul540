@@ -1,4 +1,4 @@
-import { Button, Input, Select } from '@soul540/ui';
+import { Button, Input, Select } from '../../../../../../packages/ui/src/index';
 import type { UserForm } from '../types/permissions-types';
 import styles from '../styles/Permissoes.module.scss';
 

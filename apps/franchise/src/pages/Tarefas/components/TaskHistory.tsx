@@ -1,8 +1,8 @@
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { TaskHistoryEntry } from '../../../../../../shared/contracts/types';
-import { Badge } from '@soul540/ui';
-import { taskPriorityLabels as priorityLabels } from '@soul540/screens';
+import { Badge } from '../../../../../../packages/ui/src/index';
+import { taskPriorityLabels as priorityLabels } from '../../../../../../packages/screens/src/index';
 import { PRIORITY_COLORS } from '../types/task-types';
 import styles from '../styles/Tarefas.module.scss';
 

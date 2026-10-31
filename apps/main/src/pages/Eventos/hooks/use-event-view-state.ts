@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
 
 export function useEventViewState() {
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);

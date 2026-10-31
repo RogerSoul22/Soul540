@@ -1,4 +1,4 @@
-import { UnitLoginScreen, type UnitLoginFeature } from '@soul540/screens';
+import { UnitLoginScreen, type UnitLoginFeature } from '../../../../../packages/screens/src/index';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ROUTES } from '../../routes';

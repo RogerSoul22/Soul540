@@ -1,4 +1,4 @@
-import type { User } from '@soul540/contracts';
+import type { User } from '../../../../packages/contracts/src/index';
 import { apiFetch } from '../lib/api';
 import { tokenStorage } from './token-storage';
 import type { LoginCredentials } from './credentials';

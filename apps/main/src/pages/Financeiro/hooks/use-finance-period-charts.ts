@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { FinanceEntry } from '@soul540/contracts';
+import type { FinanceEntry } from '../../../../../../packages/contracts/src/index';
 import { FIXED_CATEGORIES, VARIABLE_CATEGORIES } from '../../../../../../shared/finance/financeCategories';
 
 export function useFinancePeriodCharts(

@@ -1,4 +1,4 @@
-import { ChecklistDeliveryScreen } from '@soul540/screens';
+import { ChecklistDeliveryScreen } from '../../../../../packages/screens/src/index';
 import { apiFetch } from '../../lib/api';
 
 export default function ChecklistEnvio() {

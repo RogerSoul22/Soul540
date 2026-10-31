@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
 import type { EventFormData } from '../types/event-form-types';
 
 export function useEventFormDraft(form: EventFormData) {

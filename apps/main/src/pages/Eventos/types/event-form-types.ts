@@ -1,4 +1,4 @@
-import type { EventModality } from '@soul540/contracts';
+import type { EventModality } from '../../../../../../packages/contracts/src/index';
 
 export type EventFormData = {
   name: string;

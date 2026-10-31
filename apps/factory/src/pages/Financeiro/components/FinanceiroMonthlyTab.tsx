@@ -2,9 +2,9 @@ import type { useFinanceiroController } from '../hooks/use-financeiro-controller
 
 type Controller = ReturnType<typeof useFinanceiroController>;
 type Props = { controller: Controller };
-import { GaugeChart } from '@soul540/ui';
-import { HorizontalBarChart } from '@soul540/ui';
-import { formatCurrencyPtBr as formatBRL } from '@soul540/domain';
+import { GaugeChart } from '../../../../../../packages/ui/src/index';
+import { HorizontalBarChart } from '../../../../../../packages/ui/src/index';
+import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
 import styles from '../styles/Financeiro.module.scss';
 
 export default function FinanceiroMonthlyTab({ controller }: Props) {

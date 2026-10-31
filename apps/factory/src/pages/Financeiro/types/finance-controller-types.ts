@@ -1,7 +1,7 @@
 import { format, isValid, parseISO } from 'date-fns';
 import type { useApp } from '../../../contexts/AppContext';
 import type { RecurrenceFrequency } from '../../../../../../shared/contracts/types';
-import { getNfeEmissionDate as formatNFeDate } from '@soul540/domain';
+import { getNfeEmissionDate as formatNFeDate } from '../../../../../../packages/domain/src/index';
 
 export type FinanceType = 'revenue' | 'cost';
 export type FinanceStatus = 'pending' | 'paid';

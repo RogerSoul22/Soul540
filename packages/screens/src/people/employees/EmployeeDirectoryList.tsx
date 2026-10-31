@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Badge } from '@soul540/ui';
+import { Badge } from '../../../../ui/src/index';
 import { LocationIcon, PhoneIcon, SearchIcon } from './employee-icons';
 import { dayLabels, days, employeeStatusConfig, roleLabels, type Employee } from './employee-types';
 import cardStyles from './styles/EmployeeDirectoryCards.module.scss';

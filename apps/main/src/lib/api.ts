@@ -1,5 +1,5 @@
-import { createApiFetch } from '@soul540/api-client';
+import { createApiFetch } from '../../../../packages/api-client/src/index';
 
-export { ApiRequestError } from '@soul540/api-client';
+export { ApiRequestError } from '../../../../packages/api-client/src/index';
 
 export const apiFetch = createApiFetch();

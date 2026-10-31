@@ -1,5 +1,5 @@
 import type { FinancePeriod } from '../../../../../../shared/finance/financePeriod';
-import { notifyFeedback } from '@soul540/api-client';
+import { notifyFeedback } from '../../../../../../packages/api-client/src/index';
 import { DRE_SECTIONS, type CategoryDef } from '../../../../../../shared/finance/financeCategories';
 import type { DreSection } from '../../../../../../shared/contracts/types';
 import type { FinanceEntry, FinanceType } from '../types/finance-controller-types';

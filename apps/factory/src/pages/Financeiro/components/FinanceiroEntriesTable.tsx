@@ -4,7 +4,7 @@ type Controller = ReturnType<typeof useFinanceiroController>;
 type Props = { controller: Controller };
 import { format, isValid, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { formatCurrencyPtBr as formatBRL } from '@soul540/domain';
+import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
 import styles from '../styles/Financeiro.module.scss';
 
 type FinanceStatus = 'pending' | 'paid';

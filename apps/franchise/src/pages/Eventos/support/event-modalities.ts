@@ -1,4 +1,4 @@
-import { getEventModalityLabel, getWeeklyOccurrenceDates } from '@soul540/domain';
+import { getEventModalityLabel, getWeeklyOccurrenceDates } from '../../../../../../packages/domain/src/index';
 import type { PizzaEvent } from '../../../../../../shared/contracts/types';
 
 type RecurringFeirinha = Pick<PizzaEvent, 'modality' | 'date' | 'recurrenceEndDate'>;

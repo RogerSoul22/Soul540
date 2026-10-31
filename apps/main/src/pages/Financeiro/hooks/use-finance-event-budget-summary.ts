@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { FinanceEntry, PizzaEvent } from '@soul540/contracts';
+import type { FinanceEntry, PizzaEvent } from '../../../../../../packages/contracts/src/index';
 import { isRealizedRevenue } from '../../../../../../shared/finance/financeSettlement';
 
 export function useFinanceEventBudgetSummary(events: PizzaEvent[], finances: FinanceEntry[]) {

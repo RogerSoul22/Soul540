@@ -1,5 +1,5 @@
-import { notifyFeedback } from '@soul540/api-client';
-import type { FinanceEntry } from '@soul540/contracts';
+import { notifyFeedback } from '../../../../../../packages/api-client/src/index';
+import type { FinanceEntry } from '../../../../../../packages/contracts/src/index';
 import type { FinanceFormDependencies } from '../types/finance-form-types';
 
 type FinanceDeleteDependencies = Pick<

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { apiFetch } from '../../../lib/api';
 import { useApp } from '../../../contexts/AppContext';
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
 import { getEventSupplyForecast } from '../../../../../../shared/events/eventOperations';
 import { groupByMonth } from '../support/event-formatters';
 import type { FactoryEventEmployee } from '../types/event-types';

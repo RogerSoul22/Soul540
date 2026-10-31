@@ -1,5 +1,5 @@
-import { formatCurrencyPtBr as formatBRL } from '@soul540/domain';
-import { Modal } from '@soul540/ui';
+import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
+import { Modal } from '../../../../../../packages/ui/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
 import styles from '../styles/Financeiro.module.scss';
 

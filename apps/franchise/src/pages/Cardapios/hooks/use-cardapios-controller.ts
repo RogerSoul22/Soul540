@@ -9,7 +9,7 @@ import {
   useMenuCategoryEditor,
   type MenuCategory,
   type MenuRecord as Menu,
-} from '@soul540/screens';
+} from '../../../../../../packages/screens/src/index';
 export function useCardapiosController() {
   const { events } = useApp();
   const [menus, setMenus] = useState<Menu[]>([]);

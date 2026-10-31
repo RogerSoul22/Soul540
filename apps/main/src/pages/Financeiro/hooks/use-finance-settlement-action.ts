@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import type { FinanceEntry, FinanceStatus } from '@soul540/contracts';
-import { notifyFeedback } from '@soul540/api-client';
+import type { FinanceEntry, FinanceStatus } from '../../../../../../packages/contracts/src/index';
+import { notifyFeedback } from '../../../../../../packages/api-client/src/index';
 import { calculateSettlementStatus, getOutstandingCents } from '../../../../../../shared/finance/financePolicy';
-import { fromCents, parseCurrencyInput as parseCurrency } from '@soul540/domain';
+import { fromCents, parseCurrencyInput as parseCurrency } from '../../../../../../packages/domain/src/index';
 
 type SettlementInput = {
   settleFinance: (

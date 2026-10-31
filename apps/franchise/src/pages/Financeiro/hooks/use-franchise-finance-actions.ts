@@ -3,8 +3,8 @@ import {
   formatCurrencyInput as formatCurrency,
   formatCurrencyPtBr as formatBRL,
   parseCurrencyInput as parseCurrency,
-} from '@soul540/domain';
-import { notifyFeedback } from '@soul540/api-client';
+} from '../../../../../../packages/domain/src/index';
+import { notifyFeedback } from '../../../../../../packages/api-client/src/index';
 import { exportFranchiseFinanceCsv, exportFranchiseFinanceDre } from '../support/finance-export-actions';
 import { useFranchiseFinanceFormActions } from './use-franchise-finance-form-actions';
 import type { FranchiseFinanceState } from './use-franchise-finance-state';

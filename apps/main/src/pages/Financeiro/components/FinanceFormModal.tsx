@@ -1,5 +1,5 @@
-import { Modal } from '@soul540/ui';
-import { Button } from '@soul540/ui';
+import { Modal } from '../../../../../../packages/ui/src/index';
+import { Button } from '../../../../../../packages/ui/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
 import FinanceFormFields from './FinanceFormFields';
 import FinanceRecurrenceFields from './FinanceRecurrenceFields';

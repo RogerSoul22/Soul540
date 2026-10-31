@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 import { apiFetch } from '../lib/api';
 import { Storage } from '../lib/storage';
 
-import type { User } from '@soul540/contracts';
+import type { User } from '../../../../packages/contracts/src/index';
 interface AuthCtx {
   user: User | null;
   loading: boolean;

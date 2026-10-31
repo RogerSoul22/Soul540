@@ -1,5 +1,5 @@
-import type { FinanceCategoryEntry, FinanceEntry } from '@soul540/contracts';
-import { notifyFeedback } from '@soul540/api-client';
+import type { FinanceCategoryEntry, FinanceEntry } from '../../../../../../packages/contracts/src/index';
+import { notifyFeedback } from '../../../../../../packages/api-client/src/index';
 import {
   buildDreTemplateValues,
   DRE_TEMPLATE_INPUT_CELLS,

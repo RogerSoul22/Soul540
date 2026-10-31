@@ -1,5 +1,5 @@
-import { Button } from '@soul540/ui';
-import { Modal } from '@soul540/ui';
+import { Button } from '../../../../../../packages/ui/src/index';
+import { Modal } from '../../../../../../packages/ui/src/index';
 import styles from '../styles/Financeiro.module.scss';
 import type { FinanceSupportController } from '../types/finance-support-types';
 

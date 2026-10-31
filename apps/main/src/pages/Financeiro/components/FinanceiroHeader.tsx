@@ -1,5 +1,5 @@
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
-import { Button } from '@soul540/ui';
+import { Button } from '../../../../../../packages/ui/src/index';
 import styles from '../styles/Financeiro.module.scss';
 
 const infoTitle =

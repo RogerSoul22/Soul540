@@ -1,4 +1,4 @@
-import { notifyFeedback, notifySuccess } from '@soul540/api-client';
+import { notifyFeedback, notifySuccess } from '../../../../../../packages/api-client/src/index';
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { apiFetch } from '../../../lib/api';
 import {

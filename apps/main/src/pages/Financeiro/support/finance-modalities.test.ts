@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import type { FinanceEntry } from '@soul540/contracts';
+import type { FinanceEntry } from '../../../../../../packages/contracts/src/index';
 import { filterFinanceByModality } from './finance-modalities';
 
 const entries: FinanceEntry[] = [

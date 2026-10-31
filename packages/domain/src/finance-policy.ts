@@ -1,7 +1,7 @@
-import type { FinanceSettlement } from '@soul540/contracts';
+import type { FinanceSettlement } from '../../contracts/src/index';
 import { getSaoPauloDate, isDateOnly } from './finance-dates';
 
-export type { FinanceSettlement } from '@soul540/contracts';
+export type { FinanceSettlement } from '../../contracts/src/index';
 export type CanonicalSettlementStatus = 'open' | 'partial' | 'settled' | 'cancelled';
 
 export interface FinancePolicyEntry {

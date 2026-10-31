@@ -1,6 +1,6 @@
 import { useRef, useState, type ChangeEvent } from 'react';
-import { compareTextPtBr as compareAlpha } from '@soul540/domain';
-import { notifyFeedback } from '@soul540/api-client';
+import { compareTextPtBr as compareAlpha } from '../../../../../../packages/domain/src/index';
+import { notifyFeedback } from '../../../../../../packages/api-client/src/index';
 import type { FinanceAppState, XmlFinanceItem } from '../types/finance-controller-types';
 import { parseNFeXmlForFinance } from '../types/finance-controller-types';
 

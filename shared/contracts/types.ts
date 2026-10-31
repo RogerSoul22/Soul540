@@ -1,1 +1,1 @@
-export * from '@soul540/contracts';
+export * from '../../packages/contracts/src/index';

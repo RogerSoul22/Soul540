@@ -1,7 +1,7 @@
 import { format, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { MouseEvent } from 'react';
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../packages/contracts/src/index';
 import styles from './styles/CalendarView.module.scss';
 import { IconChevronLeft, IconChevronRight } from './CalendarIcons';
 import { getEventColor, HOURS } from './calendar-utils';

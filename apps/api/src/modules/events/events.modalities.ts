@@ -1,4 +1,4 @@
-import { canConfirmWeeklyOccurrence } from '@soul540/domain';
+import { canConfirmWeeklyOccurrence } from '../../../../../packages/domain/src/index';
 import { getTenantUnit } from '../../infrastructure/middleware/tenant';
 import { getFranchiseFilter } from '../../infrastructure/franchise-scope';
 import { logAudit } from '../../infrastructure/audit-log';

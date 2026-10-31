@@ -1,4 +1,4 @@
-import { notifyFeedback } from '@soul540/api-client';
+import { notifyFeedback } from '../../../../../packages/api-client/src/index';
 import { useState, type MouseEvent } from 'react';
 import type { PizzaEvent } from '../../types/Event';
 import styles from './styles/CalendarView.module.scss';

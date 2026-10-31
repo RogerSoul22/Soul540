@@ -1,8 +1,8 @@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { formatCurrencyPtBr as formatBRL } from '@soul540/domain';
-import type { PizzaEvent } from '@soul540/contracts';
-import type { FinanceEntry } from '@soul540/contracts';
+import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
+import type { FinanceEntry } from '../../../../../../packages/contracts/src/index';
 import styles from '../styles/Financeiro.module.scss';
 
 type FinanceValuesTableProps = {

@@ -3,8 +3,8 @@ import {
   advanceFinanceRecurrence as advanceRecurrence,
   formatCurrencyInput as formatCurrency,
   parseCurrencyInput as parseCurrency,
-} from '@soul540/domain';
-import type { FinanceEntry } from '@soul540/contracts';
+} from '../../../../../../packages/domain/src/index';
+import type { FinanceEntry } from '../../../../../../packages/contracts/src/index';
 import type { FinanceFormDependencies } from '../types/finance-form-types';
 import { useFinanceDeleteActions } from './use-finance-delete-actions';
 

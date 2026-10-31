@@ -9,7 +9,7 @@ import { buildFranchiseFinanceBudgetTotals } from '../support/finance-period-bud
 import { buildFranchiseFinanceFinalValues } from '../support/finance-period-final-values';
 import { filterFinanceByModality } from '../support/finance-modalities';
 import type { FinanceModalityFilter } from '../support/finance-modalities';
-import { normalizeEventModality } from '@soul540/domain';
+import { normalizeEventModality } from '../../../../../../packages/domain/src/index';
 
 type Props = Pick<FranchiseFinanceState, 'events' | 'finances' | 'financePeriod' | 'filterType' | 'search'> & {
   modalityFilter: FinanceModalityFilter;

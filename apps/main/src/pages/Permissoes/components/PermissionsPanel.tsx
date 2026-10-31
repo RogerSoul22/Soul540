@@ -1,5 +1,5 @@
 import type { AppUser } from '../types/permissions-types';
-import { Button } from '@soul540/ui';
+import { Button } from '../../../../../../packages/ui/src/index';
 import { ALL_KEYS, ALL_PAGES, SYSTEM_LABELS } from '../types/permissions-types';
 import styles from '../styles/Permissoes.module.scss';
 

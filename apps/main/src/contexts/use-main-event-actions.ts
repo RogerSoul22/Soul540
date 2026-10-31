@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { apiFetch } from '../lib/api';
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../packages/contracts/src/index';
 import type { AppDataState } from './app-context-types';
 
 const buildHeaders = (withBody = false): HeadersInit => ({

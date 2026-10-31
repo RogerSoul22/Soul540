@@ -1,4 +1,4 @@
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../packages/contracts/src/index';
 import styles from './styles/CalendarView.module.scss';
 import CalendarEventBasicsFields from './CalendarEventBasicsFields';
 import CalendarEventOperationsFields from './CalendarEventOperationsFields';

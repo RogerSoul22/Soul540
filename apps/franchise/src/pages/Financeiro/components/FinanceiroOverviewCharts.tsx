@@ -3,8 +3,8 @@ import type { useFinanceiroController } from '../hooks/use-financeiro-controller
 type Controller = ReturnType<typeof useFinanceiroController>;
 type Props = { controller: Controller };
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { GaugeChart } from '@soul540/ui';
-import { formatCurrencyPtBr as formatBRL } from '@soul540/domain';
+import { GaugeChart } from '../../../../../../packages/ui/src/index';
+import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
 import { ptBR } from 'date-fns/locale';
 import styles from '../styles/Financeiro.module.scss';
 

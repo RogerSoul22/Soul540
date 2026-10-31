@@ -1,4 +1,4 @@
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
 import { ptBR } from 'date-fns/locale';
 import { safeFormat } from '../support/event-formatters';
 import styles from '../styles/Eventos.module.scss';

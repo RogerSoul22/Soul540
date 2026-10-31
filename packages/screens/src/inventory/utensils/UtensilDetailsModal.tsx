@@ -1,4 +1,4 @@
-import { Badge } from '@soul540/ui';
+import { Badge } from '../../../../ui/src/index';
 import InventoryModalFrame from './InventoryModalFrame';
 import frameStyles from './styles/InventoryModalFrame.module.scss';
 import type { Utensil } from './utensil-types';

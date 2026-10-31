@@ -1,5 +1,5 @@
-import { notifyFeedback } from '@soul540/api-client';
-import { Button } from '@soul540/ui';
+import { notifyFeedback } from '../../../../api-client/src/index';
+import { Button } from '../../../../ui/src/index';
 import { useEffect, useMemo, useState } from 'react';
 import PermissionAccessPanel from './PermissionAccessPanel';
 import { CreateUserModal, PasswordModal } from './PermissionModals';

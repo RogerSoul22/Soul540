@@ -1,4 +1,4 @@
-import { Input, Select } from '@soul540/ui';
+import { Input, Select } from '../../../../ui/src/index';
 import UtensilCard from './UtensilCard';
 import type { Utensil } from './utensil-types';
 import styles from './styles/UtensilsInventoryList.module.scss';

@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 import type { PizzaEvent } from '../../../types/Event';
-import { Modal } from '@soul540/ui';
+import { Modal } from '../../../../../../packages/ui/src/index';
 import styles from '../styles/Financeiro.module.scss';
 
 type FinanceEventDetailsController = {

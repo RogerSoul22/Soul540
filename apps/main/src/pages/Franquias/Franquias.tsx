@@ -1,4 +1,4 @@
-import { ConfirmModal } from '@soul540/ui';
+import { ConfirmModal } from '../../../../../packages/ui/src/index';
 import FranchiseFormModal from './components/FranchiseFormModal';
 import PortalCard from './components/PortalCard';
 import { useFranquiasController } from './hooks/use-franquias-controller';

@@ -1,4 +1,4 @@
-import type { EventModality } from '@soul540/contracts';
+import type { EventModality } from '../../contracts/src/index';
 
 export const EVENT_MODALITY_LABELS: Record<EventModality, string> = {
   feirinha: 'Feirinha',

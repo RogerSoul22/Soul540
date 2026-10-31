@@ -1,6 +1,6 @@
-import { notifyFeedback } from '@soul540/api-client';
+import { notifyFeedback } from '../../../../../../packages/api-client/src/index';
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react';
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
 import type { EventFormData } from '../types/event-form-types';
 
 type Conflict = { employeeName: string; eventName: string };

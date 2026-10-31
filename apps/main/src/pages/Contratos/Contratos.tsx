@@ -1,8 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../../contexts/AppContext';
 import { apiFetch } from '../../lib/api';
-import { emptyContractForm, filterContracts, parseCurrency, toContractForm } from '@soul540/screens';
-import { ConfirmModal } from '@soul540/ui';
+import {
+  emptyContractForm,
+  filterContracts,
+  parseCurrency,
+  toContractForm,
+} from '../../../../../packages/screens/src/index';
+import { ConfirmModal } from '../../../../../packages/ui/src/index';
 import ContractDocument from './components/ContractDocument';
 import ContractFormModal from './components/ContractFormModal';
 import ContractList from './components/ContractList';

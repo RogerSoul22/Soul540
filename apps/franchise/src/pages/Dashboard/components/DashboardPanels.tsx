@@ -1,4 +1,4 @@
-import { formatDashboardEventDate as formatEventDate } from '@soul540/screens';
+import { formatDashboardEventDate as formatEventDate } from '../../../../../../packages/screens/src/index';
 import type { EmployeeScheduleItem, EventFinancialClosing } from '../../../../../../shared/events/eventOperations';
 import type { PizzaEvent } from '../../../../../../shared/contracts/types';
 import styles from '../styles/Dashboard.module.scss';

@@ -1,5 +1,5 @@
 import { useSuppliesController } from './hooks/use-supplies-controller';
-import { ConfirmModal } from '@soul540/ui';
+import { ConfirmModal } from '../../../../../packages/ui/src/index';
 import SupplyCatalog from './components/SupplyCatalog';
 import SupplyFormModal from './components/SupplyFormModal';
 import SupplyDetailsModal from './components/SupplyDetailsModal';

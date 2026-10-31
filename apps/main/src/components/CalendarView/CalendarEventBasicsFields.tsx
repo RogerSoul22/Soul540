@@ -1,4 +1,4 @@
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../packages/contracts/src/index';
 import styles from './styles/CalendarView.module.scss';
 import { DateField, ListField, NumberField, SelectField, TextField } from './CalendarEventField';
 type Form = Partial<PizzaEvent>;

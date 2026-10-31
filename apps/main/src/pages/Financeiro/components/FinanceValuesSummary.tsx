@@ -1,4 +1,4 @@
-import { formatCurrencyPtBr as formatBRL } from '@soul540/domain';
+import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
 import styles from '../styles/Financeiro.module.scss';
 
 type FinanceValuesSummaryProps = {

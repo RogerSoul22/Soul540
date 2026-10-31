@@ -1,5 +1,5 @@
-import { buildEventWhatsAppUrl as buildSharedEventWhatsAppUrl } from '@soul540/domain';
-import type { PizzaEvent } from '@soul540/contracts';
+import { buildEventWhatsAppUrl as buildSharedEventWhatsAppUrl } from '../../../../../../packages/domain/src/index';
+import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
 import { ptBR } from 'date-fns/locale';
 import { safeFormatDate } from '../support/event-formatters';
 import { whatsappIconPath } from '../support/factory-event-icons';

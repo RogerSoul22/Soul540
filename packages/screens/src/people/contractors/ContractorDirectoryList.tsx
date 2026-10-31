@@ -1,4 +1,4 @@
-import { Badge } from '@soul540/ui';
+import { Badge } from '../../../../ui/src/index';
 import { displayCategory } from './contractor-formatters';
 import { contractorStatusConfig, type Contractor } from './contractor-types';
 import styles from './styles/ContractorDirectoryList.module.scss';

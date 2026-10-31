@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import type { User } from '@soul540/contracts';
+import type { User } from '../../../../packages/contracts/src/index';
 import { apiFetch } from '../lib/api';
 import { storage } from '../lib/storage';
 

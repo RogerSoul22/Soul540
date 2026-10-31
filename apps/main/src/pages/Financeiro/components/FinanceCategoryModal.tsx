@@ -1,7 +1,7 @@
-import { Button } from '@soul540/ui';
-import { Modal } from '@soul540/ui';
+import { Button } from '../../../../../../packages/ui/src/index';
+import { Modal } from '../../../../../../packages/ui/src/index';
 import { DRE_SECTIONS } from '../../../../../../shared/finance/financeCategories';
-import type { DreSection } from '@soul540/contracts';
+import type { DreSection } from '../../../../../../packages/contracts/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
 import styles from '../styles/Financeiro.module.scss';
 

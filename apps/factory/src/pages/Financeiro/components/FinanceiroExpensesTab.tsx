@@ -3,7 +3,10 @@ import type { useFinanceiroController } from '../hooks/use-financeiro-controller
 type Controller = ReturnType<typeof useFinanceiroController>;
 type Props = { controller: Controller };
 import { FIXED_CATEGORIES, VARIABLE_CATEGORIES } from '../../../../../../shared/finance/financeCategories';
-import { compareTextPtBr as compareAlpha, formatCurrencyPtBr as formatBRL } from '@soul540/domain';
+import {
+  compareTextPtBr as compareAlpha,
+  formatCurrencyPtBr as formatBRL,
+} from '../../../../../../packages/domain/src/index';
 import type { CostFilter } from '../types/finance-controller-types';
 import styles from '../styles/Financeiro.module.scss';
 

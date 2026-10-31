@@ -6,7 +6,7 @@ import type {
   PizzaEvent,
   Task,
   TaskHistoryEntry,
-} from '@soul540/contracts';
+} from '../../../../packages/contracts/src/index';
 import { apiFetch } from '../lib/api';
 import type { AppContextData, AppDataState } from './app-context-types';
 import { useMainAppData } from './use-main-app-data';

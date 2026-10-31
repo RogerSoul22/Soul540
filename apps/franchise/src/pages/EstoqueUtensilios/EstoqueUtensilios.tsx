@@ -1,4 +1,4 @@
-import { UtensilsInventoryScreen } from '@soul540/screens';
+import { UtensilsInventoryScreen } from '../../../../../packages/screens/src/index';
 import { apiFetch } from '../../lib/api';
 
 export default function EstoqueUtensilios() {

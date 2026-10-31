@@ -1,1 +1,1 @@
-export * from '@soul540/domain';
+export * from '../../packages/domain/src/index';

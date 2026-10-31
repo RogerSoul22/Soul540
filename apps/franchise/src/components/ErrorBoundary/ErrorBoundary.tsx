@@ -1,1 +1,1 @@
-export { ErrorBoundary as default } from '@soul540/ui';
+export { ErrorBoundary as default } from '../../../../../packages/ui/src/index';

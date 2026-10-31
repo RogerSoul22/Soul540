@@ -1,1 +1,1 @@
-export { ApiFeedback as default } from '@soul540/ui';
+export { ApiFeedback as default } from '../../../../../packages/ui/src/index';

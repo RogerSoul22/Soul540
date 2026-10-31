@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { ROUTES } from '../../routes';
-import { Button } from '@soul540/ui';
-import { Input } from '@soul540/ui';
+import { Button } from '../../../../../packages/ui/src/index';
+import { Input } from '../../../../../packages/ui/src/index';
 import styles from './styles/Login.module.scss';
 
 export default function Login() {

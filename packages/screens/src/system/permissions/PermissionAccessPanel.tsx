@@ -1,4 +1,4 @@
-import { Button } from '@soul540/ui';
+import { Button } from '../../../../ui/src/index';
 import type { AppUser, PermissionDirectoryConfig, StyleMap } from './permission-types';
 
 type Props = {

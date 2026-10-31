@@ -1,6 +1,6 @@
 import { format, isSameDay, isSameMonth, isToday, parseISO } from 'date-fns';
 import type { MouseEvent } from 'react';
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../packages/contracts/src/index';
 import styles from './styles/CalendarView.module.scss';
 import { getEventColor, isEventStart } from './calendar-utils';
 

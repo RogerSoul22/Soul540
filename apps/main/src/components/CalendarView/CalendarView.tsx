@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { addDays, addMonths, isToday, subDays, subMonths } from 'date-fns';
-import type { PizzaEvent } from '@soul540/contracts';
+import type { PizzaEvent } from '../../../../../packages/contracts/src/index';
 import { useApp } from '../../contexts/AppContext';
 import CalendarEventModal from './CalendarEventModal';
 import CalendarDayView from './CalendarDayView';
