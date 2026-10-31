@@ -1,0 +1,131 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.recurrenceFields label {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.recurrenceFields label > span {
+  color: #63738b;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.occurrenceInput {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.occurrenceInput span {
+  flex-shrink: 0;
+  color: #63738b;
+  font-size: 11px;
+}
+
+.recurrencePreview {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f0d397;
+}
+
+.recurrencePreview > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.recurrencePreview strong {
+  color: #182235;
+  font-size: 12px;
+}
+
+.recurrencePreview > div:first-child span {
+  color: #a85f00;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.recurrenceDates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.recurrenceDates span {
+  padding: 6px 8px;
+  border: 1px solid #eadfc9;
+  border-radius: 4px;
+  background: #fff;
+  color: #40516a;
+  font-size: 10px;
+}
+
+@media (max-width: 700px) {
+  .recurrenceFields,
+  .recurrenceDates {
+    grid-template-columns: 1fr;
+  }
+  .recurrencePreview > div:first-child {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+.formSelect,
+.formInput,
+.formTextarea {
+  padding: 10px $spacing-md;
+
+  background: $bg-input;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  color: $text-primary;
+
+  font-size: $font-size-sm;
+
+  transition: all $transition-base;
+
+  &:focus {
+    outline: none;
+
+    border-color: $accent;
+
+    box-shadow: 0 0 0 3px rgba($accent, 0.08);
+  }
+}
+
+.formActions {
+  display: flex;
+
+  gap: $spacing-sm;
+
+  justify-content: flex-end;
+
+  margin-top: $spacing-md;
+
+  padding-top: $spacing-md;
+
+  border-top: 1px solid $border;
+}
+
+// Event combobox
+.eventCombo {
+  position: relative;
+}
+
+.eventComboInput {
+  width: 100%;
+
+  padding-right: 32px;
+}

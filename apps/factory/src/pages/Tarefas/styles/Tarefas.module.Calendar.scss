@@ -1,0 +1,115 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.modeBtn {
+  flex: 1;
+
+  padding: 6px 12px;
+
+  background: none;
+
+  border: none;
+
+  border-radius: $radius-xs;
+
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-medium;
+
+  color: $text-muted;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  white-space: nowrap;
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.modeBtnActive {
+  background: $accent;
+
+  color: #0a0f1e;
+}
+
+// section
+.calcResult {
+  padding: $spacing-lg;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-lg;
+}
+
+.resultSummary {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-md;
+}
+
+.resultEvent {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  color: $accent;
+}
+
+.resultKpis {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: $spacing-xl;
+}
+
+.resultKpi {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.resultKpiVal {
+  font-size: $font-size-xl;
+
+  font-weight: $font-weight-bold;
+
+  color: $text-primary;
+
+  line-height: 1;
+}
+
+.resultKpiLbl {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.4px;
+}
+
+// Result table (ingredient breakdown)
+.resultTable {
+  display: flex;
+
+  flex-direction: column;
+
+  background: $bg-card;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  overflow: hidden;
+}

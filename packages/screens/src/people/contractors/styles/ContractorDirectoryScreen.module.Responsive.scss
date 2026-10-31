@@ -1,0 +1,14 @@
+@media (max-width: 768px) {
+  .page {
+    padding: 16px;
+  }
+  .kpiGrid {
+    grid-template-columns: 1fr;
+  }
+  .actions {
+    width: 100%;
+  }
+  .actions button {
+    flex: 1;
+  }
+}

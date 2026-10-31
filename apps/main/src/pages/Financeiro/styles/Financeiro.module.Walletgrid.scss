@@ -1,0 +1,147 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.commissionGrid button:hover {
+  border-color: #f5a000;
+  background: #fffaf0;
+}
+
+.commissionGrid span {
+  overflow: hidden;
+  color: #40516a;
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.commissionGrid strong {
+  color: #d34b55;
+  font-size: 14px;
+}
+
+.commissionGrid small {
+  color: #718096;
+  font-size: 10px;
+}
+
+.walletGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 1100px) {
+  .walletGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1100px) {
+  .financeInsightsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .financeInsightsGrid > :last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+.btnDanger {
+  padding: 9px 13px;
+  border: 1px solid #e7a3a8;
+  border-radius: 5px;
+  background: #fff1f2;
+  color: #c23b45;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btnDanger:hover {
+  background: #ffe1e4;
+  border-color: #d97982;
+}
+
+.btnDanger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.confirmDeleteContent > p {
+  margin: 0;
+  color: #40516a;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.confirmDeleteSummary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid #e1e8f1;
+  border-radius: 5px;
+  background: #f8fafc;
+}
+
+.confirmDeleteSummary strong {
+  color: #182235;
+  font-size: 13px;
+}
+
+.confirmDeleteSummary span {
+  flex-shrink: 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.eventFinancialSummary {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.eventFinancialSummary > .summaryItem {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+@media (max-width: 1100px) {
+  .eventFinancialSummary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding: 14px 12px 28px;
+  }
+  .summaryBar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .summaryBar > .summaryItem:nth-child(2) {
+    border-right: 0;
+  }
+  .summaryBar > .summaryItem:nth-child(-n + 2) {
+    border-bottom: 1px solid #dbe3ef;
+  }
+  .filterRow {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+  .filterGroup {
+    flex: 1 1 160px;
+  }
+  .filterGroup:has(.searchInput) {
+    flex-basis: 100%;
+  }
+}
+
+@media (max-width: 700px) {
+  .paymentMethodsSection .agendamentosHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .paymentMethodCards {
+    grid-template-columns: 1fr;
+  }
+}

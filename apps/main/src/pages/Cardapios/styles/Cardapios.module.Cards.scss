@@ -1,0 +1,113 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.sectionHeader {
+  @include flex-between;
+  align-items: flex-end;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: $text-primary;
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  letter-spacing: -0.2px;
+}
+
+.sectionSubtitle {
+  margin: 4px 0 0;
+  color: $text-muted;
+  font-size: $font-size-xs;
+}
+
+.standardSection,
+.customSection {
+  margin-bottom: $spacing-xl;
+}
+
+.standardCardMeta,
+.cardMeta {
+  @include flex-between;
+  align-items: flex-start;
+  gap: $spacing-sm;
+  min-height: 24px;
+}
+
+.cardIdentity {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cardName {
+  overflow-wrap: anywhere;
+}
+
+.cardStats {
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.standardCategoryList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.standardCategoryItem,
+.categoryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  padding: 7px 9px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid $border-subtle;
+  border-radius: $radius-xs;
+}
+
+.standardCategoryName,
+.categoryRow > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  color: $text-secondary;
+  font-size: $font-size-xs;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.standardCategoryCount {
+  flex-shrink: 0;
+  color: $text-primary;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+}
+
+@include mobile {
+  .sectionHeader {
+    align-items: stretch;
+  }
+
+  .standardCategoryList {
+    grid-template-columns: 1fr;
+  }
+
+  .cardMeta {
+    flex-wrap: wrap;
+  }
+
+  .cardIdentity,
+  .cardStats {
+    flex-basis: 100%;
+  }
+
+  .cardStats {
+    justify-content: flex-start;
+  }
+}

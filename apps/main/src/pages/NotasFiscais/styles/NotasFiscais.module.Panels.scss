@@ -1,0 +1,129 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+// Error toast
+.errorToast {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: $spacing-md;
+
+  padding: $spacing-sm $spacing-md;
+
+  margin-bottom: $spacing-md;
+
+  background: rgba($danger, 0.1);
+
+  border: 1px solid rgba($danger, 0.25);
+
+  border-radius: $radius-sm;
+
+  color: $danger;
+
+  font-size: $font-size-sm;
+}
+
+.errorToastClose {
+  background: none;
+
+  border: none;
+
+  color: $danger;
+
+  cursor: pointer;
+
+  font-size: $font-size-xs;
+
+  padding: 2px 6px;
+
+  border-radius: $radius-xs;
+
+  &:hover {
+    background: rgba($danger, 0.1);
+  }
+}
+
+// Preview
+.preview {
+  background: #ffffff;
+
+  color: #1a1a2e;
+
+  padding: $spacing-2xl;
+
+  border-radius: $radius-lg;
+
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.previewHeader {
+  text-align: center;
+
+  margin-bottom: $spacing-xl;
+
+  padding-bottom: $spacing-lg;
+
+  border-bottom: 2px solid #eef2f7;
+}
+
+.previewLogo {
+  font-size: $font-size-2xl;
+
+  font-weight: $font-weight-bold;
+
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+
+  -webkit-background-clip: text;
+
+  -webkit-text-fill-color: transparent;
+
+  background-clip: text;
+
+  margin-bottom: $spacing-xs;
+}
+
+.previewTitle {
+  font-size: $font-size-xs;
+
+  color: #8892a4;
+
+  text-transform: uppercase;
+
+  letter-spacing: 2px;
+
+  font-weight: $font-weight-semibold;
+}
+
+.previewSection {
+  margin-bottom: $spacing-lg;
+}
+
+.previewSectionTitle {
+  font-size: 10px;
+
+  font-weight: $font-weight-bold;
+
+  color: #a0aec0;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1px;
+
+  margin-bottom: $spacing-sm;
+}
+
+.previewInfo {
+  font-size: $font-size-sm;
+
+  color: #4a5568;
+
+  line-height: 1.7;
+
+  strong {
+    color: #1a1a2e;
+  }
+}

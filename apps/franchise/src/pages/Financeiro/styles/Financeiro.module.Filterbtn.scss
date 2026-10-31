@@ -1,0 +1,156 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.filterBtn {
+  min-height: 34px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.btnExport,
+.btnXml {
+  min-height: 34px;
+  padding: 7px 11px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.tableWrap {
+  max-height: 380px;
+  border-radius: 5px;
+  box-shadow: none;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+.table {
+  min-width: 760px;
+  font-size: 12px;
+}
+
+.table th {
+  height: 34px;
+  padding: 8px 10px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.25px;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 9px 10px;
+  height: 42px;
+}
+
+.table tr:hover td {
+  background: #eaf4ff;
+}
+
+.categoryTag {
+  border-radius: 3px;
+}
+
+.walletGrid {
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.agendamentosCard,
+.chartSection,
+.barCard {
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+.sectionTitle {
+  font-size: 14px;
+}
+
+.monthSelector {
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+.monthSummaryItem {
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+@media (max-width: 560px) {
+  .tableWrap {
+    max-height: 320px;
+  }
+}
+
+.monthSelector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+}
+
+.monthSelectLabel {
+  color: #63738b;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+}
+
+.monthSelect {
+  min-width: 190px;
+  min-height: 34px;
+  padding: 6px 32px 6px 10px;
+  border: 1px solid #cfd9e7;
+  border-radius: 4px;
+  background: #fff;
+  color: #182235;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.monthSelect:focus {
+  outline: none;
+  border-color: #1464b4;
+  box-shadow: 0 0 0 3px rgba(20, 100, 180, 0.12);
+}
+
+.eventDetailGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.eventDetailGrid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid #e1e8f1;
+  border-radius: 5px;
+  background: #f8fafc;
+}
+
+.eventDetailLabel {
+  color: #63738b;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.eventDetailGrid strong {
+  color: #182235;
+  font-size: 13px;
+}
+
+.eventDetailActions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #e1e8f1;
+}

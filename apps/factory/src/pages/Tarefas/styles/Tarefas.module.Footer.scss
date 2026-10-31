@@ -1,0 +1,131 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.taskCard {
+  background: $bg-card;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  padding: $spacing-md;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-sm;
+
+  transition:
+    border-color $transition-fast,
+    opacity $transition-fast,
+    box-shadow $transition-fast;
+
+  cursor: grab;
+
+  user-select: none;
+
+  &:hover {
+    border-color: $border-accent;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.taskCardDragging {
+  opacity: 0.35;
+
+  cursor: grabbing;
+}
+
+.taskTop {
+  @include flex-between;
+}
+
+.taskDelete {
+  background: none;
+
+  border: none;
+
+  color: $text-muted;
+
+  cursor: pointer;
+
+  padding: 2px;
+
+  display: flex;
+
+  &:hover {
+    color: #f87171;
+  }
+}
+
+.taskTitle {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  color: $text-primary;
+
+  line-height: 1.4;
+}
+
+.taskDesc {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+
+  line-height: 1.4;
+}
+
+.taskRecipe {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+
+  padding-top: 8px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.taskRecipeTitle {
+  font-size: 10px;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.04em;
+}
+
+.taskRecipeList {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  font-size: $font-size-xs;
+
+  color: $text-secondary;
+}
+
+.taskRecipeEmpty {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+}
+
+.taskRecipeFooter {
+  font-size: $font-size-xs;
+
+  color: $accent;
+}

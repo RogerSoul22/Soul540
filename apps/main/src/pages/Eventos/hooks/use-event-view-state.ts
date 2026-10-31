@@ -1,0 +1,39 @@
+import { useState } from 'react';
+import type { PizzaEvent } from '@soul540/contracts';
+
+export function useEventViewState() {
+  const [showMenuDropdown, setShowMenuDropdown] = useState(false);
+  const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
+  const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
+    new Set(['orcamentos', 'confirmados', 'finalizados', 'cancelados']),
+  );
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [viewingEvent, setViewingEvent] = useState<PizzaEvent | null>(null);
+  const [showInfo, setShowInfo] = useState(false);
+  const toggleSection = (key: string) =>
+    setCollapsedSections((previous) => {
+      const next = new Set(previous);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  const toggleMonth = (key: string) =>
+    setExpandedMonths((previous) => {
+      const next = new Set(previous);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  return {
+    showMenuDropdown,
+    setShowMenuDropdown,
+    expandedMonths,
+    collapsedSections,
+    deleteTargetId,
+    setDeleteTargetId,
+    viewingEvent,
+    setViewingEvent,
+    showInfo,
+    setShowInfo,
+    toggleSection,
+    toggleMonth,
+  };
+}

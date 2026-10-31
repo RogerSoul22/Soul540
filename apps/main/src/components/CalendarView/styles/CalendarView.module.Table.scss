@@ -1,0 +1,117 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.pickerMonthActive {
+  color: $accent !important;
+
+  background: rgba($accent, 0.12) !important;
+
+  border-color: rgba($accent, 0.3) !important;
+
+  font-weight: $font-weight-semibold;
+}
+
+.headerRight {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-sm;
+}
+
+.todayBtn {
+  padding: 6px 14px;
+
+  border-radius: $radius-sm;
+
+  border: 1px solid $border;
+
+  background: transparent;
+
+  color: $text-secondary;
+
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  letter-spacing: 0.2px;
+
+  &:hover {
+    border-color: $accent;
+
+    color: $accent;
+
+    background: rgba($accent, 0.06);
+  }
+}
+
+.navBtns {
+  display: flex;
+
+  gap: 2px;
+}
+
+.navBtn {
+  @include flex-center;
+
+  width: 32px;
+
+  height: 32px;
+
+  border-radius: $radius-sm;
+
+  border: 1px solid $border;
+
+  background: transparent;
+
+  color: $text-muted;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+
+    color: $text-primary;
+
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+// section
+.weekDays {
+  display: grid;
+
+  grid-template-columns: repeat(7, 1fr);
+
+  border-bottom: 1px solid $border;
+}
+
+.weekDay {
+  padding: $spacing-sm $spacing-xs;
+
+  text-align: center;
+
+  font-size: 11px;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.8px;
+}
+
+// section
+.grid {
+  display: grid;
+
+  grid-template-columns: repeat(7, 1fr);
+}

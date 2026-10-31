@@ -1,0 +1,121 @@
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.controls input,
+.controls select {
+  min-height: 40px;
+  padding: 9px 12px;
+  border: 1px solid #29354a;
+  border-radius: 6px;
+  color: #e5e7eb;
+  background: #172033;
+}
+
+.searchInput {
+  min-width: 240px;
+  flex: 1;
+  max-width: 400px;
+}
+.empty {
+  padding: 48px;
+  color: #94a3b8;
+  text-align: center;
+}
+.letterSection {
+  margin-bottom: 32px;
+}
+
+.letterSection h2 {
+  margin: 0 0 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #f4b400;
+  font-size: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #29354a;
+  border-radius: 10px;
+  background: #172033;
+  cursor: pointer;
+}
+
+.card:hover {
+  border-color: #f4b40088;
+}
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.cardHeader strong {
+  overflow-wrap: anywhere;
+}
+
+.cardActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.cardActions a,
+.cardActions button {
+  border: 0;
+  color: #94a3b8;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.cardActions a:hover,
+.cardActions button:hover {
+  color: #f4b400;
+}
+
+.card > span {
+  overflow: hidden;
+  color: #cbd5e1;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+@media (max-width: 1000px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .controls > * {
+    width: 100%;
+    max-width: none;
+  }
+}

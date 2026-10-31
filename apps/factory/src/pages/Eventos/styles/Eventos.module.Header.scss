@@ -1,0 +1,123 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// Form section divider
+.formSection {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-md;
+
+  padding-top: $spacing-md;
+
+  border-top: 1px solid $border;
+}
+
+.formSectionTitle {
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.8px;
+
+  margin-bottom: -4px;
+}
+
+// Detail modal
+.detailModal {
+  background: $bg-secondary;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-lg;
+
+  width: 100%;
+
+  max-width: 640px;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  box-shadow: $shadow-lg;
+}
+
+.detailBody {
+  padding: $spacing-xl;
+
+  display: flex;
+
+  flex-direction: column;
+}
+
+.detailSection {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-lg;
+
+  padding: $spacing-xl 0;
+
+  border-bottom: 1px solid $border;
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.detailSectionTitle {
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.8px;
+
+  margin-bottom: -$spacing-xs;
+}
+
+.detailGrid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: $spacing-lg $spacing-xl;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detailItem {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.detailLabel {
+  font-size: 10px;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.6px;
+
+  font-weight: $font-weight-semibold;
+}

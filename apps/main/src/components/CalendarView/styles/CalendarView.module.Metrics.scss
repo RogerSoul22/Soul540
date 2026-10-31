@@ -1,0 +1,128 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.allDayEventStatus {
+  font-size: 10px;
+
+  font-weight: $font-weight-semibold;
+
+  padding: 2px 10px;
+
+  border-radius: $radius-full;
+
+  border: 1px solid transparent;
+
+  white-space: nowrap;
+
+  flex-shrink: 0;
+
+  letter-spacing: 0.2px;
+}
+
+// section
+.timeGrid {
+  overflow-y: auto;
+
+  max-height: 420px;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba($text-muted, 0.2);
+
+    border-radius: 2px;
+  }
+}
+
+.hourRow {
+  display: flex;
+
+  align-items: flex-start;
+
+  min-height: 52px;
+
+  border-bottom: 1px solid $border-faint;
+
+  position: relative;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.hourRowNow {
+  .hourLabel {
+    color: $accent;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.hourLabel {
+  width: 64px;
+
+  flex-shrink: 0;
+
+  padding: $spacing-xs $spacing-sm 0 $spacing-md;
+
+  font-size: 11px;
+
+  color: $text-muted;
+
+  letter-spacing: 0.3px;
+
+  border-right: 1px solid $border;
+
+  user-select: none;
+}
+
+.hourSlot {
+  flex: 1;
+
+  position: relative;
+
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.015);
+
+    cursor: pointer;
+  }
+}
+
+// section
+.nowIndicator {
+  display: flex;
+
+  align-items: center;
+
+  position: absolute;
+
+  top: 0;
+
+  left: 0;
+
+  right: 0;
+
+  pointer-events: none;
+
+  z-index: 2;
+}
+
+.nowDot {
+  width: 10px;
+
+  height: 10px;
+
+  border-radius: $radius-full;
+
+  background: $accent;
+
+  flex-shrink: 0;
+
+  margin-left: -5px;
+
+  box-shadow: 0 0 6px rgba($accent, 0.6);
+}

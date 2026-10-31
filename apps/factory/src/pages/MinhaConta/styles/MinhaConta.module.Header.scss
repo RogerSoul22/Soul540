@@ -1,0 +1,83 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.modal {
+  background: $bg-secondary;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: $shadow-lg;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg $spacing-xl;
+  border-bottom: 1px solid $border;
+}
+
+.modalTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.modalClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  border-radius: $radius-xs;
+  &:hover {
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.modalBody {
+  padding: $spacing-xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.infoSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.infoSectionTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $accent;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.infoText {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  line-height: 1.6;
+}
+
+.infoList {
+  margin: 0;
+  padding-left: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  li {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    line-height: 1.6;
+  }
+}

@@ -1,0 +1,134 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.rowMobileMeta {
+  display: none;
+
+  @include mobile {
+    display: flex;
+
+    align-items: center;
+
+    gap: $spacing-sm;
+
+    flex-wrap: wrap;
+  }
+}
+
+.formSectionLabel {
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-semibold;
+
+  color: $accent;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.6px;
+
+  padding-bottom: $spacing-xs;
+
+  border-bottom: 1px solid $border;
+
+  margin-top: $spacing-sm;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.empty {
+  text-align: center;
+
+  padding: $spacing-3xl;
+
+  color: $text-muted;
+
+  font-size: $font-size-sm;
+}
+
+// Buttons
+.btnPrimary {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-sm;
+
+  padding: 10px $spacing-md;
+
+  background: $accent;
+
+  color: #0a0f1e;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  border: none;
+
+  border-radius: $radius-sm;
+
+  cursor: pointer;
+
+  transition: background $transition-fast;
+
+  &:hover {
+    background: $accent-hover;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btnView {
+  padding: 6px 10px;
+
+  background: rgba(59, 130, 246, 0.1);
+
+  border: none;
+
+  border-radius: $radius-xs;
+
+  color: #60a5fa;
+
+  font-size: $font-size-xs;
+
+  cursor: pointer;
+
+  transition: background $transition-fast;
+
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(59, 130, 246, 0.2);
+  }
+}
+
+.btnEdit {
+  padding: 6px 10px;
+
+  background: rgba(255, 255, 255, 0.04);
+
+  border: 1px solid $border;
+
+  border-radius: $radius-xs;
+
+  color: $text-secondary;
+
+  font-size: $font-size-xs;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: $text-primary;
+  }
+}

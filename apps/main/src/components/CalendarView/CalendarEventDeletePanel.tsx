@@ -1,0 +1,28 @@
+import type { PizzaEvent } from '@soul540/contracts';
+import styles from './styles/CalendarView.module.scss';
+
+type Props = { event: PizzaEvent; onCancel: () => void; onConfirm: () => void };
+
+export default function CalendarEventDeletePanel({ event, onCancel, onConfirm }: Props) {
+  return (
+    <>
+      <div className={styles.panelBody}>
+        <div className={styles.deleteConfirmBox}>
+          <div className={styles.deleteWarningIcon}>⚠</div>
+          <p className={styles.deleteConfirmTitle}>Excluir evento?</p>
+          <p className={styles.deleteConfirmText}>
+            Esta ação não pode ser desfeita. O evento <strong>"{event.name}"</strong> será removido permanentemente.
+          </p>
+        </div>
+      </div>
+      <div className={styles.panelActions}>
+        <button className={styles.btnCancel} onClick={onCancel}>
+          Cancelar
+        </button>
+        <button className={styles.btnDeleteConfirm} onClick={onConfirm}>
+          Excluir
+        </button>
+      </div>
+    </>
+  );
+}

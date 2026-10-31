@@ -1,0 +1,44 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.input {
+  background: $bg-input;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 10px 12px;
+  font-size: $font-size-sm;
+  color: $text-primary;
+  transition: border-color $transition-fast;
+  font-family: inherit;
+  &::placeholder {
+    color: $text-muted;
+  }
+  &:focus {
+    outline: none;
+    border-color: $border-accent;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@include mobile {
+  .overlay {
+    padding: $spacing-xs;
+    align-items: flex-end;
+  }
+
+  .modal {
+    border-radius: $radius-lg $radius-lg 0 0;
+    max-height: 88vh;
+  }
+
+  .modalBody {
+    padding: $spacing-md;
+  }
+
+  .modalFooter {
+    padding: $spacing-sm $spacing-md;
+  }
+}

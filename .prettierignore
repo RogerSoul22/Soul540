@@ -1,0 +1,13 @@
+node_modules/
+dist/
+factory/
+franchise/
+src/
+server/
+shared/
+api/
+api-src/
+public/
+docs/
+test-nfe*.ts
+package-lock.json

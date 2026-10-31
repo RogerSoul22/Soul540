@@ -1,0 +1,21 @@
+// === Sombras ===
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+$shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+$shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
+$shadow-glow: 0 0 24px rgba(245, 158, 11, 0.18);
+$shadow-glow-blue: 0 0 24px rgba(59, 130, 246, 0.15);
+$shadow-glow-green: 0 0 24px rgba(34, 197, 94, 0.15);
+$shadow-glow-purple: 0 0 24px rgba(168, 85, 247, 0.15);
+$shadow-card:
+  0 2px 8px rgba(0, 0, 0, 0.3),
+  0 0 0 1px rgba(255, 255, 255, 0.03);
+
+// === Transicoes ===
+$transition-fast: 0.15s ease;
+$transition-base: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+$transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+// === Breakpoints ===
+$mobile: 768px;
+$tablet: 1024px;
+$desktop: 1280px;

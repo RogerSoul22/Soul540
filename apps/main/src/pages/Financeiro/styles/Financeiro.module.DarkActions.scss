@@ -1,0 +1,95 @@
+@use '../../../styles/variables' as *;
+
+html[data-theme='dark'] {
+  .scopeBtnActive,
+  .tabActive,
+  .filterBtnActive,
+  .monthBtnActive {
+    background: $accent;
+    color: $bg-primary;
+  }
+
+  .scopeBtnActive:hover,
+  .tabActive:hover,
+  .filterBtnActive:hover,
+  .monthBtnActive:hover {
+    background: $accent-hover;
+    color: $bg-primary;
+  }
+
+  .pageMonthSelect,
+  .searchInput,
+  .formInput,
+  .formSelect,
+  .formTextarea,
+  .monthSelect {
+    background: $bg-input;
+    border-color: $border;
+    color: $text-primary;
+  }
+
+  .table th {
+    background: $bg-tertiary;
+    border-color: $border;
+    color: $text-secondary;
+  }
+
+  .table td {
+    border-bottom-color: $border;
+    color: $text-secondary;
+  }
+
+  .btnExport,
+  .btnXml {
+    background: $bg-secondary;
+    border-color: $border-accent;
+    color: $accent;
+  }
+
+  .btnExport:hover,
+  .btnXml:hover {
+    background: $bg-tertiary;
+    border-color: $accent;
+  }
+
+  .btnPrimary {
+    background: $gradient-amber;
+    color: $bg-primary;
+  }
+
+  .modalHeader,
+  .modalFooter,
+  .agendamentosHeader,
+  .agendamentoRow,
+  .eventDetailActions,
+  .paymentMethodRow,
+  .ofxTotals {
+    border-color: $border;
+  }
+
+  .modalClose {
+    color: $text-secondary;
+  }
+
+  .recurrencePanel,
+  .paymentMethodCardHeader > small,
+  .financialStatus {
+    background: rgba($accent, 0.12);
+    border-color: $border-accent;
+    color: $accent;
+  }
+
+  .recurrencePreview,
+  .recurrenceDates span,
+  .paymentMethodProgress,
+  .walletBreakdown div {
+    border-color: $border;
+    background: $bg-tertiary;
+  }
+
+  .btnDanger {
+    background: rgba($danger, 0.12);
+    border-color: rgba($danger, 0.4);
+    color: #fca5a5;
+  }
+}

@@ -1,0 +1,110 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+@include mobile {
+  .header {
+    align-items: stretch;
+  }
+
+  .headerActions {
+    width: 100%;
+
+    flex-wrap: wrap;
+
+    gap: $spacing-sm;
+  }
+
+  .headerActions > .btnPrimary,
+  .headerActions > .btnSecondary {
+    flex: 1;
+
+    justify-content: center;
+  }
+
+  .saveStatus {
+    flex: 1 0 100%;
+
+    min-width: 0;
+
+    justify-content: flex-start;
+  }
+
+  .orderFilterBar {
+    flex-wrap: wrap;
+
+    align-items: stretch;
+
+    gap: $spacing-sm;
+  }
+
+  .orderFilterLabel {
+    flex: 0 0 100%;
+  }
+
+  .orderFilterMode {
+    flex: 0 0 140px;
+  }
+
+  .orderFilterSelect,
+  .orderFilterInput {
+    flex: 1 1 calc(100% - 148px);
+
+    width: 0;
+  }
+
+  .orderFilterClear {
+    flex: 1 0 100%;
+  }
+
+  .finalizedItem {
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+  .finalizedInfo,
+  .finalizedRight {
+    flex-wrap: wrap;
+  }
+
+  .finalizedItens {
+    white-space: normal;
+
+    overflow: visible;
+
+    text-overflow: clip;
+  }
+
+  .finalizedRight {
+    width: 100%;
+
+    justify-content: flex-end;
+
+    gap: $spacing-sm;
+  }
+}
+
+.saveStatus {
+  display: flex;
+
+  align-items: center;
+
+  min-width: 90px;
+
+  justify-content: flex-end;
+}
+
+.saveLabel {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+}
+
+.saveLabelOk {
+  font-size: $font-size-xs;
+
+  color: #4ade80;
+
+  font-weight: $font-weight-medium;
+}

@@ -1,0 +1,120 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.page {
+  padding: $spacing-2xl $spacing-xl;
+
+  animation: fadeIn 0.4s ease;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+// section
+.header {
+  @include flex-between;
+
+  margin-bottom: $spacing-xl;
+
+  flex-wrap: wrap;
+
+  gap: $spacing-md;
+}
+
+.headerActions {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-lg;
+}
+
+.title {
+  font-size: $font-size-3xl;
+
+  font-weight: $font-weight-bold;
+
+  color: $text-primary;
+
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+
+  margin-top: 6px;
+}
+
+.orderFilterBar {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-md;
+
+  margin-bottom: $spacing-xl;
+
+  padding: $spacing-md $spacing-lg;
+
+  background: $bg-secondary;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-lg;
+}
+
+.orderFilterLabel {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+
+  white-space: nowrap;
+}
+
+.orderFilterMode,
+.orderFilterSelect,
+.orderFilterInput {
+  background: $bg-input;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  padding: 9px 12px;
+
+  color: $text-primary;
+
+  font-family: inherit;
+
+  font-size: $font-size-sm;
+
+  &:focus {
+    outline: none;
+    border-color: $border-accent;
+  }
+
+  option {
+    background: $bg-secondary;
+  }
+}
+
+.orderFilterMode {
+  flex: 0 0 160px;
+}
+
+.orderFilterSelect,
+.orderFilterInput {
+  flex: 1;
+
+  min-width: 0;
+}
+
+.orderFilterInput::placeholder {
+  color: $text-muted;
+}

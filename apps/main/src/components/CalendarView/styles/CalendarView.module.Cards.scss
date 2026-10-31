@@ -1,0 +1,129 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.eventPanel {
+  background: $bg-card;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-lg;
+
+  width: 100%;
+
+  max-width: 600px;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  box-shadow: $shadow-lg;
+
+  animation: eventModalIn 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+
+    border-radius: 2px;
+  }
+
+  @include mobile {
+    border-radius: $radius-xl $radius-xl 0 0;
+
+    max-height: 92vh;
+
+    animation: eventModalInMobile 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@keyframes eventModalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes eventModalInMobile {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.panelHeader {
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  padding: $spacing-lg;
+
+  border-bottom: 1px solid $border;
+
+  border-left: 3px solid transparent;
+
+  gap: $spacing-md;
+}
+
+.panelHeaderLeft {
+  flex: 1;
+
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.panelTitle {
+  font-family: $font-display;
+
+  font-size: $font-size-xl;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+
+  letter-spacing: -0.3px;
+
+  line-height: 1.2;
+
+  margin: 0;
+}
+
+.statusBadge {
+  display: inline-flex;
+
+  align-items: center;
+
+  font-size: 11px;
+
+  font-weight: $font-weight-semibold;
+
+  padding: 3px 10px;
+
+  border-radius: $radius-full;
+
+  border: 1px solid transparent;
+
+  width: fit-content;
+
+  letter-spacing: 0.2px;
+}

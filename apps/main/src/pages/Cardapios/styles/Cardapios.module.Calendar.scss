@@ -1,0 +1,154 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+// section
+.controls {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-xl;
+  flex-wrap: wrap;
+}
+
+.searchWrap {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: $text-muted;
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  max-width: 360px;
+  background: $bg-secondary;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 9px 12px 9px 36px;
+  font-size: $font-size-sm;
+  color: $text-primary;
+  &::placeholder {
+    color: $text-muted;
+  }
+  &:focus {
+    outline: none;
+    border-color: $border-accent;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 1180px) and (min-width: 769px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  @include card;
+  @include card-hover;
+  padding: $spacing-md;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  min-width: 0;
+}
+
+.cardName {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.cardEvent {
+  font-size: $font-size-xs;
+  color: $accent;
+  margin-top: 4px;
+}
+
+.cardStats {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.statBadge {
+  font-size: $font-size-xs;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid $border;
+  border-radius: $radius-full;
+  padding: 2px 8px;
+  color: $text-muted;
+}
+
+.cardSubText {
+  font-size: $font-size-xs;
+  color: $text-muted;
+  font-style: italic;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.categoriesList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  margin-top: 4px;
+}
+
+.catItem {
+  @include flex-between;
+  padding: 6px $spacing-sm;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: $radius-xs;
+}
+
+.catName {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.catCount {
+  font-size: $font-size-xs;
+  color: $text-muted;
+}
+
+.cardActions {
+  display: flex;
+  gap: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: 1px solid $border;
+}
+
+@include mobile {
+  .searchInput {
+    max-width: none;
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: $spacing-3xl;
+  color: $text-muted;
+  font-size: $font-size-sm;
+}

@@ -1,0 +1,123 @@
+@use '../../../styles/variables' as *;
+
+.input {
+  flex: 1;
+
+  background: $bg-input;
+
+  border: 1px solid $border;
+
+  border-radius: 8px;
+
+  padding: 10px 14px;
+
+  font-size: 14px;
+
+  color: $text-primary;
+
+  outline: none;
+
+  transition: border-color 0.2s;
+
+  &::placeholder {
+    color: $text-muted;
+  }
+
+  &:focus {
+    border-color: $border-accent;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+.sendBtn {
+  background: $accent;
+
+  color: #000;
+
+  border: none;
+
+  border-radius: 8px;
+
+  padding: 10px 20px;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    opacity 0.2s,
+    transform 0.1s;
+
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+
+    cursor: not-allowed;
+  }
+}
+
+.micBtn {
+  background: transparent;
+
+  color: $text-muted;
+
+  border: 1px solid $border;
+
+  border-radius: 8px;
+
+  padding: 10px 12px;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  &:hover:not(:disabled) {
+    color: $text-primary;
+
+    border-color: $border-subtle;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+
+    cursor: not-allowed;
+  }
+}
+
+.micBtnActive {
+  color: $danger;
+
+  border-color: $danger;
+
+  animation: micPulse 1.2s ease-in-out infinite;
+
+  &:hover:not(:disabled) {
+    border-color: $danger;
+  }
+}

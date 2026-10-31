@@ -1,0 +1,129 @@
+.btnBarActive {
+  background: rgba(59, 130, 246, 0.12);
+
+  color: #60a5fa;
+
+  border-color: rgba(59, 130, 246, 0.3);
+
+  &:hover {
+    background: rgba(59, 130, 246, 0.18);
+  }
+}
+
+.btnBarPrimary {
+  background: #f59e0b;
+
+  color: #0a0f1e;
+
+  border-color: transparent;
+
+  font-weight: 600;
+
+  &:hover {
+    background: #d97706;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btnBarClose {
+  padding: 6px;
+
+  border-radius: 6px;
+
+  border: none;
+
+  background: none;
+
+  color: rgba(255, 255, 255, 0.4);
+
+  cursor: pointer;
+
+  display: flex;
+
+  align-items: center;
+
+  transition: color 0.15s;
+
+  &:hover {
+    color: #fff;
+  }
+}
+
+// ——— Scroll area ———
+.scrollArea {
+  flex: 1;
+
+  overflow-y: auto;
+
+  background: #e5e7eb;
+
+  padding: 24px 16px;
+
+  @media (max-width: 600px) {
+    padding: 12px 4px;
+  }
+}
+
+// ——— Paper ———
+.paper {
+  background: #ffffff;
+
+  color: #111827;
+
+  width: 100%;
+
+  max-width: 210mm;
+
+  margin: 0 auto;
+
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.25);
+}
+
+.paperInner {
+  padding: 48px 56px;
+
+  font-family: Georgia, 'Times New Roman', serif;
+
+  color: #111827;
+
+  @media (max-width: 700px) {
+    padding: 28px 24px;
+  }
+}
+
+// ——— Document sections ———
+.docHeader {
+  display: flex;
+
+  align-items: center;
+
+  gap: 20px;
+
+  border-bottom: 2px solid #111827;
+
+  padding-bottom: 16px;
+
+  margin-bottom: 8px;
+}
+
+.docLogo {
+  width: 72px;
+
+  height: 72px;
+
+  object-fit: contain;
+
+  flex-shrink: 0;
+
+  border-radius: 8px;
+}
+
+.docHeaderInfo {
+  flex: 1;
+
+  text-align: center;
+}

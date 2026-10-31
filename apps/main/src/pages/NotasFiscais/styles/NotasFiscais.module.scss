@@ -1,0 +1,59 @@
+@use '../../../styles/variables' as *;
+
+@use './NotasFiscais.module.Actions' as *;
+@use './NotasFiscais.module.Cards' as *;
+@use './NotasFiscais.module.Form' as *;
+@use './NotasFiscais.module.Header' as *;
+@use './NotasFiscais.module.Metrics' as *;
+@use './NotasFiscais.module.Modal' as *;
+@use './NotasFiscais.module.Panels' as *;
+@use './NotasFiscais.module.Table' as *;
+
+html[data-theme='dark'] {
+  .preview {
+    background: $bg-card;
+    color: $text-primary;
+    box-shadow: $shadow-card;
+  }
+
+  .previewHeader {
+    border-bottom-color: $border;
+  }
+
+  .previewTitle,
+  .previewSectionTitle,
+  .previewTotalRow,
+  .previewFooter {
+    color: $text-secondary;
+  }
+
+  .previewInfo,
+  .previewInfo strong,
+  .previewTotalFinal {
+    color: $text-primary;
+  }
+
+  .previewTable th,
+  .previewTable td {
+    border-color: $border;
+    color: $text-secondary;
+  }
+
+  .previewTable tbody tr:hover td {
+    background: $bg-elevated;
+  }
+
+  .previewTotals {
+    border-top-color: $border;
+  }
+
+  .previewNotes {
+    border-left-color: $border;
+    background: $bg-tertiary;
+    color: $text-secondary;
+
+    strong {
+      color: $text-primary;
+    }
+  }
+}

@@ -1,0 +1,121 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.monthSummaryOperator {
+  font-size: $font-size-2xl;
+
+  font-weight: $font-weight-bold;
+
+  color: $text-muted;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+// Horizontal bars grid
+.barsGrid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: $spacing-md;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+.barCard {
+  @include card;
+
+  padding: $spacing-lg;
+}
+
+// Search Input
+.searchInput {
+  flex: 1;
+
+  min-width: 200px;
+
+  padding: 9px $spacing-md;
+
+  background: $bg-card;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  color: $text-primary;
+
+  font-size: $font-size-sm;
+
+  transition: all $transition-base;
+
+  &::placeholder {
+    color: $text-muted;
+  }
+
+  &:focus {
+    outline: none;
+
+    border-color: $accent;
+
+    box-shadow: 0 0 0 3px rgba($accent, 0.08);
+  }
+}
+
+.btnExport {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 9px $spacing-md;
+
+  background: rgba($accent, 0.08);
+
+  border: 1px solid rgba($accent, 0.25);
+
+  border-radius: $radius-sm;
+
+  color: $accent;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition: all $transition-fast;
+
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba($accent, 0.15);
+    border-color: rgba($accent, 0.4);
+  }
+}
+
+// Table
+.tableWrap {
+  overflow-x: auto;
+
+  overflow-y: auto;
+
+  max-height: 380px;
+
+  -webkit-overflow-scrolling: touch;
+
+  border-radius: $radius-lg;
+
+  @include mobile {
+    border-radius: 0;
+
+    max-height: 320px;
+  }
+}

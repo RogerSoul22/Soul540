@@ -1,0 +1,118 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.printModal {
+  background: $bg-secondary;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-lg;
+
+  width: 100%;
+
+  max-width: 520px;
+
+  box-shadow: $shadow-lg;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+}
+
+.printHeader {
+  @include flex-between;
+
+  padding: $spacing-md $spacing-xl;
+
+  border-bottom: 1px solid $border;
+
+  position: sticky;
+
+  top: 0;
+
+  background: $bg-secondary;
+
+  z-index: 1;
+}
+
+.printTitle {
+  font-size: $font-size-lg;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+}
+
+.btnPrintNow {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 7px $spacing-md;
+
+  background: $accent;
+
+  color: #0a0f1e;
+
+  border: none;
+
+  border-radius: $radius-sm;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  cursor: pointer;
+
+  transition: background $transition-fast;
+
+  &:hover {
+    background: $accent-hover;
+  }
+}
+
+.modalClose {
+  @include flex-center;
+
+  width: 32px;
+
+  height: 32px;
+
+  background: none;
+
+  border: none;
+
+  color: $text-muted;
+
+  border-radius: $radius-xs;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: $text-primary;
+  }
+}
+
+.printBody {
+  padding: $spacing-xl;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-lg;
+}
+
+.printMeta {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: $spacing-sm;
+}

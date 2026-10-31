@@ -1,0 +1,111 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.detailItem {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.detailLabel {
+  font-size: 10px;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.6px;
+
+  font-weight: $font-weight-semibold;
+}
+
+.detailValue {
+  font-size: $font-size-sm;
+
+  color: $text-primary;
+
+  line-height: 1.5;
+}
+
+.menuTags {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: $spacing-xs;
+}
+
+.menuTag {
+  padding: 4px 10px;
+
+  background: rgba(245, 158, 11, 0.1);
+
+  border: 1px solid rgba(245, 158, 11, 0.2);
+
+  border-radius: 20px;
+
+  font-size: $font-size-xs;
+
+  color: $accent;
+}
+
+// Location image preview
+.detailImageWrap {
+  margin-top: $spacing-sm;
+
+  border-radius: $radius-sm;
+
+  overflow: hidden;
+
+  border: 1px solid $border;
+}
+
+.detailImage {
+  width: 100%;
+
+  max-height: 280px;
+
+  object-fit: cover;
+
+  display: block;
+}
+
+// Document cards
+.docGrid {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-sm;
+
+  margin-top: $spacing-xs;
+}
+
+.docCard {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+
+  padding: $spacing-sm;
+
+  background: $bg-card;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  overflow: hidden;
+}
+
+.docCardHeader {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+}

@@ -1,0 +1,104 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+// Form
+.formGrid2 {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: $spacing-md;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formGrid3 {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: $spacing-md;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formGroup {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.label {
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-medium;
+
+  color: $text-secondary;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+}
+
+.input,
+.textarea {
+  background: $bg-input;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  padding: 10px 12px;
+
+  font-size: $font-size-sm;
+
+  color: $text-primary;
+
+  transition: border-color $transition-fast;
+
+  font-family: inherit;
+
+  &::placeholder {
+    color: $text-muted;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $border-accent;
+  }
+}
+
+.textarea {
+  resize: vertical;
+}
+
+// Mobile: bottom-sheet modals
+@include mobile {
+  .overlay {
+    padding: $spacing-xs;
+
+    align-items: flex-end;
+  }
+
+  .modal,
+  .preview {
+    border-radius: $radius-lg $radius-lg 0 0;
+
+    max-height: 88vh;
+  }
+
+  .modalBody {
+    padding: $spacing-md;
+  }
+
+  .modalFooter {
+    padding: $spacing-sm $spacing-md;
+  }
+}

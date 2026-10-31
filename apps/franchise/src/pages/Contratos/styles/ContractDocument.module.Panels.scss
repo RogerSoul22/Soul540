@@ -1,0 +1,100 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ——— Pricing rows ———
+.priceRow {
+  display: flex;
+
+  align-items: baseline;
+
+  flex-wrap: wrap;
+
+  gap: 4px 8px;
+
+  font-size: 13px;
+
+  padding: 4px 0;
+
+  border-bottom: 1px dashed #e5e7eb;
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+
+  .clauseFieldLabel {
+    flex-shrink: 0;
+  }
+}
+
+.priceTotalRow {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  font-size: 14px;
+
+  margin-top: 10px;
+
+  padding-top: 10px;
+
+  border-top: 2px solid #111827;
+}
+
+.priceTotalValue {
+  font-size: 18px;
+
+  font-weight: 700;
+
+  color: #111827;
+}
+
+.paymentOptions {
+  font-size: 12px;
+
+  color: #4b5563;
+
+  margin-top: 12px;
+
+  line-height: 1.8;
+
+  font-family: Arial, sans-serif;
+}
+
+// ——— Annex ———
+.annex {
+  margin-top: 48px;
+
+  padding-top: 32px;
+
+  border-top: 2px solid #111827;
+
+  page-break-before: always;
+}
+
+.annexTitle {
+  font-size: 15px;
+
+  font-weight: 700;
+
+  text-align: center;
+
+  color: #111827;
+
+  margin-bottom: 24px;
+
+  letter-spacing: 0.5px;
+}
+
+.annexSection {
+  font-size: 13px;
+
+  font-weight: 700;
+
+  color: #111827;
+
+  margin: 20px 0 8px;
+
+  font-family: Arial, sans-serif;
+}

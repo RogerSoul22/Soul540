@@ -1,0 +1,129 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.hourLabel {
+  width: 64px;
+
+  flex-shrink: 0;
+
+  padding: $spacing-xs $spacing-sm 0 $spacing-md;
+
+  font-size: 11px;
+
+  color: $text-muted;
+
+  letter-spacing: 0.3px;
+
+  border-right: 1px solid $border;
+
+  user-select: none;
+}
+
+.hourSlot {
+  flex: 1;
+
+  position: relative;
+
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.015);
+
+    cursor: pointer;
+  }
+}
+
+// section
+.nowIndicator {
+  display: flex;
+
+  align-items: center;
+
+  position: absolute;
+
+  top: 0;
+
+  left: 0;
+
+  right: 0;
+
+  pointer-events: none;
+
+  z-index: 2;
+}
+
+.nowDot {
+  width: 10px;
+
+  height: 10px;
+
+  border-radius: $radius-full;
+
+  background: $accent;
+
+  flex-shrink: 0;
+
+  margin-left: -5px;
+
+  box-shadow: 0 0 6px rgba($accent, 0.6);
+}
+
+.nowLine {
+  flex: 1;
+
+  height: 2px;
+
+  background: linear-gradient(90deg, $accent, rgba($accent, 0.2));
+}
+
+// section
+@include mobile {
+  .header {
+    flex-wrap: wrap;
+
+    gap: $spacing-xs;
+
+    padding: $spacing-md $spacing-md $spacing-sm;
+  }
+
+  .monthTitle {
+    font-size: $font-size-xl;
+  }
+
+  .monthYear {
+    font-size: $font-size-sm;
+  }
+
+  .todayBtn {
+    padding: 5px 10px;
+
+    font-size: 11px;
+  }
+
+  .cell {
+    min-height: 58px;
+
+    padding: 5px 3px 3px;
+  }
+
+  .weekDay {
+    font-size: 9px;
+
+    padding: $spacing-xs 2px;
+
+    letter-spacing: 0;
+  }
+
+  .dayTitleWeekday {
+    font-size: $font-size-xl;
+  }
+
+  .timeGrid {
+    max-height: 300px;
+  }
+
+  .allDayRow {
+    min-height: 44px;
+  }
+}

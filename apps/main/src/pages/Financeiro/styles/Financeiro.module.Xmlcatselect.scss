@@ -1,0 +1,131 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.xmlCatSelect {
+  background: $bg-input;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-xs;
+
+  padding: 5px 8px;
+
+  font-size: $font-size-xs;
+
+  color: $text-secondary;
+
+  cursor: pointer;
+
+  flex-shrink: 0;
+
+  max-width: 160px;
+
+  &:focus {
+    outline: none;
+    border-color: $border-accent;
+  }
+}
+
+.xmlTotal {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+
+  text-align: right;
+
+  padding-top: $spacing-sm;
+
+  border-top: 1px solid $border;
+
+  strong {
+    color: $text-primary;
+  }
+}
+
+.walletBreakdown {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 8px;
+
+  margin-top: 12px;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 10px;
+    border: 1px solid #e1e8f1;
+    border-radius: 5px;
+    background: #f8fafc;
+  }
+
+  span {
+    color: #64748b;
+    font-size: 11px;
+  }
+
+  strong {
+    font-size: 14px;
+  }
+}
+
+.ofxType {
+  flex-shrink: 0;
+  padding: 3px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.ofxCredit {
+  color: #168a57;
+  background: #eaf8f1;
+}
+
+.ofxDebit {
+  color: #c23b45;
+  background: #fff1f2;
+}
+
+.ofxTotals {
+  display: flex;
+  justify-content: flex-end;
+  gap: 24px;
+  padding-top: 12px;
+  border-top: 1px solid #dbe3ef;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.ofxTotals span {
+  display: flex;
+  gap: 7px;
+}
+
+@media (max-width: 700px) {
+  .xmlRow {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .xmlInfo {
+    flex-basis: calc(100% - 100px);
+  }
+
+  .xmlCatSelect {
+    width: 100%;
+    max-width: none;
+  }
+
+  .walletBreakdown {
+    grid-template-columns: 1fr;
+  }
+
+  .ofxTotals {
+    justify-content: space-between;
+    gap: 10px;
+  }
+}

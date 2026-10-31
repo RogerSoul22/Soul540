@@ -1,0 +1,152 @@
+.removeButton,
+.submitButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 42px;
+  border: 0;
+  border-radius: 3px;
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.removeButton {
+  background: #c91d1d;
+}
+
+.removeButton:hover {
+  background: #ae1717;
+}
+
+.submitButton {
+  background: #2c5d43;
+}
+
+.submitButton:hover {
+  background: #214a34;
+}
+
+.removeButton:disabled,
+.submitButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.removeButton span,
+.submitButton span {
+  margin-right: 9px;
+  font-size: 18px;
+}
+
+.replaceLink,
+.cancelButton {
+  display: block;
+  margin: 12px auto 0;
+  border: 0;
+  background: transparent;
+  color: #6d655a;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.replaceLink:hover,
+.cancelButton:hover {
+  color: #2c5d43;
+  text-decoration: underline;
+}
+
+.uploadForm {
+  display: grid;
+  max-width: 520px;
+  gap: 14px;
+}
+
+.uploadZone {
+  display: grid;
+  min-height: 96px;
+  place-items: center;
+  gap: 8px;
+  padding: 16px;
+  border: 2px dashed #dfd7ca;
+  border-radius: 10px;
+  background: #fff;
+  color: #756d61;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.uploadZone:hover,
+.uploadSelected {
+  border-color: #2c5d43;
+  background: #f5faf7;
+  color: #2c5d43;
+}
+
+.uploadIcon {
+  font-size: 26px;
+}
+
+.fileInput {
+  display: none;
+}
+
+.passwordLabel {
+  margin-top: 3px;
+  color: #2e2b27;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.passwordRow {
+  display: flex;
+  border: 1px solid #ddd5c9;
+  border-radius: 3px;
+}
+
+.passwordInput {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  outline: 0;
+  color: #2e2b27;
+  font: inherit;
+}
+
+.passwordToggle {
+  width: 44px;
+  border: 0;
+  background: transparent;
+  color: #756d61;
+  cursor: pointer;
+}
+
+.error,
+.notice {
+  margin: 14px 0 0;
+  font-size: 13px;
+}
+
+.error {
+  color: #c51d1d;
+}
+
+.notice {
+  color: #16833e;
+}
+
+.loading {
+  color: #756d61;
+}
+
+@media (max-width: 640px) {
+  .uploadForm {
+    max-width: none;
+  }
+}

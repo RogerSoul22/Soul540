@@ -1,0 +1,120 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.select {
+  background: $bg-secondary;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 9px 12px;
+  font-size: $font-size-sm;
+  color: $text-primary;
+  cursor: pointer;
+  &:focus {
+    outline: none;
+    border-color: $border-accent;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  @include card;
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  transition: border-color $transition-smooth;
+  &:hover {
+    border-color: $border-accent;
+  }
+}
+
+.cardAlert {
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  &:hover {
+    border-color: rgba(239, 68, 68, 0.5) !important;
+  }
+}
+
+.cardTop {
+  @include flex-between;
+  gap: $spacing-sm;
+}
+
+.cardName {
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.cardCategory {
+  font-size: $font-size-xs;
+  color: $text-muted;
+  margin-top: 4px;
+}
+
+.cardStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-sm;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: $radius-xs;
+  padding: $spacing-sm;
+}
+
+.statVal {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.statLbl {
+  font-size: 10px;
+  color: $text-muted;
+  margin-top: 2px;
+  text-align: center;
+}
+
+.expiration {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: $font-size-xs;
+  color: $text-muted;
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.expirationWarn {
+  color: #f87171;
+}
+
+.supplier {
+  font-size: $font-size-xs;
+  color: $text-muted;
+}
+
+.cardActions {
+  display: flex;
+  gap: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: 1px solid $border;
+}

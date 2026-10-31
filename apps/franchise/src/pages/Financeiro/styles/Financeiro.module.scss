@@ -1,0 +1,153 @@
+@use '../../../styles/variables' as *;
+
+@use './Financeiro.module.Actions' as *;
+@use './Financeiro.module.Btnexport' as *;
+@use './Financeiro.module.Btnprimary' as *;
+@use './Financeiro.module.Calendar' as *;
+@use './Financeiro.module.Cards' as *;
+@use './Financeiro.module.Feedback' as *;
+@use './Financeiro.module.Filterbtn' as *;
+@use './Financeiro.module.Filters' as *;
+@use './Financeiro.module.Footer' as *;
+@use './Financeiro.module.Form' as *;
+@use './Financeiro.module.Header' as *;
+@use './Financeiro.module.Headeractions' as *;
+@use './Financeiro.module.Layout' as *;
+@use './Financeiro.module.Metrics' as *;
+@use './Financeiro.module.Modal' as *;
+@use './Financeiro.module.Panels' as *;
+@use './Financeiro.module.Scopebtnactive' as *;
+@use './Financeiro.module.Summarybar' as *;
+@use './Financeiro.module.Table' as *;
+@use './Financeiro.module.Xmlcatselect' as *;
+
+html[data-theme='dark'] {
+  .page {
+    background: $bg-primary;
+    color: $text-primary;
+  }
+
+  .header,
+  .modalHeader,
+  .modalFooter,
+  .agendamentosHeader,
+  .agendamentoRow,
+  .table td {
+    border-color: $border;
+  }
+
+  .headerLeft .title,
+  .sectionTitle,
+  .agendamentoName,
+  .agendamentoValue,
+  .summaryItemValue,
+  .monthSummaryValue,
+  .modalTitle,
+  .formLabel,
+  .catName,
+  .catValue {
+    color: $text-primary;
+  }
+
+  .headerLeft .subtitle,
+  .pageMonthLabel,
+  .filterLabel,
+  .summaryItemLabel,
+  .monthSummaryLabel,
+  .agendamentoDate,
+  .agendamentosEmpty,
+  .formHint,
+  .emptyState,
+  .pageInfo,
+  .pageTotal {
+    color: $text-secondary;
+  }
+
+  .scopeToggle,
+  .tabs,
+  .filterGroup,
+  .monthSelector,
+  .pageMonthFilter,
+  .filterRow,
+  .summaryBar,
+  .summaryBar > .summaryItem,
+  .walletGrid,
+  .agendamentosCard,
+  .chartSection,
+  .gaugeCard,
+  .barCard,
+  .monthSummaryItem,
+  .tableWrap,
+  .table,
+  .modal,
+  .xmlModal,
+  .xmlCatSelect,
+  .recurrenceConfig,
+  .recurrenceSummary {
+    background: $bg-card;
+    border-color: $border;
+    box-shadow: $shadow-card;
+  }
+
+  .scopeBtn,
+  .tab,
+  .filterBtn,
+  .monthBtn,
+  .pageBtn,
+  .modalClose,
+  .catName,
+  .recurrenceSummary span,
+  .recurrenceSummary small {
+    color: $text-secondary;
+  }
+
+  .scopeBtn:hover,
+  .tab:hover,
+  .filterBtn:hover,
+  .monthBtn:hover,
+  .pageBtn:hover,
+  .modalClose:hover,
+  .table tr:hover td {
+    background: $bg-elevated;
+    color: $text-primary;
+  }
+
+  .scopeBtnActive,
+  .tabActive,
+  .filterBtnActive,
+  .monthBtnActive {
+    background: $accent;
+    color: $bg-primary;
+  }
+
+  .pageMonthSelect,
+  .searchInput,
+  .formInput,
+  .formSelect,
+  .formTextarea,
+  .select,
+  .eventDropdown,
+  .xmlCatSelect {
+    background: $bg-input;
+    border-color: $border;
+    color: $text-primary;
+  }
+
+  .table th {
+    background: $bg-tertiary;
+    border-color: $border;
+    color: $text-secondary;
+  }
+
+  .table td {
+    color: $text-secondary;
+  }
+
+  .xmlList,
+  .xmlRow,
+  .monthSummary,
+  .chartContainer {
+    background: $bg-tertiary;
+    border-color: $border;
+  }
+}

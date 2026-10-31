@@ -1,0 +1,83 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.logoWrapper {
+  @include flex-center;
+
+  margin-bottom: $spacing-2xl;
+}
+
+.formHeader {
+  margin-bottom: $spacing-xl;
+}
+
+.formTitle {
+  font-family: $font-display;
+
+  font-size: $font-size-3xl;
+
+  font-weight: $font-weight-semibold;
+
+  font-style: italic;
+
+  color: $text-primary;
+
+  margin-bottom: 6px;
+
+  letter-spacing: -0.5px;
+
+  line-height: 1.1;
+}
+
+.formSubtitle {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+}
+
+.form {
+  @include flex-column;
+
+  gap: $spacing-lg;
+}
+
+.formFields {
+  @include flex-column;
+
+  gap: $spacing-md;
+}
+
+.formActions {
+  @include flex-column;
+
+  gap: $spacing-md;
+}
+
+.errorMessage {
+  background: rgba($danger, 0.08);
+
+  border: 1px solid rgba($danger, 0.2);
+
+  border-radius: $radius-sm;
+
+  padding: $spacing-sm $spacing-md;
+
+  color: #f87171;
+
+  font-size: $font-size-sm;
+
+  text-align: center;
+}
+
+.footer {
+  margin-top: $spacing-2xl;
+
+  text-align: center;
+}
+
+.footerText {
+  font-size: $font-size-xs;
+
+  color: rgba($text-muted, 0.6);
+}

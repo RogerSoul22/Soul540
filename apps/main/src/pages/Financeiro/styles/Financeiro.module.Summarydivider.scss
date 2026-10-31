@@ -1,0 +1,156 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.summaryDivider {
+  display: none;
+}
+
+.walletGrid {
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.agendamentosCard,
+.chartSection,
+.gaugeCard,
+.barCard,
+.monthSummaryItem,
+.tableWrap {
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(24, 34, 53, 0.05);
+}
+
+.agendamentosCard,
+.chartSection,
+.barCard {
+  padding: 20px;
+}
+
+.sectionTitle,
+.agendamentoName,
+.agendamentoValue,
+.modalTitle,
+.formLabel {
+  color: #182235;
+}
+
+.agendamentosHeader,
+.agendamentoRow,
+.table td {
+  border-bottom-color: #e7edf5;
+}
+
+.agendamentoDate,
+.agendamentosEmpty,
+.formHint {
+  color: #718096;
+}
+
+.filterRow {
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.tableWrap {
+  max-height: 560px;
+}
+
+.table {
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: none;
+}
+
+.table th {
+  color: #63738b;
+  background: #f4f7fb;
+  border-bottom-color: #dbe3ef;
+}
+
+.table td {
+  color: #40516a;
+}
+
+.table tr:hover td {
+  background: #f7faff;
+}
+
+.btnExport,
+.btnXml {
+  background: #fff;
+  border-color: #e4c98d;
+  color: #a85f00;
+}
+
+.btnExport:hover,
+.btnXml:hover {
+  background: #fff8e8;
+  border-color: #f5a000;
+}
+
+.btnPrimary {
+  background: #f28a12;
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(242, 138, 18, 0.2);
+}
+
+.btnPrimary:hover {
+  background: #d97508;
+}
+
+.modal,
+.xmlModal {
+  background: #fff;
+  border-color: #dbe3ef;
+}
+
+.modalHeader,
+.modalFooter {
+  border-color: #e7edf5;
+}
+
+.modalClose {
+  color: #718096;
+}
+
+.modalClose:hover {
+  color: #182235;
+  background: #f1f6fc;
+}
+
+.monthSummary {
+  gap: 12px;
+}
+
+.monthSummaryItem {
+  border-top-width: 3px;
+  padding: 18px 20px;
+}
+
+.chartContainer {
+  min-height: 300px;
+}
+
+@media (max-width: 900px) {
+  .page {
+    padding: 20px 18px 36px;
+  }
+  .header {
+    align-items: flex-start;
+  }
+  .headerActions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .summaryBar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

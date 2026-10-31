@@ -1,0 +1,14 @@
+export { default as taskRoutes } from './tasks.routes';
+export { default as taskHistoryRoutes } from './task-history.routes';
+export { default as employeeRoutes } from './employees.routes';
+export { default as contractorRoutes } from './contractors.routes';
+export { default as contractorCategoryRoutes } from './contractor-categories.routes';
+export { default as dashboardRoutes } from './dashboard.routes';
+export { default as utensilRoutes } from './utensils.routes';
+export { default as supplyRoutes } from './supplies.routes';
+export { default as utensilCategoryRoutes } from './utensil-categories.routes';
+export { default as supplyCategoryRoutes } from './supply-categories.routes';
+export { default as contractRoutes } from './contracts.routes';
+export { default as menuRoutes } from './menus.routes';
+export { default as chatRoutes } from './chat.routes';
+export { default as auditLogRoutes } from './auditlog.routes';

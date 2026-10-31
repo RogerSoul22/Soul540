@@ -1,0 +1,124 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.cell {
+  min-height: 88px;
+
+  padding: 8px 6px 6px;
+
+  border-right: 1px solid $border-subtle;
+
+  border-bottom: 1px solid $border-subtle;
+
+  cursor: pointer;
+
+  transition: background $transition-fast;
+
+  overflow: hidden;
+
+  min-width: 0;
+
+  &:nth-child(7n) {
+    border-right: none;
+  }
+
+  &:nth-last-child(-n + 7) {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.03);
+  }
+}
+
+.cellOtherMonth {
+  .dayNum {
+    color: rgba($text-muted, 0.3);
+  }
+
+  .pill {
+    opacity: 0.4;
+  }
+}
+
+.cellSelected {
+  background: rgba($accent, 0.05) !important;
+}
+
+.dayNum {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 26px;
+
+  height: 26px;
+
+  border-radius: $radius-full;
+
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-medium;
+
+  color: $text-secondary;
+
+  margin-bottom: 4px;
+
+  transition: all $transition-fast;
+}
+
+.dayToday {
+  background: $accent;
+
+  color: $bg-primary;
+
+  font-weight: $font-weight-bold;
+
+  box-shadow: 0 0 10px rgba($accent, 0.4);
+}
+
+// section
+.pills {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.pill {
+  display: block;
+
+  padding: 2px 6px;
+
+  border-radius: $radius-xs;
+
+  font-size: 10px;
+
+  font-weight: $font-weight-medium;
+
+  border: 1px solid transparent;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  line-height: 1.4;
+
+  transition: filter $transition-fast;
+
+  &:hover {
+    filter: brightness(1.2);
+  }
+}
+
+.pillNotes {
+  border-left-width: 2px;
+
+  font-weight: $font-weight-semibold;
+}

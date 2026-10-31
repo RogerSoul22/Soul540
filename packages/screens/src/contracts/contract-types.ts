@@ -1,0 +1,37 @@
+export interface Contract {
+  id: string;
+  clientName: string;
+  clientDocument?: string;
+  clientRg?: string;
+  clientAddress?: string;
+  clientEmail?: string;
+  clientPhone?: string;
+  eventId?: string;
+  value: number;
+  startDate: string;
+  endDate?: string;
+  description: string;
+  paymentConditions?: string;
+  terms?: string;
+  status: string;
+  createdAt: string;
+  pricePerAdult?: number;
+  adultsCount?: number;
+  pricePerChild?: number;
+  childrenCount?: number;
+  additionalServices?: string;
+  minGuests?: number;
+  serviceType?: string;
+  drinksDescription?: string;
+  cancellationDays?: number;
+  pizzaTeam?: number;
+  drinksTeam?: number;
+  menuId?: string;
+  paid?: boolean;
+  noticeHours?: number;
+  serviceObservation?: string;
+  paymentObservation?: string;
+  lateFeePercent?: number;
+  lateFeeHours?: number;
+  additionalServicesObservation?: string;
+}

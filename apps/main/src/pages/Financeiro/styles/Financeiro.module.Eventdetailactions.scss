@@ -1,0 +1,151 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.eventDetailNotes p {
+  margin: 6px 0 0;
+  color: #40516a;
+  white-space: pre-wrap;
+}
+
+.eventDetailActions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #e1e8f1;
+}
+
+.financialStatus {
+  display: inline-flex;
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: #fff7ed;
+  color: #b85f00;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.agendamentoRowInteractive {
+  cursor: pointer;
+}
+
+.agendamentoRowInteractive:hover {
+  background: #fff7ed;
+}
+
+.agendamentoRowInteractive:focus {
+  outline: 2px solid #f28a12;
+  outline-offset: -2px;
+}
+
+.paymentMethodList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.paymentMethodRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e7edf5;
+  color: #40516a;
+  font-size: 12px;
+}
+
+.paymentMethodRow:last-child {
+  border-bottom: 0;
+}
+
+.paymentMethodRow strong {
+  color: #168a57;
+}
+
+.paymentMethodsSection {
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.paymentMethodsSubtitle {
+  margin: 4px 0 0;
+  color: #718096;
+  font-size: 11px;
+}
+
+.paymentMethodsTotal {
+  color: #168a57;
+  font-size: 18px;
+}
+
+.paymentMethodCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.paymentMethodCard {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #e1e8f1;
+  border-radius: 5px;
+  background: #f8fafc;
+}
+
+.paymentMethodCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.paymentMethodCardHeader > span {
+  overflow: hidden;
+  color: #40516a;
+  font-size: 12px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.paymentMethodCardHeader small {
+  flex-shrink: 0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #fff3d6;
+  color: #a85f00;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.paymentMethodCard > strong {
+  display: block;
+  overflow: hidden;
+  color: #168a57;
+  font-size: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.paymentMethodCount {
+  display: block;
+  margin-top: 5px;
+  color: #718096;
+  font-size: 11px;
+}
+
+.paymentMethodProgress {
+  height: 4px;
+  margin-top: 12px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: #e7edf5;
+}

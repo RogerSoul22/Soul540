@@ -1,0 +1,20 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.logoutBtn {
+  @include flex-center;
+  width: 30px;
+  height: 30px;
+  border-radius: $radius-sm;
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  transition: all $transition-fast;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba($danger, 0.1);
+    color: $danger;
+  }
+}

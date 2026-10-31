@@ -1,0 +1,80 @@
+import { Schema } from 'mongoose';
+
+const eventFields = {
+  name: String,
+  date: String,
+  endDate: String,
+  time: String,
+  duration: String,
+  location: String,
+  outOfCity: Boolean,
+  phone: String,
+  guestCount: { type: Number, default: 0 },
+  status: { type: String, default: 'planning' },
+  modality: { type: String, enum: ['feirinha', 'evento_avulso'], default: 'evento_avulso' },
+  isRecurringTemplate: { type: Boolean, default: false },
+  recurrenceId: String,
+  recurrenceEndDate: String,
+  budget: { type: Number, default: 0 },
+  menu: [String],
+  notes: { type: String, default: '' },
+  responsibleEmployeeId: String,
+  staffCount: Number,
+  selectedEmployeeIds: [String],
+  paymentProofName: String,
+  contractPdfName: String,
+  createdBy: String,
+  createdAt: { type: String, default: () => new Date().toISOString() },
+  celebration: String,
+  teamArrivalTime: String,
+  city: String,
+  guestsAdult: Number,
+  guestsTeen: Number,
+  guestsChild: Number,
+  travelCost: Number,
+  teamPizzaiolo: String,
+  teamHelper: String,
+  teamGarcon: String,
+  extrasLoucas: Number,
+  extrasBebidas: Number,
+  finalValue: Number,
+  paymentMethod: String,
+  locationImageName: String,
+  locationImageData: String,
+  paymentProofData: String,
+  contractPdfData: String,
+  depositValue: Number,
+  depositDate: String,
+  pixKey: String,
+  estimatedPizzas: Number,
+  actualPizzas: Number,
+  factoryProductionStatus: { type: String, default: 'pending' },
+  factoryProductionNotes: String,
+  factoryDoughBalls: Number,
+  factorySauceKg: Number,
+  factoryCheeseKg: Number,
+  factoryPackagingUnits: Number,
+  financialStatus: { type: String, enum: ['open', 'partial', 'settled', 'closed'], default: 'open' },
+  financialCloseStatus: { type: String, enum: ['open', 'closed'], default: 'open' },
+  financiallyClosedAt: String,
+  financiallyClosedBy: String,
+  financeSyncVersion: Number,
+  deletedAt: Date,
+};
+
+function createEventSchema(source: string, collection: string) {
+  return new Schema(
+    {
+      ...eventFields,
+      source: { type: String, default: source },
+      ...(source === 'franchise' && {
+        franchiseId: { type: Schema.Types.ObjectId, ref: 'Franchise', index: true },
+      }),
+    },
+    { collection, toJSON: { virtuals: true, versionKey: false } },
+  );
+}
+
+export const EventSchema = createEventSchema('main', 'events');
+export const FranchiseEventSchema = createEventSchema('franchise', 'franchiseevents');
+export const FactoryEventSchema = createEventSchema('factory', 'factoryevents');

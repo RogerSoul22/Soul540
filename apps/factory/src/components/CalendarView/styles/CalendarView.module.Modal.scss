@@ -1,0 +1,104 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.nowDot {
+  width: 10px;
+
+  height: 10px;
+
+  border-radius: $radius-full;
+
+  background: $accent;
+
+  flex-shrink: 0;
+
+  margin-left: -5px;
+
+  box-shadow: 0 0 6px rgba($accent, 0.6);
+}
+
+.nowLine {
+  flex: 1;
+
+  height: 2px;
+
+  background: linear-gradient(90deg, $accent, rgba($accent, 0.2));
+}
+
+// section
+@include mobile {
+  .header {
+    flex-wrap: wrap;
+
+    gap: $spacing-xs;
+
+    padding: $spacing-md $spacing-md $spacing-sm;
+  }
+
+  .monthTitle {
+    font-size: $font-size-xl;
+  }
+
+  .monthYear {
+    font-size: $font-size-sm;
+  }
+
+  .todayBtn {
+    padding: 5px 10px;
+
+    font-size: 11px;
+  }
+
+  .cell {
+    min-height: 58px;
+
+    padding: 5px 3px 3px;
+  }
+
+  .weekDay {
+    font-size: 9px;
+
+    padding: $spacing-xs 2px;
+
+    letter-spacing: 0;
+  }
+
+  .dayTitleWeekday {
+    font-size: $font-size-xl;
+  }
+
+  .timeGrid {
+    max-height: 300px;
+  }
+
+  .allDayRow {
+    min-height: 44px;
+  }
+}
+
+// section
+.eventOverlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.6);
+
+  z-index: 500;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: $spacing-lg;
+
+  animation: fadeIn 0.18s ease;
+
+  @include mobile {
+    align-items: flex-end;
+
+    padding: $spacing-xs;
+  }
+}

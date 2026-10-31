@@ -1,0 +1,137 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.sidebarCollapsed {
+  @media (min-width: #{
+$mobile + 1px}
+) {
+    width: 76px;
+
+    .logoWrap {
+      padding: $spacing-md;
+    }
+
+    .logoImg {
+      width: 44px;
+      height: 44px;
+    }
+
+    .nav {
+      padding-right: $spacing-sm;
+      padding-left: $spacing-sm;
+    }
+
+    .navGroupLabel,
+    .navLabel,
+    .userDetails,
+    .logoutBtn {
+      display: none;
+    }
+
+    .navItem,
+    .userInfo {
+      justify-content: center;
+    }
+
+    .navItem {
+      padding: 10px;
+    }
+
+    .footer {
+      padding: $spacing-md $spacing-sm;
+    }
+  }
+}
+
+.logoWrap {
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  padding: $spacing-lg $spacing-md $spacing-sm;
+
+  flex-shrink: 0;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.logoImg {
+  width: 80px;
+
+  height: 80px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+
+  border: 2px solid rgba($accent, 0.3);
+
+  box-shadow: 0 0 16px rgba($accent, 0.15);
+}
+
+.nav {
+  flex: 1;
+
+  padding: $spacing-sm $spacing-sm 0;
+
+  @include flex-column;
+
+  overflow-y: auto;
+
+  gap: 0;
+
+  &::-webkit-scrollbar {
+    width: 0;
+  }
+
+  @include mobile {
+    flex-direction: row;
+
+    justify-content: flex-start;
+
+    padding: $spacing-xs;
+
+    overflow-y: visible;
+
+    overflow-x: auto;
+
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.navGroup {
+  margin-bottom: $spacing-xs;
+
+  @include mobile {
+    display: contents;
+  }
+}
+
+.navGroupLabel {
+  display: block;
+
+  font-size: 9px;
+
+  font-weight: $font-weight-semibold;
+
+  color: rgba($text-muted, 0.5);
+
+  text-transform: uppercase;
+
+  letter-spacing: 1.2px;
+
+  padding: $spacing-md $spacing-md $spacing-xs;
+
+  @include mobile {
+    display: none;
+  }
+}

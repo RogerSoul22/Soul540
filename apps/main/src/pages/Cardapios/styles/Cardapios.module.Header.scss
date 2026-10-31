@@ -1,0 +1,116 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.itemDesc {
+}
+
+.itemPrice {
+  text-align: right;
+}
+
+.btnRemoveItem {
+  @include flex-center;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  flex-shrink: 0;
+  &:hover {
+    color: #f87171;
+  }
+}
+
+.btnAddItem {
+  margin-top: $spacing-sm;
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed $border;
+  border-radius: $radius-xs;
+  color: $text-muted;
+  font-size: $font-size-xs;
+  cursor: pointer;
+  width: 100%;
+  &:hover {
+    color: $text-primary;
+    border-color: $border-accent;
+  }
+}
+
+// Custom Preview
+.previewBody {
+  padding: $spacing-xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.previewHeader {
+  font-size: $font-size-sm;
+  color: $text-muted;
+  text-align: center;
+  font-style: italic;
+}
+
+.previewTitle {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  text-align: center;
+}
+
+.previewEvent {
+  font-size: $font-size-sm;
+  color: $accent;
+  text-align: center;
+}
+
+.previewCat {
+}
+
+.previewCatName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-bottom: $spacing-sm;
+  border-bottom: 1px solid $border;
+  margin-bottom: $spacing-sm;
+}
+
+.previewItem {
+  @include flex-between;
+  padding: $spacing-sm 0;
+  gap: $spacing-md;
+}
+
+.previewItemName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+}
+
+.previewItemDesc {
+  font-size: $font-size-xs;
+  color: $text-muted;
+  margin-top: 2px;
+}
+
+.previewItemPrice {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $accent;
+  flex-shrink: 0;
+}
+
+.previewFooter {
+  font-size: $font-size-xs;
+  color: $text-muted;
+  text-align: center;
+  font-style: italic;
+  padding-top: $spacing-md;
+  border-top: 1px solid $border;
+}

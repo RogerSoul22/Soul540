@@ -1,0 +1,126 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+// section
+.allDayRow {
+  display: flex;
+
+  align-items: stretch;
+
+  border-bottom: 1px solid $border;
+
+  min-height: 52px;
+}
+
+.allDayLabel {
+  width: 64px;
+
+  flex-shrink: 0;
+
+  padding: $spacing-sm $spacing-sm $spacing-sm $spacing-md;
+
+  font-size: 10px;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.6px;
+
+  border-right: 1px solid $border;
+
+  display: flex;
+
+  align-items: center;
+}
+
+.allDayEvents {
+  flex: 1;
+
+  padding: $spacing-sm $spacing-md;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-xs;
+}
+
+.allDayEmpty {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+
+  font-style: italic;
+
+  padding: $spacing-xs 0;
+}
+
+.allDayEvent {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-sm;
+
+  padding: 10px $spacing-md;
+
+  border-radius: $radius-sm;
+
+  border: 1px solid transparent;
+
+  transition: filter $transition-fast;
+
+  position: relative;
+
+  overflow: hidden;
+
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(1.08);
+  }
+}
+
+.allDayEventBar {
+  position: absolute;
+
+  left: 0;
+
+  top: 0;
+
+  bottom: 0;
+
+  width: 3px;
+
+  border-radius: 0;
+}
+
+.allDayEventContent {
+  flex: 1;
+
+  min-width: 0;
+
+  padding-left: $spacing-xs;
+}
+
+.allDayEventName {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+
+  @include text-ellipsis;
+}
+
+.allDayEventMeta {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+
+  margin-top: 2px;
+}

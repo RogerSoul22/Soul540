@@ -1,0 +1,130 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.witnessRole {
+  font-size: 11px;
+
+  color: #6b7280;
+
+  font-family: Arial, sans-serif;
+}
+
+.witnessBlank {
+  font-size: 10px;
+
+  color: #9ca3af;
+
+  margin-top: 4px;
+
+  font-family: Arial, sans-serif;
+
+  line-height: 1.8;
+}
+
+// ——— Footer ———
+.docFooter {
+  margin-top: 32px;
+
+  padding-top: 12px;
+
+  border-top: 1px solid #e5e7eb;
+
+  text-align: center;
+
+  font-size: 9px;
+
+  color: #9ca3af;
+
+  font-family: Arial, sans-serif;
+}
+
+// ——— Editable field ———
+.fieldView {
+  // inherits surrounding text style
+}
+
+.fieldInput {
+  border: 1px solid #93c5fd;
+
+  border-radius: 3px;
+
+  padding: 1px 6px;
+
+  font-size: inherit;
+
+  font-family: inherit;
+
+  color: inherit;
+
+  background: #eff6ff;
+
+  font-weight: inherit;
+
+  min-width: 80px;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+  }
+}
+
+.fieldTextarea {
+  width: 100%;
+
+  border: 1px solid #93c5fd;
+
+  border-radius: 4px;
+
+  padding: 6px 8px;
+
+  font-size: 13px;
+
+  font-family: Georgia, 'Times New Roman', serif;
+
+  color: #111827;
+
+  background: #eff6ff;
+
+  resize: vertical;
+
+  min-height: 60px;
+
+  line-height: 1.75;
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+  }
+}
+
+// ——— Parties block ———
+.partiesBlock {
+  margin-bottom: 20px;
+}
+
+.partiesLabel {
+  font-size: 12px;
+
+  font-weight: 700;
+
+  color: #111827;
+
+  margin-bottom: 8px;
+
+  font-family: Arial, sans-serif;
+
+  letter-spacing: 0.3px;
+}
+
+// ——— Sub-title inside clause ———
+.clauseSubTitle {
+  font-size: 12px;
+
+  font-weight: 600;
+
+  color: #374151;
+
+  margin: 10px 0 6px;
+
+  font-family: Arial, sans-serif;
+}

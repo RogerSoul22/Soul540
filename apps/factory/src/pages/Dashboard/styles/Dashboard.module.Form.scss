@@ -1,0 +1,96 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.kpiSubSuccess {
+  color: #4ade80;
+}
+
+// Calendar
+.calendarSection {
+  margin-bottom: $spacing-md;
+}
+
+.calendarHeader {
+  display: flex;
+
+  align-items: baseline;
+
+  gap: $spacing-sm;
+
+  margin-bottom: $spacing-md;
+}
+
+.calendarMonth {
+  font-size: $font-size-lg;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+
+  text-transform: capitalize;
+}
+
+.calendarCount {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+}
+
+// Sections
+.sectionsGrid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: $spacing-md;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+.section {
+  @include card;
+
+  padding: $spacing-lg;
+}
+
+.sectionHeader {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: $spacing-lg;
+
+  padding-bottom: $spacing-md;
+
+  border-bottom: 1px solid $border;
+}
+
+.sectionIcon {
+  @include flex-center;
+
+  width: 26px;
+
+  height: 26px;
+
+  border-radius: $radius-xs;
+
+  background: rgba($accent, 0.08);
+
+  color: $accent;
+
+  flex-shrink: 0;
+}
+
+.sectionTitle {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+
+  letter-spacing: 0.1px;
+}

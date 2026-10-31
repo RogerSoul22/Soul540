@@ -1,0 +1,145 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.cardActions {
+  display: flex;
+  gap: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: 1px solid $border;
+  margin-top: auto;
+}
+.empty {
+  text-align: center;
+  padding: $spacing-3xl;
+  color: $text-muted;
+  font-size: $font-size-sm;
+}
+
+// section
+.detailHeaderInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+.detailHeaderBadges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-md;
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+.detailField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: $spacing-sm $spacing-md;
+  background: $bg-input;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  font-size: $font-size-sm;
+  color: $text-primary;
+}
+.detailFieldLabel {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.detailFieldFull {
+  grid-column: 1 / -1;
+}
+.detailDays {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+// section
+.btnPrimary {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: 10px $spacing-md;
+  background: $accent;
+  color: #0a0f1e;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  border: none;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: background $transition-fast;
+  &:hover {
+    background: $accent-hover;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+.btnWhatsapp {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 10px;
+  background: rgba(37, 211, 102, 0.08);
+  border: 1px solid rgba(37, 211, 102, 0.25);
+  border-radius: $radius-xs;
+  color: #25d366;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all $transition-fast;
+  &:hover {
+    background: rgba(37, 211, 102, 0.15);
+  }
+}
+.btnEdit {
+  flex: 1;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid $border;
+  border-radius: $radius-xs;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: $text-primary;
+  }
+}
+.btnDelete {
+  padding: 8px 12px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid transparent;
+  border-radius: $radius-xs;
+  color: #f87171;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+  &:hover {
+    background: rgba(239, 68, 68, 0.15);
+  }
+}
+.btnCancel {
+  padding: 10px $spacing-md;
+  background: none;
+  border: none;
+  color: $text-muted;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  &:hover {
+    color: $text-primary;
+  }
+}

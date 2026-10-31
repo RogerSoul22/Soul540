@@ -1,0 +1,126 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.page {
+  padding: $spacing-2xl $spacing-xl;
+
+  animation: fadeIn 0.4s ease;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+.header {
+  @include flex-between;
+
+  margin-bottom: $spacing-2xl;
+
+  flex-wrap: wrap;
+
+  gap: $spacing-md;
+}
+
+.title {
+  font-size: $font-size-3xl;
+
+  font-weight: $font-weight-bold;
+
+  color: $text-primary;
+
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+
+  margin-top: 6px;
+}
+
+// KPI
+.kpiGrid {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: $spacing-md;
+
+  margin-bottom: $spacing-xl;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kpiCard {
+  @include card;
+
+  padding: $spacing-lg;
+
+  position: relative;
+
+  overflow: hidden;
+
+  &::before {
+    content: '';
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 2px;
+  }
+}
+
+.blue::before {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.green::before {
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+}
+
+.amber::before {
+  background: linear-gradient(90deg, $accent, #fbbf24);
+}
+
+.kpiLabel {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  font-weight: $font-weight-medium;
+}
+
+.kpiValue {
+  font-size: $font-size-3xl;
+
+  font-weight: $font-weight-bold;
+
+  color: $text-primary;
+
+  letter-spacing: -1px;
+
+  line-height: 1;
+
+  margin: $spacing-sm 0 4px;
+}
+
+.kpiSub {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+}

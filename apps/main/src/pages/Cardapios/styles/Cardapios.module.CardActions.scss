@@ -1,0 +1,92 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.standardCardFooter,
+.cardFooter {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: $spacing-sm;
+  margin-top: auto;
+  padding-top: $spacing-sm;
+  border-top: 1px solid $border;
+
+  > button {
+    flex: 0 1 auto;
+  }
+}
+
+.cardPrimaryButton,
+.cardSecondaryButton,
+.cardPdfButton,
+.cardDangerButton {
+  flex: 0 1 auto;
+  min-width: 76px;
+  padding: 8px 10px;
+  border-radius: $radius-xs;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all $transition-fast;
+  white-space: nowrap;
+}
+
+.cardPrimaryButton {
+  min-width: 92px;
+  background: $accent-light;
+  border: 1px solid $border-accent;
+  color: $accent;
+
+  &:hover {
+    background: rgba($accent, 0.2);
+  }
+}
+
+.cardSecondaryButton {
+  background: $bg-tertiary;
+  border: 1px solid $border;
+  color: $text-secondary;
+
+  &:hover {
+    background: $bg-elevated;
+    color: $text-primary;
+  }
+}
+
+.cardPdfButton {
+  background: rgba($info, 0.1);
+  border: 1px solid rgba($info, 0.25);
+  color: $info;
+
+  &:hover {
+    background: rgba($info, 0.18);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.cardDangerButton {
+  background: rgba($danger, 0.1);
+  border: 1px solid rgba($danger, 0.22);
+  color: $danger;
+
+  &:hover {
+    background: rgba($danger, 0.18);
+  }
+}
+
+@include mobile {
+  .standardCardFooter,
+  .cardFooter {
+    flex-wrap: wrap;
+
+    > button {
+      flex: 1 1 90px;
+      min-width: 0;
+    }
+  }
+}

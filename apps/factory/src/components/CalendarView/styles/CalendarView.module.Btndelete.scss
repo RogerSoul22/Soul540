@@ -1,0 +1,106 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.btnDelete {
+  padding: 9px $spacing-lg;
+
+  border-radius: $radius-sm;
+
+  border: 1px solid rgba(239, 68, 68, 0.3);
+
+  background: rgba(239, 68, 68, 0.06);
+
+  color: #f87171;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  transition: all $transition-base;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.12);
+
+    border-color: rgba(239, 68, 68, 0.5);
+  }
+}
+
+.btnSave {
+  flex: 1;
+
+  padding: 9px $spacing-md;
+
+  border-radius: $radius-sm;
+
+  border: none;
+
+  background: $accent;
+
+  color: $bg-primary;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  cursor: pointer;
+
+  transition: all $transition-base;
+
+  &:hover {
+    background: $accent-hover;
+  }
+}
+
+.btnCancel {
+  padding: 9px $spacing-lg;
+
+  border-radius: $radius-sm;
+
+  border: 1px solid $border;
+
+  background: none;
+
+  color: $text-muted;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  transition: all $transition-base;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+
+    color: $text-primary;
+  }
+}
+
+.btnDeleteConfirm {
+  flex: 1;
+
+  padding: 9px $spacing-md;
+
+  border-radius: $radius-sm;
+
+  border: none;
+
+  background: $danger;
+
+  color: #fff;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  cursor: pointer;
+
+  transition: all $transition-base;
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+}

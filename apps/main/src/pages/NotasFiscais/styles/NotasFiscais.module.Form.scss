@@ -1,0 +1,122 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.actionBtn {
+  @include flex-center;
+
+  width: 32px;
+
+  height: 32px;
+
+  border-radius: $radius-xs;
+
+  background: none;
+
+  border: none;
+
+  color: $text-muted;
+
+  cursor: pointer;
+
+  font-size: $font-size-xs;
+
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+
+    color: $text-primary;
+  }
+}
+
+.actionBtnDanger {
+  &:hover {
+    background: rgba($danger, 0.1);
+
+    color: $danger;
+  }
+}
+
+.actionBtnWarning {
+  &:hover {
+    background: rgba(#f59e0b, 0.1);
+
+    color: #f59e0b;
+  }
+}
+
+.emptyState {
+  text-align: center;
+
+  padding: $spacing-3xl;
+
+  color: $text-muted;
+
+  font-size: $font-size-sm;
+}
+
+// Form
+.form {
+  @include flex-column;
+
+  gap: $spacing-md;
+}
+
+.formRow {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: $spacing-md;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formField {
+  @include flex-column;
+
+  gap: 6px;
+
+  min-width: 0;
+}
+
+.formLabel {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  color: $text-secondary;
+}
+
+.formSelect,
+.formInput,
+.formTextarea {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 10px $spacing-md;
+
+  background: $bg-input;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  color: $text-primary;
+
+  font-size: $font-size-sm;
+
+  transition: all $transition-base;
+
+  &:focus {
+    outline: none;
+
+    border-color: $accent;
+
+    box-shadow: 0 0 0 3px rgba($accent, 0.08);
+  }
+}

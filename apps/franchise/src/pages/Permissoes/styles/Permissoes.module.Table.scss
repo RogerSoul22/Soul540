@@ -1,0 +1,151 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.userPassword {
+  font-size: $font-size-xs;
+  color: $text-muted;
+  margin-top: 2px;
+  font-family: monospace;
+  letter-spacing: 0.5px;
+}
+
+.userMeta {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.btnEye {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  border-radius: $radius-xs;
+  &:hover {
+    color: $accent;
+    background: rgba($accent, 0.08);
+  }
+}
+
+.badgeAdmin {
+  font-size: 10px;
+  font-weight: $font-weight-semibold;
+  background: rgba($accent, 0.15);
+  color: $accent;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.badgeMaster {
+  font-size: 10px;
+  font-weight: $font-weight-semibold;
+  background: rgba(234, 179, 8, 0.15);
+  color: #facc15;
+  padding: 2px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.4px;
+}
+
+.btnDeleteUser {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  border-radius: $radius-xs;
+  &:hover {
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.1);
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: $spacing-xl;
+  color: $text-muted;
+  font-size: $font-size-sm;
+}
+
+// Permission panel
+.permPanel {
+  @include card;
+  padding: $spacing-xl;
+  min-height: 400px;
+}
+
+.permEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-md;
+  height: 300px;
+  color: $text-muted;
+  text-align: center;
+  font-size: $font-size-sm;
+  svg {
+    opacity: 0.3;
+  }
+}
+
+.permHeader {
+  @include flex-between;
+  margin-bottom: $spacing-xl;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+}
+
+.permTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.permSub {
+  font-size: $font-size-sm;
+  color: $text-muted;
+  margin-top: 4px;
+}
+
+.btnToggleAll {
+  font-size: $font-size-sm;
+  color: $accent;
+  background: none;
+  border: none;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.permGroups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: $spacing-xl;
+  margin-bottom: $spacing-xl;
+}
+
+.permGroup {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.permGroupLabel {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}

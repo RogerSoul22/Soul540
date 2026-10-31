@@ -1,0 +1,113 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.btnWhatsapp {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  padding: 9px $spacing-lg;
+
+  background: rgba(37, 211, 102, 0.08);
+
+  border: 1px solid rgba(37, 211, 102, 0.25);
+  border-radius: $radius-sm;
+
+  color: #25d366;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+  text-decoration: none;
+  transition: all $transition-base;
+
+  &:hover {
+    background: rgba(37, 211, 102, 0.15);
+    border-color: rgba(37, 211, 102, 0.4);
+  }
+}
+
+.btnFinalize {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 9px $spacing-lg;
+
+  border-radius: $radius-sm;
+
+  border: 1px solid rgba(34, 197, 94, 0.35);
+
+  background: rgba(34, 197, 94, 0.08);
+
+  color: #22c55e;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  transition: all $transition-base;
+
+  &:hover {
+    background: rgba(34, 197, 94, 0.16);
+
+    border-color: rgba(34, 197, 94, 0.55);
+  }
+}
+
+.btnDelete {
+  padding: 9px $spacing-lg;
+
+  border-radius: $radius-sm;
+
+  border: 1px solid rgba(239, 68, 68, 0.3);
+
+  background: rgba(239, 68, 68, 0.06);
+
+  color: #f87171;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  transition: all $transition-base;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.12);
+
+    border-color: rgba(239, 68, 68, 0.5);
+  }
+}
+
+.btnSave {
+  flex: 1;
+
+  padding: 9px $spacing-md;
+
+  border-radius: $radius-sm;
+
+  border: none;
+
+  background: $accent;
+
+  color: $bg-primary;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  cursor: pointer;
+
+  transition: all $transition-base;
+
+  &:hover {
+    background: $accent-hover;
+  }
+}

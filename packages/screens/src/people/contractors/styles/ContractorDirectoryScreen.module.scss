@@ -1,0 +1,165 @@
+@use './ContractorDirectoryScreen.module.Responsive' as *;
+
+.page {
+  padding: 48px 32px;
+  color: #e5e7eb;
+  animation: fadeIn 0.4s ease;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.titleRow,
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 30px;
+}
+.subtitle {
+  margin: 6px 0 0;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.infoButton {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  color: #94a3b8;
+  background: transparent;
+  cursor: pointer;
+}
+
+.infoButton:hover {
+  color: #f8fafc;
+  background: #ffffff12;
+}
+
+.primaryButton,
+.exportButton {
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primaryButton {
+  border: 0;
+  color: #0a0f1e;
+  background: #f4b400;
+}
+.exportButton {
+  border: 1px solid #f4b40055;
+  color: #f4b400;
+  background: #f4b40014;
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.kpiCard {
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  border: 1px solid #29354a;
+  border-top-width: 3px;
+  border-radius: 10px;
+  background: #172033;
+}
+
+.kpiCard span {
+  color: #94a3b8;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+.kpiCard strong {
+  color: #f8fafc;
+  font-size: 30px;
+}
+.blue {
+  border-top-color: #60a5fa;
+}
+.green {
+  border-top-color: #4ade80;
+}
+
+.categories {
+  margin-bottom: 32px;
+}
+.sectionLabel {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.categoryCard,
+.addCategory {
+  min-height: 70px;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.categoryCard {
+  position: relative;
+  display: grid;
+  gap: 5px;
+  border: 1px solid #29354a;
+  border-left: 3px solid transparent;
+  color: #f8fafc;
+  background: #172033;
+}
+
+.categoryCard small {
+  color: #94a3b8;
+}
+.categoryCardActive {
+  border-left-color: #f4b400;
+  background: #f4b40014;
+}
+
+.addCategory {
+  border: 1px dashed #475569;
+  color: #94a3b8;
+  background: transparent;
+  text-align: center;
+}
+
+.addCategory:hover {
+  border-color: #f4b400;
+  color: #f4b400;
+}
+.deleteCategory {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  color: #94a3b8;
+}
+.deleteCategory:hover {
+  color: #f87171;
+}
+

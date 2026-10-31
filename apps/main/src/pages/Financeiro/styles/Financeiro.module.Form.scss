@@ -1,0 +1,119 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.summaryItem {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  flex: 1;
+
+  min-width: 120px;
+}
+
+.summaryItemLabel {
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-medium;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+}
+
+.summaryItemValue {
+  font-size: $font-size-2xl;
+
+  font-weight: $font-weight-bold;
+
+  letter-spacing: -0.5px;
+}
+
+.green {
+  color: #4ade80;
+}
+
+.red {
+  color: #f87171;
+}
+
+.amber {
+  color: #fbbf24;
+}
+
+.blue {
+  color: #60a5fa;
+}
+
+.summaryDivider {
+  width: 1px;
+
+  height: 40px;
+
+  background: $border;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+// Chart sections
+.chartSection {
+  @include card;
+
+  padding: $spacing-lg;
+
+  margin-bottom: $spacing-xl;
+}
+
+.sectionTitle {
+  @include section-title;
+
+  margin-bottom: $spacing-lg;
+}
+
+.chartContainer {
+  margin: 0 (0 - $spacing-sm);
+}
+
+// Gauges Grid
+.walletGrid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: $spacing-md;
+
+  margin-bottom: $spacing-xl;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gaugesGrid {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: $spacing-md;
+
+  margin-bottom: $spacing-xl;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gaugeCard {
+  @include card;
+
+  padding: $spacing-xl $spacing-lg;
+
+  @include flex-center;
+}

@@ -1,0 +1,18 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+@media (max-width: 700px) {
+  .financeInsightsGrid {
+    grid-template-columns: 1fr;
+  }
+  .financeInsightsGrid > :last-child {
+    grid-column: auto;
+  }
+  .originCards {
+    grid-template-columns: 1fr;
+  }
+  .commissionGrid {
+    grid-template-columns: 1fr;
+  }
+}

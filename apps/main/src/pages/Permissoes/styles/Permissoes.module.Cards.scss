@@ -1,0 +1,144 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.userAvatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba($accent, 0.15);
+  color: $accent;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.userInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.userName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userEmail {
+  font-size: $font-size-xs;
+  color: $text-muted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userPassword {
+  font-size: $font-size-xs;
+  color: $text-muted;
+  margin-top: 2px;
+  font-family: monospace;
+  letter-spacing: 0.5px;
+}
+
+.userMeta {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.btnEye {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  border-radius: $radius-xs;
+  &:hover {
+    color: $accent;
+    background: rgba($accent, 0.08);
+  }
+}
+
+.badgeAdmin {
+  font-size: 10px;
+  font-weight: $font-weight-semibold;
+  background: rgba($accent, 0.15);
+  color: $accent;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.btnDeleteUser {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  border-radius: $radius-xs;
+  &:hover {
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.1);
+  }
+}
+
+.empty {
+  text-align: center;
+  padding: $spacing-xl;
+  color: $text-muted;
+  font-size: $font-size-sm;
+}
+
+// Permission panel
+.permPanel {
+  @include card;
+  padding: $spacing-xl;
+  min-height: 400px;
+}
+
+.crossUnitBanner {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 10px 14px;
+
+  background: rgba(129, 140, 248, 0.08);
+
+  border: 1px solid rgba(129, 140, 248, 0.25);
+
+  border-radius: $radius-sm;
+
+  font-size: $font-size-xs;
+
+  color: #a5b4fc;
+
+  margin-bottom: $spacing-md;
+
+  line-height: 1.5;
+
+  strong {
+    color: #c7d2fe;
+  }
+
+  svg {
+    flex-shrink: 0;
+    opacity: 0.8;
+  }
+}

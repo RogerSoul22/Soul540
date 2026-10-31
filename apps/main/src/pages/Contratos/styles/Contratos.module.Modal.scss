@@ -1,0 +1,126 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.btnDelete {
+  padding: 6px 10px;
+
+  background: rgba(239, 68, 68, 0.08);
+
+  border: none;
+
+  border-radius: $radius-xs;
+
+  color: #f87171;
+
+  font-size: $font-size-xs;
+
+  cursor: pointer;
+
+  transition: background $transition-fast;
+
+  white-space: nowrap;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.15);
+  }
+}
+
+.btnCancel {
+  padding: 10px $spacing-md;
+
+  background: none;
+
+  border: none;
+
+  color: $text-muted;
+
+  font-size: $font-size-sm;
+
+  cursor: pointer;
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+// Modal
+.overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.7);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  z-index: 100;
+
+  padding: $spacing-md;
+
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  background: $bg-secondary;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-lg;
+
+  width: 100%;
+
+  max-width: 560px;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  box-shadow: $shadow-lg;
+}
+
+.preview {
+  background: $bg-secondary;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-lg;
+
+  width: 100%;
+
+  max-width: 500px;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  box-shadow: $shadow-lg;
+}
+
+.modalHeader {
+  @include flex-between;
+
+  padding: $spacing-lg $spacing-xl;
+
+  border-bottom: 1px solid $border;
+
+  position: sticky;
+
+  top: 0;
+
+  background: $bg-secondary;
+
+  z-index: 1;
+}
+
+.modalTitle {
+  font-size: $font-size-lg;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+}

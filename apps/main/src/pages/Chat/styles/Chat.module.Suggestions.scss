@@ -1,0 +1,56 @@
+@use '../../../styles/variables' as *;
+
+@keyframes micPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba($danger, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 0 6px rgba($danger, 0);
+  }
+}
+
+.suggestions {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  padding: 8px 16px 0;
+}
+
+.suggestionChip {
+  background: $accent-light;
+
+  border: 1px solid rgba(245, 158, 11, 0.3);
+
+  color: $accent;
+
+  border-radius: 20px;
+
+  padding: 5px 14px;
+
+  font-size: 0.78rem;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    background: rgba(245, 158, 11, 0.18);
+
+    border-color: $accent;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+
+    cursor: not-allowed;
+  }
+}

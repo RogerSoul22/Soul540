@@ -1,0 +1,131 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.exportColItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  cursor: pointer;
+  user-select: none;
+
+  input[type='checkbox'] {
+    width: 15px;
+    height: 15px;
+    accent-color: $accent;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.exportSelectAll {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.btnSelectAll {
+  padding: 5px 12px;
+  background: none;
+  border: 1px solid $border;
+  border-radius: $radius-xs;
+  color: $text-muted;
+  font-size: $font-size-xs;
+  cursor: pointer;
+  transition: all $transition-fast;
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    color: $text-primary;
+  }
+}
+
+// section
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: $spacing-md;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  background: $bg-secondary;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: $shadow-lg;
+}
+
+.modalHeader {
+  @include flex-between;
+  padding: $spacing-lg $spacing-xl;
+  border-bottom: 1px solid $border;
+}
+
+.modalTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.modalClose {
+  @include flex-center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  color: $text-muted;
+  border-radius: $radius-xs;
+  cursor: pointer;
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: $text-primary;
+  }
+}
+
+.modalBody {
+  padding: $spacing-xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.modalFooter {
+  @include flex-between;
+  padding: $spacing-md $spacing-xl;
+  border-top: 1px solid $border;
+}
+
+.formGrid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-md;
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

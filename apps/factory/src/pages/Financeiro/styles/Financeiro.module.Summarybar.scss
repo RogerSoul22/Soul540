@@ -1,0 +1,158 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+@media (max-width: 560px) {
+  .page {
+    padding: 16px 12px 28px;
+  }
+  .summaryBar {
+    grid-template-columns: 1fr;
+  }
+  .pageMonthFilter {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .pageMonthField,
+  .pageMonthSelect,
+  .searchInput,
+  .btnExport,
+  .btnXml {
+    width: 100%;
+  }
+  .headerActions > button,
+  .headerActions > .scopeToggle {
+    width: 100%;
+  }
+  .scopeToggle {
+    overflow-x: auto;
+  }
+  .scopeBtn {
+    flex: 1 0 auto;
+  }
+}
+
+/* Dense receivables-style workspace inspired by Conta Azul. */
+.page {
+  padding: 20px 26px 40px;
+}
+
+.header {
+  padding-bottom: 16px;
+  border-bottom: 1px solid #dbe3ef;
+  margin-bottom: 14px;
+}
+
+.headerLeft .title {
+  font-size: 25px;
+}
+
+.headerLeft .subtitle {
+  font-size: 12px;
+}
+
+.tabs {
+  margin-bottom: 12px;
+  box-shadow: none;
+  border-radius: 5px;
+}
+
+.tab {
+  min-height: 36px;
+  padding: 8px 15px;
+  font-size: 13px;
+}
+
+.pageMonthFilter {
+  align-items: flex-end;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+.pageMonthField {
+  min-width: 190px;
+}
+
+.pageMonthLabel,
+.filterLabel {
+  margin-bottom: 5px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+}
+
+.pageMonthSelect,
+.searchInput {
+  min-height: 34px;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+.summaryBar {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  margin-bottom: 14px;
+  border: 1px solid #dbe3ef;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.summaryBar > .summaryItem {
+  min-height: 72px;
+  padding: 12px 16px;
+  border: 0;
+  border-right: 1px solid #dbe3ef;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.summaryBar > .summaryItem:last-child {
+  border-right: 0;
+}
+
+.summaryItemLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.summaryItemValue {
+  margin-top: 5px;
+  font-size: 20px;
+}
+
+.filterRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+.filterGroup {
+  min-width: 150px;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+}
+
+.filterGroup:has(.searchInput) {
+  flex: 1 1 240px;
+}
+
+.filterBtn {
+  min-height: 34px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.btnExport,
+.btnXml {
+  min-height: 34px;
+  padding: 7px 11px;
+  border-radius: 4px;
+  font-size: 12px;
+}

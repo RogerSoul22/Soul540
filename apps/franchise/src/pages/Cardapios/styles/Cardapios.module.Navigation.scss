@@ -1,0 +1,132 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.page {
+  padding: $spacing-2xl $spacing-xl;
+  animation: fadeIn 0.4s ease;
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+.header {
+  @include flex-between;
+  margin-bottom: $spacing-2xl;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+}
+
+.title {
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+  color: $text-muted;
+  margin-top: 6px;
+}
+
+// Section labels
+.sectionLabel {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.8px;
+
+  margin-bottom: $spacing-md;
+
+  margin-top: $spacing-xl;
+
+  svg {
+    color: $accent;
+    flex-shrink: 0;
+  }
+
+  &:first-of-type {
+    margin-top: 0;
+  }
+}
+
+// section
+.standardGrid {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: $spacing-md;
+
+  margin-bottom: $spacing-xl;
+
+  @include tablet {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.standardCard {
+  @include card;
+
+  padding: $spacing-lg;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-md;
+
+  position: relative;
+
+  overflow: hidden;
+
+  &::before {
+    content: '';
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 3px;
+  }
+}
+
+.menuAmber::before {
+  background: linear-gradient(90deg, $accent, #fbbf24);
+}
+
+.menuRed::before {
+  background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+
+.menuGold::before {
+  background: linear-gradient(90deg, #b45309, $accent);
+}
+
+.standardCardTop {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: $spacing-sm;
+}

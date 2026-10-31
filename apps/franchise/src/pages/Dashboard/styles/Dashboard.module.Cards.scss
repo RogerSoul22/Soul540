@@ -1,0 +1,124 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.legendDot {
+  width: 8px;
+
+  height: 8px;
+
+  border-radius: 50%;
+
+  opacity: 0.9;
+}
+
+// Sections
+.sectionsGrid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: $spacing-md;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+.section {
+  @include card;
+
+  padding: $spacing-lg;
+}
+
+.sectionHeader {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: $spacing-lg;
+
+  padding-bottom: $spacing-md;
+
+  border-bottom: 1px solid $border;
+}
+
+.sectionIcon {
+  @include flex-center;
+
+  width: 26px;
+
+  height: 26px;
+
+  border-radius: $radius-xs;
+
+  background: rgba($accent, 0.08);
+
+  color: $accent;
+
+  flex-shrink: 0;
+}
+
+.sectionTitle {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+
+  letter-spacing: 0.1px;
+}
+
+.listItem {
+  @include flex-between;
+
+  padding: 10px $spacing-md;
+
+  border-radius: $radius-sm;
+
+  margin-bottom: 4px;
+
+  transition: background $transition-fast;
+
+  border-left: 2px solid transparent;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  @include mobile {
+    flex-wrap: wrap;
+
+    gap: 4px;
+
+    padding: 8px $spacing-sm;
+  }
+}
+
+.listItemUrgent {
+  border-left-color: #ef4444;
+
+  background: rgba(239, 68, 68, 0.04);
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.07);
+  }
+}
+
+.listItemInfo {
+  flex: 1;
+
+  min-width: 0;
+}
+
+.listItemName {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  color: $text-primary;
+
+  @include text-ellipsis;
+}

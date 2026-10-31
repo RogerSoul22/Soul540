@@ -1,0 +1,120 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.checkItem {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-sm;
+
+  padding: 6px 8px;
+
+  border-radius: $radius-xs;
+
+  cursor: pointer;
+
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  input[type='checkbox'] {
+    accent-color: $accent;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+}
+
+.checkLabel {
+  font-size: $font-size-sm;
+
+  color: $text-primary;
+
+  cursor: pointer;
+
+  span {
+    font-size: $font-size-xs;
+    color: $text-muted;
+    margin-left: 4px;
+  }
+}
+
+// Inline checkbox row (outOfCity, etc.)
+.checkRow {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-sm;
+
+  padding: 10px 12px;
+
+  background: $bg-input;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  cursor: pointer;
+
+  transition: border-color $transition-fast;
+
+  &:hover {
+    border-color: $border-accent;
+  }
+
+  input[type='checkbox'] {
+    accent-color: $accent;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  label {
+    font-size: $font-size-sm;
+    color: $text-primary;
+    cursor: pointer;
+  }
+}
+
+// File upload
+.fileUploadBtn {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-sm;
+
+  padding: 9px 12px;
+
+  background: $bg-input;
+
+  border: 1px dashed $border;
+
+  border-radius: $radius-sm;
+
+  color: $text-secondary;
+
+  font-size: $font-size-sm;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  &:hover {
+    border-color: $border-accent;
+    color: $text-primary;
+    background: rgba(245, 158, 11, 0.04);
+  }
+}
+
+.fileSelected {
+  color: $accent;
+}

@@ -1,0 +1,151 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.btnExport,
+.btnXml {
+  min-height: 34px;
+  padding: 7px 11px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.tableWrap {
+  max-height: none;
+  border-radius: 5px;
+  box-shadow: none;
+  overflow-x: auto;
+}
+
+.table {
+  min-width: 760px;
+  font-size: 12px;
+}
+
+.table th {
+  height: 34px;
+  padding: 8px 10px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.25px;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 9px 10px;
+  height: 42px;
+}
+
+.table tr:hover td {
+  background: #fff7ed;
+}
+
+.categoryTag {
+  border-radius: 3px;
+}
+
+.walletGrid {
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.agendamentosCard,
+.chartSection,
+.barCard {
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+.sectionTitle {
+  font-size: 14px;
+}
+
+.monthSelector {
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+.monthSummaryItem {
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+.monthSelector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+}
+
+.monthSelectLabel {
+  color: #63738b;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+}
+
+.monthSelect {
+  min-width: 190px;
+  min-height: 34px;
+  padding: 6px 32px 6px 10px;
+  border: 1px solid #cfd9e7;
+  border-radius: 4px;
+  background: #fff;
+  color: #182235;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.monthSelect:focus {
+  outline: none;
+  border-color: #f5a000;
+  box-shadow: 0 0 0 3px rgba(245, 160, 0, 0.14);
+}
+
+.clickableRow {
+  cursor: pointer;
+}
+
+.clickableRow:focus td {
+  outline: 2px solid #f28a12;
+  outline-offset: -2px;
+}
+
+.eventDetailGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.eventDetailGrid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid #e1e8f1;
+  border-radius: 5px;
+  background: #f8fafc;
+}
+
+.eventDetailLabel {
+  color: #63738b;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.eventDetailGrid strong {
+  color: #182235;
+  font-size: 13px;
+}
+
+.eventDetailNotes {
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid #e1e8f1;
+  border-radius: 5px;
+  background: #f8fafc;
+}

@@ -1,0 +1,126 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.pillMore {
+  font-size: 10px;
+
+  color: $text-muted;
+
+  font-weight: $font-weight-medium;
+
+  padding: 1px 6px;
+}
+
+// section
+.dayHeader {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: $spacing-md $spacing-lg;
+
+  border-bottom: 1px solid $border;
+
+  gap: $spacing-md;
+}
+
+.backBtn {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 6px 12px;
+
+  border-radius: $radius-sm;
+
+  border: 1px solid $border;
+
+  background: transparent;
+
+  color: $text-muted;
+
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  white-space: nowrap;
+
+  &:hover {
+    color: $text-primary;
+
+    border-color: rgba(255, 255, 255, 0.1);
+
+    background: rgba(255, 255, 255, 0.04);
+  }
+}
+
+.dayTitle {
+  display: flex;
+
+  align-items: baseline;
+
+  gap: $spacing-sm;
+
+  flex: 1;
+
+  justify-content: center;
+}
+
+.dayTitleWeekday {
+  font-family: $font-display;
+
+  font-size: $font-size-2xl;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+
+  text-transform: capitalize;
+
+  letter-spacing: -0.3px;
+}
+
+.dayTitleDate {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+
+  font-weight: $font-weight-normal;
+}
+
+.todayChip {
+  font-size: 10px;
+
+  font-weight: $font-weight-bold;
+
+  background: rgba($accent, 0.15);
+
+  color: $accent;
+
+  border: 1px solid rgba($accent, 0.25);
+
+  padding: 2px 8px;
+
+  border-radius: $radius-full;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  align-self: center;
+}
+
+.dayNav {
+  display: flex;
+
+  gap: 2px;
+}

@@ -1,0 +1,100 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.card {
+  @include card;
+
+  @include card-hover;
+
+  padding: $spacing-lg;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-md;
+
+  cursor: pointer;
+}
+
+.cardTop {
+  @include flex-between;
+
+  gap: $spacing-sm;
+}
+
+.cardTitle {
+  font-size: $font-size-base;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+}
+
+.cardSub {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+
+  margin-top: 4px;
+}
+
+.cardBody {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-sm;
+}
+
+.cardRow {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-sm;
+
+  font-size: $font-size-sm;
+
+  color: $text-secondary;
+
+  svg {
+    color: $text-muted;
+    flex-shrink: 0;
+  }
+}
+
+.cardNotes {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+
+  padding: $spacing-sm;
+
+  background: rgba(255, 255, 255, 0.02);
+
+  border-radius: $radius-xs;
+
+  border-left: 2px solid $border-accent;
+}
+
+.cardActions {
+  display: flex;
+
+  gap: $spacing-sm;
+
+  padding-top: $spacing-sm;
+
+  border-top: 1px solid $border;
+}
+
+// Empty
+.empty {
+  text-align: center;
+
+  padding: $spacing-3xl $spacing-lg;
+
+  color: $text-muted;
+
+  font-size: $font-size-sm;
+}

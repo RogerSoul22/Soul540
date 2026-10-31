@@ -1,0 +1,169 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+.btnCancel {
+  padding: 10px $spacing-md;
+  background: none;
+  border: none;
+  color: $text-muted;
+  font-size: $font-size-sm;
+  cursor: pointer;
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+/* Visual refresh inspired by modern financial workspaces. */
+.page {
+  min-height: 100%;
+  padding: 28px 32px 48px;
+  background: #f5f7fb;
+  color: #182235;
+}
+
+.header {
+  align-items: flex-end;
+  margin-bottom: 22px;
+}
+
+.headerLeft .title {
+  color: #10213d;
+  font-size: 30px;
+  letter-spacing: -0.3px;
+}
+
+.headerLeft .subtitle,
+.pageMonthLabel,
+.filterLabel,
+.summaryItemLabel,
+.monthSummaryLabel {
+  color: #64748b;
+}
+
+.headerActions {
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.scopeToggle,
+.tabs,
+.filterGroup,
+.monthSelector {
+  background: #fff;
+  border: 1px solid #dbe3ef;
+  box-shadow: 0 2px 8px rgba(24, 34, 53, 0.04);
+}
+
+.scopeBtn,
+.tab,
+.filterBtn,
+.monthBtn {
+  color: #64748b;
+}
+
+.scopeBtn:hover,
+.tab:hover,
+.filterBtn:hover,
+.monthBtn:hover {
+  color: #16345f;
+  background: #f1f6fc;
+}
+
+.scopeBtnActive,
+.tabActive,
+.filterBtnActive,
+.monthBtnActive {
+  background: #f5a000;
+  color: #182235;
+  box-shadow: none;
+}
+
+.scopeBtnActive:hover,
+.tabActive:hover,
+.filterBtnActive:hover,
+.monthBtnActive:hover {
+  background: #df8e00;
+  color: #182235;
+}
+
+.tabs {
+  width: 100%;
+  margin-bottom: 18px;
+  padding: 3px;
+}
+
+.tab {
+  flex: 0 1 auto;
+  padding: 10px 18px;
+}
+
+.pageMonthFilter {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(24, 34, 53, 0.04);
+}
+
+.pageMonthSelect,
+.searchInput,
+.formInput,
+.formSelect,
+.formTextarea {
+  background: #fff;
+  border-color: #cfd9e7;
+  color: #182235;
+}
+
+.pageMonthSelect:focus,
+.searchInput:focus,
+.formInput:focus,
+.formSelect:focus,
+.formTextarea:focus {
+  border-color: #f5a000;
+  box-shadow: 0 0 0 3px rgba(245, 160, 0, 0.14);
+}
+
+.summaryBar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0;
+  margin-bottom: 20px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.summaryBar > .summaryItem {
+  min-width: 0;
+  padding: 18px 20px;
+  border: 1px solid #dbe3ef;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 3px 12px rgba(24, 34, 53, 0.05);
+}
+
+.summaryItemValue,
+.monthSummaryValue {
+  color: #182235;
+  font-size: 24px;
+}
+
+.green {
+  color: #168a57;
+}
+.red {
+  color: #d34b55;
+}
+.amber {
+  color: #c17a00;
+}
+.blue {
+  color: #b56800;
+}

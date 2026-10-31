@@ -1,0 +1,68 @@
+@use 'variables' as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root,
+html[data-theme='dark'] {
+  --bg-primary: #0a0f1e;
+  --bg-secondary: #111827;
+  --bg-tertiary: #1f2937;
+  --bg-input: #151c2c;
+  --bg-card: #111827;
+  --bg-elevated: #1a2234;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-faint: rgba(255, 255, 255, 0.03);
+}
+
+html[data-theme='light'] {
+  --bg-primary: #f4f6f9;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  --bg-input: #f0f3f8;
+  --bg-card: #ffffff;
+  --bg-elevated: #fafbfd;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --border: #e2e8f0;
+  --border-subtle: rgba(226, 232, 240, 0.6);
+  --border-faint: rgba(226, 232, 240, 0.5);
+}
+
+html.theme-switching * {
+  transition:
+    background-color 0.25s ease,
+    color 0.2s ease,
+    border-color 0.2s ease !important;
+}
+
+body {
+  font-family: $font-family;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+input,
+textarea {
+  font-family: inherit;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}

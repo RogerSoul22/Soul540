@@ -1,0 +1,79 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.menuTable {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  font-size: 12px;
+
+  font-family: Arial, sans-serif;
+
+  th {
+    background: #f3f4f6;
+
+    font-weight: 700;
+
+    color: #374151;
+
+    padding: 7px 10px;
+
+    text-align: left;
+
+    border: 1px solid #d1d5db;
+  }
+
+  td {
+    padding: 6px 10px;
+
+    border: 1px solid #e5e7eb;
+
+    color: #374151;
+
+    vertical-align: top;
+
+    line-height: 1.4;
+  }
+
+  tr:nth-child(even) td {
+    background: #f9fafb;
+  }
+}
+
+.annexObs {
+  font-size: 11px;
+
+  color: #6b7280;
+
+  margin-top: 16px;
+
+  font-style: italic;
+
+  font-family: Arial, sans-serif;
+
+  line-height: 1.6;
+}
+
+// ——— Print styles ———
+@media print {
+  .overlay {
+    position: static;
+
+    background: white;
+  }
+
+  .topBar {
+    display: none;
+  }
+
+  .scrollArea {
+    padding: 0;
+    background: white;
+  }
+
+  .paper {
+    box-shadow: none;
+    max-width: 100%;
+  }
+}

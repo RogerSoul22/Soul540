@@ -1,0 +1,126 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.finalizedItens {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+
+  @include text-ellipsis;
+}
+
+.finalizedRight {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-md;
+
+  flex-shrink: 0;
+}
+
+.finalizedCost {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  color: $text-secondary;
+
+  white-space: nowrap;
+}
+
+// Kanban
+.kanban {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: $spacing-lg;
+
+  align-items: start;
+
+  margin-bottom: $spacing-xl;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.column {
+  background: $bg-secondary;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-lg;
+
+  overflow: hidden;
+}
+
+.columnHeader {
+  @include flex-between;
+
+  padding: $spacing-md $spacing-md;
+
+  border-bottom: 1px solid $border;
+}
+
+.columnTitle {
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-secondary;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+}
+
+.columnCount {
+  font-size: $font-size-xs;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  border-radius: $radius-full;
+
+  padding: 2px 8px;
+
+  color: $text-muted;
+}
+
+.columnBody {
+  padding: $spacing-sm;
+
+  min-height: 200px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-lg;
+
+  transition:
+    background $transition-fast,
+    outline $transition-fast;
+
+  border-radius: $radius-sm;
+}
+
+.columnBodyOver {
+  background: rgba(245, 158, 11, 0.06);
+
+  outline: 2px dashed rgba(245, 158, 11, 0.35);
+
+  outline-offset: -4px;
+}
+
+.colEmpty {
+  text-align: center;
+
+  padding: $spacing-xl $spacing-md;
+
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+}

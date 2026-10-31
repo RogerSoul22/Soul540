@@ -1,0 +1,48 @@
+.editButton,
+.deleteButton {
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.editButton {
+  flex: 1;
+  border: 1px solid var(--border);
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+}
+
+.editButton:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.deleteButton {
+  border: 0;
+  padding: 8px 12px;
+  background: rgba(239, 68, 68, 0.08);
+  color: #f87171;
+}
+
+.deleteButton:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.empty {
+  padding: 64px;
+  color: #64748b;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

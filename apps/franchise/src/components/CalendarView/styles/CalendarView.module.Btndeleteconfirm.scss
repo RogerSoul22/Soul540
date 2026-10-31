@@ -1,0 +1,126 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.btnDeleteConfirm {
+  flex: 1;
+
+  padding: 9px $spacing-md;
+
+  border-radius: $radius-sm;
+
+  border: none;
+
+  background: $danger;
+
+  color: #fff;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  cursor: pointer;
+
+  transition: all $transition-base;
+
+  &:hover {
+    filter: brightness(1.1);
+  }
+}
+
+// section
+.formRow {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: $spacing-md $spacing-lg;
+
+  align-items: start;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formField {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+.formLabel {
+  font-size: 10px;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.8px;
+
+  line-height: 1.2;
+}
+
+.formInput,
+.formSelect,
+.formTextarea {
+  width: 100%;
+
+  min-height: 40px;
+
+  box-sizing: border-box;
+
+  padding: 10px 12px;
+
+  background: $bg-input;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  color: $text-primary;
+
+  font-size: $font-size-sm;
+
+  font-family: $font-family;
+
+  transition: all $transition-base;
+
+  &:focus {
+    outline: none;
+
+    border-color: $accent;
+
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.08);
+  }
+}
+
+.formTextarea {
+  resize: vertical;
+
+  min-height: 80px;
+}
+
+.statusToggle {
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 6px;
+
+  padding: 4px;
+
+  background: rgba(255, 255, 255, 0.035);
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  @include mobile {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

@@ -1,0 +1,152 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.paymentMethodProgress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #f5a000;
+}
+
+.financeInsightsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.financeRankingList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.financeRankingItem {
+  min-width: 0;
+}
+
+.financeRankingItem > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.financeRankingItem span {
+  overflow: hidden;
+  color: #40516a;
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.financeRankingItem small {
+  flex-shrink: 0;
+  color: #718096;
+  font-size: 10px;
+}
+
+.financeRankingItem > strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.financeRankingTrack {
+  height: 4px;
+  margin-top: 7px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: #e7edf5;
+}
+
+.financeRankingTrack > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #22a66f;
+}
+
+.financeRankingTrack > .expenseTrack {
+  background: #dc5962;
+}
+
+.financeRankingItemButton {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.financeRankingItemButton:hover .financeRankingItem span {
+  color: #a85f00;
+}
+
+.originCards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.originCards > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid #e1e8f1;
+  border-radius: 5px;
+  background: #f8fafc;
+}
+
+.originCards span {
+  overflow: hidden;
+  color: #64748b;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.originCards strong {
+  overflow: hidden;
+  color: #168a57;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.originCards small {
+  color: #718096;
+  font-size: 10px;
+}
+
+.commissionSection {
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.commissionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.commissionGrid button {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid #e1e8f1;
+  border-radius: 5px;
+  background: #f8fafc;
+  text-align: left;
+  cursor: pointer;
+}

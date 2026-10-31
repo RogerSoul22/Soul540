@@ -1,0 +1,126 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.brandingTitle {
+  font-family: $font-display;
+
+  font-size: 3.2rem;
+
+  font-weight: $font-weight-semibold;
+
+  font-style: italic;
+
+  color: $text-primary;
+
+  margin-bottom: $spacing-md;
+
+  line-height: 1.1;
+
+  letter-spacing: -0.5px;
+}
+
+.brandingHighlight {
+  background: linear-gradient(135deg, $accent, #f97316);
+
+  -webkit-background-clip: text;
+
+  -webkit-text-fill-color: transparent;
+
+  background-clip: text;
+}
+
+.brandingDescription {
+  font-size: $font-size-base;
+
+  color: $text-muted;
+
+  line-height: 1.7;
+}
+
+.brandingFeatures {
+  margin-top: $spacing-2xl;
+
+  @include flex-column;
+
+  gap: $spacing-lg;
+}
+
+.feature {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-md;
+
+  text-align: left;
+
+  padding: $spacing-md;
+
+  border-radius: $radius-md;
+
+  border: 1px solid transparent;
+
+  transition: all $transition-smooth;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.02);
+
+    border-color: $border;
+  }
+}
+
+.featureIcon {
+  @include flex-center;
+
+  width: 44px;
+
+  height: 44px;
+
+  min-width: 44px;
+
+  background: rgba($accent, 0.08);
+
+  border: 1px solid rgba($accent, 0.12);
+
+  color: $accent;
+
+  border-radius: $radius-md;
+
+  font-weight: $font-weight-bold;
+
+  font-size: $font-size-xs;
+}
+
+.featureText {
+  font-size: $font-size-sm;
+
+  color: $text-secondary;
+
+  line-height: 1.5;
+}
+
+// Lado direito - Formulario
+.formSide {
+  flex: 1;
+
+  @include flex-center;
+
+  flex-direction: column;
+
+  padding: $spacing-2xl;
+
+  background: $bg-primary;
+
+  @include mobile {
+    padding: $spacing-lg;
+  }
+}
+
+.formContainer {
+  width: 100%;
+
+  max-width: 380px;
+
+  animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}

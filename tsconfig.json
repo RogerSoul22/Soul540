@@ -15,14 +15,13 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
-    "ignoreDeprecations": "5.0",
-    "baseUrl": ".",
-    "paths": {
-      "@frontend/*": ["src/frontend/*"],
-      "@backend/*": ["src/backend/*"],
-      "@shared/*": ["shared/*"]
-    }
+    "ignoreDeprecations": "5.0"
   },
-  "include": ["src", "server"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "files": [],
+  "references": [
+    { "path": "./apps/api" },
+    { "path": "./apps/factory" },
+    { "path": "./apps/franchise" },
+    { "path": "./apps/main" }
+  ]
 }

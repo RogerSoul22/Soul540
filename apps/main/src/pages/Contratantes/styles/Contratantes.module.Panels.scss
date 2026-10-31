@@ -1,0 +1,126 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.btnIconDanger {
+  &:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+}
+
+.btnIconWhatsapp {
+  text-decoration: none;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color: #25d366;
+
+  &:hover {
+    background: rgba(37, 211, 102, 0.1);
+    color: #25d366;
+    border-color: rgba(37, 211, 102, 0.3);
+  }
+}
+
+.cardDetail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: $font-size-xs;
+  color: $text-secondary;
+  @include text-ellipsis;
+  svg {
+    flex-shrink: 0;
+    color: $text-muted;
+  }
+}
+
+.cardCategory {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.empty {
+  text-align: center;
+  padding: $spacing-3xl;
+  color: $text-muted;
+  font-size: $font-size-sm;
+}
+
+// section
+.btnPrimary {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: 10px $spacing-md;
+  background: $accent;
+  color: #0a0f1e;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  border: none;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: background $transition-fast;
+  white-space: nowrap;
+  &:hover {
+    background: $accent-hover;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btnCancel {
+  padding: 10px $spacing-md;
+  background: none;
+  border: none;
+  color: $text-muted;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.btnExport {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px $spacing-md;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all $transition-fast;
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: $text-primary;
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+// section
+.exportInfo {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  margin-bottom: $spacing-md;
+}
+
+.exportColsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  margin-bottom: $spacing-md;
+}

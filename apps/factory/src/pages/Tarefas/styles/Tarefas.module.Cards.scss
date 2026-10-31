@@ -1,0 +1,112 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.printMetaItem {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 2px;
+
+  background: $bg-card;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  padding: $spacing-sm $spacing-md;
+
+  span {
+    font-size: $font-size-xs;
+
+    color: $text-muted;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.4px;
+  }
+
+  strong {
+    font-size: $font-size-sm;
+
+    color: $text-primary;
+
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.printTable {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  font-size: $font-size-sm;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  overflow: hidden;
+
+  th {
+    padding: 8px 12px;
+
+    text-align: left;
+
+    font-size: $font-size-xs;
+
+    font-weight: $font-weight-medium;
+
+    color: $text-muted;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.4px;
+
+    background: rgba(255, 255, 255, 0.03);
+
+    border-bottom: 1px solid $border;
+  }
+
+  td {
+    padding: 8px 12px;
+
+    color: $text-secondary;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  tfoot td {
+    border-top: 1px solid $border;
+
+    border-bottom: none;
+
+    color: $text-primary;
+
+    background: rgba(255, 255, 255, 0.02);
+
+    padding-top: 10px;
+  }
+
+  th:not(:first-child),
+  td:not(:first-child) {
+    text-align: right;
+  }
+}
+
+.printFooter {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+
+  text-align: right;
+
+  padding-top: $spacing-sm;
+
+  border-top: 1px solid $border;
+
+  strong {
+    color: $text-primary;
+  }
+}

@@ -1,0 +1,131 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.panelTitle {
+  font-family: $font-display;
+
+  font-size: $font-size-xl;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+
+  letter-spacing: -0.3px;
+
+  line-height: 1.2;
+
+  margin: 0;
+}
+
+.statusBadge {
+  display: inline-flex;
+
+  align-items: center;
+
+  font-size: 11px;
+
+  font-weight: $font-weight-semibold;
+
+  padding: 3px 10px;
+
+  border-radius: $radius-full;
+
+  border: 1px solid transparent;
+
+  width: fit-content;
+
+  letter-spacing: 0.2px;
+}
+
+.closeBtn {
+  @include flex-center;
+
+  width: 30px;
+
+  height: 30px;
+
+  border-radius: $radius-sm;
+
+  border: none;
+
+  background: none;
+
+  color: $text-muted;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+
+    color: $text-primary;
+  }
+}
+
+.panelBody {
+  padding: $spacing-xl;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-md;
+}
+
+.panelActions {
+  display: flex;
+
+  gap: $spacing-sm;
+
+  padding: $spacing-md $spacing-lg;
+
+  border-top: 1px solid $border;
+
+  position: sticky;
+
+  bottom: 0;
+
+  background: $bg-card;
+
+  z-index: 1;
+}
+
+// section
+.detailSection {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-lg;
+
+  padding: $spacing-xl 0;
+
+  border-bottom: 1px solid $border;
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.detailSectionTitle {
+  font-size: 10px;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.8px;
+
+  margin-bottom: -$spacing-xs;
+}

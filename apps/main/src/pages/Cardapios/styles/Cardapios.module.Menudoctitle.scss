@@ -1,0 +1,123 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.menuDocTitle {
+  font-size: 20px;
+
+  font-weight: 800;
+
+  color: #fff;
+
+  text-transform: uppercase;
+
+  letter-spacing: 2px;
+
+  background: #8b1a1a;
+
+  display: inline-block;
+
+  padding: 4px 20px;
+
+  border-radius: 2px;
+}
+
+.menuDocSub {
+  font-size: 12px;
+
+  color: rgba(255, 255, 255, 0.45);
+
+  margin-top: 8px;
+
+  font-style: italic;
+}
+
+.menuDocBody {
+  padding: 24px 28px 32px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 24px;
+
+  @include mobile {
+    padding: 16px;
+  }
+}
+
+.menuDocSection {
+}
+
+.menuDocCatTitle {
+  font-size: 13px;
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1.5px;
+
+  background: #8b1a1a;
+
+  color: #fff;
+
+  display: inline-block;
+
+  padding: 4px 14px;
+
+  border-radius: 2px;
+
+  margin-bottom: 16px;
+}
+
+.menuDocCatSweet {
+  background: #7c3aed;
+}
+
+.menuDocItems {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 16px;
+}
+
+.menuDocItem {
+  padding-bottom: 16px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.menuDocItemHeader {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  align-items: baseline;
+
+  gap: 6px;
+
+  margin-bottom: 4px;
+}
+
+.menuDocItemName {
+  font-size: 14px;
+
+  font-weight: 700;
+
+  color: #fff;
+}
+
+.menuDocItemSub {
+  font-size: 11px;
+
+  color: rgba(255, 255, 255, 0.4);
+
+  font-style: italic;
+}

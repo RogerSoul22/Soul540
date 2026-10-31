@@ -1,0 +1,16 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.deleteConfirmText {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+
+  line-height: 1.5;
+
+  margin: 0;
+
+  strong {
+    color: $text-secondary;
+  }
+}

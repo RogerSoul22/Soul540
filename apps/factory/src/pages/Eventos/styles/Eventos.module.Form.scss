@@ -1,0 +1,104 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.section {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-lg;
+
+  min-width: 0;
+}
+
+.sectionEmpty {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+
+  padding: $spacing-lg 0;
+}
+
+.sectionTitle {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.6px;
+
+  padding-bottom: $spacing-xs;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+// Status toggle no form
+.statusToggle {
+  display: flex;
+
+  gap: $spacing-sm;
+
+  margin-bottom: $spacing-md;
+}
+
+.statusBtn {
+  flex: 1;
+
+  padding: $spacing-sm $spacing-md;
+
+  border-radius: $radius-md;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  background: transparent;
+
+  color: $text-secondary;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+
+    color: $text-primary;
+  }
+}
+
+.statusBtnActive {
+  background: $accent;
+
+  border-color: $accent;
+
+  color: white;
+
+  &:hover {
+    background: $accent;
+
+    color: white;
+  }
+}
+
+// Grid
+.grid {
+  display: grid;
+
+  grid-template-columns: 1fr;
+
+  gap: $spacing-md;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,145 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// section
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: $spacing-md;
+  backdrop-filter: blur(4px);
+}
+.modal {
+  background: $bg-secondary;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: $shadow-lg;
+}
+.modalHeader {
+  @include flex-between;
+  padding: $spacing-lg $spacing-xl;
+  border-bottom: 1px solid $border;
+  position: sticky;
+  top: 0;
+  background: $bg-secondary;
+  z-index: 1;
+}
+.modalTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+.modalClose {
+  @include flex-center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  color: $text-muted;
+  border-radius: $radius-xs;
+  cursor: pointer;
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: $text-primary;
+  }
+}
+.modalBody {
+  padding: $spacing-xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+.modalFooter {
+  @include flex-between;
+  padding: $spacing-md $spacing-xl;
+  border-top: 1px solid $border;
+}
+
+.formGrid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-md;
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.label {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.input {
+  background: $bg-input;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 10px 12px;
+  font-size: $font-size-sm;
+  color: $text-primary;
+  transition: border-color $transition-fast;
+  font-family: inherit;
+  &::placeholder {
+    color: $text-muted;
+  }
+  &:focus {
+    outline: none;
+    border-color: $border-accent;
+  }
+}
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+// section
+.dayPicker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.dayBtn {
+  padding: 9px 4px;
+  background: $bg-input;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  color: $text-secondary;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all $transition-fast;
+  text-align: center;
+  letter-spacing: 0.3px;
+  font-family: inherit;
+  &:hover {
+    border-color: $border-accent;
+    color: $text-primary;
+  }
+}
+
+.dayBtnActive {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: #4ade80;
+}
+
+// section
+.skillsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

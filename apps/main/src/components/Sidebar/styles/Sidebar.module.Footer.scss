@@ -1,0 +1,107 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.navLabel {
+  line-height: 1;
+
+  @include mobile {
+    font-size: 10px;
+  }
+}
+
+.footer {
+  padding: $spacing-md;
+
+  border-top: 1px solid $border-subtle;
+
+  flex-shrink: 0;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+.userInfo {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-sm;
+}
+
+.avatar {
+  @include flex-center;
+
+  width: 34px;
+
+  height: 34px;
+
+  border-radius: $radius-full;
+
+  background: linear-gradient(135deg, $accent, #f97316);
+
+  color: $bg-primary;
+
+  font-weight: $font-weight-bold;
+
+  font-size: $font-size-sm;
+
+  flex-shrink: 0;
+
+  box-shadow: 0 0 12px rgba($accent, 0.3);
+}
+
+.userDetails {
+  flex: 1;
+
+  min-width: 0;
+}
+
+.userName {
+  font-size: 13px;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+
+  @include text-ellipsis;
+}
+
+.userRole {
+  font-size: 11px;
+
+  color: $text-muted;
+
+  text-transform: capitalize;
+
+  margin-top: 1px;
+}
+
+.logoutBtn {
+  @include flex-center;
+
+  width: 30px;
+
+  height: 30px;
+
+  border-radius: $radius-sm;
+
+  background: none;
+
+  border: none;
+
+  color: $text-muted;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba($danger, 0.1);
+
+    color: $danger;
+  }
+}

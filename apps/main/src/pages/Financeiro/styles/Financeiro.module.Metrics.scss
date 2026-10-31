@@ -1,0 +1,118 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.monthBtn {
+  padding: 6px 14px;
+
+  border-radius: $radius-xs;
+
+  border: none;
+
+  background: none;
+
+  color: $text-muted;
+
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  transition: all $transition-base;
+
+  white-space: nowrap;
+
+  &:hover {
+    color: $text-primary;
+
+    background: rgba(255, 255, 255, 0.04);
+  }
+}
+
+.monthBtnActive {
+  background: $accent;
+
+  color: $bg-primary;
+
+  font-weight: $font-weight-semibold;
+
+  box-shadow: 0 1px 4px rgba($accent, 0.3);
+
+  &:hover {
+    background: $accent-hover;
+
+    color: $bg-primary;
+  }
+}
+
+// Monthly Summary Bar (Revenue - Expenses = Profit)
+.monthSummary {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-md;
+
+  margin-bottom: $spacing-xl;
+
+  flex-wrap: wrap;
+
+  justify-content: center;
+
+  @include mobile {
+    flex-direction: column;
+  }
+}
+
+.monthSummaryItem {
+  @include card;
+
+  padding: $spacing-md $spacing-xl;
+
+  text-align: center;
+
+  min-width: 160px;
+
+  flex: 1;
+}
+
+.monthRevenue {
+  border-top: 3px solid #4ade80;
+}
+
+.monthExpense {
+  border-top: 3px solid #f87171;
+}
+
+.monthProfit {
+  border-top: 3px solid #4ade80;
+}
+
+.monthLoss {
+  border-top: 3px solid #f87171;
+}
+
+.monthSummaryLabel {
+  display: block;
+
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-medium;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  margin-bottom: 6px;
+}
+
+.monthSummaryValue {
+  font-size: $font-size-xl;
+
+  font-weight: $font-weight-bold;
+
+  color: $text-primary;
+}

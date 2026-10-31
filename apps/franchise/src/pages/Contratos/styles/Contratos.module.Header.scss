@@ -1,0 +1,128 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.cellClient {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+
+  @include text-ellipsis;
+}
+
+.cellDesc {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+
+  margin-top: 2px;
+
+  @include text-ellipsis;
+}
+
+// Cell: event + dates (col 2)
+.cellMeta {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+
+  min-width: 0;
+
+  @include tablet {
+    display: none;
+  }
+
+  @include mobile {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+}
+
+.cellEvent {
+  display: inline-flex;
+
+  align-items: center;
+
+  font-size: $font-size-xs;
+
+  color: $accent;
+
+  background: rgba($accent, 0.08);
+
+  padding: 2px 8px;
+
+  border-radius: $radius-full;
+
+  @include text-ellipsis;
+
+  max-width: 100%;
+}
+
+.cellDates {
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+}
+
+.dateSep {
+  color: $text-muted;
+
+  opacity: 0.5;
+}
+
+// Cell: value (col 3)
+.cellValue {
+  font-size: $font-size-base;
+
+  font-weight: $font-weight-bold;
+
+  color: $text-primary;
+
+  letter-spacing: -0.3px;
+
+  @include mobile {
+    font-size: $font-size-lg;
+  }
+}
+
+// Cell: actions (col 4)
+.cellActions {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  justify-content: flex-end;
+
+  @include mobile {
+    justify-content: flex-start;
+    padding-top: $spacing-sm;
+    border-top: 1px solid $border;
+  }
+}
+
+// Mobile row header
+.rowMobileTop {
+  display: none;
+
+  @include mobile {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+  }
+}

@@ -1,0 +1,104 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.wrapper {
+  @include card;
+
+  overflow: hidden;
+
+  animation: fadeIn 0.25s ease;
+}
+
+.wrapperDay {
+  animation: slideInDay 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInDay {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// section
+.header {
+  @include flex-between;
+
+  padding: $spacing-lg $spacing-lg $spacing-md;
+
+  border-bottom: 1px solid $border;
+}
+
+.monthTitle {
+  font-family: $font-display;
+
+  font-size: $font-size-2xl;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+
+  letter-spacing: -0.5px;
+
+  text-transform: capitalize;
+}
+
+.monthYear {
+  font-family: $font-family;
+
+  font-size: $font-size-xl;
+
+  font-weight: $font-weight-normal;
+
+  color: $text-muted;
+}
+
+.headerRight {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-sm;
+}
+
+.todayBtn {
+  padding: 6px 14px;
+
+  border-radius: $radius-sm;
+
+  border: 1px solid $border;
+
+  background: transparent;
+
+  color: $text-secondary;
+
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  letter-spacing: 0.2px;
+
+  &:hover {
+    border-color: $accent;
+
+    color: $accent;
+
+    background: rgba($accent, 0.06);
+  }
+}
+
+.navBtns {
+  display: flex;
+
+  gap: 2px;
+}

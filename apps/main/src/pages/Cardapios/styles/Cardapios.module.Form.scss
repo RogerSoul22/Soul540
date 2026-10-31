@@ -1,0 +1,153 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.modalFooter {
+  @include flex-between;
+  padding: $spacing-md $spacing-xl;
+  border-top: 1px solid $border;
+  position: sticky;
+  bottom: 0;
+  background: $bg-secondary;
+  z-index: 1;
+}
+
+.formGrid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-md;
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.input {
+  background: $bg-input;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  padding: 10px 12px;
+  font-size: $font-size-sm;
+  color: $text-primary;
+  transition: border-color $transition-fast;
+  font-family: inherit;
+  &::placeholder {
+    color: $text-muted;
+  }
+  &:focus {
+    outline: none;
+    border-color: $border-accent;
+  }
+}
+
+// Categories editor
+.categoriesSection {
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+  overflow: hidden;
+}
+
+.categoriesHeader {
+  @include flex-between;
+  padding: $spacing-md;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid $border;
+}
+
+.categoriesTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.btnAddCat {
+  padding: 6px 12px;
+  background: rgba($accent, 0.1);
+  border: 1px solid $border-accent;
+  border-radius: $radius-xs;
+  color: $accent;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  &:hover {
+    background: rgba($accent, 0.2);
+  }
+}
+
+.catBlock {
+  padding: $spacing-md;
+  border-bottom: 1px solid $border;
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.catBlockHeader {
+  @include flex-between;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+}
+
+.catNameInput {
+  flex: 1;
+  background: $bg-input;
+  border: 1px solid $border;
+  border-radius: $radius-xs;
+  padding: 6px 10px;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  &:focus {
+    outline: none;
+    border-color: $border-accent;
+  }
+}
+
+.btnRemoveCat {
+  @include flex-center;
+  width: 28px;
+  height: 28px;
+  background: rgba(239, 68, 68, 0.1);
+  border: none;
+  border-radius: $radius-xs;
+  color: #f87171;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.itemRow {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 80px 28px;
+  gap: 6px;
+  margin-bottom: 6px;
+  align-items: center;
+}
+
+.itemInput {
+  background: $bg-input;
+  border: 1px solid $border;
+  border-radius: $radius-xs;
+  padding: 6px 8px;
+  font-size: $font-size-xs;
+  color: $text-primary;
+  &::placeholder {
+    color: $text-muted;
+  }
+  &:focus {
+    outline: none;
+    border-color: $border-accent;
+  }
+}

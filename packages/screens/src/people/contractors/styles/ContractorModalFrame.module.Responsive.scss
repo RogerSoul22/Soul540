@@ -1,0 +1,22 @@
+@media (max-width: 600px) {
+  .overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .modal {
+    max-height: 88vh;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+  .body {
+    padding: 16px;
+  }
+  .header,
+  .footer {
+    padding: 14px 16px;
+  }
+  .twoColumns,
+  .detailsGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,68 @@
+.configuredBanner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 72px;
+  padding: 12px 16px;
+  border: 1px solid #a9cbed;
+  border-radius: 10px;
+  background: #e5f1fe;
+  color: #1265ab;
+}
+
+.configuredBanner strong,
+.configuredBanner span {
+  display: block;
+}
+
+.configuredBanner strong {
+  margin-bottom: 5px;
+  font-size: 15px;
+}
+
+.configuredBanner span {
+  font-size: 13px;
+}
+
+.bannerIcon {
+  font-size: 28px !important;
+  transform: rotate(45deg);
+}
+
+.metadata {
+  display: grid;
+  gap: 17px;
+  margin: 19px 0 18px;
+}
+
+.metadata div {
+  display: grid;
+  gap: 5px;
+}
+
+.metadata dt {
+  color: #766e62;
+  font-size: 13px;
+}
+
+.metadata dd {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.metadata dd strong {
+  margin-right: 4px;
+}
+
+.daysOk {
+  color: #16833e;
+}
+
+.daysWarning {
+  color: #b66a00;
+}
+
+.daysExpired {
+  color: #c51d1d;
+}

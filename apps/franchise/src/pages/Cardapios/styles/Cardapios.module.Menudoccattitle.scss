@@ -1,0 +1,124 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.menuDocCatTitle {
+  font-size: 13px;
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 1.5px;
+
+  background: #8b1a1a;
+
+  color: #fff;
+
+  display: inline-block;
+
+  padding: 4px 14px;
+
+  border-radius: 2px;
+
+  margin-bottom: 16px;
+}
+
+.menuDocCatSweet {
+  background: #7c3aed;
+}
+
+.menuDocItems {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 16px;
+}
+
+.menuDocItem {
+  padding-bottom: 16px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+}
+
+.menuDocItemHeader {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  align-items: baseline;
+
+  gap: 6px;
+
+  margin-bottom: 4px;
+}
+
+.menuDocItemName {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.menuDocItemSub {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+}
+
+.menuDocItemDesc {
+  font-size: 12px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+.menuDocItemHarm {
+  font-size: 11px;
+
+  color: rgba(255, 255, 255, 0.35);
+
+  margin: 6px 0 0;
+
+  font-style: italic;
+
+  line-height: 1.5;
+
+  strong {
+    color: rgba(255, 255, 255, 0.5);
+    font-style: normal;
+  }
+}
+
+.menuDocObs {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 8px;
+
+  font-size: 11px;
+
+  color: rgba(255, 255, 255, 0.35);
+
+  font-style: italic;
+
+  padding: 12px 14px;
+
+  background: rgba(255, 255, 255, 0.03);
+
+  border-radius: $radius-xs;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: $accent;
+  }
+}

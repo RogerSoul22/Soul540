@@ -1,0 +1,121 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.unitFilterBtn {
+  padding: 5px 14px;
+
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-medium;
+
+  color: $text-muted;
+
+  background: none;
+
+  border: none;
+
+  border-radius: calc(#{$radius-sm} - 2px);
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  &:hover {
+    color: $text-primary;
+
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  @include mobile {
+    flex: 1;
+
+    text-align: center;
+
+    padding: 5px 8px;
+  }
+}
+
+.unitFilterBtnActive {
+  background: $accent;
+
+  color: #0a0f1e;
+
+  font-weight: $font-weight-semibold;
+
+  &:hover {
+    background: $accent-hover;
+
+    color: #0a0f1e;
+  }
+}
+
+// Legend
+.legend {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-lg;
+
+  margin-bottom: $spacing-sm;
+
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+
+  font-weight: $font-weight-medium;
+}
+
+.legendDot {
+  width: 8px;
+
+  height: 8px;
+
+  border-radius: 50%;
+
+  flex-shrink: 0;
+}
+
+// Sections
+.sectionsGrid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: $spacing-md;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+.section {
+  @include card;
+
+  padding: $spacing-lg;
+}
+
+.sectionHeader {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: $spacing-lg;
+
+  padding-bottom: $spacing-md;
+
+  border-bottom: 1px solid $border;
+}

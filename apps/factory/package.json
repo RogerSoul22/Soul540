@@ -1,0 +1,19 @@
+{
+  "name": "@soul540/portal-factory",
+  "private": true,
+  "version": "0.1.0",
+  "dependencies": {
+    "@soul540/api-client": "workspace:*",
+    "@soul540/contracts": "workspace:*",
+    "@soul540/domain": "workspace:*",
+    "@soul540/screens": "workspace:*",
+    "@soul540/ui": "workspace:*"
+  },
+  "scripts": {
+    "build": "cd ../.. && vite build --config apps/factory/vite.config.ts",
+    "dev": "cd ../.. && vite --config apps/factory/vite.config.ts",
+    "preview": "cd ../.. && vite preview --config apps/factory/vite.config.ts"
+  }
+}
+
+

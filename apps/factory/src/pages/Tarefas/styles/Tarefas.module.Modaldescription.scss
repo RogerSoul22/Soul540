@@ -1,0 +1,129 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.modalDescription {
+  margin: 0;
+
+  color: $text-secondary;
+
+  font-size: $font-size-sm;
+
+  line-height: 1.5;
+}
+
+.formError {
+  display: block;
+
+  margin-top: 6px;
+
+  color: #f87171;
+
+  font-size: $font-size-xs;
+}
+
+.modalActions {
+  display: flex;
+
+  justify-content: flex-end;
+
+  align-items: center;
+
+  gap: $spacing-sm;
+}
+
+// Modal
+.overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.7);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  z-index: 100;
+
+  padding: $spacing-md;
+
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  background: $bg-secondary;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-lg;
+
+  width: 100%;
+
+  max-width: 500px;
+
+  box-shadow: $shadow-lg;
+}
+
+.modalHeader {
+  @include flex-between;
+
+  padding: $spacing-lg $spacing-xl;
+
+  border-bottom: 1px solid $border;
+}
+
+.modalTitle {
+  font-size: $font-size-lg;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+}
+
+.modalClose {
+  @include flex-center;
+
+  width: 32px;
+
+  height: 32px;
+
+  background: none;
+
+  border: none;
+
+  color: $text-muted;
+
+  border-radius: $radius-xs;
+
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: $text-primary;
+  }
+}
+
+.modalBody {
+  padding: $spacing-xl;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-md;
+
+  max-height: 80vh;
+
+  overflow-y: auto;
+}
+
+.modalFooter {
+  @include flex-between;
+
+  padding: $spacing-md $spacing-xl;
+
+  border-top: 1px solid $border;
+}

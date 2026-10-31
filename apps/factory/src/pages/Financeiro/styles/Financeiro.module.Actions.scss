@@ -1,0 +1,129 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.categoryTag {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  font-size: $font-size-xs;
+}
+
+.categoryDot {
+  width: 8px;
+
+  height: 8px;
+
+  border-radius: 50%;
+
+  flex-shrink: 0;
+}
+
+.actionBtn {
+  @include flex-center;
+
+  width: 30px;
+
+  height: 30px;
+
+  border-radius: $radius-xs;
+
+  background: none;
+
+  border: none;
+
+  color: $text-muted;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.06);
+
+    color: $text-primary;
+  }
+}
+
+.actionBtnDanger {
+  &:hover {
+    background: rgba($danger, 0.1);
+
+    color: $danger;
+  }
+}
+
+.emptyState {
+  text-align: center;
+
+  padding: $spacing-3xl;
+
+  color: $text-muted;
+
+  font-size: $font-size-sm;
+}
+
+.tableNote {
+  text-align: center;
+
+  padding: $spacing-md;
+
+  color: $text-muted;
+
+  font-size: $font-size-xs;
+}
+
+.pagination {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: $spacing-md;
+
+  padding: $spacing-lg 0;
+
+  color: $text-secondary;
+
+  font-size: $font-size-sm;
+}
+
+.pageBtn {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  min-height: 34px;
+
+  padding: 0 $spacing-md;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  background: $bg-card;
+
+  color: $text-secondary;
+
+  font: inherit;
+
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: $accent;
+
+    color: $accent;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+
+    cursor: not-allowed;
+  }
+}

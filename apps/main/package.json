@@ -1,0 +1,17 @@
+{
+  "name": "@soul540/portal-main",
+  "private": true,
+  "version": "0.1.0",
+  "dependencies": {
+    "@soul540/api-client": "workspace:*",
+    "@soul540/contracts": "workspace:*",
+    "@soul540/domain": "workspace:*",
+    "@soul540/screens": "workspace:*",
+    "@soul540/ui": "workspace:*"
+  },
+  "scripts": {
+    "build": "cd ../.. && vite build --config apps/main/vite.config.ts",
+    "dev": "cd ../.. && vite --config apps/main/vite.config.ts",
+    "preview": "cd ../.. && vite preview --config apps/main/vite.config.ts"
+  }
+}

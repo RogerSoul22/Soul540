@@ -1,0 +1,111 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+// section
+.receitasGrid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: $spacing-xl;
+
+  margin-bottom: $spacing-xl;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+.recipeBlock {
+  background: $bg-secondary;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-lg;
+
+  overflow: hidden;
+
+  display: flex;
+
+  flex-direction: column;
+}
+
+.blockHeader {
+  @include flex-between;
+
+  padding: $spacing-md $spacing-lg;
+
+  border-bottom: 1px solid $border;
+
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.blockTitle {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+}
+
+.blockSub {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+}
+
+// section
+.tableWrap {
+  overflow-x: auto;
+
+  flex: 1;
+}
+
+.insumosTableWrap {
+  max-height: 480px;
+
+  overflow-y: auto;
+}
+
+.table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  font-size: $font-size-sm;
+
+  thead tr {
+    border-bottom: 1px solid $border;
+  }
+
+  th {
+    padding: 8px 10px;
+
+    text-align: left;
+
+    font-size: $font-size-xs;
+
+    font-weight: $font-weight-medium;
+
+    color: $text-muted;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.4px;
+
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 4px 6px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+}

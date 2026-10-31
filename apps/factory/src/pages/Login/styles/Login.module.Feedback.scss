@@ -1,0 +1,73 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.btn {
+  background: linear-gradient(135deg, $accent, #f97316);
+
+  border: none;
+
+  border-radius: $radius-sm;
+
+  padding: 13px $spacing-xl;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  color: #fff;
+
+  font-family: $font-family;
+
+  cursor: pointer;
+
+  transition: all $transition-smooth;
+
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.22);
+
+  letter-spacing: 0.3px;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+
+    box-shadow: 0 6px 22px rgba(245, 158, 11, 0.32);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+  }
+}
+
+.errorMessage {
+  background: rgba(239, 68, 68, 0.07);
+
+  border: 1px solid rgba(239, 68, 68, 0.18);
+
+  border-radius: $radius-sm;
+
+  padding: $spacing-sm $spacing-md;
+
+  color: #f87171;
+
+  font-size: $font-size-sm;
+
+  text-align: center;
+}
+
+.footer {
+  margin-top: $spacing-2xl;
+
+  text-align: center;
+}
+
+.footerText {
+  font-size: $font-size-xs;
+
+  color: rgba(100, 116, 139, 0.45);
+}

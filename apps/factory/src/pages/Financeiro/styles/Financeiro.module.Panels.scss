@@ -1,0 +1,122 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.agendamentoValue {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+
+  min-width: 100px;
+
+  text-align: right;
+}
+
+.agendamentoStatus {
+  padding: 4px 8px;
+
+  border-radius: $radius-xs;
+
+  border: 1px solid $border;
+
+  background: $bg-input;
+
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  appearance: none;
+
+  -webkit-appearance: none;
+
+  padding-right: 24px;
+
+  $select-arrow-data: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' " +
+    "height='10' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-wi" +
+    "dth='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3" + 'E';
+  background-image: url($select-arrow-data);
+
+  background-repeat: no-repeat;
+
+  background-position: right 6px center;
+
+  &:focus {
+    outline: none;
+    border-color: $accent;
+  }
+}
+
+.statusPending {
+  color: #fbbf24;
+
+  border-color: rgba(251, 191, 36, 0.3);
+
+  background-color: rgba(251, 191, 36, 0.07);
+}
+
+.statusReceived {
+  color: #4ade80;
+
+  border-color: rgba(74, 222, 128, 0.3);
+
+  background-color: rgba(74, 222, 128, 0.07);
+}
+
+.agendamentoNoFinance {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+}
+
+// Form
+.form {
+  @include flex-column;
+
+  gap: $spacing-md;
+}
+
+.formRow {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: $spacing-md;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.formField {
+  @include flex-column;
+
+  gap: 6px;
+}
+
+.formSection {
+  padding-top: $spacing-sm;
+
+  border-top: 1px dashed $border;
+}
+
+.formLabel {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: $spacing-sm;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  color: $text-secondary;
+}

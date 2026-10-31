@@ -1,0 +1,122 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.profileEmail {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+
+  margin-top: 4px;
+}
+
+.profileStats {
+  display: flex;
+
+  gap: $spacing-xl;
+
+  @include mobile {
+    gap: $spacing-lg;
+  }
+}
+
+.stat {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 4px;
+}
+
+.statValue {
+  font-size: $font-size-2xl;
+
+  font-weight: $font-weight-bold;
+
+  color: $text-primary;
+}
+
+.statLabel {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+}
+
+// Tabs
+.tabs {
+  display: flex;
+
+  gap: 2px;
+
+  margin-bottom: $spacing-xl;
+
+  background: $bg-card;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  padding: 4px;
+
+  width: fit-content;
+
+  @include mobile {
+    width: 100%;
+
+    overflow-x: auto;
+  }
+}
+
+.tab {
+  padding: 8px 20px;
+
+  border-radius: $radius-xs;
+
+  border: none;
+
+  background: none;
+
+  color: $text-muted;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  transition: all $transition-base;
+
+  white-space: nowrap;
+
+  &:hover {
+    color: $text-primary;
+
+    background: rgba(255, 255, 255, 0.03);
+  }
+}
+
+.tabActive {
+  background: $accent;
+
+  color: $bg-primary;
+
+  font-weight: $font-weight-semibold;
+
+  box-shadow: 0 1px 4px rgba($accent, 0.3);
+
+  &:hover {
+    background: $accent-hover;
+
+    color: $bg-primary;
+  }
+}
+
+.tabContent {
+  animation: fadeIn 0.3s ease;
+}

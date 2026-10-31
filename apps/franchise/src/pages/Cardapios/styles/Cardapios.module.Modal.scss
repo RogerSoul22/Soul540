@@ -1,0 +1,144 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.btnViewMenu {
+  flex: 1;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 10px $spacing-md;
+
+  background: rgba($accent, 0.08);
+
+  border: 1px solid rgba($accent, 0.2);
+
+  border-radius: $radius-sm;
+
+  color: $accent;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba($accent, 0.15);
+    border-color: rgba($accent, 0.35);
+  }
+}
+
+.btnEdit {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 12px;
+
+  background: rgba(99, 179, 237, 0.07);
+  border: 1px solid rgba(99, 179, 237, 0.2);
+
+  border-radius: $radius-sm;
+  color: #63b3ed;
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(99, 179, 237, 0.15);
+    border-color: rgba(99, 179, 237, 0.4);
+  }
+}
+
+.btnPdf {
+  display: flex;
+
+  align-items: center;
+
+  gap: 5px;
+
+  padding: 10px 12px;
+
+  background: rgba(239, 68, 68, 0.07);
+
+  border: 1px solid rgba(239, 68, 68, 0.2);
+
+  border-radius: $radius-sm;
+
+  color: #f87171;
+
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-semibold;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  white-space: nowrap;
+
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.14);
+    border-color: rgba(239, 68, 68, 0.35);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btnPdfModal {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 6px 14px;
+
+  background: rgba(239, 68, 68, 0.1);
+
+  border: 1px solid rgba(239, 68, 68, 0.25);
+
+  border-radius: $radius-xs;
+
+  color: #f87171;
+
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-semibold;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.18);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinning {
+  animation: spin 0.8s linear infinite;
+}

@@ -1,0 +1,57 @@
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.api
+    env_file: ../../.env
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3001/api/health').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks: [soul540]
+
+  main:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.portal
+      args: { PORTAL: main }
+    ports: ['80:80']
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [soul540]
+
+  factory:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.portal
+      args: { PORTAL: factory }
+    ports: ['8081:80']
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [soul540]
+
+  franchise:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.portal
+      args: { PORTAL: franchise }
+    ports: ['8082:80']
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [soul540]
+
+networks:
+  soul540:
+    driver: bridge

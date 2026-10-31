@@ -1,0 +1,139 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+// XML import
+.btnXml {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 8px 14px;
+
+  background: rgba(245, 158, 11, 0.1);
+
+  border: 1px solid rgba(245, 158, 11, 0.3);
+
+  border-radius: $radius-sm;
+
+  color: #f59e0b;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  transition: all $transition-base;
+
+  &:hover {
+    background: rgba(245, 158, 11, 0.18);
+    border-color: rgba(245, 158, 11, 0.5);
+  }
+}
+
+.xmlModal {
+  background: $bg-secondary;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-lg;
+
+  width: 100%;
+
+  max-width: 620px;
+
+  max-height: 85vh;
+
+  display: flex;
+
+  flex-direction: column;
+
+  box-shadow: $shadow-lg;
+
+  overflow: hidden;
+}
+
+.xmlSupplier {
+  font-size: $font-size-xs;
+  color: $text-muted;
+  margin-top: 4px;
+  strong {
+    color: $text-secondary;
+  }
+}
+
+.xmlMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.xmlCount {
+  font-size: $font-size-xs;
+  color: $text-muted;
+}
+
+.xmlToggleAll {
+  font-size: $font-size-xs;
+  color: $accent;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.xmlList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  max-height: 45vh;
+}
+
+.xmlRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px;
+
+  background: $bg-card;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  transition: opacity $transition-fast;
+}
+
+.xmlRowDisabled {
+  opacity: 0.4;
+}
+
+.xmlInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.xmlName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  @include text-ellipsis;
+}
+
+.xmlDetails {
+  font-size: $font-size-xs;
+  color: $text-muted;
+  strong {
+    color: $text-secondary;
+  }
+}

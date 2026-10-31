@@ -1,0 +1,146 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.permItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  cursor: pointer;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: $accent;
+  cursor: pointer;
+}
+
+.permFooter {
+  border-top: 1px solid $border;
+  padding-top: $spacing-lg;
+  display: flex;
+  justify-content: flex-end;
+}
+
+// Buttons
+.btnPrimary {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: 10px $spacing-md;
+  background: $accent;
+  color: #0a0f1e;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  border: none;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: background $transition-fast;
+  &:hover {
+    background: $accent-hover;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btnSave {
+  padding: 10px $spacing-xl;
+  background: $accent;
+  color: #0a0f1e;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  border: none;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  transition: background $transition-fast;
+  &:hover {
+    background: $accent-hover;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btnCancel {
+  padding: 10px $spacing-md;
+  background: none;
+  border: none;
+  color: $text-muted;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.btnDanger {
+  padding: 10px $spacing-md;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: $radius-sm;
+  color: #f87171;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  &:hover {
+    background: rgba(239, 68, 68, 0.18);
+  }
+}
+
+// Modal
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: $spacing-md;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  background: $bg-secondary;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: $shadow-lg;
+}
+
+.modalHeader {
+  @include flex-between;
+  padding: $spacing-lg $spacing-xl;
+  border-bottom: 1px solid $border;
+}
+
+.modalTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.modalClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  border-radius: $radius-xs;
+  &:hover {
+    color: $text-primary;
+    background: rgba(255, 255, 255, 0.06);
+  }
+}

@@ -1,0 +1,132 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+// Filter Row
+.filterRow {
+  display: flex;
+
+  gap: $spacing-sm;
+
+  margin-bottom: $spacing-lg;
+
+  flex-wrap: wrap;
+
+  align-items: center;
+}
+
+.filterGroup {
+  display: flex;
+
+  gap: 2px;
+
+  background: $bg-card;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  padding: 3px;
+}
+
+.filterBtn {
+  padding: 6px 14px;
+
+  border-radius: $radius-xs;
+
+  border: none;
+
+  background: none;
+
+  color: $text-muted;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  transition: all $transition-base;
+
+  white-space: nowrap;
+
+  &:hover {
+    color: $text-primary;
+
+    background: rgba(255, 255, 255, 0.03);
+  }
+}
+
+.filterBtnActive {
+  background: $accent;
+
+  color: $bg-primary;
+
+  box-shadow: 0 1px 4px rgba($accent, 0.3);
+
+  &:hover {
+    background: $accent-hover;
+
+    color: $bg-primary;
+  }
+}
+
+// Category chips
+.categoryChips {
+  @include card;
+
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: $spacing-sm;
+
+  padding: $spacing-md $spacing-lg;
+}
+
+.chip {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 4px 12px;
+
+  border-radius: $radius-full;
+
+  background: rgba(255, 255, 255, 0.04);
+
+  font-size: 11px;
+
+  font-weight: $font-weight-medium;
+
+  color: $text-secondary;
+}
+
+.chipDot {
+  width: 8px;
+
+  height: 8px;
+
+  border-radius: 50%;
+}
+
+// Month selector
+.monthSelector {
+  display: flex;
+
+  gap: 4px;
+
+  margin-bottom: $spacing-xl;
+
+  flex-wrap: wrap;
+
+  background: $bg-card;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  padding: 4px;
+}

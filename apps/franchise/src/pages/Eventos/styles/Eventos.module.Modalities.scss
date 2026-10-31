@@ -1,0 +1,48 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.modalityBadge {
+  display: inline-flex;
+  width: fit-content;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba($accent, 0.12);
+  color: $accent;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+}
+.recurringCard {
+  @include card;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  border-color: rgba($accent, 0.45);
+}
+.recurringHeader {
+  display: flex;
+  justify-content: space-between;
+}
+.recurringOccurrences {
+  display: grid;
+  gap: 6px;
+}
+.recurringOccurrence {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-sm;
+  padding: 8px 10px;
+  border-radius: $radius-sm;
+  background: rgba(255, 255, 255, 0.04);
+  color: $text-secondary;
+}
+.recurringConfirm {
+  padding: 6px 10px;
+  border: 1px solid rgba($accent, 0.5);
+  border-radius: $radius-sm;
+  background: transparent;
+  color: $accent;
+  cursor: pointer;
+}

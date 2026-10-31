@@ -1,0 +1,12 @@
+{
+  "name": "@soul540/domain",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@soul540/contracts": "file:../contracts"
+  }
+}

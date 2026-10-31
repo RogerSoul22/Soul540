@@ -1,0 +1,126 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.btnExport {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 9px $spacing-md;
+
+  background: rgba($accent, 0.08);
+
+  border: 1px solid rgba($accent, 0.25);
+
+  border-radius: $radius-sm;
+
+  color: $accent;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition: all $transition-fast;
+
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba($accent, 0.15);
+
+    border-color: rgba($accent, 0.4);
+  }
+}
+
+// Table
+.tableWrap {
+  overflow-x: auto;
+
+  -webkit-overflow-scrolling: touch;
+
+  border-radius: $radius-lg;
+
+  @include mobile {
+    border-radius: 0;
+  }
+}
+
+.table {
+  width: 100%;
+
+  border-collapse: separate;
+
+  border-spacing: 0;
+
+  @include card;
+
+  overflow: hidden;
+
+  min-width: 600px;
+
+  @include mobile {
+    border-radius: 0;
+
+    box-shadow: none;
+  }
+}
+
+.table th {
+  text-align: left;
+
+  padding: $spacing-md $spacing-lg;
+
+  font-size: 11px;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  border-bottom: 1px solid $border;
+
+  background: rgba($raw-bg-tertiary, 0.2);
+}
+
+.table td {
+  padding: 12px $spacing-lg;
+
+  font-size: $font-size-sm;
+
+  color: $text-secondary;
+
+  border-bottom: 1px solid $border-faint;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr {
+  transition: background $transition-fast;
+}
+
+.table tr:hover td {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.typeRevenue {
+  color: #4ade80;
+
+  font-weight: $font-weight-semibold;
+}
+
+.typeCost {
+  color: #f87171;
+
+  font-weight: $font-weight-semibold;
+}

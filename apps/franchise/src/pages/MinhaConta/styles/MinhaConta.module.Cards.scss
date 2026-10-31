@@ -1,0 +1,125 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.page {
+  padding: $spacing-2xl $spacing-xl;
+
+  animation: fadeIn 0.4s ease;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+.header {
+  margin-bottom: $spacing-xl;
+}
+
+.title {
+  font-size: $font-size-3xl;
+
+  font-weight: $font-weight-bold;
+
+  color: $text-primary;
+
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+
+  margin-top: 6px;
+}
+
+.profileCard {
+  @include card;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-xl;
+
+  padding: $spacing-xl;
+
+  margin-bottom: $spacing-xl;
+
+  position: relative;
+
+  overflow: hidden;
+
+  &::before {
+    content: '';
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 3px;
+
+    background: linear-gradient(90deg, $accent, $accent-hover, #f97316);
+  }
+
+  @include mobile {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.profileAvatar {
+  @include flex-center;
+
+  width: 72px;
+
+  height: 72px;
+
+  border-radius: $radius-full;
+
+  background: linear-gradient(135deg, $accent, #f97316);
+
+  color: $bg-primary;
+
+  font-size: $font-size-3xl;
+
+  font-weight: $font-weight-bold;
+
+  flex-shrink: 0;
+
+  box-shadow: 0 4px 16px rgba($accent, 0.3);
+}
+
+.profileInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.profileName {
+  font-size: $font-size-xl;
+
+  font-weight: $font-weight-bold;
+
+  color: $text-primary;
+}
+
+.profileRole {
+  font-size: $font-size-sm;
+
+  color: $accent;
+
+  font-weight: $font-weight-medium;
+
+  margin-top: 2px;
+}
+
+.profileEmail {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+
+  margin-top: 4px;
+}

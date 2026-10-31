@@ -1,0 +1,13 @@
+{
+  "name": "@soul540/api",
+  "private": true,
+  "version": "0.1.0",
+  "dependencies": {
+    "@soul540/domain": "workspace:*"
+  },
+  "scripts": {
+    "dev": "cd ../.. && tsx apps/api/src/index.ts",
+    "start": "cd ../.. && tsx apps/api/src/index.ts",
+    "build": "tsc --project tsconfig.json --noEmit"
+  }
+}

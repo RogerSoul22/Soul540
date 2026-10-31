@@ -1,0 +1,150 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.tableWrap {
+  max-height: 380px;
+  border-radius: 5px;
+  box-shadow: none;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+.table {
+  min-width: 760px;
+  font-size: 12px;
+}
+
+.table th {
+  height: 34px;
+  padding: 8px 10px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.25px;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 9px 10px;
+  height: 42px;
+}
+
+.table tr:hover td {
+  background: #eaf4ff;
+}
+
+.categoryTag {
+  border-radius: 3px;
+}
+
+.walletGrid {
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.agendamentosCard,
+.chartSection,
+.barCard {
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+.sectionTitle {
+  font-size: 14px;
+}
+
+.monthSelector {
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+.monthSummaryItem {
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+@media (max-width: 560px) {
+  .tableWrap {
+    max-height: 320px;
+  }
+}
+
+.monthSelector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+}
+
+.monthSelectLabel {
+  color: #63738b;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.35px;
+}
+
+.monthSelect {
+  min-width: 190px;
+  min-height: 34px;
+  padding: 6px 32px 6px 10px;
+  border: 1px solid #cfd9e7;
+  border-radius: 4px;
+  background: #fff;
+  color: #182235;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.monthSelect:focus {
+  outline: none;
+  border-color: #1464b4;
+  box-shadow: 0 0 0 3px rgba(20, 100, 180, 0.12);
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding: 14px 12px 28px;
+  }
+  .summaryBar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .summaryBar > .summaryItem:nth-child(2) {
+    border-right: 0;
+  }
+  .summaryBar > .summaryItem:nth-child(-n + 2) {
+    border-bottom: 1px solid #dbe3ef;
+  }
+  .filterRow {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+  .filterGroup {
+    flex: 1 1 160px;
+  }
+  .filterGroup:has(.searchInput) {
+    flex-basis: 100%;
+  }
+}
+
+.recurrenceConfig {
+  display: grid;
+  grid-template-columns: 120px minmax(130px, 1fr) 130px;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 12px;
+  border: 1px solid #f0d397;
+  border-radius: 5px;
+  background: #fffaf0;
+}
+
+.recurrenceConfig label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: #63738b;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}

@@ -1,0 +1,102 @@
+@use '../../../styles/variables' as *;
+@use './Financeiro.module.DarkActions' as *;
+
+// The finance workspace has a light visual refinement layered over the
+// structural styles above. Reapply the theme tokens when the application is
+// in dark mode so that the refinement does not force light surfaces globally.
+html[data-theme='dark'] {
+  .page {
+    background: $bg-primary;
+    color: $text-primary;
+  }
+
+  .header {
+    border-bottom-color: $border;
+  }
+
+  .headerLeft .title,
+  .summaryItemValue,
+  .monthSummaryValue,
+  .sectionTitle,
+  .agendamentoName,
+  .agendamentoValue,
+  .modalTitle,
+  .formLabel,
+  .recurrenceToggle strong,
+  .recurrencePreview strong,
+  .eventDetailGrid strong,
+  .confirmDeleteSummary strong {
+    color: $text-primary;
+  }
+
+  .headerLeft .subtitle,
+  .pageMonthLabel,
+  .filterLabel,
+  .summaryItemLabel,
+  .monthSummaryLabel,
+  .agendamentoDate,
+  .agendamentosEmpty,
+  .formHint,
+  .recurrenceToggle small,
+  .recurrenceFields label > span,
+  .occurrenceInput span,
+  .eventDetailLabel,
+  .paymentMethodsSubtitle,
+  .paymentMethodCount,
+  .emptyState,
+  .tableNote {
+    color: $text-secondary;
+  }
+
+  .scopeToggle,
+  .tabs,
+  .filterGroup,
+  .monthSelector,
+  .pageMonthFilter,
+  .filterRow,
+  .summaryBar > .summaryItem,
+  .agendamentosCard,
+  .chartSection,
+  .gaugeCard,
+  .barCard,
+  .monthSummaryItem,
+  .tableWrap,
+  .table,
+  .modal,
+  .xmlModal,
+  .recurrenceToggle,
+  .eventDetailGrid > div,
+  .eventDetailNotes,
+  .paymentMethodCard,
+  .walletBreakdown div,
+  .confirmDeleteSummary {
+    background: $bg-card;
+    border-color: $border;
+    box-shadow: $shadow-card;
+  }
+
+  .scopeBtn,
+  .tab,
+  .filterBtn,
+  .monthBtn,
+  .monthSelectLabel,
+  .eventDetailNotes p,
+  .paymentMethodRow,
+  .paymentMethodCardHeader > span,
+  .walletBreakdown span,
+  .ofxTotals,
+  .recurrenceDates span {
+    color: $text-secondary;
+  }
+
+  .scopeBtn:hover,
+  .tab:hover,
+  .filterBtn:hover,
+  .monthBtn:hover,
+  .modalClose:hover,
+  .agendamentoRowInteractive:hover,
+  .table tr:hover td {
+    color: $text-primary;
+    background: $bg-elevated;
+  }
+}
