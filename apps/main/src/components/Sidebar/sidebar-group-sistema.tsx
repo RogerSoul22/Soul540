@@ -89,25 +89,5 @@ export const sidebarGroupSistema: NavGroup = {
         </svg>
       ),
     },
-    {
-      path: ROUTES.CONFIGURACAO_FISCAL,
-      permKey: '__admin__',
-      label: 'Configuração fiscal',
-      icon: (
-        <svg
-          width="17"
-          height="17"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M12 3v18M3 12h18" />
-          <circle cx="12" cy="12" r="9" />
-        </svg>
-      ),
-    },
   ],
 };

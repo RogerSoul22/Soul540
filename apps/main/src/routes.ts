@@ -17,5 +17,4 @@ export const ROUTES = {
   CHAT: '/chat',
   PERMISSOES: '/permissoes',
   AUDITORIA: '/auditoria',
-  CONFIGURACAO_FISCAL: '/configuracao-fiscal',
 } as const;

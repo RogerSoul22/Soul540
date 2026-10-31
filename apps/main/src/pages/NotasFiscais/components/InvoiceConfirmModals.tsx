@@ -1,6 +1,6 @@
-import { Button } from '@soul540/ui';
-import { Modal } from '@soul540/ui';
-import type { Invoice } from '@soul540/contracts';
+import { Button } from '../../../../../../packages/ui/src/index';
+import { Modal } from '../../../../../../packages/ui/src/index';
+import type { Invoice } from '../../../../../../packages/contracts/src/index';
 import styles from '../styles/NotasFiscais.module.scss';
 
 type Props = {

@@ -1,7 +1,7 @@
 import type { FormEvent } from 'react';
-import { Modal } from '@soul540/ui';
+import { Modal } from '../../../../../../packages/ui/src/index';
 import type { InvoiceFormState } from '../types/invoice-types';
-import type { InvoiceItem } from '@soul540/contracts';
+import type { InvoiceItem } from '../../../../../../packages/contracts/src/index';
 import InvoiceFormFields from './InvoiceFormFields';
 import styles from '../styles/NotasFiscais.module.scss';
 

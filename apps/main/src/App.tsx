@@ -1,13 +1,13 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import { ThemeProvider } from '@soul540/ui';
+import { ThemeProvider } from '../../../packages/ui/src/index';
 import { AuthProvider } from './contexts/AuthContext';
 import { AppProvider } from './contexts/AppContext';
 import { useAuth } from './hooks/useAuth';
 import { ROUTES } from './routes';
 import Login from './pages/Login/Login';
 import Layout from './components/Layout/Layout';
-import { ErrorBoundary } from '@soul540/ui';
+import { ErrorBoundary } from '../../../packages/ui/src/index';
 
 const Auditoria = lazy(() => import('./pages/Auditoria/Auditoria'));
 const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
@@ -26,7 +26,6 @@ const EstoqueInsumos = lazy(() => import('./pages/EstoqueInsumos/EstoqueInsumos'
 const EstoqueUtensilios = lazy(() => import('./pages/EstoqueUtensilios/EstoqueUtensilios'));
 const Chat = lazy(() => import('./pages/Chat/Chat'));
 const Permissoes = lazy(() => import('./pages/Permissoes/Permissoes'));
-const ConfiguracaoFiscal = lazy(() => import('./pages/ConfiguracaoFiscal/ConfiguracaoFiscal'));
 
 function AppLoading() {
   return (
@@ -131,7 +130,6 @@ export default function App() {
                       <Route element={<PermissionRoute routeKey="__admin__" />}>
                         <Route path={ROUTES.PERMISSOES} element={<Permissoes />} />
                         <Route path={ROUTES.AUDITORIA} element={<Auditoria />} />
-                        <Route path={ROUTES.CONFIGURACAO_FISCAL} element={<ConfiguracaoFiscal />} />
                       </Route>
                     </Route>
                   </Route>

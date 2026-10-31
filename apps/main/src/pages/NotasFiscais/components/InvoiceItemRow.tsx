@@ -1,6 +1,6 @@
 import type { ChangeEvent } from 'react';
-import { Button, Input } from '@soul540/ui';
-import type { InvoiceItem } from '@soul540/contracts';
+import { Button, Input } from '../../../../../../packages/ui/src/index';
+import type { InvoiceItem } from '../../../../../../packages/contracts/src/index';
 import type { InvoiceFormState } from '../types/invoice-types';
 import styles from '../styles/NotasFiscais.module.scss';
 

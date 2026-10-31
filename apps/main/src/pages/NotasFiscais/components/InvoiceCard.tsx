@@ -1,6 +1,6 @@
 import { format, parseISO } from 'date-fns';
-import type { Invoice } from '@soul540/contracts';
-import { Badge } from '@soul540/ui';
+import type { Invoice } from '../../../../../../packages/contracts/src/index';
+import { Badge } from '../../../../../../packages/ui/src/index';
 import { statusColors, statusLabels } from '../types/invoice-types';
 import styles from '../styles/NotasFiscais.module.scss';
 

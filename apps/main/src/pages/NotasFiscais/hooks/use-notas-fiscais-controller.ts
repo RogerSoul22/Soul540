@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useApp } from '../../../contexts/AppContext';
-import type { Invoice, InvoiceStatus } from '@soul540/contracts';
+import type { Invoice, InvoiceStatus } from '../../../../../../packages/contracts/src/index';
 import { useInvoiceForm } from './use-invoice-form';
 import { type FilterStatus, statusLabels } from '../types/invoice-types';
 import { maskCpfCnpj } from '../support/invoice-formatters';

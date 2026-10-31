@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { Invoice, InvoiceItem } from '@soul540/contracts';
+import type { Invoice, InvoiceItem } from '../../../../../../packages/contracts/src/index';
 import { createEmptyInvoiceForm, createEmptyInvoiceItem, type InvoiceFormState } from '../types/invoice-types';
 
 export function useInvoiceForm() {

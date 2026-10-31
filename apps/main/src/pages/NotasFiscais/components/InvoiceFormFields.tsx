@@ -1,5 +1,5 @@
 import type { ChangeEvent } from 'react';
-import type { InvoiceItem } from '@soul540/contracts';
+import type { InvoiceItem } from '../../../../../../packages/contracts/src/index';
 import type { InvoiceFormState } from '../types/invoice-types';
 import { maskCpfCnpj } from '../support/invoice-formatters';
 import InvoiceFormField from './InvoiceFormField';

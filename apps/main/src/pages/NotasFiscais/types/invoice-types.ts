@@ -1,4 +1,4 @@
-import type { Invoice, InvoiceItem, InvoiceStatus } from '@soul540/contracts';
+import type { Invoice, InvoiceItem, InvoiceStatus } from '../../../../../../packages/contracts/src/index';
 
 export type FilterStatus = 'all' | InvoiceStatus;
 export type InvoiceFormType = 'nfse' | 'nfe';

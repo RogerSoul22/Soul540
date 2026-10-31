@@ -1,13 +1,16 @@
-import { Button, Input } from '@soul540/ui';
+import { Button, Input } from '../../../../../packages/ui/src/index';
 import InvoiceCard from './components/InvoiceCard';
 import InvoiceConfirmModals from './components/InvoiceConfirmModals';
 import InvoiceFormModal from './components/InvoiceFormModal';
 import InvoicePreviewModal from './components/InvoicePreviewModal';
+import FiscalConfigurationSection from './components/FiscalConfigurationSection';
 import { statusLabels, type FilterStatus } from './types/invoice-types';
 import { useNotasFiscaisController } from './hooks/use-notas-fiscais-controller';
+import { useAuth } from '../../hooks/useAuth';
 import styles from './styles/NotasFiscais.module.scss';
 
 export default function NotasFiscais() {
+  const { isAdmin } = useAuth();
   const controller = useNotasFiscaisController();
   const emissionInvoice = controller.confirmEmitId
     ? controller.invoices.find((invoice) => invoice.id === controller.confirmEmitId) || null
@@ -113,6 +116,7 @@ export default function NotasFiscais() {
           onClose={() => controller.setPreviewInvoice(null)}
         />
       )}
+      {isAdmin && <FiscalConfigurationSection />}
     </div>
   );
 }
