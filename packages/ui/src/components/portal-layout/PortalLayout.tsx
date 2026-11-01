@@ -1,4 +1,5 @@
 import { type ReactNode, useEffect, useState } from 'react';
+import OfflineBanner from '../offline-banner/OfflineBanner';
 import styles from './styles/PortalLayout.module.scss';
 
 const defaultStorageKey = 'soul540-sidebar-collapsed';
@@ -34,6 +35,7 @@ export default function PortalLayout({
         onToggle: () => setSidebarCollapsed((current) => !current),
       })}
       {feedback}
+      <OfflineBanner />
       <main className={`${styles.main} ${sidebarCollapsed ? styles.mainCollapsed : ''}`}>{children}</main>
     </div>
   );

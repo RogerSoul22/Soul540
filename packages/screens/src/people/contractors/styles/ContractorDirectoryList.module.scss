@@ -6,7 +6,8 @@
 }
 
 .controls input,
-.controls select {
+.controls select,
+.controls button[aria-haspopup='listbox'] {
   min-height: 40px;
   padding: 9px 12px;
   border: 1px solid var(--border);
@@ -79,7 +80,7 @@
   color: var(--text-secondary);
   background: transparent;
   font: inherit;
-  font-size: 12px;
+  font-size: 13px;
   text-decoration: none;
   cursor: pointer;
 }
@@ -92,7 +93,7 @@
 .card > span {
   overflow: hidden;
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 14px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

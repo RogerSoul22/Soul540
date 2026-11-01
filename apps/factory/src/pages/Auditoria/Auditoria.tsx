@@ -8,7 +8,7 @@ export default function Auditoria() {
       apiFetch={apiFetch}
       csvPrefix="auditoria-fabrica"
       styles={styles}
-      unitLabels={{ main: 'Principal', franchise: 'Itu', factory: 'Fábrica' }}
+      unitLabels={{ factory: 'Fábrica' }}
     />
   );
 }

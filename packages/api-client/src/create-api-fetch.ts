@@ -1,3 +1,5 @@
+import { getOfflineLayer } from './offline/offline-runtime';
+
 export class ApiRequestError extends Error {
   constructor(
     public readonly status: number,
@@ -92,9 +94,21 @@ export function createApiFetch({ baseUrl = '', system, franchiseId }: ApiClientO
     const headers = createHeaders(options, system, franchiseId);
     headers.delete(SILENT_ERRORS_HEADER);
 
+    const offline = getOfflineLayer();
+    const request = {
+      method: (options.method ?? 'GET').toUpperCase(),
+      url: `${baseUrl}${path}`,
+      path,
+      body: options.body,
+      headers: Object.fromEntries(headers.entries()),
+    };
+
     try {
-      response = await fetch(`${baseUrl}${path}`, { ...options, credentials: 'include', headers });
+      response = await fetch(request.url, { ...options, credentials: 'include', headers });
     } catch {
+      // Sem conexão: consultas voltam do cache do aparelho e alterações entram na fila de envio.
+      const offlineResponse = await offline?.fallback(request).catch(() => null);
+      if (offlineResponse) return offlineResponse;
       const error = new ApiRequestError(
         0,
         'Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.',
@@ -113,6 +127,10 @@ export function createApiFetch({ baseUrl = '', system, franchiseId }: ApiClientO
       throw new ApiRequestError(error.status, error.message);
     }
 
-    return unwrapResponseEnvelope(response);
+    const result = await unwrapResponseEnvelope(response);
+    if (request.method === 'GET') void offline?.remember(request, result.clone()).catch(() => undefined);
+    // Entrar ou sair troca o usuário: nada guardado do anterior pode ficar no aparelho.
+    if (path === '/api/auth/login' || path === '/api/auth/logout') void offline?.clear().catch(() => undefined);
+    return result;
   };
 }

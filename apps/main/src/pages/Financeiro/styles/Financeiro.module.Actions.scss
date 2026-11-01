@@ -11,7 +11,7 @@
 
 .recurrenceFields label > span {
   color: #63738b;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -25,7 +25,7 @@
 .occurrenceInput span {
   flex-shrink: 0;
   color: #63738b;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .recurrencePreview {
@@ -43,12 +43,12 @@
 
 .recurrencePreview strong {
   color: #182235;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .recurrencePreview > div:first-child span {
   color: #a85f00;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -65,7 +65,7 @@
   border-radius: 4px;
   background: #fff;
   color: #40516a;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 @media (max-width: 700px) {

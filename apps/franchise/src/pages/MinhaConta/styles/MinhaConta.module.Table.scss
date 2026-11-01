@@ -49,6 +49,11 @@
   padding: $spacing-lg;
 }
 
+// Seções soltas na página (segurança e aparência) não passam pelo espaçamento do formulário.
+.page > .formSection {
+  margin-top: $spacing-lg;
+}
+
 .formSectionTitle {
   font-size: $font-size-sm;
 

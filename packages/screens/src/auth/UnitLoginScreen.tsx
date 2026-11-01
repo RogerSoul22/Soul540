@@ -1,6 +1,8 @@
 import { Button, Heading, Input } from '../../../pentagono/src/index';
 import { type FormEvent, type ReactNode, useState } from 'react';
 
+const LOGO_SRC = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/logo.png`;
+
 export interface UnitLoginFeature {
   icon: ReactNode;
   text: string;
@@ -49,7 +51,7 @@ export default function UnitLoginScreen({
     <div className={styles.container}>
       <div className={styles.branding}>
         <div className={styles.brandingContent}>
-          <img src="/logo.png" alt="Soul540" className={styles.brandingLogo} />
+          <img src={LOGO_SRC} alt="Soul540" className={styles.brandingLogo} />
           <Heading variant="display" className={styles.brandingTitle}>
             Soul<span className={styles.brandingHighlight}>540</span>
             <br />

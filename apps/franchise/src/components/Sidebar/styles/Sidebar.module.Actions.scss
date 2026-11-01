@@ -13,7 +13,7 @@
 
 .navGroupLabel {
   display: block;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: $font-weight-semibold;
   color: rgba($text-muted, 0.5);
   text-transform: uppercase;
@@ -33,7 +33,7 @@
   padding: 9px $spacing-md;
   border-radius: $radius-sm;
   color: rgba($text-muted, 0.85);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: $font-weight-medium;
   transition: all $transition-base;
   cursor: pointer;
@@ -112,7 +112,7 @@
   line-height: 1;
 
   @include mobile {
-    font-size: 10px;
+    font-size: 12px;
   }
 }
 

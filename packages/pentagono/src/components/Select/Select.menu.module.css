@@ -1,0 +1,61 @@
+/* Lista aberta do Select (renderizada no body). */
+@layer pentagono {
+  .menu {
+    position: fixed;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px;
+    overflow-y: auto;
+    color: var(--pentagono-color-text);
+    font-family: var(--pentagono-font-sans);
+    font-size: var(--pentagono-text-sm);
+    background: var(--pentagono-color-surface-raised);
+    border: 1px solid var(--pentagono-color-border);
+    border-radius: var(--pentagono-radius-md);
+    box-shadow: var(--pentagono-shadow-lg);
+    animation: select-menu-in 0.12s ease-out;
+  }
+
+  .group {
+    padding: 8px 10px 4px;
+    color: var(--pentagono-color-text-muted);
+    font-size: var(--pentagono-text-xs);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--pentagono-space-3);
+    padding: 9px 10px;
+    border-radius: var(--pentagono-radius-sm);
+    cursor: pointer;
+    transition: background var(--pentagono-transition-fast);
+  }
+
+  .option[data-active='true'] {
+    background: var(--pentagono-color-hover);
+  }
+
+  .selected {
+    color: var(--pentagono-color-brand);
+    font-weight: var(--pentagono-font-semibold);
+    background: var(--pentagono-color-brand-soft);
+  }
+
+  .disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  @keyframes select-menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+}

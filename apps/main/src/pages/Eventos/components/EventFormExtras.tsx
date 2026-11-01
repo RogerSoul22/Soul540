@@ -35,7 +35,7 @@ export default function EventFormExtras({ controller }: { controller: EventFormC
                       style={{
                         background: 'rgba(255,193,7,0.15)',
                         color: '#ffc107',
-                        fontSize: 12,
+                        fontSize: 13,
                         borderRadius: 4,
                         padding: '2px 7px',
                       }}
@@ -44,7 +44,7 @@ export default function EventFormExtras({ controller }: { controller: EventFormC
                     </span>
                   ))
               ) : (
-                <span style={{ color: 'var(--text-muted, #666)', fontSize: 13 }}>Selecionar cardápios...</span>
+                <span style={{ color: 'var(--text-muted, #666)', fontSize: 14 }}>Selecionar cardápios...</span>
               )}
             </div>
             {showMenuDropdown && (
@@ -96,7 +96,7 @@ export default function EventFormExtras({ controller }: { controller: EventFormC
                             setForm({ ...form, menu: next.join(', ') });
                           }}
                         />
-                        <span style={{ fontSize: 13, color: '#e2e8f0' }}>{name}</span>
+                        <span style={{ fontSize: 14, color: '#e2e8f0' }}>{name}</span>
                       </Label>
                     );
                   })}

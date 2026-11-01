@@ -33,13 +33,13 @@ export default function FinanceiroOverviewCharts({ controller }: Props) {
               <XAxis
                 dataKey="month"
                 tickFormatter={formatMonth}
-                tick={{ fill: '#64748b', fontSize: 12 }}
+                tick={{ fill: '#64748b', fontSize: 13 }}
                 axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
                 tickLine={false}
               />
               <YAxis
                 tickFormatter={(v: number) => `${(v / 1000).toFixed(0)}k`}
-                tick={{ fill: '#64748b', fontSize: 12 }}
+                tick={{ fill: '#64748b', fontSize: 13 }}
                 axisLine={false}
                 tickLine={false}
               />
@@ -49,12 +49,12 @@ export default function FinanceiroOverviewCharts({ controller }: Props) {
                   border: '1px solid rgba(255,255,255,0.1)',
                   borderRadius: '8px',
                   color: '#f1f5f9',
-                  fontSize: '13px',
+                  fontSize: '14px',
                 }}
                 formatter={(value: unknown) => [formatBRL(Number(value))]}
                 labelFormatter={(label: unknown) => formatMonth(String(label))}
               />
-              <Legend wrapperStyle={{ fontSize: '12px', color: '#94a3b8' }} />
+              <Legend wrapperStyle={{ fontSize: '13px', color: '#94a3b8' }} />
               <Bar dataKey="receita" name="Receita" fill="#4ade80" radius={[4, 4, 0, 0]} />
               <Bar dataKey="despesa" name="Despesa" fill="#f87171" radius={[4, 4, 0, 0]} />
             </BarChart>

@@ -93,6 +93,9 @@
 .userCard {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  text-align: left;
   gap: $spacing-md;
   padding: $spacing-md;
   border-radius: $radius-sm;
@@ -125,11 +128,15 @@
 }
 
 .userInfo {
+  display: flex;
   flex: 1;
+  flex-direction: column;
   min-width: 0;
+  text-align: left;
 }
 
 .userName {
+  display: block;
   font-size: $font-size-sm;
   font-weight: $font-weight-medium;
   color: $text-primary;
@@ -139,6 +146,7 @@
 }
 
 .userEmail {
+  display: block;
   font-size: $font-size-xs;
   color: $text-muted;
   white-space: nowrap;
@@ -147,7 +155,8 @@
 }
 
 .userUnit {
-  font-size: 10px;
+  display: block;
+  font-size: 12px;
   color: #818cf8;
   font-weight: 500;
   margin-top: 2px;

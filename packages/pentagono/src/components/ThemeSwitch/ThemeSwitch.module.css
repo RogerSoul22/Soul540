@@ -34,7 +34,7 @@
 
   .active,
   .active:hover {
-    color: var(--pentagono-color-on-brand);
+    color: #111827;
     background: linear-gradient(135deg, var(--pentagono-color-brand), var(--pentagono-color-brand-end));
   }
 }

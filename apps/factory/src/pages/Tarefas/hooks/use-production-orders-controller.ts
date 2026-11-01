@@ -42,7 +42,7 @@ export function useProductionOrdersController() {
   const pedidosByStatus = useMemo(() => {
     const map: Record<PedidoStatus, Pedido[]> = { a_preparar: [], a_enviar: [], entregue: [] };
     filteredOrders.forEach((order) => map[order.status].push(order));
-    ALL_STATUSES.forEach((status) => map[status].sort(sortOrdersByNumber));
+    ALL_STATUSES.forEach(({ id }) => map[id].sort(sortOrdersByNumber));
     return map;
   }, [filteredOrders]);
   const ordersForAlphabeticalSelection = useMemo(() => [...pedidos].sort(sortOrdersAlphabetically), [pedidos]);

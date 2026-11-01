@@ -10,7 +10,7 @@
 
 .label {
   color: var(--text-secondary, #64748b);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.45px;
   text-transform: uppercase;
@@ -29,12 +29,12 @@
 }
 
 .arrow {
-  width: 34px;
+  width: 40px;
   border: 1px solid var(--border, #cfd9e7);
   background: var(--bg-card, #fff);
   color: var(--text-secondary, #38516f);
   cursor: pointer;
-  font-size: 24px;
+  font-size: 28px;
   line-height: 1;
 
   &:first-child {
@@ -60,14 +60,14 @@
   justify-content: space-between;
   flex: 1;
   min-width: 0;
-  height: 36px;
+  height: 42px;
   margin: 0 -1px;
   padding: 0 11px;
   border: 1px solid var(--border, #cfd9e7);
   background: var(--bg-card, #fff);
   color: var(--text-primary, #29496d);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
 
@@ -79,17 +79,18 @@
 }
 
 .chevron {
+  display: inline-flex;
   margin-left: 10px;
   color: var(--finance-period-accent);
-  font-size: 16px;
+  font-size: 20px;
 }
 
 .menu {
   position: absolute;
   top: calc(100% + 6px);
   right: 0;
-  width: min(100%, 290px);
-  min-width: 248px;
+  width: min(100%, 340px);
+  min-width: 300px;
   padding: 6px;
   border: 1px solid var(--border, #d5dfeb);
   border-radius: 6px;
@@ -100,13 +101,13 @@
 .option {
   display: block;
   width: 100%;
-  padding: 9px 10px;
+  padding: 12px 14px;
   border: 0;
   border-radius: 4px;
   background: transparent;
   color: var(--text-secondary, #334e6f);
   cursor: pointer;
-  font-size: 12px;
+  font-size: 15px;
   text-align: left;
 
   &:hover {
@@ -132,14 +133,14 @@
     display: grid;
     gap: 4px;
     color: var(--text-secondary, #64748b);
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 700;
     text-transform: uppercase;
   }
 
   input {
     min-width: 0;
-    height: 32px;
+    height: 38px;
     padding: 0 6px;
     border: 1px solid var(--border, #cfd9e7);
     border-radius: 4px;
@@ -161,14 +162,14 @@
 
   button {
     flex: 1;
-    min-height: 30px;
+    min-height: 36px;
     border: 1px solid var(--border, #cfd9e7);
     border-radius: 4px;
     background: var(--bg-card, #fff);
     color: var(--text-secondary, #64748b);
     cursor: pointer;
     font: inherit;
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 700;
   }
 }

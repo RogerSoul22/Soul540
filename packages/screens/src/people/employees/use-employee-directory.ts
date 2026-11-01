@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { emptyEmployeeForm, type ApiFetch, type Employee, type EmployeeForm } from './employee-types';
+import { cleanName, nameInitial } from './employee-formatters';
 
 export default function useEmployeeDirectory(apiFetch: ApiFetch) {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -46,11 +47,11 @@ export default function useEmployeeDirectory(apiFetch: ApiFetch) {
   const groupedEmployees = useMemo(() => {
     const employeesByLetter = new Map<string, Employee[]>();
     const sortedEmployees = [...filteredEmployees].sort((first, second) =>
-      first.name.localeCompare(second.name, 'pt-BR'),
+      cleanName(first.name).localeCompare(cleanName(second.name), 'pt-BR'),
     );
 
     for (const employee of sortedEmployees) {
-      const letter = employee.name.charAt(0).toUpperCase();
+      const letter = nameInitial(employee.name);
       const group = employeesByLetter.get(letter) ?? [];
       employeesByLetter.set(letter, [...group, employee]);
     }

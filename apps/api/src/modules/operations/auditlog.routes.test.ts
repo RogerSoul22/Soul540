@@ -14,3 +14,11 @@ test('global administrator can query audit records across units', () => {
     resource: 'events',
   });
 });
+
+test('global administrator on the factory portal only sees factory records, ignoring the unit filter', () => {
+  const req = { user: { isAdmin: true, unit: 'main' }, headers: { 'x-system': 'factory' } };
+  assert.deepEqual(getAuditLogFilter(req, { resource: 'events', userUnit: 'main' }), {
+    resource: 'events',
+    userUnit: 'factory',
+  });
+});

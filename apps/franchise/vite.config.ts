@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+import { soulPwa } from '../../packages/pwa/src/soul-pwa-plugin';
 
 const franchiseDevSpaFallback = {
   name: 'franchise-dev-spa-fallback',
@@ -28,7 +29,19 @@ const franchiseDevSpaFallback = {
 export default defineConfig({
   root: __dirname,
   base: '/franchise-assets/',
-  plugins: [react(), franchiseDevSpaFallback],
+  plugins: [
+    react(),
+    franchiseDevSpaFallback,
+    soulPwa({
+      assetsDir: resolve(__dirname, '../../packages/pwa/assets'),
+      id: '/itu/',
+      name: 'Soul540 Franquia',
+      shortName: 'Franquia',
+      description: 'Gestão da franquia Soul540.',
+      scope: '/itu/',
+      startUrl: '/itu/',
+    }),
+  ],
   css: {
     preprocessorOptions: {
       scss: { api: 'modern-compiler' },

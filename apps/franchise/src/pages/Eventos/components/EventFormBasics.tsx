@@ -151,7 +151,7 @@ export default function EventFormBasics({ controller }: { controller: EventFormC
             {form.locationImageName || 'Enviar foto do local das pizzas'}
             <Input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleLocationImageFile} />
           </Label>
-          <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
             Nos ajuda a dimensionar os equipamentos necessários
           </p>
         </div>

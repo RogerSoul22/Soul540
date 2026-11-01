@@ -3,31 +3,25 @@
 @use '../../../styles/mixins' as *;
 
 .finalizedItens {
-  font-size: $font-size-xs;
-
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
   color: $text-muted;
-
-  @include text-ellipsis;
+  font-size: $font-size-xs;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
-
-.finalizedRight {
-  display: flex;
-
-  align-items: center;
-
-  gap: $spacing-md;
-
-  flex-shrink: 0;
-}
-
 .finalizedCost {
-  font-size: $font-size-sm;
-
-  font-weight: $font-weight-medium;
-
+  flex-shrink: 0;
+  padding: 2px 10px;
   color: $text-secondary;
-
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
   white-space: nowrap;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $radius-full;
 }
 
 // Kanban
@@ -116,11 +110,6 @@
 }
 
 .colEmpty {
-  text-align: center;
-
   padding: $spacing-xl $spacing-md;
-
-  font-size: $font-size-xs;
-
   color: $text-muted;
 }

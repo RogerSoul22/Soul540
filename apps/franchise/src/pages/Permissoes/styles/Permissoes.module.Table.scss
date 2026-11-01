@@ -10,12 +10,14 @@
 
 .btnEye {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  padding: 3px 10px;
+  font-size: 13px;
+  font-weight: $font-weight-medium;
   background: none;
-  border: none;
+  border: 1px solid $border;
   color: $text-muted;
   cursor: pointer;
   border-radius: $radius-xs;
@@ -26,7 +28,7 @@
 }
 
 .badgeAdmin {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: $font-weight-semibold;
   background: rgba($accent, 0.15);
   color: $accent;

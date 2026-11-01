@@ -5,6 +5,11 @@ import { ROUTES } from '../../routes';
 import styles from './styles/Sidebar.module.scss';
 import { franchiseSidebarGroups } from './franchise-sidebar-navigation';
 
+// No servidor de desenvolvimento os arquivos públicos ficam sob o prefixo (base) do app.
+const externalHref = (path: string) => (import.meta.env.DEV ? `${LOGO_BASE}${path.replace(/^\//, '')}` : path);
+const LOGO_BASE = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
+const LOGO_SRC = `${LOGO_BASE}logo.png`;
+
 type SidebarProps = {
   collapsed: boolean;
   onToggle: () => void;
@@ -45,7 +50,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
         </svg>
       </Button>
       <div className={styles.logo}>
-        <img src="/logo.png" alt="Soul540" className={styles.logoImg} />
+        <img src={LOGO_SRC} alt="Soul540" className={styles.logoImg} />
         <span className={styles.logoTag}>Itu</span>
       </div>
       <nav className={styles.nav}>
@@ -67,7 +72,9 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
                     key={item.path}
                     className={`${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
                     onClick={() =>
-                      'external' in item && item.external ? (window.location.href = item.path) : navigate(item.path)
+                      'external' in item && item.external
+                        ? (window.location.href = externalHref(item.path))
+                        : navigate(item.path)
                     }
                     title={collapsed ? item.label : undefined}
                   >

@@ -56,11 +56,11 @@ function EventCard({
           <Heading level={3} variant="section" className={styles.cardTitle}>
             {ev.name}
           </Heading>
-          <span style={{ color: ev.modality === 'feirinha' ? '#34d399' : '#94a3b8', fontSize: 12, fontWeight: 600 }}>
+          <span style={{ color: ev.modality === 'feirinha' ? '#34d399' : '#94a3b8', fontSize: 13, fontWeight: 600 }}>
             {getEventModalityLabel(ev.modality)}
           </span>
           {ev.source === 'franchise' && (
-            <span style={{ color: '#f59e0b', fontSize: 12, fontWeight: 600 }}>Franquia · somente leitura</span>
+            <span style={{ color: '#f59e0b', fontSize: 13, fontWeight: 600 }}>Franquia · somente leitura</span>
           )}
           <p className={styles.cardSub}>
             {safeFormat(ev.date, "dd 'de' MMM, yyyy", { locale: ptBR })}

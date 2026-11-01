@@ -1,5 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { createEmployee, deleteEmployee, updateEmployee } from './employee-api';
+import { cleanName } from './employee-formatters';
 import type { ApiFetch, Employee, EmployeeForm } from './employee-types';
 
 interface EmployeeMutationOptions {
@@ -22,13 +23,15 @@ export default function useEmployeeMutations({
   setEmployees,
 }: EmployeeMutationOptions) {
   async function submitEmployee() {
-    if (!form.name) return;
+    const name = cleanName(form.name);
+    if (!name) return;
+    const payload = { ...form, name };
 
     if (editingId) {
-      const updated = await updateEmployee(apiFetch, editingId, form);
+      const updated = await updateEmployee(apiFetch, editingId, payload);
       setEmployees((employees) => employees.map((employee) => (employee.id === editingId ? updated : employee)));
     } else {
-      const created = await createEmployee(apiFetch, form);
+      const created = await createEmployee(apiFetch, payload);
       setEmployees((employees) => [...employees, created]);
     }
 

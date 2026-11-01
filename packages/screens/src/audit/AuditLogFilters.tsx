@@ -22,14 +22,16 @@ export default function AuditLogFilters({ styles, unitLabels, resource, unit, on
           </option>
         ))}
       </Select>
-      <Select className={styles.select} value={unit} onChange={(event) => onUnitChange(event.target.value)}>
-        <option value="">Todos os sistemas</option>
-        {Object.entries(unitLabels).map(([key, label]) => (
-          <option key={key} value={key}>
-            {label}
-          </option>
-        ))}
-      </Select>
+      {Object.keys(unitLabels).length > 1 && (
+        <Select className={styles.select} value={unit} onChange={(event) => onUnitChange(event.target.value)}>
+          <option value="">Todos os sistemas</option>
+          {Object.entries(unitLabels).map(([key, label]) => (
+            <option key={key} value={key}>
+              {label}
+            </option>
+          ))}
+        </Select>
+      )}
     </div>
   );
 }

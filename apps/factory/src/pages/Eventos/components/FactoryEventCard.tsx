@@ -39,7 +39,7 @@ function EventCard({
             </Heading>
             <span
               style={{
-                fontSize: 10,
+                fontSize: 12,
                 fontWeight: 700,
                 padding: '2px 7px',
                 borderRadius: 10,

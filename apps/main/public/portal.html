@@ -109,14 +109,15 @@
 
       .grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.75rem;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 360px));
+        justify-content: center;
+        gap: 2rem;
         animation: fadeInUp 0.9s ease-out;
       }
 
       @media (max-width: 860px) {
         .grid {
-          grid-template-columns: 1fr;
+          grid-template-columns: minmax(0, 1fr);
           max-width: 420px;
           margin: 0 auto;
         }

@@ -39,7 +39,7 @@ export default function InvoicePreviewModal({ invoice, eventName, onClose }: Pro
           <p>Data de Emissão: {format(parseISO(invoice.issueDate), 'dd/MM/yyyy')}</p>
           {(invoice.numeroNF || invoice.nfeioNumber) && <p>Número NF: {invoice.numeroNF || invoice.nfeioNumber}</p>}
           {invoice.chaveAcesso && (
-            <p style={{ wordBreak: 'break-all', fontSize: '10px' }}>Chave: {invoice.chaveAcesso}</p>
+            <p style={{ wordBreak: 'break-all', fontSize: '12px' }}>Chave: {invoice.chaveAcesso}</p>
           )}
         </PreviewSection>
         <Table variant="plain" className={styles.previewTable}>

@@ -23,3 +23,14 @@ export function formatRg(value: string) {
   if (digits.length <= 8) return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5)}`;
   return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}-${digits.slice(8)}`;
 }
+
+// Nomes antigos podem ter espaço ou caractere invisível no começo; só o texto visível conta.
+export function cleanName(name: string) {
+  return name.replace(/^[\s​-‍﻿]+/, '').trim();
+}
+
+// Letra de agrupamento e do avatar: sem acento, em maiúscula, ou # para nomes que não começam por letra.
+export function nameInitial(name: string) {
+  const letter = cleanName(name).normalize('NFD').charAt(0).toUpperCase();
+  return /[A-Z]/.test(letter) ? letter : '#';
+}

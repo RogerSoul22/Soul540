@@ -95,6 +95,20 @@ html[data-theme='dark'] {
     color: $text-secondary;
   }
 
+  .tab,
+  .filterBtn,
+  .monthBtn,
+  .pageBtn {
+    background: transparent;
+  }
+
+  .btnExport,
+  .btnXml {
+    background: rgba($accent, 0.1);
+    border-color: rgba($accent, 0.3);
+    color: $accent;
+  }
+
   .tab:hover,
   .filterBtn:hover,
   .monthBtn:hover,

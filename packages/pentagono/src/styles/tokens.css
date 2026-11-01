@@ -41,8 +41,8 @@
 
   --pentagono-font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --pentagono-font-display: 'Cormorant', Georgia, serif;
-  --pentagono-text-xs: 0.75rem;
-  --pentagono-text-sm: 0.875rem;
+  --pentagono-text-xs: 0.8125rem;
+  --pentagono-text-sm: 0.9375rem;
   --pentagono-text-base: 1rem;
   --pentagono-text-lg: 1.125rem;
   --pentagono-text-xl: 1.25rem;

@@ -4,14 +4,14 @@
 @use '../../../styles/mixins' as *;
 
 .userName {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: $font-weight-semibold;
   color: $text-primary;
   @include text-ellipsis;
 }
 
 .userRole {
-  font-size: 11px;
+  font-size: 13px;
   color: $text-muted;
   text-transform: capitalize;
   margin-top: 1px;

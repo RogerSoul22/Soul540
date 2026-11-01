@@ -1,11 +1,23 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+import { soulPwa } from '../../packages/pwa/src/soul-pwa-plugin';
 
 export default defineConfig({
   root: __dirname,
   base: '/',
-  plugins: [react()],
+  plugins: [
+    react(),
+    soulPwa({
+      assetsDir: resolve(__dirname, '../../packages/pwa/assets'),
+      id: '/',
+      name: 'Soul540',
+      shortName: 'Soul540',
+      description: 'Sistema de gestão principal da Soul540.',
+      scope: '/',
+      startUrl: '/',
+    }),
+  ],
   css: {
     preprocessorOptions: {
       scss: { api: 'modern-compiler' },

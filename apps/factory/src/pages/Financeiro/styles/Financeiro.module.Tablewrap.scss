@@ -12,13 +12,13 @@
 
 .table {
   min-width: 760px;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .table th {
   height: 34px;
   padding: 8px 10px;
-  font-size: 10px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.25px;
   white-space: nowrap;
@@ -51,7 +51,7 @@
 }
 
 .sectionTitle {
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .monthSummaryItem {
@@ -112,7 +112,7 @@
   flex-direction: column;
   gap: 5px;
   color: #63738b;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
 }

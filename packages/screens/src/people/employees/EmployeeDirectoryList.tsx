@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Badge, Button, SkeletonContent } from '../../../../pentagono/src/index';
 import EmployeeDirectoryFilters from './EmployeeDirectoryFilters';
+import { cleanName, nameInitial } from './employee-formatters';
 import { LocationIcon, PhoneIcon } from './employee-icons';
 import { dayLabels, days, employeeStatusConfig, roleLabels, type Employee } from './employee-types';
 import cardStyles from './styles/EmployeeDirectoryCards.module.scss';
@@ -86,9 +87,9 @@ function EmployeeCard({
   return (
     <article className={cardStyles.card} onClick={() => onView(employee)}>
       <div className={cardStyles.cardTop}>
-        <div className={cardStyles.cardAvatar}>{employee.name.charAt(0)}</div>
+        <div className={cardStyles.cardAvatar}>{nameInitial(employee.name)}</div>
         <div className={cardStyles.cardInfo}>
-          <p className={cardStyles.cardName}>{employee.name}</p>
+          <p className={cardStyles.cardName}>{cleanName(employee.name)}</p>
           <p className={cardStyles.cardRole}>{roleLabels[employee.role]}</p>
         </div>
         <Badge variant={status.color}>{status.label}</Badge>

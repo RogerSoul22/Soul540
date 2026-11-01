@@ -45,7 +45,7 @@
 
   border-radius: $radius-full;
 
-  font-size: 10px;
+  font-size: 12px;
 
   font-weight: $font-weight-semibold;
 
@@ -77,50 +77,68 @@
 
 .finalizedList {
   display: flex;
-
   flex-direction: column;
-
   max-height: 480px;
-
   overflow-y: auto;
+  scrollbar-color: $border transparent;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $border;
+    border-radius: $radius-full;
+  }
 }
 
 .finalizedItem {
-  @include flex-between;
-
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   padding: $spacing-sm $spacing-lg;
-
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-
-  gap: $spacing-md;
+  transition: background $transition-fast;
 
   &:last-child {
     border-bottom: none;
   }
 
   &:hover {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.03);
   }
 }
 
-.finalizedInfo {
+.finalizedHead {
   display: flex;
-
   align-items: center;
-
   gap: $spacing-sm;
-
-  flex: 1;
-
   min-width: 0;
 }
 
+.finalizedDelete {
+  width: 28px;
+  height: 28px;
+  color: $text-muted;
+  opacity: 0.6;
+
+  &:hover {
+    color: $danger;
+    background: rgba($danger, 0.12);
+    opacity: 1;
+  }
+}
+
 .finalizedFilial {
+  flex: 1;
+  min-width: 0;
   font-size: $font-size-sm;
-
-  font-weight: $font-weight-medium;
-
+  font-weight: $font-weight-semibold;
   color: $text-primary;
-
-  white-space: nowrap;
+  @include text-ellipsis;
 }

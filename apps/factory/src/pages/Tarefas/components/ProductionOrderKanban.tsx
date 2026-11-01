@@ -1,4 +1,4 @@
-import { Button } from '../../../../../../packages/pentagono/src/index';
+import { Button, EmptyState } from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/Tarefas.module.scss';
 import ProductionOrderCard from './ProductionOrderCard';
 import { ALL_STATUSES, formatQty, formatR$ } from '../support/task-formatters';
@@ -68,7 +68,12 @@ export default function ProductionOrderKanban({
               }}
             >
               {!pedidosByStatus[column.id].length ? (
-                <div className={styles.colEmpty}>Nenhum pedido</div>
+                <EmptyState
+                  variant="compact"
+                  className={styles.colEmpty}
+                  title="Nenhum pedido"
+                  description="Arraste um card para esta coluna."
+                />
               ) : (
                 pedidosByStatus[column.id].map((pedido) => (
                   <ProductionOrderCard
@@ -94,6 +99,9 @@ export default function ProductionOrderKanban({
   );
 }
 
+const summary = (pedido: Pedido) =>
+  pedido.itens.map((item) => `${item.nome} ${formatQty(item.quantidade)} ${item.measure}`).join(', ');
+
 function FinalizedOrders({ pedidos, onDelete }: { pedidos: Pedido[]; onDelete: (id: string) => void }) {
   if (!pedidos.length) return null;
   return (
@@ -105,25 +113,24 @@ function FinalizedOrders({ pedidos, onDelete }: { pedidos: Pedido[]; onDelete: (
       <div className={styles.finalizedList}>
         {pedidos.map((pedido) => (
           <div key={pedido.id} className={styles.finalizedItem}>
-            <div className={styles.finalizedInfo}>
+            <div className={styles.finalizedHead}>
               {pedido.orderNumber !== undefined && <span className={styles.orderBadge}>#{pedido.orderNumber}</span>}
               <span className={styles.finalizedFilial}>{pedido.filial}</span>
-              <span className={styles.finalizedItens}>
-                {pedido.itens.map((item) => `${item.nome} ${formatQty(item.quantidade)} ${item.measure}`).join(', ')}
-              </span>
-            </div>
-            <div className={styles.finalizedRight}>
-              <span className={styles.finalizedCost}>Custo: R$ {formatR$(pedido.totalCost)}</span>
+              <span className={styles.finalizedCost}>R$ {formatR$(pedido.totalCost)}</span>
               <Button
-                variant="danger"
-                size="sm"
-                className={styles.taskDelete}
+                variant="ghost"
+                size="icon"
+                className={styles.finalizedDelete}
                 onClick={() => onDelete(pedido.id)}
-                title="Excluir"
+                title="Excluir pedido"
+                aria-label={`Excluir pedido ${pedido.orderNumber ?? pedido.filial}`}
               >
                 <DeleteIcon />
               </Button>
             </div>
+            <p className={styles.finalizedItens} title={summary(pedido)}>
+              {summary(pedido)}
+            </p>
           </div>
         ))}
       </div>

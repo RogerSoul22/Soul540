@@ -79,12 +79,13 @@
 .field label,
 .detail small {
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: 13px;
   text-transform: uppercase;
 }
 
 .field input,
-.field select {
+.field select,
+.field button[aria-haspopup='listbox'] {
   box-sizing: border-box;
   width: 100%;
   padding: 10px 12px;

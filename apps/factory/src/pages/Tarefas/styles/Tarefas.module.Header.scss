@@ -56,33 +56,6 @@
   .orderFilterClear {
     flex: 1 0 100%;
   }
-
-  .finalizedItem {
-    flex-direction: column;
-
-    align-items: stretch;
-  }
-
-  .finalizedInfo,
-  .finalizedRight {
-    flex-wrap: wrap;
-  }
-
-  .finalizedItens {
-    white-space: normal;
-
-    overflow: visible;
-
-    text-overflow: clip;
-  }
-
-  .finalizedRight {
-    width: 100%;
-
-    justify-content: flex-end;
-
-    gap: $spacing-sm;
-  }
 }
 
 .saveStatus {
