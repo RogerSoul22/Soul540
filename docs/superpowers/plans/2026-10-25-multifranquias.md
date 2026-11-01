@@ -31,6 +31,7 @@
 ### Task 1: Contexto de franquia e contratos compartilhados
 
 **Files:**
+
 - Create: `apps/api/src/infrastructure/franchise-context.ts`
 - Modify: `apps/api/src/infrastructure/middleware/tenant.ts`
 - Modify: `apps/api/src/modules/identity/auth.routes.ts`
@@ -39,6 +40,7 @@
 - Test: `apps/api/src/infrastructure/franchise-context.test.ts`
 
 **Interfaces:**
+
 - Produces `FranchiseScope = { unit: 'main' | 'franchise' | 'factory'; franchiseId?: string; isAdmin: boolean }`.
 - Produces `getFranchiseScope(req): FranchiseScope` and `requireFranchiseId(req): string`.
 - `User` recebe `franchiseId?: string`.
@@ -52,6 +54,7 @@
 ### Task 2: Modelo de franquia, slug e vínculo de usuários
 
 **Files:**
+
 - Modify: `apps/api/src/modules/identity/franchises.routes.ts`
 - Modify: `apps/api/src/modules/identity/auth.routes.ts`
 - Modify: `apps/api/src/modules/identity/users.routes.ts`
@@ -60,6 +63,7 @@
 - Test: `apps/api/src/modules/identity/franchise-policy.test.ts`
 
 **Interfaces:**
+
 - `Franchise` terá `slug`, índice único de slug e status validado.
 - Produces `getActiveFranchiseOrThrow(id)` e `normalizeFranchiseSlug(name)`.
 - Usuário `unit === 'franchise'` exige `franchiseId`; usuário `main` não pode escolher franquia de outro contexto sem permissão.
@@ -73,6 +77,7 @@
 ### Task 3: Migração idempotente de Itu
 
 **Files:**
+
 - Create: `apps/api/src/scripts/migrate-franchise-tenants.ts`
 - Modify: `apps/api/src/modules/identity/franchises.routes.ts`
 - Modify: `apps/api/src/modules/identity/auth.routes.ts`
@@ -82,6 +87,7 @@
 - Test: `apps/api/src/scripts/migrate-franchise-tenants.test.ts`
 
 **Interfaces:**
+
 - Command `pnpm migrate:franchise-tenants -- --slug itu --apply`.
 - Sem `--apply`, o comando somente informa contagens, registros sem vínculo e alterações previstas.
 - Com `--apply`, o comando cria/encontra Itu e preenche `franchiseId` nos usuários e documentos legados das coleções de franquia.
@@ -95,6 +101,7 @@
 ### Task 4: Isolamento nos módulos da API
 
 **Files:**
+
 - Modify: `apps/api/src/modules/events/events.routes.ts`
 - Modify: `apps/api/src/modules/events/events.finance.ts`
 - Modify: `apps/api/src/modules/finance/finance-tenant.ts`
@@ -115,6 +122,7 @@
 - Test: `apps/api/src/modules/tenant-isolation.test.ts`
 
 **Interfaces:**
+
 - `createTenantModels` passa a produzir modelos já preparados para `franchiseId`.
 - Cada rota recebe um filtro de escopo comum e injeta o vínculo na criação.
 - Auditoria registra `franchiseId` efetivo.
@@ -128,6 +136,7 @@
 ### Task 5: Cliente HTTP, sessão e portal compartilhado
 
 **Files:**
+
 - Modify: `packages/api-client/src/create-api-fetch.ts`
 - Modify: `packages/api-client/src/index.ts`
 - Modify: `packages/contracts/src/users.ts`
@@ -140,6 +149,7 @@
 - Create: `apps/franchise/src/franchise-context.ts`
 
 **Interfaces:**
+
 - `createApiFetch` aceita `franchiseId?: string` apenas para chamadas administrativas configuradas.
 - `FranchiseContext` expõe `{ id, slug, name, city, status }` para o portal.
 - `/itu` continua apontando para o registro de Itu; novos slugs usam a configuração dinâmica do portal.
@@ -153,6 +163,7 @@
 ### Task 6: Testes de regressão, documentação e revisão
 
 **Files:**
+
 - Modify: `docs/superpowers/specs/2026-10-25-multifranquias-design.md`
 - Modify: `docs/HANDOFF_CONTINUACAO_MIGRACAO.md`
 - Create: `apps/api/src/modules/identity/franchise-isolation.test.ts`
@@ -163,4 +174,3 @@
 - [ ] Executar `pnpm build:main`, `pnpm build:franchise`, `pnpm build:factory` e `pnpm build:api`.
 - [ ] Registrar no handoff o que foi migrado, o comando de migração e pendências fiscais.
 - [ ] Rodar `revisar-padrao` sobre os arquivos alterados e corrigir desvios introduzidos pela feature.
-

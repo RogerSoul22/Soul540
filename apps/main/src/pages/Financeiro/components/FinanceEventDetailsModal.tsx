@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
-import { ConfirmModal, Modal } from '../../../../../../packages/ui/src/index';
+import { Button, ConfirmModal, Modal } from '../../../../../../packages/pentagono/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
 import styles from '../styles/Financeiro.module.scss';
 
@@ -83,8 +83,8 @@ export default function FinanceEventDetailsModal({ controller }: { controller: F
       )}
       <div className={styles.eventDetailActions}>
         {selectedEvent.financialCloseStatus === 'closed' ? (
-          <button
-            className={styles.btnExport}
+          <Button
+            variant="secondary"
             type="button"
             onClick={async () => {
               await reopenEventFinance(selectedEvent.id);
@@ -92,10 +92,10 @@ export default function FinanceEventDetailsModal({ controller }: { controller: F
             }}
           >
             Reabrir financeiro
-          </button>
+          </Button>
         ) : (
-          <button
-            className={styles.btnExport}
+          <Button
+            variant="secondary"
             type="button"
             onClick={async () => {
               await closeEventFinance(selectedEvent.id);
@@ -103,20 +103,20 @@ export default function FinanceEventDetailsModal({ controller }: { controller: F
             }}
           >
             Fechar financeiro
-          </button>
+          </Button>
         )}
-        <button
-          className={styles.btnPrimary}
+        <Button
+          variant="primary"
           type="button"
           onClick={() => {
             window.location.href = '/eventos?edit=' + encodeURIComponent(selectedEvent.id);
           }}
         >
           Editar evento
-        </button>
-        <button className={styles.btnDanger} type="button" onClick={() => setConfirmDelete(true)}>
+        </Button>
+        <Button variant="danger" type="button" onClick={() => setConfirmDelete(true)}>
           Excluir evento
-        </button>
+        </Button>
       </div>
       {confirmDelete && (
         <ConfirmModal

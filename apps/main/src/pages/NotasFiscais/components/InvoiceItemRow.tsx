@@ -1,5 +1,5 @@
 import type { ChangeEvent } from 'react';
-import { Button, Input } from '../../../../../../packages/ui/src/index';
+import { Button, Input } from '../../../../../../packages/pentagono/src/index';
 import type { InvoiceItem } from '../../../../../../packages/contracts/src/index';
 import type { InvoiceFormState } from '../types/invoice-types';
 import styles from '../styles/NotasFiscais.module.scss';

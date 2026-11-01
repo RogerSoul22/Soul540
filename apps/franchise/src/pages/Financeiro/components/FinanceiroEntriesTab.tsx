@@ -2,7 +2,7 @@ import type { useFinanceiroController } from '../hooks/use-financeiro-controller
 
 type Controller = ReturnType<typeof useFinanceiroController>;
 type Props = { controller: Controller };
-import { Badge } from '../../../../../../packages/ui/src/index';
+import { Badge, Button, Input } from '../../../../../../packages/pentagono/src/index';
 import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
 import styles from '../styles/Financeiro.module.scss';
 import FinanceiroEntriesTable from './FinanceiroEntriesTable';
@@ -27,7 +27,8 @@ export default function FinanceiroEntriesTab({ controller }: Props) {
       <div className={styles.filterRow}>
         <div className={styles.filterGroup}>
           {(['all', 'revenue', 'cost', 'pending'] as FilterType[]).map((type) => (
-            <button
+            <Button
+              variant="chip"
               key={type}
               className={`${styles.filterBtn} ${filterType === type ? styles.filterBtnActive : ''}`}
               onClick={() => {
@@ -36,12 +37,13 @@ export default function FinanceiroEntriesTab({ controller }: Props) {
               }}
             >
               {type === 'all' ? 'Todos' : type === 'revenue' ? 'Receitas' : type === 'pending' ? 'Pendentes' : 'Custos'}
-            </button>
+            </Button>
           ))}
         </div>
         <div className={styles.filterGroup}>
           {(['all', 'feirinha', 'evento_avulso'] as const).map((modality) => (
-            <button
+            <Button
+              variant="chip"
               key={modality}
               className={`${styles.filterBtn} ${modalityFilter === modality ? styles.filterBtnActive : ''}`}
               onClick={() => {
@@ -50,10 +52,11 @@ export default function FinanceiroEntriesTab({ controller }: Props) {
               }}
             >
               {modality === 'all' ? 'Todas modalidades' : modality === 'feirinha' ? 'Feirinhas' : 'Eventos avulsos'}
-            </button>
+            </Button>
           ))}
         </div>
-        <input
+        <Input
+          variant="search"
           type="text"
           className={styles.searchInput}
           placeholder="Buscar por descrição, categoria..."
@@ -63,7 +66,7 @@ export default function FinanceiroEntriesTab({ controller }: Props) {
             setLancamentosPage(1);
           }}
         />
-        <button className={styles.btnExport} onClick={exportCSV} title="Exportar lançamentos filtrados para CSV">
+        <Button variant="secondary" onClick={exportCSV} title="Exportar lançamentos filtrados para CSV">
           <svg
             width="14"
             height="14"
@@ -79,8 +82,8 @@ export default function FinanceiroEntriesTab({ controller }: Props) {
             <line x1="12" y1="15" x2="12" y2="3" />
           </svg>
           Exportar CSV
-        </button>
-        <button className={styles.btnExport} onClick={exportDRE} title="Exportar no padrão DRE (mensal, por seção)">
+        </Button>
+        <Button variant="secondary" onClick={exportDRE} title="Exportar no padrão DRE (mensal, por seção)">
           <svg
             width="14"
             height="14"
@@ -97,7 +100,7 @@ export default function FinanceiroEntriesTab({ controller }: Props) {
             <line x1="16" y1="17" x2="8" y2="17" />
           </svg>
           Exportar DRE
-        </button>
+        </Button>
       </div>
 
       <FinanceiroEntriesTable controller={controller} />

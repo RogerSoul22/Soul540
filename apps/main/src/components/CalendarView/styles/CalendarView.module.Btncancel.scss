@@ -28,32 +28,6 @@
   }
 }
 
-.btnDeleteConfirm {
-  flex: 1;
-
-  padding: 9px $spacing-md;
-
-  border-radius: $radius-sm;
-
-  border: none;
-
-  background: $danger;
-
-  color: #fff;
-
-  font-size: $font-size-sm;
-
-  font-weight: $font-weight-semibold;
-
-  cursor: pointer;
-
-  transition: all $transition-base;
-
-  &:hover {
-    filter: brightness(1.1);
-  }
-}
-
 // section
 .formRow {
   display: grid;

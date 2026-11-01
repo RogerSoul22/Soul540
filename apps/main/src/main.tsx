@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import '../../../packages/pentagono/src/styles/pentagono.css';
 import './styles/global.scss';
 import App from './App';
 

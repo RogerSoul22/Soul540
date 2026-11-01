@@ -1,13 +1,7 @@
 import { getSaoPauloDate, isDateOnly } from './financeDates';
 
 export type FinancePeriodPreset =
-  | 'this_week'
-  | 'this_month'
-  | 'this_year'
-  | 'last_30_days'
-  | 'last_12_months'
-  | 'all_time'
-  | 'custom';
+  'this_week' | 'this_month' | 'this_year' | 'last_30_days' | 'last_12_months' | 'all_time' | 'custom';
 
 export interface FinancePeriod {
   preset: FinancePeriodPreset;
@@ -97,10 +91,7 @@ export function createMonthRangePeriod(startMonth: string, endMonth: string): Fi
 
 export function matchesFinancePeriod(date: string | undefined | null, period: FinancePeriod): boolean {
   return Boolean(
-    date
-    && isDateOnly(date)
-    && (!period.start || date >= period.start)
-    && (!period.end || date <= period.end),
+    date && isDateOnly(date) && (!period.start || date >= period.start) && (!period.end || date <= period.end),
   );
 }
 
@@ -117,7 +108,8 @@ export function getShiftedFinancePeriod(period: FinancePeriod, direction: -1 | 1
     return { ...period, start: addYears(period.start, direction), end: addYears(period.end, direction) };
   }
 
-  const inclusiveDays = Math.round((parseDate(period.end).getTime() - parseDate(period.start).getTime()) / 86_400_000) + 1;
+  const inclusiveDays =
+    Math.round((parseDate(period.end).getTime() - parseDate(period.start).getTime()) / 86_400_000) + 1;
   return {
     ...period,
     start: addDays(period.start, direction * inclusiveDays),

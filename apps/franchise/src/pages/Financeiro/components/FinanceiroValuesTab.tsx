@@ -1,3 +1,4 @@
+import { Card, Heading } from '../../../../../../packages/pentagono/src/index';
 import type { useFinanceiroController } from '../hooks/use-financeiro-controller';
 
 type Controller = ReturnType<typeof useFinanceiroController>;
@@ -13,11 +14,11 @@ export default function FinanceiroValuesTab({ controller }: Props) {
     <>
       {activeTab === 'valores' && (
         <div className={styles.tabContent}>
-          <div className={styles.agendamentosCard}>
+          <Card className={styles.agendamentosCard}>
             <div className={styles.agendamentosHeader}>
-              <h3 className={styles.sectionTitle} style={{ margin: 0 }}>
+              <Heading level={3} variant="section" className={styles.sectionTitle} style={{ margin: 0 }}>
                 Financeiro dos Eventos
-              </h3>
+              </Heading>
               <div className={styles.agendamentosPills}>
                 <div className={styles.agendamentosPill}>
                   <span className={styles.agendamentosPillLabel}>Total Final</span>
@@ -68,7 +69,7 @@ export default function FinanceiroValuesTab({ controller }: Props) {
                 ))}
               </div>
             )}
-          </div>
+          </Card>
         </div>
       )}
 

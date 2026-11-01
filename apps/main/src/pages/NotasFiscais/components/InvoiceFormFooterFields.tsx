@@ -1,3 +1,4 @@
+import { Select, Textarea } from '../../../../../../packages/pentagono/src/index';
 import type { InvoiceFormState } from '../types/invoice-types';
 import InvoiceFormField from './InvoiceFormField';
 import styles from '../styles/NotasFiscais.module.scss';
@@ -18,21 +19,21 @@ export default function InvoiceFormFooterFields({ form, subtotal, taxAmount, edi
         {(subtotal + taxAmount).toLocaleString('pt-BR')}
       </div>
       <InvoiceFormField label="Observações">
-        <textarea
+        <Textarea
           className={styles.formTextarea}
           value={form.notes}
           onChange={(event) => onChange('notes', event.target.value)}
         />
       </InvoiceFormField>
       <InvoiceFormField label="Status">
-        <select
+        <Select
           className={styles.formSelect}
           value={form.status}
           onChange={(event) => onChange('status', event.target.value as InvoiceFormState['status'])}
         >
           <option value="rascunho">Rascunho</option>
           {editing && <option value="emitida">Emitida</option>}
-        </select>
+        </Select>
       </InvoiceFormField>
     </>
   );

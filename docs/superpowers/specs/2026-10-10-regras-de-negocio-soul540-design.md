@@ -32,11 +32,11 @@ Quando houver conflito, a regra não deve ser considerada fechada: ela entra na 
 
 O Soul540 possui três contextos operacionais:
 
-| Contexto | Responsabilidade | Dados padrão visíveis |
-|---|---|---|
-| Matriz (`main`) | gestão central, eventos, financeiro consolidado e administração | todos os contextos, conforme permissão |
-| Franquia (`franchise`) | operação de uma unidade/franquia | somente a própria unidade e administradores |
-| Fábrica (`factory`) | produção e expedição | produção própria e dados operacionais autorizados |
+| Contexto               | Responsabilidade                                                | Dados padrão visíveis                             |
+| ---------------------- | --------------------------------------------------------------- | ------------------------------------------------- |
+| Matriz (`main`)        | gestão central, eventos, financeiro consolidado e administração | todos os contextos, conforme permissão            |
+| Franquia (`franchise`) | operação de uma unidade/franquia                                | somente a própria unidade e administradores       |
+| Fábrica (`factory`)    | produção e expedição                                            | produção própria e dados operacionais autorizados |
 
 A API é compartilhada entre os contextos. A unidade deve ser determinada no servidor e nunca confiada apenas ao cliente.
 
@@ -44,39 +44,39 @@ A API é compartilhada entre os contextos. A unidade deve ser determinada no ser
 
 ### 4.1 Identidade, autenticação e unidade
 
-| Regra | Status | Evidência / observação |
-|---|---|---|
-| Usuário precisa estar autenticado para acessar a área protegida da API. | Confirmada | `apps/api/src/infrastructure/middleware/auth.ts` e composição em `apps/api/src/app.ts`. |
-| Token pode vir de cookie HTTP-only ou cabeçalho Bearer. | Confirmada | Middleware de autenticação. |
-| Login usa e-mail normalizado em minúsculas e senha com hash bcrypt. | Confirmada | `auth.routes.ts`. |
-| Usuário não administrador só pode entrar no sistema correspondente à sua unidade. | Confirmada | Validação de `unit` contra `X-System`. |
-| Administrador pode acessar mais de um contexto. | Confirmada | Regra de autenticação e tenant. |
-| Usuário comum fica restrito à própria unidade; o cliente não pode trocar essa unidade com `X-System`. | Confirmada | `tenant.ts`. |
-| Matriz pode consultar dados de outras unidades quando o escopo solicitado for permitido. | Confirmada | Filtros de tenant e escopo administrativo. |
-| Toda consulta e mutação deve aplicar filtro de unidade no servidor. | Confirmada / lacuna | Implementada nos módulos principais, mas deve ser auditada nos módulos auxiliares e no chat. |
-| A unidade enviada pelo cliente não pode substituir a unidade calculada pelo servidor. | Confirmada / lacuna | Há risco no cadastro de usuários, que aceita `body.unit` sem restringir explicitamente o administrador não matriz. |
-| Dados sem unidade pertencem à matriz somente quando essa for a regra explícita do modelo. | Inferida | Deve ser evitado como fallback silencioso em novas entidades. |
+| Regra                                                                                                 | Status              | Evidência / observação                                                                                             |
+| ----------------------------------------------------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Usuário precisa estar autenticado para acessar a área protegida da API.                               | Confirmada          | `apps/api/src/infrastructure/middleware/auth.ts` e composição em `apps/api/src/app.ts`.                            |
+| Token pode vir de cookie HTTP-only ou cabeçalho Bearer.                                               | Confirmada          | Middleware de autenticação.                                                                                        |
+| Login usa e-mail normalizado em minúsculas e senha com hash bcrypt.                                   | Confirmada          | `auth.routes.ts`.                                                                                                  |
+| Usuário não administrador só pode entrar no sistema correspondente à sua unidade.                     | Confirmada          | Validação de `unit` contra `X-System`.                                                                             |
+| Administrador pode acessar mais de um contexto.                                                       | Confirmada          | Regra de autenticação e tenant.                                                                                    |
+| Usuário comum fica restrito à própria unidade; o cliente não pode trocar essa unidade com `X-System`. | Confirmada          | `tenant.ts`.                                                                                                       |
+| Matriz pode consultar dados de outras unidades quando o escopo solicitado for permitido.              | Confirmada          | Filtros de tenant e escopo administrativo.                                                                         |
+| Toda consulta e mutação deve aplicar filtro de unidade no servidor.                                   | Confirmada / lacuna | Implementada nos módulos principais, mas deve ser auditada nos módulos auxiliares e no chat.                       |
+| A unidade enviada pelo cliente não pode substituir a unidade calculada pelo servidor.                 | Confirmada / lacuna | Há risco no cadastro de usuários, que aceita `body.unit` sem restringir explicitamente o administrador não matriz. |
+| Dados sem unidade pertencem à matriz somente quando essa for a regra explícita do modelo.             | Inferida            | Deve ser evitado como fallback silencioso em novas entidades.                                                      |
 
 ### 4.2 Dinheiro, datas e idempotência
 
-| Regra | Status |
-|---|---|
-| Valores monetários são representados em centavos no domínio e aceitam no máximo duas casas decimais na entrada. | Confirmada |
-| Datas de negócio são strings `YYYY-MM-DD`, sem conversão acidental de fuso. | Confirmada |
-| A referência de data operacional deve considerar o fuso de São Paulo. | Confirmada |
-| Liquidações repetidas com a mesma chave de idempotência não podem duplicar o pagamento. | Confirmada |
-| Origem, tipo, unidade, vínculo automático e reversão financeira são controlados pelo servidor. | Confirmada |
-| Comandos financeiros devem ser preferidos a alterações genéricas de campos derivados. | Confirmada |
+| Regra                                                                                                                 | Status     |
+| --------------------------------------------------------------------------------------------------------------------- | ---------- |
+| Valores monetários são representados em centavos no domínio e aceitam no máximo duas casas decimais na entrada.       | Confirmada |
+| Datas de negócio são strings `YYYY-MM-DD`, sem conversão acidental de fuso.                                           | Confirmada |
+| A referência de data operacional deve considerar o fuso de São Paulo.                                                 | Confirmada |
+| Liquidações repetidas com a mesma chave de idempotência não podem duplicar o pagamento.                               | Confirmada |
+| Origem, tipo, unidade, vínculo automático e reversão financeira são controlados pelo servidor.                        | Confirmada |
+| Comandos financeiros devem ser preferidos a alterações genéricas de campos derivados.                                 | Confirmada |
 | Migrações e backfills devem ser comandos explícitos de manutenção, nunca executados automaticamente na inicialização. | Confirmada |
 
 ### 4.3 Auditoria
 
-| Regra | Status |
-|---|---|
-| Criações, alterações e exclusões relevantes devem gerar registro de auditoria. | Confirmada nos módulos que já chamam o serviço de auditoria. |
-| O registro deve indicar ação, entidade, usuário e unidade efetiva. | Confirmada |
-| Reversão financeira deve ser auditável e não deve apagar o histórico da transação. | Confirmada no domínio / conflitante em alguns fluxos atuais. |
-| Toda ação administrativa sensível deve registrar o motivo quando houver reversão, cancelamento, reabertura ou exclusão lógica. | Inferida; recomendada |
+| Regra                                                                                                                          | Status                                                       |
+| ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ |
+| Criações, alterações e exclusões relevantes devem gerar registro de auditoria.                                                 | Confirmada nos módulos que já chamam o serviço de auditoria. |
+| O registro deve indicar ação, entidade, usuário e unidade efetiva.                                                             | Confirmada                                                   |
+| Reversão financeira deve ser auditável e não deve apagar o histórico da transação.                                             | Confirmada no domínio / conflitante em alguns fluxos atuais. |
+| Toda ação administrativa sensível deve registrar o motivo quando houver reversão, cancelamento, reabertura ou exclusão lógica. | Inferida; recomendada                                        |
 
 ## 5. Usuários, permissões e papéis
 
@@ -119,18 +119,18 @@ Um evento pode conter, entre outros dados:
 
 O código utiliza estados como `planning`, `confirmed`, `completed` e `cancelled`, mas as transições não estão centralizadas em uma máquina de estados.
 
-| Transição / regra | Status |
-|---|---|
-| Novo evento começa em planejamento. | Confirmada |
-| Evento confirmado pode ser usado como referência para produção vinculada. | Confirmada |
-| Evento concluído não deve aparecer como próximo evento no dashboard. | Confirmada |
-| Evento cancelado não deve aparecer como próximo evento. | Confirmada |
-| Fábrica não cria eventos. | Confirmada |
-| Fábrica pode atualizar apenas dados operacionais autorizados. | Confirmada |
-| Fábrica não exclui eventos. | Confirmada |
-| Apenas matriz/franquia criam, editam e excluem eventos comerciais. | Confirmada |
-| Exclusão física de evento é permitida atualmente para matriz/franquia. | Atual; precisa de decisão |
-| Cancelamento e exclusão são operações diferentes. | Inferida; recomendada |
+| Transição / regra                                                         | Status                    |
+| ------------------------------------------------------------------------- | ------------------------- |
+| Novo evento começa em planejamento.                                       | Confirmada                |
+| Evento confirmado pode ser usado como referência para produção vinculada. | Confirmada                |
+| Evento concluído não deve aparecer como próximo evento no dashboard.      | Confirmada                |
+| Evento cancelado não deve aparecer como próximo evento.                   | Confirmada                |
+| Fábrica não cria eventos.                                                 | Confirmada                |
+| Fábrica pode atualizar apenas dados operacionais autorizados.             | Confirmada                |
+| Fábrica não exclui eventos.                                               | Confirmada                |
+| Apenas matriz/franquia criam, editam e excluem eventos comerciais.        | Confirmada                |
+| Exclusão física de evento é permitida atualmente para matriz/franquia.    | Atual; precisa de decisão |
+| Cancelamento e exclusão são operações diferentes.                         | Inferida; recomendada     |
 
 ### 6.3 Transições recomendadas para aprovação
 
@@ -176,12 +176,12 @@ Fábrica não sincroniza diretamente o financeiro do evento comercial.
 
 ### 7.3 Conflitos que precisam de decisão
 
-| Tema | Comportamento atual | Regra desejada registrada | Decisão necessária |
-|---|---|---|---|
-| Sinal | É criado como já pago/liquidado quando o valor existe. | Há documento que trata todo sinal informado como recebido; outro documento trata previsões de sinal como abertas. | Confirmar se informar sinal significa recebimento efetivo ou apenas valor contratado. |
-| Cancelamento | Pode remover fisicamente lançamentos automáticos, inclusive em certos casos liquidados. | Regra financeira canônica recomenda preservar histórico e cancelar/reverter por comando. | Definir retenção, devolução, crédito ou multa e proibir exclusão física. |
-| Alteração de preço | Sincroniza previsões abertas. | Não deve reescrever valores já liquidados; deve criar ajuste auditável. | Confirmar política de ajuste. |
-| Fechamento | Pode marcar fechamento do evento e bloquear parte da sincronização. | Fechamento financeiro é distinto do status financeiro e deve exigir comando explícito. | Definir quem fecha/reabre e quais campos ficam bloqueados. |
+| Tema               | Comportamento atual                                                                     | Regra desejada registrada                                                                                         | Decisão necessária                                                                    |
+| ------------------ | --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Sinal              | É criado como já pago/liquidado quando o valor existe.                                  | Há documento que trata todo sinal informado como recebido; outro documento trata previsões de sinal como abertas. | Confirmar se informar sinal significa recebimento efetivo ou apenas valor contratado. |
+| Cancelamento       | Pode remover fisicamente lançamentos automáticos, inclusive em certos casos liquidados. | Regra financeira canônica recomenda preservar histórico e cancelar/reverter por comando.                          | Definir retenção, devolução, crédito ou multa e proibir exclusão física.              |
+| Alteração de preço | Sincroniza previsões abertas.                                                           | Não deve reescrever valores já liquidados; deve criar ajuste auditável.                                           | Confirmar política de ajuste.                                                         |
+| Fechamento         | Pode marcar fechamento do evento e bloquear parte da sincronização.                     | Fechamento financeiro é distinto do status financeiro e deve exigir comando explícito.                            | Definir quem fecha/reabre e quais campos ficam bloqueados.                            |
 
 ## 8. Financeiro geral
 
@@ -205,11 +205,11 @@ Regras:
 
 ### 8.2 Caixa, competência e DRE
 
-| Visão | Data usada | Regra |
-|---|---|---|
-| Caixa | data de cada liquidação | entra somente o que foi efetivamente recebido/pago no período |
-| Competência | data do lançamento, evento ou vencimento conforme a natureza | mostra a previsão/obrigação do período |
-| DRE | lançamentos não cancelados e corretamente classificados | não deve incluir itens sem classificação válida |
+| Visão       | Data usada                                                   | Regra                                                         |
+| ----------- | ------------------------------------------------------------ | ------------------------------------------------------------- |
+| Caixa       | data de cada liquidação                                      | entra somente o que foi efetivamente recebido/pago no período |
+| Competência | data do lançamento, evento ou vencimento conforme a natureza | mostra a previsão/obrigação do período                        |
+| DRE         | lançamentos não cancelados e corretamente classificados      | não deve incluir itens sem classificação válida               |
 
 O período selecionado deve controlar simultaneamente cartões, gráficos, tabela e eventos relacionados. O padrão documentado é “Este mês”.
 
@@ -248,10 +248,10 @@ O código atual cria receita automática para ordem entregue sem usar de forma e
 
 **Regra a aprovar:**
 
-| Tratamento | Financeiro esperado |
-|---|---|
-| `internal_transfer` | movimentação operacional/contábil interna, sem entrada de caixa por padrão |
-| `external_sale` | receita somente com cliente, preço, forma de pagamento e condições preenchidos |
+| Tratamento          | Financeiro esperado                                                            |
+| ------------------- | ------------------------------------------------------------------------------ |
+| `internal_transfer` | movimentação operacional/contábil interna, sem entrada de caixa por padrão     |
+| `external_sale`     | receita somente com cliente, preço, forma de pagamento e condições preenchidos |
 
 ### 9.3 Estados recomendados
 
@@ -466,4 +466,4 @@ Após a aprovação deste mapa e das decisões pendentes, o trabalho deve ser di
 5. fiscal;
 6. dashboard, chat e melhorias operacionais.
 
-Cada etapa deve incluir contrato de API, regras de transição, validações, auditoria, migração de dados quando necessária e testes de integração. 
+Cada etapa deve incluir contrato de API, regras de transição, validações, auditoria, migração de dados quando necessária e testes de integração.

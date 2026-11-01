@@ -1,4 +1,4 @@
-import { Badge, Button } from '../../../../ui/src/index';
+import { Badge, Button } from '../../../../pentagono/src/index';
 import type { Utensil } from './utensil-types';
 import { utensilStatusConfig } from './utensil-types';
 import styles from './styles/UtensilsInventoryList.module.scss';

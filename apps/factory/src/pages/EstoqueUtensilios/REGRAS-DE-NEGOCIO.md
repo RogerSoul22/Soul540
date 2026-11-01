@@ -33,4 +33,3 @@ A visualização e as ações dependem da permissão da página e das permissõe
 - Definir estados oficiais.
 - Definir manutenção e baixa.
 - Definir se o planejamento de evento reserva utensílios automaticamente.
-

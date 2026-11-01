@@ -1,7 +1,17 @@
+import {
+  Button,
+  EmptyState,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeadCell,
+  TableRow,
+} from '../../../../../../packages/pentagono/src/index';
 import type { useFinanceiroController } from '../hooks/use-financeiro-controller';
 
-type Controller = ReturnType<typeof useFinanceiroController>;
-type Props = { controller: Controller };
+type Props = { controller: ReturnType<typeof useFinanceiroController> };
 import { format, isValid, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
@@ -27,33 +37,32 @@ export default function FinanceiroEntriesTable({ controller }: Props) {
   } = controller;
   return (
     <>
-      {/* Table */}
       {filtered.length === 0 ? (
-        <div className={styles.emptyState}>Nenhum lancamento encontrado.</div>
+        <EmptyState title="Nenhum lancamento encontrado." />
       ) : (
         <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Tipo</th>
-                <th>Descricao</th>
-                <th>Categoria</th>
-                <th>Data</th>
-                <th>Status</th>
-                <th>Valor</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table variant="plain" className={styles.table}>
+            <TableHead>
+              <TableRow>
+                <TableHeadCell>Tipo</TableHeadCell>
+                <TableHeadCell>Descricao</TableHeadCell>
+                <TableHeadCell>Categoria</TableHeadCell>
+                <TableHeadCell>Data</TableHeadCell>
+                <TableHeadCell>Status</TableHeadCell>
+                <TableHeadCell>Valor</TableHeadCell>
+                <TableHeadCell></TableHeadCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {filtered.slice((lancamentosPage - 1) * 50, lancamentosPage * 50).map((entry) => (
-                <tr key={entry.id}>
-                  <td>
+                <TableRow key={entry.id}>
+                  <TableCell>
                     <span className={entry.type === 'revenue' ? styles.typeRevenue : styles.typeCost}>
                       {entry.type === 'revenue' ? 'Receita' : 'Custo'}
                     </span>
-                  </td>
-                  <td>{entry.description}</td>
-                  <td>
+                  </TableCell>
+                  <TableCell>{entry.description}</TableCell>
+                  <TableCell>
                     <span className={styles.categoryTag}>
                       <span
                         className={styles.categoryDot}
@@ -61,10 +70,11 @@ export default function FinanceiroEntriesTable({ controller }: Props) {
                       />
                       {categoryLabels[entry.category] || entry.category}
                     </span>
-                  </td>
-                  <td>{safeFormat(entry.date, 'dd/MM/yy')}</td>
-                  <td>
-                    <select
+                  </TableCell>
+                  <TableCell>{safeFormat(entry.date, 'dd/MM/yy')}</TableCell>
+                  <TableCell>
+                    <Select
+                      variant="compact"
                       className={[
                         styles.agendamentoStatus,
                         entry.status === 'paid' ? styles.statusReceived : styles.statusPending,
@@ -74,16 +84,21 @@ export default function FinanceiroEntriesTable({ controller }: Props) {
                     >
                       <option value="pending">Pendente</option>
                       <option value="paid">Pago</option>
-                    </select>
-                  </td>
-                  <td>
+                    </Select>
+                  </TableCell>
+                  <TableCell>
                     <span className={entry.type === 'revenue' ? styles.typeRevenue : styles.typeCost}>
                       {entry.type === 'revenue' ? '+' : '-'} {formatBRL(entry.amount)}
                     </span>
-                  </td>
-                  <td>
+                  </TableCell>
+                  <TableCell>
                     <div style={{ display: 'flex', gap: 4 }}>
-                      <button className={styles.actionBtn} onClick={() => handleEdit(entry)} title="Editar">
+                      <Button
+                        variant="outline"
+                        className={styles.actionBtn}
+                        onClick={() => handleEdit(entry)}
+                        title="Editar"
+                      >
                         <svg
                           width="14"
                           height="14"
@@ -97,8 +112,10 @@ export default function FinanceiroEntriesTable({ controller }: Props) {
                           <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                           <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                         </svg>
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
                         className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
                         onClick={() => deleteFinance(entry.id)}
                         title="Excluir"
@@ -114,35 +131,37 @@ export default function FinanceiroEntriesTable({ controller }: Props) {
                           <polyline points="3 6 5 6 21 6" />
                           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                         </svg>
-                      </button>
+                      </Button>
                     </div>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       )}
       {filtered.length > 50 && (
         <div className={styles.pagination}>
-          <button
+          <Button
+            variant="outline"
             className={styles.pageBtn}
             onClick={() => setLancamentosPage((page) => page - 1)}
             disabled={lancamentosPage <= 1}
           >
             Anterior
-          </button>
+          </Button>
           <span className={styles.pageInfo}>
             Pagina {lancamentosPage} de {Math.ceil(filtered.length / 50)}
             <span className={styles.pageTotal}>{filtered.length} lancamentos</span>
           </span>
-          <button
+          <Button
+            variant="outline"
             className={styles.pageBtn}
             onClick={() => setLancamentosPage((page) => page + 1)}
             disabled={lancamentosPage >= Math.ceil(filtered.length / 50)}
           >
             Proxima
-          </button>
+          </Button>
         </div>
       )}
     </>

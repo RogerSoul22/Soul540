@@ -1,29 +1,6 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
-.modalClose {
-  @include flex-center;
-
-  width: 32px;
-
-  height: 32px;
-
-  background: none;
-
-  border: none;
-
-  color: $text-muted;
-
-  border-radius: $radius-xs;
-
-  cursor: pointer;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: $text-primary;
-  }
-}
-
 .modalBody {
   padding: $spacing-xl;
 

@@ -1,0 +1,24 @@
+/* Camada: classes da página (fora de @layer) sempre vencem o padrão do Pentágono. */
+@layer pentagono {
+  .heading {
+    margin: 0;
+    color: var(--pentagono-color-text);
+  }
+
+  .page {
+    font-size: var(--pentagono-text-2xl);
+    font-weight: var(--pentagono-font-bold);
+  }
+
+  .display {
+    font-family: var(--pentagono-font-display);
+    font-size: 2rem;
+    font-weight: var(--pentagono-font-bold);
+    line-height: 1.15;
+  }
+
+  .section {
+    font-size: var(--pentagono-text-lg);
+    font-weight: var(--pentagono-font-semibold);
+  }
+}

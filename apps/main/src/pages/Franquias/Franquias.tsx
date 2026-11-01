@@ -1,4 +1,4 @@
-import { ConfirmModal } from '../../../../../packages/ui/src/index';
+import { ConfirmModal, EmptyState, PageHeader } from '../../../../../packages/pentagono/src/index';
 import FranchiseFormModal from './components/FranchiseFormModal';
 import PortalCard from './components/PortalCard';
 import { useFranquiasController } from './hooks/use-franquias-controller';
@@ -12,12 +12,7 @@ export default function Franquias() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.header}>
-        <div>
-          <h1 className={styles.title}>Franquias</h1>
-          <p className={styles.subtitle}>Gerencie unidades franqueadas da Soul540</p>
-        </div>
-      </div>
+      <PageHeader title="Franquias" subtitle="Gerencie unidades franqueadas da Soul540" />
       <div className={styles.sectionLabel}>Franquias ativas ({activeFranchises.length})</div>
       <div className={styles.portalsGrid}>
         {activeFranchises.map((franchise) => {
@@ -30,7 +25,7 @@ export default function Franquias() {
             />
           );
         })}
-        {activeFranchises.length === 0 && <div className={styles.emptyState}>Nenhuma franquia ativa cadastrada.</div>}
+        {activeFranchises.length === 0 && <EmptyState title="Nenhuma franquia ativa cadastrada." />}
       </div>
       {controller.showModal && (
         <FranchiseFormModal

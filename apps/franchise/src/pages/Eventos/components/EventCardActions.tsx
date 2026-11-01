@@ -1,3 +1,4 @@
+import { Button } from '../../../../../../packages/pentagono/src/index';
 import type { PizzaEvent } from '../../../types/Event';
 import { whatsappIconPath } from '../support/event-icons';
 import styles from '../styles/Eventos.module.scss';
@@ -28,7 +29,9 @@ export default function EventCardActions({ event, whatsappUrl, onEdit, onDelete,
         </a>
       )}
       {event.status !== 'completed' && event.status !== 'cancelled' && (
-        <button
+        <Button
+          variant="primary"
+          size="sm"
           className={styles.btnFinalize}
           onClick={(click) => {
             click.stopPropagation();
@@ -36,26 +39,27 @@ export default function EventCardActions({ event, whatsappUrl, onEdit, onDelete,
           }}
         >
           Finalizar
-        </button>
+        </Button>
       )}
-      <button
-        className={styles.btnEdit}
+      <Button
+        variant="secondary"
+        size="sm"
         onClick={(click) => {
           click.stopPropagation();
           onEdit(event);
         }}
       >
         Editar
-      </button>
-      <button
-        className={styles.btnDelete}
+      </Button>
+      <Button
+        variant="danger"
         onClick={(click) => {
           click.stopPropagation();
           onDelete(event.id);
         }}
       >
         Excluir
-      </button>
+      </Button>
     </div>
   );
 }

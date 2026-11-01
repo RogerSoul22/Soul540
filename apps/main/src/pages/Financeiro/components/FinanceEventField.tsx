@@ -1,3 +1,4 @@
+import { Button, Input, Label } from '../../../../../../packages/pentagono/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
 import styles from '../styles/Financeiro.module.scss';
 
@@ -15,9 +16,9 @@ export default function FinanceEventField({ controller }: { controller: Financei
 
   return (
     <div className={styles.formField}>
-      <label className={styles.formLabel}>Evento</label>
+      <Label className={styles.formLabel}>Evento</Label>
       <div className={styles.eventCombo} ref={eventComboRef}>
-        <input
+        <Input
           type="text"
           className={styles.formInput + ' ' + styles.eventComboInput}
           placeholder="Buscar evento..."
@@ -31,7 +32,9 @@ export default function FinanceEventField({ controller }: { controller: Financei
           onFocus={() => setShowEventDropdown(true)}
         />
         {(eventSearch || formEventId) && (
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             type="button"
             className={styles.eventClearBtn}
             onClick={() => {
@@ -42,7 +45,7 @@ export default function FinanceEventField({ controller }: { controller: Financei
             title="Limpar evento"
           >
             ×
-          </button>
+          </Button>
         )}
         {showEventDropdown && (
           <div className={styles.eventDropdown}>
@@ -50,7 +53,8 @@ export default function FinanceEventField({ controller }: { controller: Financei
               <div className={styles.eventDropdownEmpty}>Nenhum evento encontrado</div>
             ) : (
               eventDropdownOptions.map((event) => (
-                <button
+                <Button
+                  variant="chip"
                   key={event.id}
                   type="button"
                   className={styles.eventOption + ' ' + (formEventId === event.id ? styles.eventOptionSelected : '')}
@@ -62,7 +66,7 @@ export default function FinanceEventField({ controller }: { controller: Financei
                   }}
                 >
                   {event.name}
-                </button>
+                </Button>
               ))
             )}
           </div>

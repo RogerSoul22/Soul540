@@ -1,3 +1,4 @@
+import { Card, Heading } from '../../../../../../packages/pentagono/src/index';
 import type { useFinanceiroController } from '../hooks/use-financeiro-controller';
 
 type Controller = ReturnType<typeof useFinanceiroController>;
@@ -44,11 +45,11 @@ export default function FinanceiroOverviewSummary({ controller }: Props) {
 
       {/* Carteira + Faturamento x Saldo em Aberto */}
       <div className={styles.walletGrid}>
-        <div className={styles.agendamentosCard}>
+        <Card className={styles.agendamentosCard}>
           <div className={styles.agendamentosHeader}>
-            <h3 className={styles.sectionTitle} style={{ margin: 0 }}>
+            <Heading level={3} variant="section" className={styles.sectionTitle} style={{ margin: 0 }}>
               Carteira
-            </h3>
+            </Heading>
           </div>
           <div className={styles.summaryItem} style={{ padding: '4px 0' }}>
             <span className={styles.summaryItemLabel}>Saldo disponível</span>
@@ -62,12 +63,12 @@ export default function FinanceiroOverviewSummary({ controller }: Props) {
           <p className={styles.agendamentosEmpty} style={{ marginTop: 4 }}>
             Receitas já recebidas menos custos já pagos no período selecionado.
           </p>
-        </div>
-        <div className={styles.agendamentosCard}>
+        </Card>
+        <Card className={styles.agendamentosCard}>
           <div className={styles.agendamentosHeader}>
-            <h3 className={styles.sectionTitle} style={{ margin: 0 }}>
+            <Heading level={3} variant="section" className={styles.sectionTitle} style={{ margin: 0 }}>
               Faturamento x Saldo em Aberto
-            </h3>
+            </Heading>
           </div>
           <div className={styles.summaryBar} style={{ padding: '4px 0' }}>
             <div className={styles.summaryItem}>
@@ -87,7 +88,7 @@ export default function FinanceiroOverviewSummary({ controller }: Props) {
               </span>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* Revenue vs Costs Chart */}

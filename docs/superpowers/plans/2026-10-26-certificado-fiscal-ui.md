@@ -20,6 +20,7 @@
 ### Task 1: contrato visual estrutural
 
 **Files:**
+
 - Modify: `apps/main/src/pages/ConfiguracaoFiscal/ConfiguracaoFiscal.structure.test.ts`
 
 - [ ] Adicionar asserções para os dois estados, validade/dias restantes, área de upload, senha e ações destrutivas.
@@ -28,6 +29,7 @@
 ### Task 2: implementação da tela
 
 **Files:**
+
 - Modify: `apps/main/src/pages/ConfiguracaoFiscal/ConfiguracaoFiscal.tsx`
 - Modify: `apps/main/src/pages/ConfiguracaoFiscal/styles/ConfiguracaoFiscal.module.scss`
 

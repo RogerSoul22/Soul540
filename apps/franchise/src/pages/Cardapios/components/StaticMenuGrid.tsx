@@ -1,3 +1,4 @@
+import { Button, Heading } from '../../../../../../packages/pentagono/src/index';
 import type { StaticMenu } from '../../../data/soul540Menus/index';
 import styles from '../styles/Cardapios.module.scss';
 
@@ -26,7 +27,9 @@ export default function StaticMenuGrid({
     <section className={styles.standardSection}>
       <div className={styles.sectionHeader}>
         <div>
-          <h2 className={styles.sectionTitle}>Menus Soul540</h2>
+          <Heading level={2} variant="section" className={styles.sectionTitle}>
+            Menus Soul540
+          </Heading>
           <p className={styles.sectionSubtitle}>Opções padrão para apresentação aos clientes.</p>
         </div>
       </div>
@@ -40,7 +43,9 @@ export default function StaticMenuGrid({
                 <span className={styles.standardBadge}>Soul540</span>
                 <span>{itemCount} itens</span>
               </div>
-              <h3 className={styles.standardName}>{menu.name}</h3>
+              <Heading level={3} variant="section" className={styles.standardName}>
+                {menu.name}
+              </Heading>
               <p className={styles.standardTagline}>{menu.tagline}</p>
               <div className={styles.standardCategories}>
                 {menu.categories.map((category) => (
@@ -51,19 +56,20 @@ export default function StaticMenuGrid({
                 ))}
               </div>
               <div className={styles.standardActions}>
-                <button className={styles.btnViewMenu} onClick={() => onPreview(menu)}>
+                <Button variant="outline" className={styles.btnViewMenu} onClick={() => onPreview(menu)}>
                   Visualizar
-                </button>
-                <button className={styles.btnEdit} onClick={() => onEdit(menu)}>
+                </Button>
+                <Button variant="secondary" size="sm" onClick={() => onEdit(menu)}>
                   Editar
-                </button>
-                <button
-                  className={styles.btnView}
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={() => onGeneratePdf(menu)}
                   disabled={generatingPdf === menu.id}
                 >
                   {generatingPdf === menu.id ? 'Gerando...' : 'PDF'}
-                </button>
+                </Button>
               </div>
             </article>
           );

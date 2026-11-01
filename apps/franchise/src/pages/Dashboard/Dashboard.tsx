@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import CalendarView from '../../components/CalendarView/CalendarView';
+import { SkeletonContent } from '../../../../../packages/pentagono/src/index';
 import styles from './styles/Dashboard.module.scss';
 import DashboardHeader from './components/DashboardHeader';
 import DashboardInfoModal from './components/DashboardInfoModal';
@@ -13,6 +14,7 @@ export default function Dashboard() {
   const [showInfo, setShowInfo] = useState(false);
   const navigate = useNavigate();
   const controller = useDashboardController();
+  const dataLoading = controller.dataLoading;
   const currentMonth = format(controller.calendarMonth, 'MMMM', {
     locale: ptBR,
   });
@@ -34,17 +36,23 @@ export default function Dashboard() {
             {controller.monthEventCount !== 1 ? 's' : ''}
           </span>
         </div>
-        <DashboardPanels
-          operationalAlerts={controller.operationalAlerts}
-          teamSchedule={controller.teamSchedule}
-          financialClosings={controller.financialClosings}
-          onNavigate={() => {}}
-        />
-        <CalendarView
-          events={controller.events}
-          month={controller.calendarMonth}
-          onMonthChange={controller.setCalendarMonth}
-        />
+        {dataLoading ? (
+          <SkeletonContent variant="cards" label="Carregando painéis..." />
+        ) : (
+          <DashboardPanels
+            operationalAlerts={controller.operationalAlerts}
+            teamSchedule={controller.teamSchedule}
+            financialClosings={controller.financialClosings}
+            onNavigate={() => {}}
+          />
+        )}
+        <div data-skeleton={dataLoading}>
+          <CalendarView
+            events={controller.events}
+            month={controller.calendarMonth}
+            onMonthChange={controller.setCalendarMonth}
+          />
+        </div>
       </div>
       {showInfo && <DashboardInfoModal onClose={() => setShowInfo(false)} />}
     </div>

@@ -55,7 +55,11 @@ function isWithinPeriod(date: string, start?: string, end?: string): boolean {
   return (!start || date >= start) && (!end || date <= end);
 }
 
-function belongsToReportingUnit(source: ReportingUnit | undefined, date: string, reportingUnit?: ReportingUnit): boolean {
+function belongsToReportingUnit(
+  source: ReportingUnit | undefined,
+  date: string,
+  reportingUnit?: ReportingUnit,
+): boolean {
   return !reportingUnit || getReportingUnit(source, date) === reportingUnit;
 }
 
@@ -66,7 +70,10 @@ export function buildFinanceSummary(entries: SummaryEntry[], options: FinanceSum
   let projectedExpenseCents = 0;
   let excludedCancelled = 0;
   const byPaymentMethod = new Map<string, { method: string; amountCents: number; count: number }>();
-  const byEvent = new Map<string, { eventId: string; receivedCents: number; receivableCents: number; costsCents: number }>();
+  const byEvent = new Map<
+    string,
+    { eventId: string; receivedCents: number; receivableCents: number; costsCents: number }
+  >();
 
   for (const entry of entries) {
     if (isCancelledFinance(entry)) {
@@ -79,8 +86,10 @@ export function buildFinanceSummary(entries: SummaryEntry[], options: FinanceSum
       : undefined;
     const realizedSettlements = getEffectiveSettlements(entry).filter((settlement) => {
       const relevantDate = options.view === 'cash' ? settlement.settledOn : entry.date;
-      return isWithinPeriod(relevantDate, options.start, options.end)
-        && belongsToReportingUnit(source, relevantDate, options.reportingUnit);
+      return (
+        isWithinPeriod(relevantDate, options.start, options.end) &&
+        belongsToReportingUnit(source, relevantDate, options.reportingUnit)
+      );
     });
     const realizedCents = realizedSettlements.reduce((total, settlement) => total + settlement.amountCents, 0);
     if (entry.type === 'revenue') {
@@ -100,7 +109,11 @@ export function buildFinanceSummary(entries: SummaryEntry[], options: FinanceSum
 
     const forecastDate = options.view === 'cash' ? entry.dueDate || entry.date : entry.date;
     const outstandingCents = getOutstandingCents(entry);
-    if (outstandingCents > 0 && isWithinPeriod(forecastDate, options.start, options.end) && belongsToReportingUnit(source, forecastDate, options.reportingUnit)) {
+    if (
+      outstandingCents > 0 &&
+      isWithinPeriod(forecastDate, options.start, options.end) &&
+      belongsToReportingUnit(source, forecastDate, options.reportingUnit)
+    ) {
       if (entry.type === 'revenue') {
         projectedIncomeCents += outstandingCents;
         if (eventTotals) eventTotals.receivableCents += outstandingCents;

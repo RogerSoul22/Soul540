@@ -1,3 +1,4 @@
+import { Button } from '../../../../../packages/pentagono/src/index';
 import type { PizzaEvent } from '../../types/Event';
 import styles from './styles/CalendarView.module.scss';
 
@@ -16,12 +17,12 @@ export default function CalendarEventDeletePanel({ event, onCancel, onConfirm }:
         </div>
       </div>
       <div className={styles.panelActions}>
-        <button className={styles.btnCancel} onClick={onCancel}>
+        <Button variant="ghost" onClick={onCancel}>
           Cancelar
-        </button>
-        <button className={styles.btnDeleteConfirm} onClick={onConfirm}>
+        </Button>
+        <Button variant="danger" onClick={onConfirm}>
           Excluir
-        </button>
+        </Button>
       </div>
     </>
   );

@@ -152,6 +152,7 @@ afetados. A API é publicada independentemente dos frontends.
 - As telas de login de Fábrica e Campinas usam `UnitLoginScreen`; a auditoria
   dos três portais usa `AuditLogScreen`, ambas em `@soul540/screens` com
   adaptadores locais apenas para autenticação, cliente HTTP, estilos e textos.
+
 ## Validação mais recente
 
 - `build:main`, `build:factory`, `build:franchise` e `build:api` validam artefatos publicáveis de forma independente; o comando `build` raiz executa os quatro.

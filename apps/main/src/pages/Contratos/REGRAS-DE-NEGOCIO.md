@@ -35,4 +35,3 @@ A visualização e as ações dependem da permissão da página e das permissõe
 - Definir estados oficiais e transições.
 - Definir assinatura e validade jurídica.
 - Definir cálculo de multa, aditivo e efeito do cancelamento.
-

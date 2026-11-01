@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { apiFetch } from '../../../lib/api';
+import { SILENT_ERRORS_HEADER, apiFetch } from '../../../lib/api';
 import { encodeCertificateBytes } from '../certificate-file';
 
 export interface FiscalCertificateSummary {
@@ -31,7 +31,9 @@ export function useConfiguracaoFiscal() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await apiFetch('/api/fiscal/certificado', { headers: { 'X-System': 'main' } });
+      const response = await apiFetch('/api/fiscal/certificado', {
+        headers: { 'X-System': 'main', [SILENT_ERRORS_HEADER]: '1' },
+      });
       setSummary((await response.json()) as FiscalCertificateSummary);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Não foi possível carregar o certificado.');

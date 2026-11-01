@@ -1,3 +1,4 @@
+import { Button, Input } from '../../../../../../packages/pentagono/src/index';
 import type { FormEvent } from 'react';
 import styles from '../styles/Chat.module.scss';
 
@@ -22,7 +23,7 @@ export default function ChatInput({
 }: Props) {
   return (
     <form className={styles.inputBar} onSubmit={onSubmit}>
-      <input
+      <Input
         className={styles.input}
         value={input}
         onChange={(event) => onChange(event.target.value)}
@@ -31,7 +32,8 @@ export default function ChatInput({
         autoFocus
       />
       {speechAvailable && (
-        <button
+        <Button
+          variant="outline"
           type="button"
           className={styles.micBtn + (listening ? ' ' + styles.micBtnActive : '')}
           onClick={onToggleMic}
@@ -40,11 +42,11 @@ export default function ChatInput({
           aria-label={listening ? 'Parar gravação' : 'Falar'}
         >
           {listening ? '■' : '●'}
-        </button>
+        </Button>
       )}
-      <button className={styles.sendBtn} type="submit" disabled={loading || !input.trim()}>
+      <Button variant="outline" className={styles.sendBtn} type="submit" disabled={loading || !input.trim()}>
         Enviar
-      </button>
+      </Button>
     </form>
   );
 }

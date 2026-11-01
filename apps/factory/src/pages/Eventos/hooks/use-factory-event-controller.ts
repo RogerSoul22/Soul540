@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { apiFetch } from '../../../lib/api';
 import { useApp } from '../../../contexts/AppContext';
 import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
@@ -28,12 +29,20 @@ const emptyProductionForm: FactoryProductionForm = {
 
 export function useFactoryEventController() {
   const { events, updateEvent } = useApp();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [employees, setEmployees] = useState<FactoryEventEmployee[]>([]);
   const [search, setSearch] = useState('');
   const [viewingEvent, setViewingEvent] = useState<PizzaEvent | null>(null);
   const [productionForm, setProductionForm] = useState<FactoryProductionForm>(emptyProductionForm);
   const [showInfo, setShowInfo] = useState(false);
   const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    const viewId = searchParams.get('view');
+    const target = viewId ? events.find((event) => event.id === viewId) : undefined;
+    if (!target) return;
+    setViewingEvent(target);
+    setSearchParams({});
+  }, [events, searchParams, setSearchParams]);
   useEffect(() => {
     apiFetch('/api/employees')
       .then((response) => response.json())

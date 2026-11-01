@@ -1,3 +1,4 @@
+import { Button, EmptyState, Heading } from '../../../../../../packages/pentagono/src/index';
 import type { useFinanceiroController } from '../hooks/use-financeiro-controller';
 
 type Controller = ReturnType<typeof useFinanceiroController>;
@@ -17,20 +18,23 @@ export default function FinanceiroExpensesTab({ controller }: Props) {
           <div className={styles.filterRow}>
             <div className={styles.filterGroup}>
               {(['all', 'fixed', 'variable'] as CostFilter[]).map((f) => (
-                <button
+                <Button
+                  variant="chip"
                   key={f}
                   className={`${styles.filterBtn} ${costFilter === f ? styles.filterBtnActive : ''}`}
                   onClick={() => setCostFilter(f)}
                 >
                   {f === 'all' ? 'Todas' : f === 'fixed' ? 'Fixas' : 'Variaveis'}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
 
           {/* Category totals list */}
           <div className={styles.chartSection}>
-            <h3 className={styles.sectionTitle}>Total por Categoria</h3>
+            <Heading level={3} variant="section" className={styles.sectionTitle}>
+              Total por Categoria
+            </Heading>
             {(() => {
               const cats =
                 costFilter === 'fixed'
@@ -48,7 +52,10 @@ export default function FinanceiroExpensesTab({ controller }: Props) {
                 .filter(({ total }) => total > 0)
                 .sort((a, b) => compareAlpha(categoryLabels[a.cat] || a.cat, categoryLabels[b.cat] || b.cat));
               const max = totals[0]?.total || 1;
-              if (totals.length === 0) return <p className={styles.emptyState}>Nenhuma despesa registrada.</p>;
+              if (totals.length === 0)
+                return (
+                  <EmptyState variant="compact" title="Nenhuma despesa registrada." className={styles.emptyState} />
+                );
               return (
                 <div className={styles.catList}>
                   {totals.map(({ cat, total }) => (

@@ -18,11 +18,17 @@ export default function ChecklistEnvioPage(props: ChecklistEnvioPageProps) {
           <div>
             <p className={styles.eyebrow}>Soul540</p>
             <h1 className={styles.title}>Checklist de envio</h1>
-            <p className={styles.subtitle}>Checklist publico e editavel por evento para conferir tudo antes da saida da equipe.</p>
+            <p className={styles.subtitle}>
+              Checklist publico e editavel por evento para conferir tudo antes da saida da equipe.
+            </p>
           </div>
           <div className={styles.headerActions}>
-            <button className={styles.buttonGhost} type="button" onClick={checklist.copyLink}>Copiar link</button>
-            <button className={styles.button} type="button" onClick={checklist.clearChecklist}>Limpar checklist</button>
+            <button className={styles.buttonGhost} type="button" onClick={checklist.copyLink}>
+              Copiar link
+            </button>
+            <button className={styles.button} type="button" onClick={checklist.clearChecklist}>
+              Limpar checklist
+            </button>
           </div>
         </header>
 

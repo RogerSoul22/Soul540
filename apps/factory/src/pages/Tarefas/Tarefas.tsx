@@ -1,5 +1,5 @@
 import { ROUTES } from '../../routes';
-import { ConfirmModal } from '../../../../../packages/ui/src/index';
+import { Button, ConfirmModal, Modal, PageHeader, SkeletonContent } from '../../../../../packages/pentagono/src/index';
 import styles from './styles/Tarefas.module.scss';
 import NewProductionOrderForm from './components/NewProductionOrderForm';
 import ProductionOrderFilters from './components/ProductionOrderFilters';
@@ -11,6 +11,7 @@ export default function Tarefas() {
   const controller = useProductionOrdersController();
   const {
     recipe,
+    loading,
     availableEvents,
     saving,
     saved,
@@ -35,27 +36,27 @@ export default function Tarefas() {
   } = controller;
   return (
     <div className={styles.page}>
-      <div className={styles.header}>
-        <div>
-          <h1 className={styles.title}>Pedidos</h1>
-          <p className={styles.subtitle}>Gestão de pedidos e insumos de produção</p>
-        </div>
-        <div className={styles.headerActions}>
-          <button className={styles.btnPrimary} onClick={() => setShowNovoPedido(true)}>
-            ＋ Novo Pedido
-          </button>
-          <button
-            className={styles.btnSecondary}
-            onClick={() => window.open(`/fabrica${ROUTES.CHECKLIST_ENVIO}`, '_blank', 'noopener,noreferrer')}
-          >
-            Checklist envio
-          </button>
-          <div className={styles.saveStatus}>
-            {saving && <span className={styles.saveLabel}>Salvando...</span>}
-            {saved && <span className={styles.saveLabelOk}>✓ Salvo</span>}
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        title="Pedidos"
+        subtitle="Gestão de pedidos e insumos de produção"
+        actions={
+          <>
+            <Button variant="primary" onClick={() => setShowNovoPedido(true)}>
+              ＋ Novo Pedido
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => window.open(`/fabrica${ROUTES.CHECKLIST_ENVIO}`, '_blank', 'noopener,noreferrer')}
+            >
+              Checklist envio
+            </Button>
+            <div className={styles.saveStatus}>
+              {saving && <span className={styles.saveLabel}>Salvando...</span>}
+              {saved && <span className={styles.saveLabelOk}>✓ Salvo</span>}
+            </div>
+          </>
+        }
+      />
       <ProductionOrderFilters
         mode={orderSearchMode}
         term={orderSearchTerm}
@@ -67,37 +68,33 @@ export default function Tarefas() {
         onModeChange={handleOrderSearchModeChange}
         onClear={handleClearOrderFilters}
       />
-      <ProductionOrderKanban
-        pedidosByStatus={pedidosByStatus}
-        draggedId={controller.draggedId}
-        dragOverCol={controller.dragOverCol}
-        setDraggedId={controller.setDraggedId}
-        setDragOverCol={controller.setDragOverCol}
-        onMove={handleMove}
-        onDelete={setDeleteConfirmId}
-      />
+      {loading ? (
+        <SkeletonContent variant="cards" label="Carregando pedidos..." />
+      ) : (
+        <ProductionOrderKanban
+          pedidosByStatus={pedidosByStatus}
+          draggedId={controller.draggedId}
+          dragOverCol={controller.dragOverCol}
+          setDraggedId={controller.setDraggedId}
+          setDragOverCol={controller.setDragOverCol}
+          onMove={handleMove}
+          onDelete={setDeleteConfirmId}
+        />
+      )}
       {showNovoPedido && (
-        <div className={styles.overlay} onClick={() => setShowNovoPedido(false)}>
-          <div className={styles.modal} onClick={(event) => event.stopPropagation()} style={{ maxWidth: 420 }}>
-            <div className={styles.modalHeader}>
-              <h2 className={styles.modalTitle}>Novo Pedido</h2>
-              <button className={styles.modalClose} onClick={() => setShowNovoPedido(false)}>
-                ×
-              </button>
-            </div>
-            <div className={styles.modalBody}>
-              <NewProductionOrderForm
-                ingredients={recipe.ingredients}
-                insumos={recipe.insumos}
-                events={availableEvents}
-                onSave={async (pedido) => {
-                  await handleCreatePedido(pedido);
-                  setShowNovoPedido(false);
-                }}
-              />
-            </div>
+        <Modal title="Novo Pedido" onClose={() => setShowNovoPedido(false)} closeOnOverlay maxWidth={420} flush>
+          <div className={styles.modalBody}>
+            <NewProductionOrderForm
+              ingredients={recipe.ingredients}
+              insumos={recipe.insumos}
+              events={availableEvents}
+              onSave={async (pedido) => {
+                await handleCreatePedido(pedido);
+                setShowNovoPedido(false);
+              }}
+            />
           </div>
-        </div>
+        </Modal>
       )}
       <ProductionRecipeGrid
         ingredients={recipe.ingredients}

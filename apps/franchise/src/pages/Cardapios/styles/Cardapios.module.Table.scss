@@ -22,23 +22,6 @@
   text-transform: uppercase;
 }
 
-.standardStatsRow {
-  display: flex;
-
-  gap: $spacing-sm;
-}
-
-.standardStat {
-  font-size: 10px;
-
-  color: $text-muted;
-
-  strong {
-    color: $text-secondary;
-    font-weight: $font-weight-semibold;
-  }
-}
-
 .standardName {
   font-size: $font-size-xl;
 
@@ -67,34 +50,6 @@
   flex-wrap: wrap;
 
   gap: 6px;
-}
-
-.standardCatTag {
-  font-size: 10px;
-
-  font-weight: $font-weight-medium;
-
-  color: $text-muted;
-
-  background: rgba(255, 255, 255, 0.04);
-
-  border: 1px solid $border;
-
-  border-radius: $radius-xs;
-
-  padding: 3px 8px;
-
-  text-transform: uppercase;
-
-  letter-spacing: 0.4px;
-}
-
-.sweetTag {
-  color: #f9a8d4;
-
-  background: rgba(249, 168, 212, 0.06);
-
-  border-color: rgba(249, 168, 212, 0.15);
 }
 
 .standardTotal {

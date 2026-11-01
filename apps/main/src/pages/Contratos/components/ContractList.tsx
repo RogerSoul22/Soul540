@@ -1,3 +1,4 @@
+import { Button, EmptyState, Input } from '../../../../../../packages/pentagono/src/index';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { Contract, ContractEvents } from '../types/contract-types';
@@ -30,7 +31,8 @@ export default function ContractList({ contracts, events, search, onSearchChange
           <span className={styles.searchIcon} aria-hidden="true">
             ⌕
           </span>
-          <input
+          <Input
+            variant="search"
             className={styles.searchInput}
             placeholder="Buscar por cliente ou descricao..."
             value={search}
@@ -39,7 +41,7 @@ export default function ContractList({ contracts, events, search, onSearchChange
         </div>
       </div>
       {contracts.length === 0 ? (
-        <div className={styles.empty}>Nenhum contrato encontrado.</div>
+        <EmptyState title="Nenhum contrato encontrado." />
       ) : (
         <div className={styles.tableWrap}>
           <div className={styles.tableHead}>
@@ -76,15 +78,15 @@ export default function ContractList({ contracts, events, search, onSearchChange
               </div>
               <div className={styles.cellValue}>R$ {contract.value.toLocaleString('pt-BR')}</div>
               <div className={styles.cellActions}>
-                <button className={styles.btnView} onClick={() => onView(contract)}>
+                <Button variant="secondary" size="sm" onClick={() => onView(contract)}>
                   Ver
-                </button>
-                <button className={styles.btnEdit} onClick={() => onEdit(contract)}>
+                </Button>
+                <Button variant="secondary" size="sm" onClick={() => onEdit(contract)}>
                   Editar
-                </button>
-                <button className={styles.btnDelete} onClick={() => onDelete(contract.id)}>
+                </Button>
+                <Button variant="danger" onClick={() => onDelete(contract.id)}>
                   Excluir
-                </button>
+                </Button>
               </div>
             </div>
           ))}

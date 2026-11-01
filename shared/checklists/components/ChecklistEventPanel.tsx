@@ -14,7 +14,9 @@ export function ChecklistEventPanel({ events, loading, meta, selectedEventId, on
   return (
     <div className={styles.panel}>
       <div className={styles.panelBody}>
-        <label className={styles.label} htmlFor="event-select">Evento</label>
+        <label className={styles.label} htmlFor="event-select">
+          Evento
+        </label>
         <select
           id="event-select"
           className={styles.select}
@@ -24,16 +26,23 @@ export function ChecklistEventPanel({ events, loading, meta, selectedEventId, on
         >
           {loading && <option>Carregando eventos...</option>}
           {!loading && events.length === 0 && <option value="">Nenhum evento encontrado</option>}
-          {!loading && events.map((event) => {
-            const id = getEventId(event);
-            return <option key={id} value={id}>{formatDate(event.date)} - {getEventName(event)}</option>;
-          })}
+          {!loading &&
+            events.map((event) => {
+              const id = getEventId(event);
+              return (
+                <option key={id} value={id}>
+                  {formatDate(event.date)} - {getEventName(event)}
+                </option>
+              );
+            })}
         </select>
         <div className={styles.eventMeta}>
           {meta.map((item) => (
             <div className={styles.metaItem} key={item.label}>
               <span className={styles.metaLabel}>{item.label}</span>
-              <span className={styles.metaValue} title={item.value}>{item.value}</span>
+              <span className={styles.metaValue} title={item.value}>
+                {item.value}
+              </span>
             </div>
           ))}
         </div>

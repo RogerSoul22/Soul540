@@ -84,6 +84,20 @@
   background: rgba(255, 255, 255, 0.025);
 }
 
+.opsItemLink {
+  cursor: pointer;
+  transition:
+    background $transition-fast,
+    border-color $transition-fast;
+
+  &:hover,
+  &:focus-visible {
+    border-color: rgba(245, 158, 11, 0.45);
+    background: rgba(245, 158, 11, 0.06);
+    outline: none;
+  }
+}
+
 .opsItemMain {
   display: flex;
   justify-content: space-between;

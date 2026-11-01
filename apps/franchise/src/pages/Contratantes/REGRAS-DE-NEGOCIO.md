@@ -34,4 +34,3 @@ A visualização e as ações dependem da permissão da página e das permissõe
 - Definir campos obrigatórios por tipo de pessoa.
 - Definir regra de fusão de cadastros duplicados.
 - Definir arquivamento e reativação.
-

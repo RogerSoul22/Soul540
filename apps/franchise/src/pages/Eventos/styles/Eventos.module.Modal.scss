@@ -29,53 +29,6 @@
   }
 }
 
-.btnEdit {
-  flex: 1;
-
-  padding: 8px;
-
-  background: rgba(255, 255, 255, 0.04);
-
-  border: 1px solid $border;
-
-  border-radius: $radius-xs;
-
-  color: $text-secondary;
-
-  font-size: $font-size-sm;
-
-  cursor: pointer;
-
-  transition: all $transition-fast;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: $text-primary;
-  }
-}
-
-.btnDelete {
-  padding: 8px 12px;
-
-  background: rgba(239, 68, 68, 0.08);
-
-  border: 1px solid transparent;
-
-  border-radius: $radius-xs;
-
-  color: #f87171;
-
-  font-size: $font-size-sm;
-
-  cursor: pointer;
-
-  transition: all $transition-fast;
-
-  &:hover {
-    background: rgba(239, 68, 68, 0.15);
-  }
-}
-
 .btnCancel {
   padding: 10px $spacing-md;
 

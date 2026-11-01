@@ -1,3 +1,4 @@
+import { Button, Input } from '../../../../../../packages/pentagono/src/index';
 import type { MenuCategory, MenuItem } from '../../../../../../packages/screens/src/index';
 import styles from '../styles/Cardapios.module.scss';
 
@@ -24,51 +25,63 @@ export default function MenuCategoryEditorFields({
     <div className={styles.categoriesSection}>
       <div className={styles.categoriesHeader}>
         <strong>Categorias e itens</strong>
-        <button className={styles.btnAddCat} type="button" onClick={onAdd}>
+        <Button variant="dashed" className={styles.btnAddCat} type="button" onClick={onAdd}>
           + Categoria
-        </button>
+        </Button>
       </div>
       {categories.map((category) => (
         <section key={category.id} className={styles.categoryEditor}>
           <div className={styles.categoryEditorHeader}>
-            <input
+            <Input
               className={styles.formInput}
               value={category.name}
               onChange={(event) => onChange(category.id, event.target.value)}
             />
-            <button className={styles.btnRemoveCat} type="button" onClick={() => onRemove(category.id)}>
+            <Button
+              variant="danger"
+              size="sm"
+              className={styles.btnRemoveCat}
+              type="button"
+              onClick={() => onRemove(category.id)}
+            >
               Remover
-            </button>
+            </Button>
           </div>
           {category.items.map((item) => (
             <div key={item.id} className={styles.itemEditor}>
-              <input
+              <Input
                 className={styles.formInput}
                 value={item.name}
                 onChange={(event) => onItemChange(category.id, item.id, 'name', event.target.value)}
                 placeholder="Nome do item"
               />
-              <input
+              <Input
                 className={styles.formInput}
                 value={item.description}
                 onChange={(event) => onItemChange(category.id, item.id, 'description', event.target.value)}
                 placeholder="Descrição"
               />
-              <input
+              <Input
                 className={styles.formInput}
                 type="number"
                 value={item.price}
                 onChange={(event) => onItemChange(category.id, item.id, 'price', Number(event.target.value))}
                 placeholder="Preço"
               />
-              <button className={styles.btnRemoveItem} type="button" onClick={() => onItemRemove(category.id, item.id)}>
+              <Button
+                variant="danger"
+                size="sm"
+                className={styles.btnRemoveItem}
+                type="button"
+                onClick={() => onItemRemove(category.id, item.id)}
+              >
                 ×
-              </button>
+              </Button>
             </div>
           ))}
-          <button className={styles.btnAddItem} type="button" onClick={() => onItemAdd(category.id)}>
+          <Button variant="dashed" className={styles.btnAddItem} type="button" onClick={() => onItemAdd(category.id)}>
             + Item
-          </button>
+          </Button>
         </section>
       ))}
     </div>

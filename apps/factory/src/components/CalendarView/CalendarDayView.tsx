@@ -1,3 +1,4 @@
+import { Button } from '../../../../../packages/pentagono/src/index';
 import { format, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { MouseEvent } from 'react';
@@ -20,22 +21,22 @@ export default function CalendarDayView({ selectedDay, dayEvents, onBack, onPrev
   return (
     <div className={`${styles.wrapper} ${styles.wrapperDay}`}>
       <div className={styles.dayHeader}>
-        <button className={styles.backBtn} onClick={onBack}>
+        <Button variant="outline" className={styles.backBtn} onClick={onBack}>
           <IconChevronLeft />
           <span>Voltar ao mês</span>
-        </button>
+        </Button>
         <div className={styles.dayTitle}>
           <span className={styles.dayTitleWeekday}>{format(selectedDay, 'EEEE', { locale: ptBR })}</span>
           <span className={styles.dayTitleDate}>{format(selectedDay, "d 'de' MMMM 'de' yyyy", { locale: ptBR })}</span>
           {selectedToday && <span className={styles.todayChip}>Hoje</span>}
         </div>
         <div className={styles.dayNav}>
-          <button className={styles.navBtn} onClick={onPrevious} aria-label="Dia anterior">
+          <Button variant="outline" className={styles.navBtn} onClick={onPrevious} aria-label="Dia anterior">
             <IconChevronLeft />
-          </button>
-          <button className={styles.navBtn} onClick={onNext} aria-label="Próximo dia">
+          </Button>
+          <Button variant="outline" className={styles.navBtn} onClick={onNext} aria-label="Próximo dia">
             <IconChevronRight />
-          </button>
+          </Button>
         </div>
       </div>
       <div className={styles.allDayRow}>

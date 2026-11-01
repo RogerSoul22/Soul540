@@ -35,4 +35,3 @@ A visualização e as ações dependem da permissão da página e das permissõe
 - Definir estados e transições.
 - Definir dependências e bloqueios.
 - Definir notificações e recorrência.
-

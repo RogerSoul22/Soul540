@@ -26,39 +26,9 @@
   margin-top: 6px;
 }
 
-.infoButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-  border: 0;
-  border-radius: 50%;
-  background: none;
-  color: #64748b;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
 .infoButton:hover {
   background: rgba(255, 255, 255, 0.07);
   color: var(--text-primary);
-}
-
-.primaryButton {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border: 0;
-  border-radius: 8px;
-  padding: 10px 16px;
-  background: #f59e0b;
-  color: #0a0f1e;
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 600;
-  transition: background 0.15s ease;
 }
 
 .primaryButton:hover {

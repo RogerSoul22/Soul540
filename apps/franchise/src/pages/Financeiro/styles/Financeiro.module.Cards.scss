@@ -2,68 +2,6 @@
 
 @use '../../../styles/mixins' as *;
 
-.pageMonthSelect {
-  height: 40px;
-
-  width: 100%;
-
-  padding: 0 12px;
-
-  border-radius: $radius-sm;
-
-  border: 1px solid $border;
-
-  background: $bg-card;
-
-  color: $text-primary;
-
-  font-size: $font-size-sm;
-
-  font-family: inherit;
-
-  cursor: pointer;
-
-  transition: all $transition-fast;
-
-  &:focus {
-    outline: none;
-
-    border-color: $border-accent;
-
-    box-shadow: 0 0 0 3px rgba($accent, 0.08);
-  }
-}
-
-.pageMonthClear {
-  height: 40px;
-
-  padding: 0 14px;
-
-  border-radius: $radius-sm;
-
-  border: 1px solid $border;
-
-  background: transparent;
-
-  color: $text-muted;
-
-  font-size: $font-size-sm;
-
-  font-weight: $font-weight-medium;
-
-  cursor: pointer;
-
-  transition: all $transition-fast;
-
-  &:hover {
-    color: $text-primary;
-
-    border-color: $border-accent;
-
-    background: rgba($accent, 0.06);
-  }
-}
-
 .tabs {
   display: flex;
 

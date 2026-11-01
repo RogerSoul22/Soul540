@@ -56,12 +56,14 @@
   display: flex;
   width: 32px;
   height: 32px;
+
+  padding: 0;
   align-items: center;
   justify-content: center;
   border: 1px solid $border;
   border-radius: $radius-full;
   background: $bg-card;
-  color: $text-secondary;
+  color: $text-primary;
   box-shadow: $shadow-card;
   cursor: pointer;
 

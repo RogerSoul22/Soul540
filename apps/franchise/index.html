@@ -2,6 +2,7 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -11,7 +12,12 @@
     />
     <title>Soul540 — Franquia</title>
     <style>
-      html, body { margin: 0; min-height: 100%; background: #0a0f1e; }
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #0a0f1e;
+      }
       #boot-status {
         min-height: 100vh;
         display: grid;
@@ -19,7 +25,10 @@
         padding: 24px;
         box-sizing: border-box;
         color: #f1f5f9;
-        font: 500 16px/1.5 Outfit, Arial, sans-serif;
+        font:
+          500 16px/1.5 Outfit,
+          Arial,
+          sans-serif;
         text-align: center;
       }
       #boot-status button {
@@ -44,12 +53,17 @@
         const root = document.getElementById('root');
         const showBootError = () => {
           if (!root?.querySelector('#boot-status')) return;
-          root.innerHTML = '<div id="boot-status" role="alert">Não foi possível iniciar o sistema.<button type="button" onclick="location.reload()">Recarregar página</button></div>';
+          root.innerHTML =
+            '<div id="boot-status" role="alert">Não foi possível iniciar o sistema.<button type="button" onclick="location.reload()">Recarregar página</button></div>';
         };
         window.addEventListener('unhandledrejection', showBootError);
-        window.addEventListener('error', (event) => {
-          if (event.error || event.target instanceof HTMLScriptElement) showBootError();
-        }, true);
+        window.addEventListener(
+          'error',
+          (event) => {
+            if (event.error || event.target instanceof HTMLScriptElement) showBootError();
+          },
+          true,
+        );
         window.setTimeout(() => {
           if (root?.querySelector('#boot-status')) showBootError();
         }, 10000);

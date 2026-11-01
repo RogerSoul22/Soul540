@@ -1,3 +1,4 @@
+import { Button } from '../../../../../packages/pentagono/src/index';
 import { notifyFeedback } from '../../../../../packages/api-client/src/index';
 import { useState, type MouseEvent } from 'react';
 import type { PizzaEvent } from '../../types/Event';
@@ -59,9 +60,9 @@ export default function CalendarEventModal({ event, onClose, onUpdate, onDelete 
               {mode === 'view' ? event.name : mode === 'edit' ? 'Editar evento' : 'Excluir evento'}
             </p>
           </div>
-          <button className={styles.closeBtn} onClick={onClose} aria-label="Fechar">
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Fechar">
             ×
-          </button>
+          </Button>
         </div>
         {mode === 'view' && (
           <CalendarEventViewPanel

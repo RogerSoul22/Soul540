@@ -2,54 +2,6 @@
 
 @use '../../../styles/mixins' as *;
 
-.listItemDetail {
-  font-size: $font-size-xs;
-
-  color: $text-muted;
-
-  margin-top: 3px;
-
-  @include text-ellipsis;
-
-  @include mobile {
-    margin-top: 0;
-
-    white-space: normal;
-  }
-}
-
-.listItemActions {
-  display: flex;
-
-  align-items: center;
-
-  gap: $spacing-sm;
-
-  flex-shrink: 0;
-
-  margin-left: $spacing-md;
-
-  @include mobile {
-    width: 100%;
-
-    margin-left: 0;
-
-    padding-top: 4px;
-
-    border-top: 1px solid $border-faint;
-  }
-}
-
-.emptyText {
-  font-size: $font-size-sm;
-
-  color: $text-muted;
-
-  text-align: center;
-
-  padding: $spacing-2xl $spacing-lg;
-}
-
 // Info button
 .titleRow {
   display: flex;

@@ -2,29 +2,6 @@
 
 @use '../../../styles/mixins' as *;
 
-.modalClose {
-  @include flex-center;
-
-  width: 32px;
-
-  height: 32px;
-
-  background: none;
-
-  border: none;
-
-  color: $text-muted;
-
-  border-radius: $radius-xs;
-
-  cursor: pointer;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: $text-primary;
-  }
-}
-
 .modalBody {
   padding: $spacing-xl;
 
@@ -44,16 +21,6 @@
 }
 
 // Preview
-.previewBody {
-  padding: $spacing-xl;
-
-  display: flex;
-
-  flex-direction: column;
-
-  gap: $spacing-lg;
-}
-
 .previewSection {
   display: flex;
 
@@ -62,63 +29,3 @@
   gap: $spacing-sm;
 }
 
-.previewRow {
-  display: flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-
-  padding: $spacing-sm;
-
-  border-radius: $radius-xs;
-
-  &:nth-child(odd) {
-    background: rgba(255, 255, 255, 0.02);
-  }
-
-  span {
-    font-size: $font-size-sm;
-    color: $text-muted;
-  }
-
-  strong {
-    font-size: $font-size-sm;
-    color: $text-primary;
-  }
-}
-
-.previewValue {
-  color: $accent !important;
-  font-size: $font-size-lg !important;
-}
-
-.previewDesc {
-  background: rgba(255, 255, 255, 0.02);
-
-  border: 1px solid $border;
-
-  border-radius: $radius-sm;
-
-  padding: $spacing-md;
-}
-
-.previewDescLabel {
-  font-size: $font-size-xs;
-
-  color: $text-muted;
-
-  text-transform: uppercase;
-
-  letter-spacing: 0.5px;
-
-  margin-bottom: $spacing-sm;
-}
-
-.previewDescText {
-  font-size: $font-size-sm;
-
-  color: $text-secondary;
-
-  line-height: 1.6;
-}

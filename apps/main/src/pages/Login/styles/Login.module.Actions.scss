@@ -2,12 +2,6 @@
 
 @use '../../../styles/mixins' as *;
 
-.logoWrapper {
-  @include flex-center;
-
-  margin-bottom: $spacing-2xl;
-}
-
 .formHeader {
   margin-bottom: $spacing-xl;
 }

@@ -1,0 +1,40 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pentagono-space-3);
+  width: 100%;
+}
+
+.title {
+  width: min(18rem, 60%);
+  height: 1.75rem;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--pentagono-space-3);
+}
+
+.card {
+  height: 5.5rem;
+  border-radius: var(--pentagono-radius-card) !important;
+}
+
+.header {
+  height: 2.5rem;
+}
+
+.row {
+  height: 3.25rem;
+}
+
+.item {
+  height: 4.5rem;
+  border-radius: var(--pentagono-radius-card) !important;
+}
+
+.block {
+  height: 16rem;
+  border-radius: var(--pentagono-radius-card) !important;
+}

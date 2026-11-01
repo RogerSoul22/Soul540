@@ -1,18 +1,19 @@
 @use '../../../styles/variables' as *;
 
+// Classe repetida: a regra do estado ativo precisa vencer a cor genérica de .scopeBtn e .tab abaixo.
 html[data-theme='dark'] {
-  .scopeBtnActive,
-  .tabActive,
-  .filterBtnActive,
-  .monthBtnActive {
+  .scopeBtnActive.scopeBtnActive,
+  .tabActive.tabActive,
+  .filterBtnActive.filterBtnActive,
+  .monthBtnActive.monthBtnActive {
     background: $accent;
     color: $bg-primary;
   }
 
-  .scopeBtnActive:hover,
-  .tabActive:hover,
-  .filterBtnActive:hover,
-  .monthBtnActive:hover {
+  .scopeBtnActive.scopeBtnActive:hover,
+  .tabActive.tabActive:hover,
+  .filterBtnActive.filterBtnActive:hover,
+  .monthBtnActive.monthBtnActive:hover {
     background: $accent-hover;
     color: $bg-primary;
   }

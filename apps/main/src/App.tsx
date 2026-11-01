@@ -1,3 +1,4 @@
+import { Spinner } from '../../../packages/pentagono/src/index';
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { ThemeProvider } from '../../../packages/ui/src/index';
@@ -38,17 +39,7 @@ function AppLoading() {
         background: 'var(--bg-primary)',
       }}
     >
-      <div
-        style={{
-          width: 32,
-          height: 32,
-          border: '3px solid rgba(245,158,11,0.2)',
-          borderTopColor: '#f59e0b',
-          borderRadius: '50%',
-          animation: 'spin 0.8s linear infinite',
-        }}
-      />
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <Spinner />
     </div>
   );
 }

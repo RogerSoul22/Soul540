@@ -81,28 +81,6 @@
   margin-top: 4px;
 }
 
-.previewNotes {
-  margin-top: $spacing-lg;
-
-  padding: $spacing-md;
-
-  background: #f8f9fb;
-
-  border-radius: $radius-sm;
-
-  border-left: 3px solid #e2e8f0;
-
-  font-size: $font-size-sm;
-
-  color: #718096;
-
-  line-height: 1.6;
-
-  strong {
-    color: #4a5568;
-  }
-}
-
 .previewFooter {
   margin-top: $spacing-xl;
 
@@ -117,12 +95,3 @@
   color: #a0aec0;
 }
 
-.previewActions {
-  display: flex;
-
-  gap: $spacing-sm;
-
-  justify-content: center;
-
-  margin-top: $spacing-lg;
-}

@@ -25,51 +25,6 @@
   }
 }
 
-.btnView {
-  flex: 0 1 auto;
-  min-width: 92px;
-  padding: 8px;
-  background: rgba(59, 130, 246, 0.1);
-  border: none;
-  border-radius: $radius-xs;
-  color: #60a5fa;
-  font-size: $font-size-sm;
-  cursor: pointer;
-  &:hover {
-    background: rgba(59, 130, 246, 0.2);
-  }
-}
-
-.btnEdit {
-  flex: 0 1 auto;
-  min-width: 76px;
-  padding: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid $border;
-  border-radius: $radius-xs;
-  color: $text-secondary;
-  font-size: $font-size-sm;
-  cursor: pointer;
-  &:hover {
-    background: rgba(255, 255, 255, 0.08);
-  }
-}
-
-.btnDelete {
-  flex: 0 1 auto;
-  min-width: 76px;
-  padding: 8px 12px;
-  background: rgba(239, 68, 68, 0.08);
-  border: none;
-  border-radius: $radius-xs;
-  color: #f87171;
-  font-size: $font-size-sm;
-  cursor: pointer;
-  &:hover {
-    background: rgba(239, 68, 68, 0.15);
-  }
-}
-
 .btnCancel {
   padding: 10px $spacing-md;
   background: none;
@@ -115,37 +70,6 @@
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: $shadow-lg;
-}
-
-.modalHeader {
-  @include flex-between;
-  padding: $spacing-lg $spacing-xl;
-  border-bottom: 1px solid $border;
-  position: sticky;
-  top: 0;
-  background: $bg-secondary;
-  z-index: 1;
-}
-
-.modalTitle {
-  font-size: $font-size-lg;
-  font-weight: $font-weight-semibold;
-  color: $text-primary;
-}
-
-.modalClose {
-  @include flex-center;
-  width: 32px;
-  height: 32px;
-  background: none;
-  border: none;
-  color: $text-muted;
-  border-radius: $radius-xs;
-  cursor: pointer;
-  &:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: $text-primary;
-  }
 }
 
 .modalBody {

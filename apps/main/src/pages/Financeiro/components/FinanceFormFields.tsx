@@ -1,3 +1,4 @@
+import { Button, Input, Label, Select } from '../../../../../../packages/pentagono/src/index';
 import { formatCurrencyInput as formatCurrency } from '../../../../../../packages/domain/src/index';
 import type { FinanceType } from '../../../../../../packages/contracts/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
@@ -29,9 +30,8 @@ export default function FinanceFormFields({ controller }: { controller: Financei
     <>
       <div className={styles.formRow}>
         <div className={styles.formField}>
-          <label className={styles.formLabel}>Tipo</label>
-          <select
-            className={styles.formSelect}
+          <Select
+            label="Tipo"
             value={formType}
             onChange={(event) => {
               setFormType(event.target.value as FinanceType);
@@ -40,27 +40,27 @@ export default function FinanceFormFields({ controller }: { controller: Financei
           >
             <option value="revenue">Receita</option>
             <option value="cost">Custo</option>
-          </select>
+          </Select>
         </div>
         <FinanceEventField controller={controller} />
         <div className={styles.formField}>
-          <label className={styles.formLabel}>Modalidade</label>
-          <select
-            className={styles.formSelect}
+          <Select
+            label="Modalidade"
             value={formModality}
             onChange={(event) => setFormModality(event.target.value as typeof formModality)}
           >
             <option value="evento_avulso">Evento avulso</option>
             <option value="feirinha">Feirinha semanal</option>
-          </select>
+          </Select>
         </div>
       </div>
 
       <div className={styles.formRow}>
         <div className={styles.formField}>
-          <label className={styles.formLabel}>
+          <Label className={styles.formLabel}>
             Categoria
-            <button
+            <Button
+              variant="dashed"
               type="button"
               className={styles.btnAddCategory}
               onClick={() => {
@@ -70,9 +70,9 @@ export default function FinanceFormFields({ controller }: { controller: Financei
               title="Criar nova categoria"
             >
               + Nova categoria
-            </button>
-          </label>
-          <select
+            </Button>
+          </Label>
+          <Select
             className={styles.formSelect}
             value={formCategory}
             onChange={(event) => setFormCategory(event.target.value)}
@@ -90,13 +90,12 @@ export default function FinanceFormFields({ controller }: { controller: Financei
                   ))}
                 </optgroup>
               ))}
-          </select>
+          </Select>
         </div>
         <div className={styles.formField}>
-          <label className={styles.formLabel}>Valor (R$)</label>
-          <input
+          <Input
+            label="Valor (R$)"
             type="text"
-            className={styles.formInput}
             value={formAmount}
             onChange={(event) => setFormAmount(formatCurrency(event.target.value))}
             placeholder="R$ 0,00"
@@ -106,10 +105,9 @@ export default function FinanceFormFields({ controller }: { controller: Financei
       </div>
 
       <div className={styles.formField}>
-        <label className={styles.formLabel}>Descrição</label>
-        <input
+        <Input
+          label="Descrição"
           type="text"
-          className={styles.formInput}
           value={formDescription}
           onChange={(event) => setFormDescription(event.target.value)}
           placeholder="Descreva o lançamento"
@@ -118,25 +116,23 @@ export default function FinanceFormFields({ controller }: { controller: Financei
 
       <div className={styles.formRow}>
         <div className={styles.formField}>
-          <label className={styles.formLabel}>Data</label>
-          <input
+          <Input
+            label="Data"
             type="date"
-            className={styles.formInput}
             value={formDate}
             onChange={(event) => setFormDate(event.target.value)}
             required
           />
         </div>
         <div className={styles.formField}>
-          <label className={styles.formLabel}>Status</label>
+          <Label className={styles.formLabel}>Status</Label>
           <p className={styles.formHint}>Pendente. Registre a liquidação na lista de lançamentos.</p>
         </div>
       </div>
 
       <div className={styles.formField}>
-        <label className={styles.formLabel}>Forma de pagamento</label>
-        <select
-          className={styles.formSelect}
+        <Select
+          label="Forma de pagamento"
           value={formPaymentMethod}
           onChange={(event) => setFormPaymentMethod(event.target.value)}
         >
@@ -147,7 +143,7 @@ export default function FinanceFormFields({ controller }: { controller: Financei
           <option value="credit">Cartão de crédito</option>
           <option value="transfer">Transferência</option>
           <option value="other">Outro</option>
-        </select>
+        </Select>
       </div>
     </>
   );

@@ -1,3 +1,4 @@
+import { Card, Heading } from '../../../../../../packages/pentagono/src/index';
 import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
 import styles from '../styles/Financeiro.module.scss';
@@ -73,7 +74,9 @@ export default function FinanceOverviewSummary({ controller }: { controller: Fin
       <div className={styles.agendamentosCard + ' ' + styles.paymentMethodsSection}>
         <div className={styles.agendamentosHeader}>
           <div>
-            <h3 className={styles.sectionTitle}>Recebimentos por forma</h3>
+            <Heading level={3} variant="section" className={styles.sectionTitle}>
+              Recebimentos por forma
+            </Heading>
             <p className={styles.sectionSubtitle}>Total identificado: {formatBRL(paymentMethodTotal)}</p>
           </div>
         </div>
@@ -82,7 +85,7 @@ export default function FinanceOverviewSummary({ controller }: { controller: Fin
         ) : (
           <div className={styles.paymentMethodCards}>
             {paymentMethodSummary.map((item) => (
-              <div key={item.method} className={styles.paymentMethodCard}>
+              <Card key={item.method} className={styles.paymentMethodCard}>
                 <div className={styles.paymentMethodCardHeader}>
                   <strong>{item.method === 'nao-informado' ? 'Não informado' : item.method}</strong>
                   <span>{formatBRL(item.amount)}</span>
@@ -91,7 +94,7 @@ export default function FinanceOverviewSummary({ controller }: { controller: Fin
                   <span style={{ width: (item.amount / (paymentMethodTotal || 1)) * 100 + '%' }} />
                 </div>
                 <small>{item.count} recebimento(s)</small>
-              </div>
+              </Card>
             ))}
           </div>
         )}
@@ -102,12 +105,14 @@ export default function FinanceOverviewSummary({ controller }: { controller: Fin
 
 function WalletCard({ title, value, detail, tone }: { title: string; value: string; detail: string; tone: string }) {
   return (
-    <div className={styles.agendamentosCard}>
+    <Card className={styles.agendamentosCard}>
       <div className={styles.agendamentosHeader}>
-        <h3 className={styles.sectionTitle}>{title}</h3>
+        <Heading level={3} variant="section" className={styles.sectionTitle}>
+          {title}
+        </Heading>
       </div>
       <div className={styles.summaryItemValue + ' ' + tone}>{value}</div>
       <p className={styles.agendamentosEmpty}>{detail}</p>
-    </div>
+    </Card>
   );
 }

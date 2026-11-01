@@ -1,3 +1,4 @@
+import { Button } from '../../../../../../packages/pentagono/src/index';
 import { formatDashboardEventDate as formatEventDate } from '../../../../../../packages/screens/src/index';
 import type {
   EmployeeScheduleItem,
@@ -38,13 +39,26 @@ export default function DashboardOperationalPanels({
               <p className={styles.opsTitle}>Atenção operacional</p>
               <p className={styles.opsSubtitle}>Eventos próximos com pendências para revisar</p>
             </div>
-            <button className={styles.opsAction} onClick={() => onNavigate('/eventos')}>
+            <Button variant="outline" className={styles.opsAction} onClick={() => onNavigate('/eventos')}>
               Ver eventos
-            </button>
+            </Button>
           </div>
           <div className={styles.opsList}>
             {operationalAlerts.map((alert) => (
-              <div key={alert.event.id} className={styles.opsItem}>
+              <div
+                key={alert.event.id}
+                className={`${styles.opsItem} ${styles.opsItemLink}`}
+                role="link"
+                tabIndex={0}
+                aria-label={`Abrir evento ${alert.event.name}`}
+                onClick={() => onNavigate(`/eventos?edit=${alert.event.id}`)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    onNavigate(`/eventos?edit=${alert.event.id}`);
+                  }
+                }}
+              >
                 <div className={styles.opsItemMain}>
                   <span className={styles.opsEventName}>{alert.event.name}</span>
                   <span className={styles.opsEventDate}>{formatEventDate(alert.event.date, 'dd/MM/yyyy')}</span>

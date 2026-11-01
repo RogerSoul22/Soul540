@@ -38,7 +38,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     refreshFinances,
   };
 
-  useFactoryAppData(state);
+  const dataLoading = useFactoryAppData(state);
   const financeActions = useFactoryFinanceActions(state);
   return (
     <AppContext.Provider
@@ -48,6 +48,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         financeCategories,
         tasks,
         invoices,
+        dataLoading,
         ...financeActions,
         ...useFactoryEventActions(state),
         ...useFactoryTaskActions(state),

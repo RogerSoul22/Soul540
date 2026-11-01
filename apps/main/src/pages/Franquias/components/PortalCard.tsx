@@ -1,38 +1,44 @@
+import { Badge, Heading } from '../../../../../../packages/pentagono/src/index';
 import type { FranchiseStatus, PortalSystem } from '../types/franchise-types';
 import styles from '../styles/Franquias.module.scss';
 
 type Props = { system: PortalSystem; franchiseName?: string; status: FranchiseStatus };
 
+const SYSTEM_LABEL: Record<PortalSystem, string> = { franchise: 'Franquia', factory: 'Fábrica' };
+
 export default function PortalCard({ system, franchiseName, status }: Props) {
   const label = franchiseName || (system === 'franchise' ? 'Franquia Itu' : 'Portal Fábrica');
-  const color = system === 'franchise' ? styles.portalAmber : styles.portalBlue;
-  const statusLabel = status === 'ativa' ? 'Ativa' : 'Em implantação';
+  const active = status === 'ativa';
+  const statusLabel = active ? 'Ativa' : 'Em implantação';
+  const accent = system === 'franchise' ? styles.portalAmber : styles.portalBlue;
 
   return (
-    <div className={styles.portalCard + ' ' + color}>
-      <div className={styles.portalTop}>
-        <div className={styles.portalIcon}>{system === 'franchise' ? '⌘' : '▣'}</div>
-        <div>
-          <div className={styles.portalLabel}>{label}</div>
-          <div className={styles.portalSub}>Sistema {system}</div>
+    <article className={`${styles.portalCard} ${accent}`}>
+      <header className={styles.portalTop}>
+        <div className={styles.portalIcon} aria-hidden="true">
+          {system === 'franchise' ? '⌘' : '▣'}
         </div>
-        <div className={styles.portalStatus}>
-          <span className={styles.statusDot + ' ' + styles.statusOnline} />
-          <span className={styles.statusLabel}>{statusLabel}</span>
+        <div className={styles.portalHeading}>
+          <Heading level={3} variant="section" className={styles.portalLabel}>
+            {label}
+          </Heading>
+          <p className={styles.portalSub}>Portal {SYSTEM_LABEL[system].toLowerCase()}</p>
         </div>
-      </div>
-      <div className={styles.portalStats}>
-        <Stat value={statusLabel} label="Status da franquia" />
-      </div>
-    </div>
-  );
-}
-
-function Stat({ value, label }: { value: string | number; label: string }) {
-  return (
-    <div className={styles.portalStat}>
-      <span className={styles.portalStatValue}>{value}</span>
-      <span className={styles.portalStatLabel}>{label}</span>
-    </div>
+        <Badge variant={active ? 'green' : 'amber'}>{statusLabel}</Badge>
+      </header>
+      <dl className={styles.portalDetails}>
+        <div className={styles.portalDetail}>
+          <dt>Sistema</dt>
+          <dd>{SYSTEM_LABEL[system]}</dd>
+        </div>
+        <div className={styles.portalDetail}>
+          <dt>Status da franquia</dt>
+          <dd>
+            <span className={`${styles.statusDot} ${active ? styles.statusOnline : styles.statusPending}`} />
+            {statusLabel}
+          </dd>
+        </div>
+      </dl>
+    </article>
   );
 }

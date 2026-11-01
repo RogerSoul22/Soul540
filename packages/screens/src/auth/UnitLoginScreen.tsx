@@ -1,3 +1,4 @@
+import { Button, Heading, Input } from '../../../pentagono/src/index';
 import { type FormEvent, type ReactNode, useState } from 'react';
 
 export interface UnitLoginFeature {
@@ -49,11 +50,11 @@ export default function UnitLoginScreen({
       <div className={styles.branding}>
         <div className={styles.brandingContent}>
           <img src="/logo.png" alt="Soul540" className={styles.brandingLogo} />
-          <h1 className={styles.brandingTitle}>
+          <Heading variant="display" className={styles.brandingTitle}>
             Soul<span className={styles.brandingHighlight}>540</span>
             <br />
             {unitName}
-          </h1>
+          </Heading>
           <p className={styles.brandingDescription}>{description}</p>
           <div className={styles.brandingFeatures}>
             {features.map((feature) => (
@@ -69,14 +70,16 @@ export default function UnitLoginScreen({
       <div className={styles.formSide}>
         <div className={styles.formContainer}>
           <div className={styles.formHeader}>
-            <h2 className={styles.formTitle}>Bem-vindo</h2>
+            <Heading level={2} variant="section" className={styles.formTitle}>
+              Bem-vindo
+            </Heading>
             <p className={styles.formSubtitle}>Acesse sua conta para continuar</p>
           </div>
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.formFields}>
               <div className={styles.field}>
-                <label htmlFor="unit-login-email">Email</label>
-                <input
+                <Input
+                  label="Email"
                   id="unit-login-email"
                   type="email"
                   value={email}
@@ -86,8 +89,8 @@ export default function UnitLoginScreen({
                 />
               </div>
               <div className={styles.field}>
-                <label htmlFor="unit-login-password">Senha</label>
-                <input
+                <Input
+                  label="Senha"
                   id="unit-login-password"
                   type="password"
                   value={password}
@@ -99,9 +102,9 @@ export default function UnitLoginScreen({
             </div>
             {error && <p className={styles.errorMessage}>{error}</p>}
             <div className={styles.formActions}>
-              <button type="submit" className={styles.btn} disabled={loading}>
+              <Button variant="outline" type="submit" className={styles.btn} disabled={loading}>
                 {loading ? 'Entrando...' : 'Entrar'}
-              </button>
+              </Button>
             </div>
           </form>
           <div className={styles.footer}>

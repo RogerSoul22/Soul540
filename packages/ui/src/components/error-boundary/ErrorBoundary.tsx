@@ -1,3 +1,4 @@
+import { Button, Heading } from '../../../../pentagono/src/index';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 
 type Props = { children: ReactNode };
@@ -29,11 +30,11 @@ export default class ErrorBoundary extends Component<Props, State> {
         }}
       >
         <section role="alert" style={{ maxWidth: 440, textAlign: 'center' }}>
-          <h1>Não foi possível abrir esta tela</h1>
+          <Heading variant="display">Não foi possível abrir esta tela</Heading>
           <p>Recarregue a página. Se o problema continuar, tente novamente em alguns minutos.</p>
-          <button type="button" onClick={() => window.location.reload()}>
+          <Button variant="outline" type="button" onClick={() => window.location.reload()}>
             Recarregar página
-          </button>
+          </Button>
         </section>
       </main>
     );

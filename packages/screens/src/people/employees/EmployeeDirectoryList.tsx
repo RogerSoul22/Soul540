@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
-import { Badge } from '../../../../ui/src/index';
-import { LocationIcon, PhoneIcon, SearchIcon } from './employee-icons';
+import { Badge, Button, SkeletonContent } from '../../../../pentagono/src/index';
+import EmployeeDirectoryFilters from './EmployeeDirectoryFilters';
+import { LocationIcon, PhoneIcon } from './employee-icons';
 import { dayLabels, days, employeeStatusConfig, roleLabels, type Employee } from './employee-types';
 import cardStyles from './styles/EmployeeDirectoryCards.module.scss';
-import filterStyles from './styles/EmployeeDirectoryFilters.module.scss';
 interface EmployeeDirectoryListProps {
   employeesByLetter: Map<string, Employee[]>;
   loading: boolean;
@@ -34,42 +34,16 @@ export default function EmployeeDirectoryList({
 }: EmployeeDirectoryListProps) {
   return (
     <>
-      <div className={filterStyles.controls}>
-        <div className={filterStyles.searchWrap}>
-          <SearchIcon className={filterStyles.searchIcon} width="16" height="16" />
-          <input
-            className={filterStyles.searchInput}
-            placeholder="Buscar por nome, email, CPF, cidade..."
-            value={search}
-            onChange={(event) => onSearchChange(event.target.value)}
-          />
-        </div>
-        <select
-          className={filterStyles.select}
-          value={statusFilter}
-          onChange={(event) => onStatusFilterChange(event.target.value)}
-        >
-          <option value="all">Todos os status</option>
-          <option value="ativo">Ativo</option>
-          <option value="ferias">Férias</option>
-          <option value="afastado">Afastado</option>
-          <option value="desligado">Desligado</option>
-        </select>
-        <select
-          className={filterStyles.select}
-          value={roleFilter}
-          onChange={(event) => onRoleFilterChange(event.target.value)}
-        >
-          <option value="all">Todos os cargos</option>
-          {Object.entries(roleLabels).map(([role, label]) => (
-            <option key={role} value={role}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </div>
+      <EmployeeDirectoryFilters
+        search={search}
+        statusFilter={statusFilter}
+        roleFilter={roleFilter}
+        onSearchChange={onSearchChange}
+        onStatusFilterChange={onStatusFilterChange}
+        onRoleFilterChange={onRoleFilterChange}
+      />
       {loading ? (
-        <div className={cardStyles.empty}>Carregando...</div>
+        <SkeletonContent variant="list" label="Carregando funcionários..." />
       ) : total === 0 ? (
         <div className={cardStyles.empty}>Nenhum funcionário encontrado.</div>
       ) : (
@@ -135,7 +109,8 @@ function EmployeeCard({
         </div>
       )}
       <div className={cardStyles.cardActions}>
-        <button
+        <Button
+          variant="outline"
           className={cardStyles.editButton}
           onClick={(event) => {
             event.stopPropagation();
@@ -143,8 +118,10 @@ function EmployeeCard({
           }}
         >
           Editar
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="danger"
+          size="sm"
           className={cardStyles.deleteButton}
           onClick={(event) => {
             event.stopPropagation();
@@ -152,7 +129,7 @@ function EmployeeCard({
           }}
         >
           Excluir
-        </button>
+        </Button>
       </div>
     </article>
   );

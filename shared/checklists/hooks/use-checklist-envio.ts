@@ -47,7 +47,9 @@ export function useChecklistEnvio({ apiFetch, storageScope, systemName }: Props)
       .finally(() => {
         if (active) setLoading(false);
       });
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [apiFetch]);
 
   const selectedEvent = useMemo(
@@ -59,7 +61,7 @@ export function useChecklistEnvio({ apiFetch, storageScope, systemName }: Props)
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(storageKey);
-      const stored = raw ? JSON.parse(raw) as Partial<StoredChecklist> : {};
+      const stored = raw ? (JSON.parse(raw) as Partial<StoredChecklist>) : {};
       setItems(Array.isArray(stored.items) ? stored.items : []);
       setChecked(stored.checked && typeof stored.checked === 'object' ? stored.checked : {});
     } catch {
@@ -83,11 +85,19 @@ export function useChecklistEnvio({ apiFetch, storageScope, systemName }: Props)
   const guestTotal = getGuestTotal(selectedEvent);
   const meta: ChecklistMeta[] = [
     { label: 'Sistema', value: systemName },
-    { label: 'Data', value: selectedEvent ? `${formatDate(selectedEvent.date)}${selectedEvent.time ? ` as ${selectedEvent.time}` : ''}` : 'Sem evento' },
+    {
+      label: 'Data',
+      value: selectedEvent
+        ? `${formatDate(selectedEvent.date)}${selectedEvent.time ? ` as ${selectedEvent.time}` : ''}`
+        : 'Sem evento',
+    },
     { label: 'Local', value: selectedEvent?.location || selectedEvent?.city || 'Nao informado' },
     { label: 'Convidados', value: guestTotal ? String(guestTotal) : 'Nao informado' },
     { label: 'Cardapio', value: selectedEvent?.menu?.length ? selectedEvent.menu.join(', ') : 'Nao informado' },
-    { label: 'Pizzas', value: selectedEvent?.estimatedPizzas ? String(selectedEvent.estimatedPizzas) : 'Nao informado' },
+    {
+      label: 'Pizzas',
+      value: selectedEvent?.estimatedPizzas ? String(selectedEvent.estimatedPizzas) : 'Nao informado',
+    },
   ];
 
   const showFeedback = (message: string, time = 1800) => {

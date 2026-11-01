@@ -2,30 +2,6 @@
 
 @use '../../../styles/mixins' as *;
 
-.btnDelete {
-  padding: 6px 10px;
-
-  background: rgba(239, 68, 68, 0.08);
-
-  border: none;
-
-  border-radius: $radius-xs;
-
-  color: #f87171;
-
-  font-size: $font-size-xs;
-
-  cursor: pointer;
-
-  transition: background $transition-fast;
-
-  white-space: nowrap;
-
-  &:hover {
-    background: rgba(239, 68, 68, 0.15);
-  }
-}
-
 .btnCancel {
   padding: 10px $spacing-md;
 
@@ -101,26 +77,3 @@
   box-shadow: $shadow-lg;
 }
 
-.modalHeader {
-  @include flex-between;
-
-  padding: $spacing-lg $spacing-xl;
-
-  border-bottom: 1px solid $border;
-
-  position: sticky;
-
-  top: 0;
-
-  background: $bg-secondary;
-
-  z-index: 1;
-}
-
-.modalTitle {
-  font-size: $font-size-lg;
-
-  font-weight: $font-weight-semibold;
-
-  color: $text-primary;
-}

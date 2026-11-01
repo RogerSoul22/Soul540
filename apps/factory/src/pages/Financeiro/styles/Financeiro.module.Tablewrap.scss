@@ -54,11 +54,6 @@
   font-size: 14px;
 }
 
-.monthSelector {
-  border-radius: 5px;
-  box-shadow: none;
-}
-
 .monthSummaryItem {
   border-radius: 5px;
   box-shadow: none;
@@ -68,33 +63,6 @@
   .tableWrap {
     max-height: 320px;
   }
-}
-
-.monthSelector {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-}
-
-.monthSelectLabel {
-  color: #63738b;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.35px;
-}
-
-.monthSelect {
-  min-width: 190px;
-  min-height: 34px;
-  padding: 6px 32px 6px 10px;
-  border: 1px solid #cfd9e7;
-  border-radius: 4px;
-  background: #fff;
-  color: #182235;
-  font-size: 12px;
-  cursor: pointer;
 }
 
 .monthSelect:focus {

@@ -1,3 +1,4 @@
+import { Button, Input, Label, Select } from '../../../../pentagono/src/index';
 import type { ReactNode } from 'react';
 import type { ContractorForm } from './contractor-types';
 import styles from './styles/ContractorModalFrame.module.scss';
@@ -8,17 +9,17 @@ export function IndividualFields({ form, update }: { form: ContractorForm; updat
   return (
     <div className={styles.twoColumns}>
       <EditorField label="Estado civil">
-        <select onChange={(event) => update('maritalStatus', event.target.value)} value={form.maritalStatus}>
+        <Select onChange={(event) => update('maritalStatus', event.target.value)} value={form.maritalStatus}>
           <option value="">-- selecione --</option>
           <option value="solteiro">Solteiro(a)</option>
           <option value="casado">Casado(a)</option>
           <option value="divorciado">Divorciado(a)</option>
           <option value="viuvo">Viúvo(a)</option>
           <option value="uniao_estavel">União estável</option>
-        </select>
+        </Select>
       </EditorField>
       <EditorField label="Profissão">
-        <input onChange={(event) => update('profession', event.target.value)} value={form.profession} />
+        <Input onChange={(event) => update('profession', event.target.value)} value={form.profession} />
       </EditorField>
     </div>
   );
@@ -37,7 +38,7 @@ export function IndividualDocumentOptions() {
 export function EditorField({ children, label }: { children: ReactNode; label: string }) {
   return (
     <div className={styles.field}>
-      <label>{label}</label>
+      <Label>{label}</Label>
       {children}
     </div>
   );
@@ -56,12 +57,12 @@ export function EditorFooter({
 }) {
   return (
     <>
-      <button className={styles.cancelButton} onClick={onClose} type="button">
+      <Button variant="ghost" onClick={onClose} type="button">
         Cancelar
-      </button>
-      <button className={styles.primaryButton} disabled={!valid} onClick={onSubmit} type="button">
+      </Button>
+      <Button variant="primary" disabled={!valid} onClick={onSubmit} type="button">
         {editingId ? 'Salvar alterações' : 'Cadastrar Contratante'}
-      </button>
+      </Button>
     </>
   );
 }

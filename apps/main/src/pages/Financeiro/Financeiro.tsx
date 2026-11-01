@@ -1,3 +1,4 @@
+import { SkeletonContent } from '../../../../../packages/pentagono/src/index';
 import { useFinanceiroController } from './hooks/use-financeiro-controller';
 import FinanceiroHeader from './components/FinanceiroHeader';
 import FinanceiroTabs from './components/FinanceiroTabs';
@@ -12,10 +13,12 @@ import FinanceXmlImportModal from './components/FinanceXmlImportModal';
 import FinanceOfxImportModal from './components/FinanceOfxImportModal';
 import FinanceSupportModals from './components/FinanceSupportModals';
 import FinanceSettlementModal from './components/FinanceSettlementModal';
+import { useApp } from '../../contexts/AppContext';
 import styles from './styles/Financeiro.module.scss';
 
 export default function Financeiro() {
   const controller = useFinanceiroController();
+  const { dataLoading } = useApp();
   const {
     activeTab,
     costFilter,
@@ -38,10 +41,11 @@ export default function Financeiro() {
     <div className={styles.page}>
       <FinanceiroHeader controller={controller} />
       <FinanceiroTabs controller={controller} />
+      {dataLoading && <SkeletonContent variant="page" label="Carregando financeiro..." />}
       {/* ===== TAB: VISAO GERAL ===== */}
-      {activeTab === 'geral' && <FinanceOverviewTab controller={controller} />}
+      {!dataLoading && activeTab === 'geral' && <FinanceOverviewTab controller={controller} />}
 
-      {activeTab === 'despesas' && (
+      {!dataLoading && activeTab === 'despesas' && (
         <FinanceExpensesTab
           costFilter={costFilter}
           setCostFilter={setCostFilter}
@@ -51,7 +55,7 @@ export default function Financeiro() {
         />
       )}
 
-      {activeTab === 'mensal' && (
+      {!dataLoading && activeTab === 'mensal' && (
         <FinanceMonthlyTab
           monthRevenue={monthRevenue}
           monthCosts={monthCosts}
@@ -64,10 +68,10 @@ export default function Financeiro() {
         />
       )}
       {/* ===== TAB: LANCAMENTOS ===== */}
-      {activeTab === 'lancamentos' && <FinanceEntriesTab controller={controller} />}
+      {!dataLoading && activeTab === 'lancamentos' && <FinanceEntriesTab controller={controller} />}
 
       {/* ===== TAB: ESTIMADO x FINAL ===== */}
-      {activeTab === 'valores' && <FinanceValuesTab controller={controller} />}
+      {!dataLoading && activeTab === 'valores' && <FinanceValuesTab controller={controller} />}
 
       <FinanceDetailsModals controller={controller} />
 

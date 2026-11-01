@@ -1,7 +1,7 @@
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { Task, TaskStatus } from '../../../../../../shared/contracts/types';
-import { Badge } from '../../../../../../packages/ui/src/index';
+import { Badge, Button } from '../../../../../../packages/pentagono/src/index';
 import {
   taskPriorityLabels as priorityLabels,
   taskStatusLabels as statusLabels,
@@ -45,9 +45,9 @@ export default function TaskCard({
     >
       <div className={styles.taskTop}>
         <Badge variant={PRIORITY_COLORS[task.priority]}>{priorityLabels[task.priority]}</Badge>
-        <button className={styles.taskDelete} onClick={onDelete} title="Excluir">
+        <Button variant="danger" size="sm" className={styles.taskDelete} onClick={onDelete} title="Excluir">
           ×
-        </button>
+        </Button>
       </div>
       <p className={styles.taskTitle}>{task.title}</p>
       {task.description && <p className={styles.taskDesc}>{task.description}</p>}
@@ -76,18 +76,28 @@ export function TaskMoveControls({
 }) {
   return (
     <div className={styles.taskMoveRow}>
-      <button className={styles.taskMoveBtn} disabled={!previous} onClick={() => previous && onMove(previous.id)}>
+      <Button
+        variant="outline"
+        className={styles.taskMoveBtn}
+        disabled={!previous}
+        onClick={() => previous && onMove(previous.id)}
+      >
         ‹
-      </button>
+      </Button>
       <span className={styles.taskMoveLabel}>{statusLabels[task.status]}</span>
       {task.status === 'done' && onArchive ? (
-        <button className={styles.taskArchiveBtn} onClick={onArchive}>
+        <Button variant="outline" className={styles.taskArchiveBtn} onClick={onArchive}>
           Histórico
-        </button>
+        </Button>
       ) : (
-        <button className={styles.taskMoveBtn} disabled={!next} onClick={() => next && onMove(next.id)}>
+        <Button
+          variant="outline"
+          className={styles.taskMoveBtn}
+          disabled={!next}
+          onClick={() => next && onMove(next.id)}
+        >
           ›
-        </button>
+        </Button>
       )}
     </div>
   );

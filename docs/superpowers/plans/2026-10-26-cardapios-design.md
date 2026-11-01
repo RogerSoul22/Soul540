@@ -28,11 +28,13 @@
 ### Task 1: Fixar a estrutura operacional dos cards
 
 **Files:**
+
 - Create: `apps/main/src/pages/Cardapios/Cardapios.structure.test.ts`
 - Modify: `apps/main/src/pages/Cardapios/components/StaticMenuGrid.tsx`
 - Modify: `apps/main/src/pages/Cardapios/components/CustomMenuList.tsx`
 
 **Interfaces:**
+
 - Consumes: dados e callbacks já existentes em `StaticMenuGrid` e `CustomMenuList`.
 - Produces: estrutura com cabeçalho informativo, lista de categorias identificável e ações agrupadas no rodapé.
 
@@ -57,6 +59,7 @@
 ### Task 2: Apply the compact responsive visual system
 
 **Files:**
+
 - Create: `apps/main/src/pages/Cardapios/styles/Cardapios.module.CardActions.scss`
 - Create: `apps/main/src/pages/Cardapios/styles/Cardapios.module.Cards.scss`
 - Modify: `apps/main/src/pages/Cardapios/styles/Cardapios.module.Navigation.scss`
@@ -65,6 +68,7 @@
 - Modify: `apps/main/src/pages/Cardapios/styles/Cardapios.module.Table.scss`
 
 **Interfaces:**
+
 - Consumes: class hooks produced by Task 1 and existing theme variables/mixins.
 - Produces: compact three/two/one-column layout, readable category chips/rows, inline desktop actions, mobile-safe controls.
 
@@ -87,6 +91,7 @@
 ### Task 3: Regression verification
 
 **Files:**
+
 - No production files expected.
 
 - [ ] **Step 1: Run the focused structure test**

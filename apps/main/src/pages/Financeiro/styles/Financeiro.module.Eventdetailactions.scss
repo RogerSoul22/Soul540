@@ -29,10 +29,6 @@
   white-space: nowrap;
 }
 
-.agendamentoRowInteractive {
-  cursor: pointer;
-}
-
 .agendamentoRowInteractive:hover {
   background: #fff7ed;
 }
@@ -40,23 +36,6 @@
 .agendamentoRowInteractive:focus {
   outline: 2px solid #f28a12;
   outline-offset: -2px;
-}
-
-.paymentMethodList {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.paymentMethodRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 8px 0;
-  border-bottom: 1px solid #e7edf5;
-  color: #40516a;
-  font-size: 12px;
 }
 
 .paymentMethodRow:last-child {
@@ -70,17 +49,6 @@
 .paymentMethodsSection {
   width: 100%;
   margin-bottom: 14px;
-}
-
-.paymentMethodsSubtitle {
-  margin: 4px 0 0;
-  color: #718096;
-  font-size: 11px;
-}
-
-.paymentMethodsTotal {
-  color: #168a57;
-  font-size: 18px;
 }
 
 .paymentMethodCards {
@@ -133,13 +101,6 @@
   font-size: 20px;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.paymentMethodCount {
-  display: block;
-  margin-top: 5px;
-  color: #718096;
-  font-size: 11px;
 }
 
 .paymentMethodProgress {

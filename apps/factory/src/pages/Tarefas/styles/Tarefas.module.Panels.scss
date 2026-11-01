@@ -36,58 +36,6 @@
 }
 
 // section
-.calcSection {
-  background: $bg-secondary;
-
-  border: 1px solid $border;
-
-  border-radius: $radius-lg;
-
-  overflow: hidden;
-}
-
-.calcHeader {
-  padding: $spacing-md $spacing-lg;
-
-  border-bottom: 1px solid $border;
-
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.calcInputs {
-  display: flex;
-
-  flex-wrap: wrap;
-
-  gap: $spacing-md;
-
-  padding: $spacing-lg;
-
-  border-bottom: 1px solid $border;
-}
-
-.calcGroup {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 6px;
-
-  min-width: 160px;
-}
-
-.calcLabel {
-  font-size: $font-size-xs;
-
-  font-weight: $font-weight-medium;
-
-  color: $text-muted;
-
-  text-transform: uppercase;
-
-  letter-spacing: 0.4px;
-}
-
 .calcSelect,
 .calcInput {
   background: $bg-input;
@@ -120,16 +68,3 @@
   }
 }
 
-.modeToggle {
-  display: flex;
-
-  background: $bg-input;
-
-  border: 1px solid $border;
-
-  border-radius: $radius-sm;
-
-  padding: 3px;
-
-  gap: 2px;
-}

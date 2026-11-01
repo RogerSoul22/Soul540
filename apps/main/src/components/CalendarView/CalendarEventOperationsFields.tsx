@@ -1,3 +1,4 @@
+import { Textarea } from '../../../../../packages/pentagono/src/index';
 import type { PizzaEvent } from '../../../../../packages/contracts/src/index';
 import styles from './styles/CalendarView.module.scss';
 import { DateField, ListField, NumberField, TextField } from './CalendarEventField';
@@ -65,9 +66,8 @@ export default function CalendarEventOperationsFields({ form, updateForm, readNu
         />
       </div>
       <div className={styles.formField}>
-        <label className={styles.formLabel}>Observações</label>
-        <textarea
-          className={styles.formTextarea}
+        <Textarea
+          label="Observações"
           value={form.notes ?? ''}
           onChange={(event) => updateForm({ notes: event.target.value })}
         />

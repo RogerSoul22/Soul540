@@ -1,54 +1,6 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
-.statusBadge {
-  display: inline-flex;
-
-  align-items: center;
-
-  font-size: 11px;
-
-  font-weight: $font-weight-semibold;
-
-  padding: 3px 10px;
-
-  border-radius: $radius-full;
-
-  border: 1px solid transparent;
-
-  width: fit-content;
-
-  letter-spacing: 0.2px;
-}
-
-.closeBtn {
-  @include flex-center;
-
-  width: 30px;
-
-  height: 30px;
-
-  border-radius: $radius-sm;
-
-  border: none;
-
-  background: none;
-
-  color: $text-muted;
-
-  cursor: pointer;
-
-  transition: all $transition-fast;
-
-  flex-shrink: 0;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.06);
-
-    color: $text-primary;
-  }
-}
-
 .panelBody {
   padding: $spacing-xl;
 

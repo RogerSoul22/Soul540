@@ -1,3 +1,4 @@
+import { Card, Heading } from '../../../../../../packages/pentagono/src/index';
 import { buildEventWhatsAppUrl as buildSharedEventWhatsAppUrl } from '../../../../../../packages/domain/src/index';
 import type { PizzaEvent } from '../../../../../../packages/contracts/src/index';
 import { ptBR } from 'date-fns/locale';
@@ -29,13 +30,13 @@ function EventCard({
 }) {
   const isFranchise = (ev as any).source === 'franchise';
   return (
-    <div className={styles.card} onClick={() => onView(ev)}>
+    <Card className={styles.card} interactive onClick={() => onView(ev)}>
       <div className={styles.cardTop}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-            <h3 className={styles.cardTitle} style={{ margin: 0 }}>
+            <Heading level={3} variant="section" className={styles.cardTitle} style={{ margin: 0 }}>
               {ev.name}
-            </h3>
+            </Heading>
             <span
               style={{
                 fontSize: 10,
@@ -147,7 +148,7 @@ function EventCard({
           </a>
         )}
       </div>
-    </div>
+    </Card>
   );
 }
 

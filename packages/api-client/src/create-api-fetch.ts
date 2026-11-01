@@ -19,6 +19,8 @@ export interface ApiClientOptions {
   franchiseId?: string;
 }
 
+export const SILENT_ERRORS_HEADER = 'X-Silent-Errors';
+
 function notifyApiError(detail: ApiErrorDetail) {
   window.dispatchEvent(new CustomEvent<ApiErrorDetail>('soul540:api-error', { detail }));
 }
@@ -85,19 +87,19 @@ async function unwrapResponseEnvelope(response: Response) {
 export function createApiFetch({ baseUrl = '', system, franchiseId }: ApiClientOptions = {}) {
   return async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
     let response: Response;
+    // Cabeçalho interno: a tela mostra o erro por conta própria, sem o aviso global.
+    const silent = new Headers(options.headers).has(SILENT_ERRORS_HEADER);
+    const headers = createHeaders(options, system, franchiseId);
+    headers.delete(SILENT_ERRORS_HEADER);
 
     try {
-      response = await fetch(`${baseUrl}${path}`, {
-        ...options,
-        credentials: 'include',
-        headers: createHeaders(options, system, franchiseId),
-      });
+      response = await fetch(`${baseUrl}${path}`, { ...options, credentials: 'include', headers });
     } catch {
       const error = new ApiRequestError(
         0,
         'Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.',
       );
-      notifyApiError(error);
+      if (!silent) notifyApiError(error);
       throw error;
     }
 
@@ -107,7 +109,7 @@ export function createApiFetch({ baseUrl = '', system, franchiseId }: ApiClientO
 
     if (!response.ok) {
       const error = await responseError(response);
-      if (!path.startsWith('/api/auth/')) notifyApiError(error);
+      if (!silent && !path.startsWith('/api/auth/')) notifyApiError(error);
       throw new ApiRequestError(error.status, error.message);
     }
 

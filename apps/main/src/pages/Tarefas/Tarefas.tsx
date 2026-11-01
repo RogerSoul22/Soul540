@@ -1,14 +1,16 @@
-import { ConfirmModal } from '../../../../../packages/ui/src/index';
+import { ConfirmModal, Input, Select, SkeletonContent } from '../../../../../packages/pentagono/src/index';
 import TaskBoard from './components/TaskBoard';
 import TaskCreateModal from './components/TaskCreateModal';
 import TaskHistory from './components/TaskHistory';
 import TaskInfoModal from './components/TaskInfoModal';
 import TasksHeader from './components/TasksHeader';
 import { useTarefasController } from './hooks/use-tarefas-controller';
+import { useApp } from '../../contexts/AppContext';
 import styles from './styles/Tarefas.module.scss';
 
 export default function Tarefas() {
   const controller = useTarefasController();
+  const { dataLoading } = useApp();
   const closeCreate = () => {
     controller.setShowModal(false);
     controller.setForm({
@@ -35,13 +37,14 @@ export default function Tarefas() {
         <Stat value={controller.urgentCount} label="Urgentes" danger={controller.urgentCount > 0} />
       </div>
       <div className={styles.controls}>
-        <input
+        <Input
+          variant="search"
           className={styles.searchInput}
           placeholder="Buscar tarefas..."
           value={controller.search}
           onChange={(event) => controller.setSearch(event.target.value)}
         />
-        <select
+        <Select
           className={styles.select}
           value={controller.eventFilter}
           onChange={(event) => controller.setEventFilter(event.target.value)}
@@ -52,31 +55,35 @@ export default function Tarefas() {
               {event.name}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
-      <TaskBoard
-        viewMode={controller.viewMode}
-        groups={controller.tasksByStatus}
-        filtered={controller.filtered}
-        eventMap={controller.eventMap}
-        columns={controller.columns}
-        draggedId={controller.draggedId}
-        dragOverColumn={controller.dragOverColumn}
-        onDragStart={controller.setDraggedId}
-        onDragEnd={() => {
-          controller.setDraggedId(null);
-          controller.setDragOverColumn(null);
-        }}
-        onDragOver={controller.setDragOverColumn}
-        onDrop={(status) => {
-          if (controller.draggedId) controller.moveTask(controller.draggedId, status);
-          controller.setDraggedId(null);
-          controller.setDragOverColumn(null);
-        }}
-        onDelete={controller.setDeleteTargetId}
-        onMove={controller.moveTask}
-        onArchive={controller.archiveTask}
-      />
+      {dataLoading ? (
+        <SkeletonContent variant="cards" label="Carregando tarefas..." />
+      ) : (
+        <TaskBoard
+          viewMode={controller.viewMode}
+          groups={controller.tasksByStatus}
+          filtered={controller.filtered}
+          eventMap={controller.eventMap}
+          columns={controller.columns}
+          draggedId={controller.draggedId}
+          dragOverColumn={controller.dragOverColumn}
+          onDragStart={controller.setDraggedId}
+          onDragEnd={() => {
+            controller.setDraggedId(null);
+            controller.setDragOverColumn(null);
+          }}
+          onDragOver={controller.setDragOverColumn}
+          onDrop={(status) => {
+            if (controller.draggedId) controller.moveTask(controller.draggedId, status);
+            controller.setDraggedId(null);
+            controller.setDragOverColumn(null);
+          }}
+          onDelete={controller.setDeleteTargetId}
+          onMove={controller.moveTask}
+          onArchive={controller.archiveTask}
+        />
+      )}
       <TaskHistory
         entries={controller.taskHistory}
         eventMap={controller.eventMap}

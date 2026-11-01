@@ -1,0 +1,40 @@
+/* Camada: classes da página (fora de @layer) sempre vencem o padrão do Pentágono. */
+@layer pentagono {
+  .switch {
+    display: inline-flex;
+    gap: var(--pentagono-space-1);
+    padding: var(--pentagono-space-1);
+    background: var(--pentagono-color-surface-muted);
+    border: 1px solid var(--pentagono-color-border);
+    border-radius: var(--pentagono-radius-full);
+  }
+
+  .option {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    color: var(--pentagono-color-text-muted);
+    background: transparent;
+    border: none;
+    border-radius: var(--pentagono-radius-full);
+    cursor: pointer;
+    transition: all var(--pentagono-transition-base);
+  }
+
+  .option:hover {
+    color: var(--pentagono-color-text);
+  }
+
+  .option:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--pentagono-color-brand-glow);
+  }
+
+  .active,
+  .active:hover {
+    color: var(--pentagono-color-on-brand);
+    background: linear-gradient(135deg, var(--pentagono-color-brand), var(--pentagono-color-brand-end));
+  }
+}

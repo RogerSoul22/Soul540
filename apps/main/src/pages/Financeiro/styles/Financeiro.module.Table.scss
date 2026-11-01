@@ -48,26 +48,6 @@
   }
 }
 
-.headerLeft {
-  .title {
-    font-size: $font-size-3xl;
-
-    font-weight: $font-weight-bold;
-
-    color: $text-primary;
-
-    letter-spacing: -0.5px;
-  }
-
-  .subtitle {
-    font-size: $font-size-sm;
-
-    color: $text-muted;
-
-    margin-top: 6px;
-  }
-}
-
 .headerActions {
   display: flex;
 

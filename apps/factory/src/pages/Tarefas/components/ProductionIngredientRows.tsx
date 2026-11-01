@@ -1,3 +1,4 @@
+import { Input, Select, TableCell, TableRow } from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/Tarefas.module.scss';
 import { formatR$, MEASURES } from '../support/task-formatters';
 import ProductionRemoveButton from './ProductionRemoveButton';
@@ -13,17 +14,19 @@ export default function ProductionIngredientRows({ items, onUpdate, onRemove }: 
   return (
     <>
       {items.map((item) => (
-        <tr key={item.id}>
-          <td>
-            <input
+        <TableRow key={item.id}>
+          <TableCell>
+            <Input
+              variant="inline"
               className={styles.cellInput}
               value={item.name}
               onChange={(event) => onUpdate(item.id, 'name', event.target.value)}
               placeholder="Ex: Farinha"
             />
-          </td>
-          <td>
-            <select
+          </TableCell>
+          <TableCell>
+            <Select
+              variant="inline"
               className={styles.cellSelect}
               value={item.measure}
               onChange={(event) => onUpdate(item.id, 'measure', event.target.value)}
@@ -33,19 +36,21 @@ export default function ProductionIngredientRows({ items, onUpdate, onRemove }: 
                   {measure}
                 </option>
               ))}
-            </select>
-          </td>
-          <td>
-            <input
+            </Select>
+          </TableCell>
+          <TableCell>
+            <Input
+              variant="inline"
               className={`${styles.cellInput} ${styles.cellNumber}`}
               type="number"
               value={item.quantity || ''}
               onChange={(event) => onUpdate(item.id, 'quantity', parseFloat(event.target.value) || 0)}
               placeholder="0"
             />
-          </td>
-          <td>
-            <input
+          </TableCell>
+          <TableCell>
+            <Input
+              variant="inline"
               className={`${styles.cellInput} ${styles.cellNumber}`}
               type="number"
               step="0.01"
@@ -53,12 +58,12 @@ export default function ProductionIngredientRows({ items, onUpdate, onRemove }: 
               onChange={(event) => onUpdate(item.id, 'cost', parseFloat(event.target.value) || 0)}
               placeholder="0,00"
             />
-          </td>
-          <td className={styles.cellCalc}>R$ {formatR$(item.quantity * item.cost)}</td>
-          <td>
+          </TableCell>
+          <TableCell className={styles.cellCalc}>R$ {formatR$(item.quantity * item.cost)}</TableCell>
+          <TableCell>
             <ProductionRemoveButton onClick={() => onRemove(item.id)} />
-          </td>
-        </tr>
+          </TableCell>
+        </TableRow>
       ))}
     </>
   );

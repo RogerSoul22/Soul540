@@ -28,20 +28,6 @@
 }
 
 // section
-.detailHeaderInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-  flex: 1;
-}
-
-.detailHeaderBadges {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
 .detailGrid {
   display: grid;
 
@@ -52,34 +38,6 @@
   @include mobile {
     grid-template-columns: 1fr;
   }
-}
-
-.detailField {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-
-  padding: $spacing-sm $spacing-md;
-
-  background: $bg-input;
-  border: 1px solid $border;
-  border-radius: $radius-sm;
-
-  font-size: $font-size-sm;
-  color: $text-primary;
-}
-
-.detailFieldLabel {
-  font-size: $font-size-xs;
-  font-weight: $font-weight-medium;
-
-  color: $text-muted;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.detailFieldFull {
-  grid-column: 1 / -1;
 }
 
 .cardHeader {
@@ -105,25 +63,3 @@
   flex-shrink: 0;
 }
 
-.btnIcon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 28px;
-  height: 28px;
-  background: none;
-  border: 1px solid $border;
-
-  border-radius: $radius-xs;
-  color: $text-muted;
-  cursor: pointer;
-
-  transition: all $transition-fast;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: $text-primary;
-    border-color: $border-accent;
-  }
-}

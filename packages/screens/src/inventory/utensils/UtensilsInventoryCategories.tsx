@@ -1,3 +1,4 @@
+import { Button } from '../../../../pentagono/src/index';
 import type { Utensil } from './utensil-types';
 import styles from './styles/UtensilsInventoryCategories.module.scss';
 
@@ -34,7 +35,9 @@ export default function UtensilsInventoryCategories({
             >
               <div className={styles.categoryTop}>
                 <span className={styles.categoryName}>{category}</span>
-                <button
+                <Button
+                  variant="danger"
+                  size="sm"
                   className={styles.deleteButton}
                   onClick={(event) => {
                     event.stopPropagation();
@@ -43,7 +46,7 @@ export default function UtensilsInventoryCategories({
                   title="Remover"
                 >
                   <CloseIcon />
-                </button>
+                </Button>
               </div>
               <span className={styles.categoryCount}>
                 {count} item{count !== 1 ? 's' : ''}
@@ -51,10 +54,10 @@ export default function UtensilsInventoryCategories({
             </div>
           );
         })}
-        <button className={styles.addButton} onClick={onAddCategory}>
+        <Button variant="dashed" className={styles.addButton} onClick={onAddCategory}>
           <PlusIcon />
           <span>Nova categoria</span>
-        </button>
+        </Button>
       </div>
     </section>
   );

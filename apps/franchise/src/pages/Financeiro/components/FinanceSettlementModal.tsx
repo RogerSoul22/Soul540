@@ -1,4 +1,4 @@
-import { Button, Input, Modal } from '../../../../../../packages/ui/src/index';
+import { Button, Input, Modal } from '../../../../../../packages/pentagono/src/index';
 import type { useFinanceiroController } from '../hooks/use-financeiro-controller';
 import styles from '../styles/Financeiro.module.scss';
 

@@ -1,3 +1,4 @@
+import { Button, Input, Label, Select } from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/Tarefas.module.scss';
 import type { OrderSearchMode, Pedido } from '../types/task-types';
 
@@ -26,10 +27,11 @@ export default function ProductionOrderFilters({
 }: Props) {
   return (
     <div className={styles.orderFilterBar}>
-      <label className={styles.orderFilterLabel} htmlFor="order-search-mode">
+      <Label className={styles.orderFilterLabel} htmlFor="order-search-mode">
         Localizar pedido
-      </label>
-      <select
+      </Label>
+      <Select
+        variant="compact"
         id="order-search-mode"
         className={styles.orderFilterMode}
         value={mode}
@@ -37,9 +39,9 @@ export default function ProductionOrderFilters({
       >
         <option value="typing">Digitar</option>
         <option value="alphabetical">Lista alfabética</option>
-      </select>
+      </Select>
       {mode === 'typing' ? (
-        <input
+        <Input
           className={styles.orderFilterInput}
           type="search"
           value={term}
@@ -48,7 +50,8 @@ export default function ProductionOrderFilters({
           aria-label="Digite o número ou filial"
         />
       ) : (
-        <select
+        <Select
+          variant="compact"
           className={styles.orderFilterSelect}
           value={selectedId}
           onChange={(event) => onSelectedChange(event.target.value)}
@@ -60,11 +63,18 @@ export default function ProductionOrderFilters({
               {order.filial} — #{order.orderNumber ?? 'Sem número'}
             </option>
           ))}
-        </select>
+        </Select>
       )}
-      <button type="button" className={styles.orderFilterClear} onClick={onClear} disabled={!hasFilter}>
+      <Button
+        variant="ghost"
+        size="sm"
+        type="button"
+        className={styles.orderFilterClear}
+        onClick={onClear}
+        disabled={!hasFilter}
+      >
         Limpar filtros
-      </button>
+      </Button>
     </div>
   );
 }

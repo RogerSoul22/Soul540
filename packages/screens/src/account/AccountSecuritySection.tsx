@@ -1,3 +1,4 @@
+import { Button, Heading, Input, Label } from '../../../pentagono/src/index';
 import { useState } from 'react';
 
 type ApiFetch = (path: string, options?: RequestInit) => Promise<Response>;
@@ -30,32 +31,40 @@ export default function AccountSecuritySection({ apiFetch, styles, userId }: Acc
 
   return (
     <section className={styles.formSection}>
-      <h3 className={styles.formSectionTitle}>Segurança</h3>
+      <Heading level={3} variant="section" className={styles.formSectionTitle}>
+        Segurança
+      </Heading>
       {saved ? <div className={styles.toast}>Senha alterada com sucesso!</div> : null}
       <div className={styles.passwordRow}>
-        <label className={styles.formField} style={{ flex: 1 }}>
+        <Label className={styles.formField} style={{ flex: 1 }}>
           <span className={styles.formLabel}>Nova senha</span>
           <div className={styles.passwordInputWrap}>
-            <input
+            <Input
               className={styles.formInput}
               onChange={(event) => setPassword(event.target.value)}
               placeholder="Mínimo 6 caracteres"
               type={showPassword ? 'text' : 'password'}
               value={password}
             />
-            <button className={styles.eyeBtn} onClick={() => setShowPassword((visible) => !visible)} type="button">
+            <Button
+              variant="outline"
+              className={styles.eyeBtn}
+              onClick={() => setShowPassword((visible) => !visible)}
+              type="button"
+            >
               {showPassword ? 'Ocultar' : 'Ver'}
-            </button>
+            </Button>
           </div>
-        </label>
-        <button
+        </Label>
+        <Button
+          variant="outline"
           className={styles.btnChangePassword}
           disabled={saving || password.length < 6}
           onClick={savePassword}
           type="button"
         >
           {saving ? 'Salvando...' : 'Alterar senha'}
-        </button>
+        </Button>
       </div>
     </section>
   );

@@ -1,0 +1,93 @@
+/* Camada: classes da página (fora de @layer) sempre vencem o padrão do Pentágono. */
+@layer pentagono {
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .label {
+    color: var(--pentagono-color-text-secondary);
+    font-size: var(--pentagono-text-sm);
+    font-weight: var(--pentagono-font-medium);
+  }
+
+  .wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--pentagono-space-2);
+    padding: 0 var(--pentagono-space-3);
+    background: var(--pentagono-color-input);
+    border: 1px solid var(--pentagono-color-border);
+    border-radius: var(--pentagono-radius-control);
+    transition: all var(--pentagono-transition-base);
+  }
+
+  .wrapper:focus-within {
+    border-color: var(--pentagono-color-brand);
+    box-shadow: 0 0 0 3px var(--pentagono-color-focus);
+  }
+
+  .hasError {
+    border-color: var(--pentagono-color-danger);
+  }
+
+  .hasError:focus-within {
+    border-color: var(--pentagono-color-danger);
+    box-shadow: 0 0 0 3px var(--pentagono-color-danger-soft);
+  }
+
+  .icon {
+    display: flex;
+    flex-shrink: 0;
+    color: var(--pentagono-color-text-muted);
+    font-size: var(--pentagono-text-lg);
+  }
+
+  .input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 0;
+    color: var(--pentagono-color-text);
+    font-family: inherit;
+    font-size: var(--pentagono-text-sm);
+    background: transparent;
+    border: none;
+    outline: none;
+  }
+
+  .input::placeholder {
+    color: var(--pentagono-color-text-muted);
+  }
+
+  .input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px var(--pentagono-color-input) inset;
+    -webkit-text-fill-color: var(--pentagono-color-text);
+  }
+
+  .toggle {
+    padding: 4px 8px;
+    color: var(--pentagono-color-brand);
+    font-family: inherit;
+    font-size: var(--pentagono-text-xs);
+    font-weight: var(--pentagono-font-medium);
+    white-space: nowrap;
+    background: none;
+    border: none;
+    border-radius: var(--pentagono-radius-xs);
+    cursor: pointer;
+    transition: all var(--pentagono-transition-fast);
+  }
+
+  .toggle:hover {
+    color: var(--pentagono-color-brand-hover);
+    background: var(--pentagono-color-brand-soft);
+  }
+
+  .error {
+    color: var(--pentagono-color-danger);
+    font-size: var(--pentagono-text-xs);
+    font-weight: var(--pentagono-font-medium);
+  }
+}

@@ -38,4 +38,3 @@ A visualização e as ações dependem da permissão da página e das permissõe
 - Definir sinal recebido versus previsão.
 - Definir reabertura após fechamento.
 - Definir política de ajustes de valores já liquidados.
-

@@ -8,6 +8,8 @@
 
   height: 32px;
 
+  padding: 0;
+
   border-radius: $radius-sm;
 
   border: 1px solid $border;
@@ -99,4 +101,24 @@
 
 .cellSelected {
   background: rgba($accent, 0.05) !important;
+}
+
+.pickerYearBtn {
+  @include flex-center;
+
+  width: 28px;
+
+  height: 28px;
+
+  padding: 0;
+
+  background: transparent;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  color: $text-muted;
+
+  cursor: pointer;
 }

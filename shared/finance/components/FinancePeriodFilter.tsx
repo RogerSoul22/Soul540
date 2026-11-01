@@ -63,7 +63,7 @@ export default function FinancePeriodFilter({ period, onChange, accentColor }: F
     onChange(next);
   };
 
-  const monthValue = (date: string) => isDateOnly(date) ? date.slice(0, 7) : '';
+  const monthValue = (date: string) => (isDateOnly(date) ? date.slice(0, 7) : '');
   const updateCustomMonth = (field: 'start' | 'end', value: string) => {
     const startMonth = field === 'start' ? value : monthValue(period.start);
     const endMonth = field === 'end' ? value : monthValue(period.end);
@@ -92,7 +92,9 @@ export default function FinancePeriodFilter({ period, onChange, accentColor }: F
           aria-expanded={open}
         >
           <span>{formatFinancePeriodLabel(period)}</span>
-          <span className={styles.chevron} aria-hidden="true">⌄</span>
+          <span className={styles.chevron} aria-hidden="true">
+            ⌄
+          </span>
         </button>
         <button
           type="button"
@@ -120,29 +122,61 @@ export default function FinancePeriodFilter({ period, onChange, accentColor }: F
           {period.preset === 'custom' && (
             <div className={styles.customDates}>
               <div className={styles.customMode}>
-                <button type="button" className={customMode === 'month' ? styles.customModeActive : ''} onClick={() => setCustomMode('month')}>Mês e ano</button>
-                <button type="button" className={customMode === 'date' ? styles.customModeActive : ''} onClick={() => setCustomMode('date')}>Dias exatos</button>
+                <button
+                  type="button"
+                  className={customMode === 'month' ? styles.customModeActive : ''}
+                  onClick={() => setCustomMode('month')}
+                >
+                  Mês e ano
+                </button>
+                <button
+                  type="button"
+                  className={customMode === 'date' ? styles.customModeActive : ''}
+                  onClick={() => setCustomMode('date')}
+                >
+                  Dias exatos
+                </button>
               </div>
               {customMode === 'month' ? (
                 <>
                   <label>
                     Mês inicial
-                    <input type="month" value={monthValue(period.start)} max={monthValue(period.end) || undefined} onChange={(event) => updateCustomMonth('start', event.target.value)} />
+                    <input
+                      type="month"
+                      value={monthValue(period.start)}
+                      max={monthValue(period.end) || undefined}
+                      onChange={(event) => updateCustomMonth('start', event.target.value)}
+                    />
                   </label>
                   <label>
                     Mês final
-                    <input type="month" value={monthValue(period.end)} min={monthValue(period.start) || undefined} onChange={(event) => updateCustomMonth('end', event.target.value)} />
+                    <input
+                      type="month"
+                      value={monthValue(period.end)}
+                      min={monthValue(period.start) || undefined}
+                      onChange={(event) => updateCustomMonth('end', event.target.value)}
+                    />
                   </label>
                 </>
               ) : (
                 <>
                   <label>
                     Data inicial
-                    <input type="date" value={period.start} max={period.end || undefined} onChange={(event) => updateCustomDate('start', event.target.value)} />
+                    <input
+                      type="date"
+                      value={period.start}
+                      max={period.end || undefined}
+                      onChange={(event) => updateCustomDate('start', event.target.value)}
+                    />
                   </label>
                   <label>
                     Data final
-                    <input type="date" value={period.end} min={period.start || undefined} onChange={(event) => updateCustomDate('end', event.target.value)} />
+                    <input
+                      type="date"
+                      value={period.end}
+                      min={period.start || undefined}
+                      onChange={(event) => updateCustomDate('end', event.target.value)}
+                    />
                   </label>
                 </>
               )}

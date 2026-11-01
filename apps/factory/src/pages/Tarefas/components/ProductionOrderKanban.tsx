@@ -1,3 +1,4 @@
+import { Button } from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/Tarefas.module.scss';
 import ProductionOrderCard from './ProductionOrderCard';
 import { ALL_STATUSES, formatQty, formatR$ } from '../support/task-formatters';
@@ -113,9 +114,15 @@ function FinalizedOrders({ pedidos, onDelete }: { pedidos: Pedido[]; onDelete: (
             </div>
             <div className={styles.finalizedRight}>
               <span className={styles.finalizedCost}>Custo: R$ {formatR$(pedido.totalCost)}</span>
-              <button className={styles.taskDelete} onClick={() => onDelete(pedido.id)} title="Excluir">
+              <Button
+                variant="danger"
+                size="sm"
+                className={styles.taskDelete}
+                onClick={() => onDelete(pedido.id)}
+                title="Excluir"
+              >
                 <DeleteIcon />
-              </button>
+              </Button>
             </div>
           </div>
         ))}

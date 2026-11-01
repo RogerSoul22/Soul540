@@ -1,3 +1,4 @@
+import { Button, Card, Heading } from '../../../../../../packages/pentagono/src/index';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { getModalityLabel, getUpcomingFeirinhaOccurrences } from '../support/event-modalities';
@@ -14,11 +15,13 @@ export default function RecurringFeirinhaCard({ event, onConfirm }: Props) {
   const today = format(new Date(), 'yyyy-MM-dd');
   const occurrences = getUpcomingFeirinhaOccurrences(event, today, 8);
   return (
-    <div className={styles.recurringCard}>
+    <Card className={styles.recurringCard}>
       <div className={styles.recurringHeader}>
         <div>
           <span className={styles.modalityBadge}>{getModalityLabel(event.modality)}</span>
-          <h3 className={styles.cardTitle}>{event.name}</h3>
+          <Heading level={3} variant="section" className={styles.cardTitle}>
+            {event.name}
+          </Heading>
           <p className={styles.cardSub}>Programação semanal · {event.location}</p>
         </div>
       </div>
@@ -26,7 +29,9 @@ export default function RecurringFeirinhaCard({ event, onConfirm }: Props) {
         {occurrences.map((date) => (
           <div key={date} className={styles.recurringOccurrence}>
             <span>{format(new Date(`${date}T12:00:00`), "dd 'de' MMMM", { locale: ptBR })}</span>
-            <button
+            <Button
+              variant="primary"
+              size="sm"
               className={styles.recurringConfirm}
               onClick={async () => {
                 try {
@@ -37,11 +42,11 @@ export default function RecurringFeirinhaCard({ event, onConfirm }: Props) {
               }}
             >
               Confirmar ocorrência
-            </button>
+            </Button>
           </div>
         ))}
         {occurrences.length === 0 && <span className={styles.sectionEmpty}>Nenhuma ocorrência futura.</span>}
       </div>
-    </div>
+    </Card>
   );
 }

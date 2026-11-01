@@ -1,4 +1,4 @@
-import { Button, Input } from '../../../../../packages/ui/src/index';
+import { Button, EmptyState, Input, PageHeader } from '../../../../../packages/pentagono/src/index';
 import InvoiceCard from './components/InvoiceCard';
 import InvoiceConfirmModals from './components/InvoiceConfirmModals';
 import InvoiceFormModal from './components/InvoiceFormModal';
@@ -21,15 +21,16 @@ export default function NotasFiscais() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.header}>
-        <div className={styles.headerLeft}>
-          <h1 className={styles.title}>Notas Fiscais</h1>
-          <p className={styles.subtitle}>Emissão e controle de notas fiscais de serviço</p>
-        </div>
-        <div className={styles.headerActions}>
-          <Button onClick={controller.openCreateForm}>+ Nova Nota Fiscal</Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Notas Fiscais"
+        subtitle="Emissão e controle de notas fiscais de serviço"
+        actions={
+          <>
+            <Button onClick={controller.openCreateForm}>+ Nova Nota Fiscal</Button>
+          </>
+        }
+      />
+      {isAdmin && <FiscalConfigurationSection />}
       <div className={styles.filters}>
         <div className={styles.filterGroup}>
           {(['all', 'rascunho', 'emitida', 'cancelada'] as FilterStatus[]).map((status) => (
@@ -66,7 +67,7 @@ export default function NotasFiscais() {
         </div>
       )}
       {controller.filtered.length === 0 ? (
-        <div className={styles.emptyState}>Nenhuma nota fiscal encontrada.</div>
+        <EmptyState title="Nenhuma nota fiscal encontrada." />
       ) : (
         <div className={styles.cardsGrid}>
           {controller.filtered.map((invoice) => (
@@ -116,7 +117,6 @@ export default function NotasFiscais() {
           onClose={() => controller.setPreviewInvoice(null)}
         />
       )}
-      {isAdmin && <FiscalConfigurationSection />}
     </div>
   );
 }

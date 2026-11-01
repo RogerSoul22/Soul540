@@ -1,3 +1,4 @@
+import { Card } from '../../../../../../packages/pentagono/src/index';
 import type { useFinanceiroController } from '../hooks/use-financeiro-controller';
 
 type Controller = ReturnType<typeof useFinanceiroController>;
@@ -43,7 +44,7 @@ export default function FinanceiroMonthlyTab({ controller }: Props) {
 
           {/* Gauges row */}
           <div className={styles.gaugesGrid}>
-            <div className={styles.gaugeCard}>
+            <Card className={styles.gaugeCard}>
               <GaugeChart
                 label="Lucro"
                 value={monthMargin}
@@ -51,8 +52,8 @@ export default function FinanceiroMonthlyTab({ controller }: Props) {
                 suffix="%"
                 color={monthMargin >= 20 ? '#4ade80' : monthMargin >= 10 ? '#fbbf24' : '#f87171'}
               />
-            </div>
-            <div className={styles.gaugeCard}>
+            </Card>
+            <Card className={styles.gaugeCard}>
               <GaugeChart
                 label="Insumos"
                 value={insumosRatio}
@@ -60,8 +61,8 @@ export default function FinanceiroMonthlyTab({ controller }: Props) {
                 suffix="%"
                 color={insumosRatio <= 30 ? '#4ade80' : insumosRatio <= 45 ? '#fbbf24' : '#f87171'}
               />
-            </div>
-            <div className={styles.gaugeCard}>
+            </Card>
+            <Card className={styles.gaugeCard}>
               <GaugeChart
                 label="Mao de Obra"
                 value={maoObraRatio}
@@ -69,17 +70,17 @@ export default function FinanceiroMonthlyTab({ controller }: Props) {
                 suffix="%"
                 color={maoObraRatio <= 25 ? '#4ade80' : maoObraRatio <= 40 ? '#fbbf24' : '#f87171'}
               />
-            </div>
+            </Card>
           </div>
 
           {/* Horizontal bars */}
           <div className={styles.barsGrid}>
-            <div className={styles.barCard}>
+            <Card className={styles.barCard}>
               <HorizontalBarChart title="Despesas Variaveis" items={variableCosts} formatValue={formatBRL} />
-            </div>
-            <div className={styles.barCard}>
+            </Card>
+            <Card className={styles.barCard}>
               <HorizontalBarChart title="Despesas Fixas" items={fixedCosts} formatValue={formatBRL} />
-            </div>
+            </Card>
           </div>
         </div>
       )}

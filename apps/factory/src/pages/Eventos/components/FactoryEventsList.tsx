@@ -1,3 +1,11 @@
+import {
+  Button,
+  EmptyState,
+  Heading,
+  InfoButton,
+  Input,
+  PageHeader,
+} from '../../../../../../packages/pentagono/src/index';
 import type { FactoryEventController } from '../hooks/use-factory-event-controller';
 import FactoryEventCard from './FactoryEventCard';
 import styles from '../styles/Eventos.module.scss';
@@ -17,21 +25,15 @@ export default function FactoryEventsList({ controller }: { controller: FactoryE
   } = controller;
   return (
     <>
-      <div className={styles.header}>
-        <div>
-          <div className={styles.titleRow}>
-            <h1 className={styles.title}>Eventos</h1>
-            <button className={styles.btnInfo} onClick={() => setShowInfo(true)} title="Como usar esta página">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="16" x2="12" y2="12" />
-                <line x1="12" y1="8" x2="12.01" y2="8" />
-              </svg>
-            </button>
-          </div>
-          <p className={styles.subtitle}>Visualize os agendamentos e eventos de pizza</p>
-        </div>
-      </div>
+      <PageHeader
+        title="Eventos"
+        subtitle="Visualize os agendamentos e eventos de pizza"
+        titleExtra={
+          <>
+            <InfoButton label="Como usar esta página" onClick={() => setShowInfo(true)} />
+          </>
+        }
+      />
       <div className={styles.controls}>
         <div className={styles.searchWrap}>
           <svg
@@ -46,7 +48,8 @@ export default function FactoryEventsList({ controller }: { controller: FactoryE
             <circle cx="11" cy="11" r="8" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <input
+          <Input
+            variant="search"
             className={styles.searchInput}
             placeholder="Buscar eventos..."
             value={search}
@@ -55,14 +58,14 @@ export default function FactoryEventsList({ controller }: { controller: FactoryE
         </div>
       </div>
       {filtered.fechados.length === 0 && filtered.orcamentos.length === 0 ? (
-        <div className={styles.empty}>
-          <p>Nenhum evento encontrado.</p>
-        </div>
+        <EmptyState className={styles.empty} title="Nenhum evento encontrado." />
       ) : (
         <div className={styles.sections}>
           {filtered.orcamentos.length > 0 && (
             <div className={styles.section}>
-              <h2 className={styles.sectionTitle}>Orçamentos</h2>
+              <Heading level={2} variant="section" className={styles.sectionTitle}>
+                Orçamentos
+              </Heading>
               <div className={styles.grid}>
                 {filtered.orcamentos.map((event) => (
                   <FactoryEventCard key={event.id} ev={event} employeeMap={employeeMap} onView={setViewingEvent} />
@@ -72,14 +75,17 @@ export default function FactoryEventsList({ controller }: { controller: FactoryE
           )}
           {monthGroupsFechados.length > 0 && (
             <div className={styles.section}>
-              <h2 className={styles.sectionTitle}>Eventos Fechados</h2>
+              <Heading level={2} variant="section" className={styles.sectionTitle}>
+                Eventos Fechados
+              </Heading>
               <div className={styles.monthGroup}>
                 {monthGroupsFechados.map(({ key, label, events }) => {
                   const isOpen = expandedMonths.has(key);
                   const total = events.reduce((sum, event) => sum + (event.finalValue ?? event.budget ?? 0), 0);
                   return (
                     <div key={key}>
-                      <button
+                      <Button
+                        variant="chip"
                         className={`${styles.monthCard} ${isOpen ? styles.monthCardOpen : ''}`}
                         onClick={() => toggleMonth(key)}
                       >
@@ -105,7 +111,7 @@ export default function FactoryEventsList({ controller }: { controller: FactoryE
                             <polyline points="6 9 12 15 18 9" />
                           </svg>
                         </div>
-                      </button>
+                      </Button>
                       {isOpen && (
                         <div className={styles.monthCardBody}>
                           <div className={styles.grid}>

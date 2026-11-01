@@ -1,3 +1,4 @@
+import { DocumentViewer } from '../../../../../../packages/pentagono/src/index';
 import { useCallback, useRef } from 'react';
 import styles from '../styles/ContractDocument.module.scss';
 import { ContractDocumentClauses } from './ContractDocumentClauses';
@@ -42,9 +43,12 @@ export default function ContractDocument({ contract, event, onClose }: ContractD
   }, [contract.id, model]);
 
   return (
-    <div className={styles.overlay}>
-      <ContractDocumentToolbar model={model} onGeneratePdf={handleGeneratePdf} onClose={onClose} />
-      <div className={styles.scrollArea}>
+    <DocumentViewer
+      label="Contrato"
+      toolbar={<ContractDocumentToolbar model={model} onGeneratePdf={handleGeneratePdf} onClose={onClose} />}
+      onClose={onClose}
+    >
+      <>
         <div className={styles.paper}>
           <div className={styles.paperInner} ref={docRef}>
             <ContractDocumentHeader model={model} />
@@ -53,7 +57,7 @@ export default function ContractDocument({ contract, event, onClose }: ContractD
             <ContractDocumentMenu model={model} />
           </div>
         </div>
-      </div>
-    </div>
+      </>
+    </DocumentViewer>
   );
 }

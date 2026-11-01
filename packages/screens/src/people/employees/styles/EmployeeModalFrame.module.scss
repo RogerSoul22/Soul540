@@ -76,20 +76,6 @@
 }
 
 .primaryButton,
-.cancelButton {
-  border: 0;
-  cursor: pointer;
-  font-size: 0.875rem;
-}
-
-.primaryButton {
-  border-radius: 8px;
-  padding: 10px 16px;
-  background: #f59e0b;
-  color: #0a0f1e;
-  font-weight: 600;
-}
-
 .primaryButton:hover {
   background: #eab308;
 }
@@ -97,12 +83,6 @@
 .primaryButton:disabled {
   cursor: not-allowed;
   opacity: 0.5;
-}
-
-.cancelButton {
-  padding: 10px 16px;
-  background: none;
-  color: #64748b;
 }
 
 .cancelButton:hover {

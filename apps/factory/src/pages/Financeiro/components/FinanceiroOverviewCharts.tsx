@@ -1,3 +1,4 @@
+import { Card, Heading, Select } from '../../../../../../packages/pentagono/src/index';
 import type { useFinanceiroController } from '../hooks/use-financeiro-controller';
 type Controller = ReturnType<typeof useFinanceiroController>;
 type Props = { controller: Controller };
@@ -31,7 +32,7 @@ export default function FinanceiroOverviewCharts({ controller }: Props) {
 
       {/* Gauges */}
       <div className={styles.gaugesGrid}>
-        <div className={styles.gaugeCard}>
+        <Card className={styles.gaugeCard}>
           <GaugeChart
             label="Margem de Lucro"
             value={margin}
@@ -39,8 +40,8 @@ export default function FinanceiroOverviewCharts({ controller }: Props) {
             suffix="%"
             color={margin >= 20 ? '#4ade80' : margin >= 10 ? '#fbbf24' : '#f87171'}
           />
-        </div>
-        <div className={styles.gaugeCard}>
+        </Card>
+        <Card className={styles.gaugeCard}>
           <GaugeChart
             label="Insumos / Receita"
             value={insumosRatio}
@@ -48,8 +49,8 @@ export default function FinanceiroOverviewCharts({ controller }: Props) {
             suffix="%"
             color={insumosRatio <= 30 ? '#4ade80' : insumosRatio <= 45 ? '#fbbf24' : '#f87171'}
           />
-        </div>
-        <div className={styles.gaugeCard}>
+        </Card>
+        <Card className={styles.gaugeCard}>
           <GaugeChart
             label="Mao de Obra / Receita"
             value={maoObraRatio}
@@ -57,15 +58,15 @@ export default function FinanceiroOverviewCharts({ controller }: Props) {
             suffix="%"
             color={maoObraRatio <= 25 ? '#4ade80' : maoObraRatio <= 40 ? '#fbbf24' : '#f87171'}
           />
-        </div>
+        </Card>
       </div>
 
       {/* Events Budget Card */}
-      <div className={styles.agendamentosCard}>
+      <Card className={styles.agendamentosCard}>
         <div className={styles.agendamentosHeader}>
-          <h3 className={styles.sectionTitle} style={{ margin: 0 }}>
+          <Heading level={3} variant="section" className={styles.sectionTitle} style={{ margin: 0 }}>
             Valores dos Agendamentos
-          </h3>
+          </Heading>
           <div className={styles.agendamentosPills}>
             <div className={styles.agendamentosPill}>
               <span className={styles.agendamentosPillLabel}>Contratado</span>
@@ -99,7 +100,8 @@ export default function FinanceiroOverviewCharts({ controller }: Props) {
                 <div className={styles.agendamentoRight}>
                   <span className={styles.agendamentoValue}>{formatBRL(event.budget ?? 0)}</span>
                   {finance ? (
-                    <select
+                    <Select
+                      variant="compact"
                       className={[
                         styles.agendamentoStatus,
                         finance.status === 'paid' ? styles.statusReceived : styles.statusPending,
@@ -109,7 +111,7 @@ export default function FinanceiroOverviewCharts({ controller }: Props) {
                     >
                       <option value="pending">Pendente</option>
                       <option value="paid">Pago</option>
-                    </select>
+                    </Select>
                   ) : (
                     <span className={styles.agendamentoNoFinance}>—</span>
                   )}
@@ -118,7 +120,7 @@ export default function FinanceiroOverviewCharts({ controller }: Props) {
             ))}
           </div>
         )}
-      </div>
+      </Card>
     </>
   );
 }

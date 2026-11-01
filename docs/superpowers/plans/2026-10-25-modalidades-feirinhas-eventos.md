@@ -33,6 +33,7 @@
 ### Task 1: Domínio compartilhado de modalidades e recorrência
 
 **Files:**
+
 - Modify: `packages/contracts/src/events.ts`
 - Modify: `packages/contracts/src/finance.ts`
 - Create: `packages/domain/src/event-modalities.ts`
@@ -40,6 +41,7 @@
 - Test: `packages/domain/src/event-modalities.test.ts`
 
 **Interfaces:**
+
 - Produces `EventModality = 'feirinha' | 'evento_avulso'`.
 - Produces `normalizeEventModality(value: unknown): EventModality`.
 - Produces `getWeeklyOccurrenceDates(startDate: string, endDate: string | undefined, fromDate: string, limit: number): string[]`.
@@ -55,6 +57,7 @@
 ### Task 2: Persist modality and recurring templates in the API
 
 **Files:**
+
 - Modify: `apps/api/src/modules/events/events.schemas.ts`
 - Modify: `apps/api/src/modules/events/events.routes.ts`
 - Modify: `apps/api/src/modules/events/events.finance.ts`
@@ -65,6 +68,7 @@
 - Test: `apps/api/src/modules/finance/finance-modalities.test.ts`
 
 **Interfaces:**
+
 - Event schemas persist `modality` with default `evento_avulso`, plus `isRecurringTemplate`, `recurrenceId` and `recurrenceEndDate`.
 - Finance schemas persist optional `modality` with legacy fallback `evento_avulso`.
 - `POST /api/events` accepts a weekly Feirinha template and must not create automatic finance for a template.
@@ -82,6 +86,7 @@
 ### Task 3: Franchise agendamentos with modality and weekly Feirinha template
 
 **Files:**
+
 - Modify: `apps/franchise/src/pages/Eventos/types/event-form-types.ts`
 - Modify: `apps/franchise/src/pages/Eventos/types/event-types.ts`
 - Modify: `apps/franchise/src/pages/Eventos/hooks/use-eventos-controller.ts`
@@ -94,6 +99,7 @@
 - Test: `apps/franchise/src/pages/Eventos/utils/event-modalities.test.ts`
 
 **Interfaces:**
+
 - Form state exposes `modality` and `recurrenceEndDate`.
 - A Feirinha form shows the weekly recurrence end date and creates a template payload; Evento avulso keeps the current single-event flow.
 - Recurring cards show upcoming virtual weekly occurrences and a “Confirmar ocorrência” action.
@@ -110,6 +116,7 @@
 ### Task 4: Franchise financeiro separated by modality
 
 **Files:**
+
 - Modify: `apps/franchise/src/pages/Financeiro/types/finance-controller-types.ts`
 - Modify: `apps/franchise/src/pages/Financeiro/hooks/use-franchise-finance-state.ts`
 - Modify: `apps/franchise/src/pages/Financeiro/hooks/use-franchise-finance-period.ts`
@@ -119,6 +126,7 @@
 - Modify: `apps/franchise/src/pages/Financeiro/components/FinanceiroEntriesTable.tsx`
 
 **Interfaces:**
+
 - Finance state exposes `modalityFilter` and `setModalityFilter` with `all | feirinha | evento_avulso`.
 - Manual finance form exposes `formModality`, defaulting to `evento_avulso`, and sends it in create/update/import payloads when relevant.
 - Period totals, charts, event-value panels, table and exports consume the modality-filtered collection.
@@ -133,6 +141,7 @@
 ### Task 5: Matrix agendamentos and financeiro separated by modality
 
 **Files:**
+
 - Modify: `apps/main/src/pages/Eventos/hooks/use-event-filters.ts`
 - Modify: `apps/main/src/pages/Eventos/components/EventosFilters.tsx`
 - Modify: `apps/main/src/pages/Eventos/components/EventCard.tsx`
@@ -145,6 +154,7 @@
 - Modify: `apps/main/src/pages/Financeiro/components/FinanceiroOverviewTab.tsx`
 
 **Interfaces:**
+
 - Matrix event filters expose modality independently from source (`principal`, `franquias`, `fábrica`) and status/date/search filters.
 - Matrix finance state exposes the same `all | feirinha | evento_avulso` filter for every data scope.
 - Main event and finance rows show the normalized modality, including franchise records loaded through the existing admin scope.
@@ -159,6 +169,7 @@
 ### Task 6: Cross-system verification and standards review
 
 **Files:**
+
 - Modify: only files identified by the preceding tasks if verification exposes a defect.
 
 - [ ] **Step 1: Run all focused domain, franchise and API tests** with `node --import tsx --test`.

@@ -33,4 +33,3 @@ A visualização e as ações dependem da permissão da página e das permissõe
 - Definir versionamento formal.
 - Definir se itens sem preço podem aparecer em cardápio publicado.
 - Definir publicação e arquivamento.
-

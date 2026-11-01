@@ -1,14 +1,6 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
-.userPassword {
-  font-size: $font-size-xs;
-  color: $text-muted;
-  margin-top: 2px;
-  font-family: monospace;
-  letter-spacing: 0.5px;
-}
-
 .userMeta {
   display: flex;
   align-items: center;
@@ -40,16 +32,6 @@
   color: $accent;
   padding: 2px 8px;
   border-radius: 20px;
-}
-
-.badgeMaster {
-  font-size: 10px;
-  font-weight: $font-weight-semibold;
-  background: rgba(234, 179, 8, 0.15);
-  color: #facc15;
-  padding: 2px 8px;
-  border-radius: 20px;
-  letter-spacing: 0.4px;
 }
 
 .btnDeleteUser {

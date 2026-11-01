@@ -1,3 +1,4 @@
+import { Heading } from '../../../../pentagono/src/index';
 import styles from './styles/HorizontalBarChart.module.scss';
 
 interface BarItem {
@@ -20,7 +21,9 @@ export default function HorizontalBarChart({ title, items, formatValue }: Horizo
   return (
     <div className={styles.chart}>
       <div className={styles.header}>
-        <h3 className={styles.title}>{title}</h3>
+        <Heading level={3} variant="section" className={styles.title}>
+          {title}
+        </Heading>
         <span className={styles.total}>{format(total)}</span>
       </div>
       <div className={styles.bars}>

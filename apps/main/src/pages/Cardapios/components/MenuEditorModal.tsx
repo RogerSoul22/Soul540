@@ -1,3 +1,4 @@
+import { Button, Input, Label, Modal, Select, Textarea } from '../../../../../../packages/pentagono/src/index';
 import type { MenuCategory, MenuItem } from '../../../../../../packages/screens/src/index';
 import styles from '../styles/Cardapios.module.scss';
 import MenuCategoryEditorFields from './MenuCategoryEditorFields';
@@ -47,71 +48,59 @@ export default function MenuEditorModal({
   onSubmit,
 }: Props) {
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={(event) => event.stopPropagation()}>
-        <div className={styles.modalHeader}>
-          <h2 className={styles.modalTitle}>{editing ? 'Editar cardápio' : 'Novo cardápio'}</h2>
-          <button className={styles.modalClose} onClick={onClose}>
-            ×
-          </button>
+    <Modal title={editing ? 'Editar cardápio' : 'Novo cardápio'} onClose={onClose} closeOnOverlay maxWidth={680} flush>
+      <div className={styles.form}>
+        <Label className={styles.formLabel}>
+          Nome
+          <Input className={styles.formInput} value={name} onChange={(event) => onNameChange(event.target.value)} />
+        </Label>
+        <Label className={styles.formLabel}>
+          Evento
+          <Select className={styles.formSelect} value={eventId} onChange={(event) => onEventChange(event.target.value)}>
+            <option value="">Sem evento</option>
+            {events.map((event) => (
+              <option key={event.id} value={event.id}>
+                {event.name}
+              </option>
+            ))}
+          </Select>
+        </Label>
+        <div className={styles.formRow}>
+          <Label className={styles.formLabel}>
+            Cabeçalho
+            <Textarea
+              className={styles.formTextarea}
+              value={headerText}
+              onChange={(event) => onHeaderChange(event.target.value)}
+            />
+          </Label>
+          <Label className={styles.formLabel}>
+            Rodapé
+            <Textarea
+              className={styles.formTextarea}
+              value={footerText}
+              onChange={(event) => onFooterChange(event.target.value)}
+            />
+          </Label>
         </div>
-        <div className={styles.form}>
-          <label className={styles.formLabel}>
-            Nome
-            <input className={styles.formInput} value={name} onChange={(event) => onNameChange(event.target.value)} />
-          </label>
-          <label className={styles.formLabel}>
-            Evento
-            <select
-              className={styles.formSelect}
-              value={eventId}
-              onChange={(event) => onEventChange(event.target.value)}
-            >
-              <option value="">Sem evento</option>
-              {events.map((event) => (
-                <option key={event.id} value={event.id}>
-                  {event.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <div className={styles.formRow}>
-            <label className={styles.formLabel}>
-              Cabeçalho
-              <textarea
-                className={styles.formTextarea}
-                value={headerText}
-                onChange={(event) => onHeaderChange(event.target.value)}
-              />
-            </label>
-            <label className={styles.formLabel}>
-              Rodapé
-              <textarea
-                className={styles.formTextarea}
-                value={footerText}
-                onChange={(event) => onFooterChange(event.target.value)}
-              />
-            </label>
-          </div>
-          <MenuCategoryEditorFields
-            categories={categories}
-            onAdd={onCategoryAdd}
-            onRemove={onCategoryRemove}
-            onChange={onCategoryChange}
-            onItemAdd={onItemAdd}
-            onItemRemove={onItemRemove}
-            onItemChange={onItemChange}
-          />
-        </div>
-        <div className={styles.formActions}>
-          <button className={styles.btnCancel} onClick={onClose}>
-            Cancelar
-          </button>
-          <button className={styles.btnPrimary} onClick={onSubmit} disabled={!name.trim()}>
-            Salvar
-          </button>
-        </div>
+        <MenuCategoryEditorFields
+          categories={categories}
+          onAdd={onCategoryAdd}
+          onRemove={onCategoryRemove}
+          onChange={onCategoryChange}
+          onItemAdd={onItemAdd}
+          onItemRemove={onItemRemove}
+          onItemChange={onItemChange}
+        />
       </div>
-    </div>
+      <div className={styles.formActions}>
+        <Button variant="ghost" onClick={onClose}>
+          Cancelar
+        </Button>
+        <Button variant="primary" onClick={onSubmit} disabled={!name.trim()}>
+          Salvar
+        </Button>
+      </div>
+    </Modal>
   );
 }

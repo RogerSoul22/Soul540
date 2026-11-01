@@ -1,4 +1,4 @@
-import { Input, Select } from '../../../../ui/src/index';
+import { EmptyState, Input, Select, SkeletonContent } from '../../../../pentagono/src/index';
 import UtensilCard from './UtensilCard';
 import type { Utensil } from './utensil-types';
 import styles from './styles/UtensilsInventoryList.module.scss';
@@ -53,9 +53,9 @@ export default function UtensilsInventoryList({
       </div>
 
       {loading ? (
-        <div className={styles.empty}>Carregando...</div>
+        <SkeletonContent variant="cards" count={6} label="Carregando utensílios..." />
       ) : items.length === 0 ? (
-        <div className={styles.empty}>Nenhum utensílio encontrado.</div>
+        <EmptyState title="Nenhum utensílio encontrado." />
       ) : (
         <div className={styles.grid}>
           {items.map((utensil) => (

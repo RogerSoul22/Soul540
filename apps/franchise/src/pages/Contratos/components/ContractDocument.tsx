@@ -1,3 +1,4 @@
+import { DocumentViewer } from '../../../../../../packages/pentagono/src/index';
 import { useCallback, useRef, useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -145,9 +146,12 @@ export default function ContractDocument({ contract, event, onClose }: ContractD
   };
 
   return (
-    <div className={styles.overlay}>
-      <ContractDocumentToolbar model={model} onGeneratePdf={handleGeneratePdf} onClose={onClose} />
-      <div className={styles.scrollArea}>
+    <DocumentViewer
+      label="Contrato"
+      toolbar={<ContractDocumentToolbar model={model} onGeneratePdf={handleGeneratePdf} onClose={onClose} />}
+      onClose={onClose}
+    >
+      <>
         <div className={styles.paper}>
           <div className={styles.paperInner} ref={docRef}>
             <ContractDocumentHeader model={model} />
@@ -156,7 +160,7 @@ export default function ContractDocument({ contract, event, onClose }: ContractD
             <ContractDocumentMenu model={model} />
           </div>
         </div>
-      </div>
-    </div>
+      </>
+    </DocumentViewer>
   );
 }

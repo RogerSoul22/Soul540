@@ -127,18 +127,18 @@ O documento da página deve explicar o negócio, não apenas repetir nomes de co
 
 ### Arquivos e pastas
 
-| Elemento | Padrão |
-|---|---|
-| Pasta de domínio | PascalCase: `Contratantes`, `NotasFiscais` |
-| Componente React | PascalCase: `ContractFormModal.tsx` |
-| Hook | kebab-case com `use-`: `use-eventos-controller.ts` |
-| Tipos | kebab-case ou nome do domínio: `event-types.ts` |
-| Utilitário | nome semântico: `currency.ts`, `date.ts`, `checklist-utils.ts` |
-| Estilo principal | `<Pagina>.module.scss` |
-| Estilo especializado | `<Pagina>.module.<Area>.scss` |
-| Regra de negócio | `REGRAS-DE-NEGOCIO.md` |
-| Decisão arquitetural | `docs/decisoes/NNNN-titulo.md` |
-| Especificação | `docs/superpowers/specs/YYYY-MM-DD-titulo-design.md` |
+| Elemento             | Padrão                                                         |
+| -------------------- | -------------------------------------------------------------- |
+| Pasta de domínio     | PascalCase: `Contratantes`, `NotasFiscais`                     |
+| Componente React     | PascalCase: `ContractFormModal.tsx`                            |
+| Hook                 | kebab-case com `use-`: `use-eventos-controller.ts`             |
+| Tipos                | kebab-case ou nome do domínio: `event-types.ts`                |
+| Utilitário           | nome semântico: `currency.ts`, `date.ts`, `checklist-utils.ts` |
+| Estilo principal     | `<Pagina>.module.scss`                                         |
+| Estilo especializado | `<Pagina>.module.<Area>.scss`                                  |
+| Regra de negócio     | `REGRAS-DE-NEGOCIO.md`                                         |
+| Decisão arquitetural | `docs/decisoes/NNNN-titulo.md`                                 |
+| Especificação        | `docs/superpowers/specs/YYYY-MM-DD-titulo-design.md`           |
 
 ### Proibições
 

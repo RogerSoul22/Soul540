@@ -1,3 +1,4 @@
+import { Button } from '../../../../../packages/pentagono/src/index';
 import type { PizzaEvent } from '../../../../../packages/contracts/src/index';
 import styles from './styles/CalendarView.module.scss';
 import CalendarEventBasicsFields from './CalendarEventBasicsFields';
@@ -27,14 +28,15 @@ export default function CalendarEventEditPanel({ form, updateForm, readNumber, r
               ['cancelled', 'Cancelado'],
             ] as const
           ).map(([value, label]) => (
-            <button
+            <Button
+              variant="chip"
               key={value}
               type="button"
               className={styles.statusBtn + ' ' + (status === value ? styles.statusBtnActive : '')}
               onClick={() => updateForm({ status: value })}
             >
               {label}
-            </button>
+            </Button>
           ))}
         </div>
         <div className={styles.editFields}>
@@ -48,12 +50,12 @@ export default function CalendarEventEditPanel({ form, updateForm, readNumber, r
         </div>
       </div>
       <div className={styles.panelActions}>
-        <button className={styles.btnCancel} onClick={onCancel}>
+        <Button variant="ghost" onClick={onCancel}>
           Cancelar
-        </button>
-        <button className={styles.btnSave} onClick={onSave}>
+        </Button>
+        <Button variant="primary" onClick={onSave}>
           Salvar
-        </button>
+        </Button>
       </div>
     </>
   );

@@ -35,4 +35,3 @@ A página é pública apenas para autenticação; o restante do portal exige ses
 - Definir recuperação de senha.
 - Definir expiração e revogação de sessões.
 - Definir MFA e política de bloqueio por tentativas.
-

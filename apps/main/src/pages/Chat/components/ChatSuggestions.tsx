@@ -1,3 +1,4 @@
+import { Button } from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/Chat.module.scss';
 
 type Props = {
@@ -10,7 +11,8 @@ export default function ChatSuggestions({ suggestions, loading, onSelect }: Prop
   return (
     <div className={styles.suggestions}>
       {suggestions.map((suggestion) => (
-        <button
+        <Button
+          variant="chip"
           key={suggestion}
           className={styles.suggestionChip}
           onClick={() => onSelect(suggestion)}
@@ -18,7 +20,7 @@ export default function ChatSuggestions({ suggestions, loading, onSelect }: Prop
           type="button"
         >
           {suggestion}
-        </button>
+        </Button>
       ))}
     </div>
   );

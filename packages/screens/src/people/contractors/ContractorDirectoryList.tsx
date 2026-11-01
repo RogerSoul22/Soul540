@@ -1,4 +1,4 @@
-import { Badge } from '../../../../ui/src/index';
+import { Badge, Button, EmptyState, Heading, Input, Select, SkeletonContent } from '../../../../pentagono/src/index';
 import { displayCategory } from './contractor-formatters';
 import { contractorStatusConfig, type Contractor } from './contractor-types';
 import styles from './styles/ContractorDirectoryList.module.scss';
@@ -33,31 +33,34 @@ export default function ContractorDirectoryList({
   return (
     <>
       <section className={styles.controls} aria-label="Filtros de contratantes">
-        <input
+        <Input
+          variant="search"
           className={styles.searchInput}
           onChange={(event) => onSearchChange(event.target.value)}
           placeholder="Buscar contratantes..."
           value={search}
         />
-        <select onChange={(event) => onStatusFilterChange(event.target.value)} value={statusFilter}>
+        <Select onChange={(event) => onStatusFilterChange(event.target.value)} value={statusFilter}>
           <option value="all">Todos os status</option>
           <option value="ativo">Ativo</option>
           <option value="inativo">Inativo</option>
           <option value="bloqueado">Bloqueado</option>
-        </select>
-        <select onChange={(event) => onTypeFilterChange(event.target.value)} value={typeFilter}>
+        </Select>
+        <Select onChange={(event) => onTypeFilterChange(event.target.value)} value={typeFilter}>
           <option value="all">Todos os tipos</option>
           <option value="pessoa_fisica">Pessoa Física</option>
           <option value="pessoa_juridica">Pessoa Jurídica</option>
-        </select>
+        </Select>
       </section>
-      {loading ? <p className={styles.empty}>Carregando...</p> : null}
+      {loading ? <SkeletonContent variant="list" label="Carregando contratantes..." /> : null}
       {!loading && contractorsByLetter.size === 0 ? (
-        <p className={styles.empty}>Nenhum contratante encontrado.</p>
+        <EmptyState variant="compact" title="Nenhum contratante encontrado." className={styles.empty} />
       ) : null}
       {[...contractorsByLetter].map(([letter, contractors]) => (
         <section className={styles.letterSection} key={letter}>
-          <h2>{letter}</h2>
+          <Heading level={2} variant="section">
+            {letter}
+          </Heading>
           <div className={styles.grid}>
             {contractors.map((contractor) => (
               <ContractorCard
@@ -99,8 +102,12 @@ function ContractorCard({
               WhatsApp
             </a>
           ) : null}
-          <button onClick={(event) => edit(event, contractor, onEdit)}>Editar</button>
-          <button onClick={(event) => remove(event, contractor.id, onDelete)}>Excluir</button>
+          <Button variant="outline" onClick={(event) => edit(event, contractor, onEdit)}>
+            Editar
+          </Button>
+          <Button variant="outline" onClick={(event) => remove(event, contractor.id, onDelete)}>
+            Excluir
+          </Button>
         </div>
       </div>
       {contractor.phone ? <span>{contractor.phone}</span> : null}

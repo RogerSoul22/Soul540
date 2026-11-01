@@ -1,3 +1,4 @@
+import { Input, Textarea } from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/ContractDocument.module.scss';
 
 export function ContractDocumentField({
@@ -25,7 +26,7 @@ export function ContractDocumentField({
 
   if (multiline) {
     return (
-      <textarea
+      <Textarea
         value={value}
         onChange={(event) => onChange(event.target.value)}
         className={styles.fieldTextarea}
@@ -35,7 +36,7 @@ export function ContractDocumentField({
   }
 
   return (
-    <input
+    <Input
       type="text"
       value={value}
       onChange={(event) => onChange(event.target.value)}

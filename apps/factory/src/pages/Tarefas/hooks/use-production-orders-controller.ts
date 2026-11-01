@@ -11,6 +11,7 @@ export function useProductionOrdersController() {
   const [showNovoPedido, setShowNovoPedido] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [orderSearchMode, setOrderSearchMode] = useState<OrderSearchMode>('typing');
+  const [loading, setLoading] = useState(true);
   const [orderSearchTerm, setOrderSearchTerm] = useState('');
   const [selectedOrderId, setSelectedOrderId] = useState('');
   const [draggedId, setDraggedId] = useState<string | null>(null);
@@ -20,7 +21,8 @@ export function useProductionOrdersController() {
     apiFetch('/api/production-orders')
       .then((response) => response.json() as Promise<Pedido[]>)
       .then(setPedidos)
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLoading(false));
     apiFetch('/api/production-orders/available-events')
       .then((response) => (response.ok ? (response.json() as Promise<AvailableEvent[]>) : []))
       .then((events) => setAvailableEvents(Array.isArray(events) ? events : []))
@@ -78,6 +80,7 @@ export function useProductionOrdersController() {
   };
   return {
     ...recipeController,
+    loading,
     availableEvents,
     pedidos,
     pedidosByStatus,

@@ -1,3 +1,4 @@
+import { Input, Label, Select } from '../../../../../packages/pentagono/src/index';
 import type { PizzaEvent } from '../../types/Event';
 import styles from './styles/CalendarView.module.scss';
 
@@ -18,8 +19,8 @@ function valueOf(form: Form, field: keyof PizzaEvent) {
 export function TextField({ label, field, form, updateForm }: FieldProps) {
   return (
     <div className={styles.formField}>
-      <label className={styles.formLabel}>{label}</label>
-      <input
+      <Label className={styles.formLabel}>{label}</Label>
+      <Input
         className={styles.formInput}
         value={valueOf(form, field)}
         onChange={(event) => updateForm({ [field]: event.target.value } as Form)}
@@ -37,8 +38,8 @@ export function NumberField({
 }: FieldProps & { readNumber: (value: string) => number | undefined }) {
   return (
     <div className={styles.formField}>
-      <label className={styles.formLabel}>{label}</label>
-      <input
+      <Label className={styles.formLabel}>{label}</Label>
+      <Input
         type="number"
         className={styles.formInput}
         value={valueOf(form, field)}
@@ -51,8 +52,8 @@ export function NumberField({
 export function DateField({ label, field, form, updateForm }: FieldProps) {
   return (
     <div className={styles.formField}>
-      <label className={styles.formLabel}>{label}</label>
-      <input
+      <Label className={styles.formLabel}>{label}</Label>
+      <Input
         type="date"
         className={styles.formInput}
         value={valueOf(form, field).slice(0, 10)}
@@ -71,8 +72,8 @@ export function SelectField({
 }: FieldProps & { options: Array<[string, string]> }) {
   return (
     <div className={styles.formField}>
-      <label className={styles.formLabel}>{label}</label>
-      <select
+      <Label className={styles.formLabel}>{label}</Label>
+      <Select
         className={styles.formInput}
         value={valueOf(form, field)}
         onChange={(event) => updateForm({ [field]: event.target.value } as Form)}
@@ -82,7 +83,7 @@ export function SelectField({
             {text}
           </option>
         ))}
-      </select>
+      </Select>
     </div>
   );
 }
@@ -96,8 +97,8 @@ export function ListField({
 }: FieldProps & { readList: (value: string) => string[] }) {
   return (
     <div className={styles.formField}>
-      <label className={styles.formLabel}>{label}</label>
-      <input
+      <Label className={styles.formLabel}>{label}</Label>
+      <Input
         className={styles.formInput}
         value={Array.isArray(form[field]) ? (form[field] as string[]).join(', ') : valueOf(form, field)}
         onChange={(event) => updateForm({ [field]: readList(event.target.value) } as Form)}

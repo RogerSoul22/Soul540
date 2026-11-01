@@ -1,3 +1,4 @@
+import { Card, Heading } from '../../../../../../packages/pentagono/src/index';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
@@ -7,9 +8,11 @@ import styles from '../styles/Financeiro.module.scss';
 export default function FinanceOverviewAppointments({ controller }: { controller: FinanceiroController }) {
   const { eventsWithFinalValue, totalFinalValue } = controller;
   return (
-    <div className={styles.agendamentosCard}>
+    <Card className={styles.agendamentosCard}>
       <div className={styles.agendamentosHeader}>
-        <h3 className={styles.sectionTitle}>Valores dos agendamentos</h3>
+        <Heading level={3} variant="section" className={styles.sectionTitle}>
+          Valores dos agendamentos
+        </Heading>
         <div className={styles.agendamentosPills}>
           <div className={styles.agendamentosPill}>
             <span className={styles.agendamentosPillLabel}>Total final</span>
@@ -34,6 +37,6 @@ export default function FinanceOverviewAppointments({ controller }: { controller
           ))}
         </div>
       )}
-    </div>
+    </Card>
   );
 }

@@ -1,3 +1,4 @@
+import { Heading } from '../../../../../../packages/pentagono/src/index';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { buildEventWhatsAppUrl as buildSharedEventWhatsAppUrl } from '../../../../../../packages/domain/src/index';
@@ -52,7 +53,9 @@ function EventCard({
     <div className={`${styles.card} ${statusClass}`} onClick={() => onView(ev)}>
       <div className={styles.cardTop}>
         <div>
-          <h3 className={styles.cardTitle}>{ev.name}</h3>
+          <Heading level={3} variant="section" className={styles.cardTitle}>
+            {ev.name}
+          </Heading>
           <span style={{ color: ev.modality === 'feirinha' ? '#34d399' : '#94a3b8', fontSize: 12, fontWeight: 600 }}>
             {getEventModalityLabel(ev.modality)}
           </span>

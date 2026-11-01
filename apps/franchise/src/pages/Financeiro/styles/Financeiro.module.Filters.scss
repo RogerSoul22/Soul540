@@ -105,14 +105,3 @@
 }
 
 // Category chips
-.categoryChips {
-  @include card;
-
-  display: flex;
-
-  flex-wrap: wrap;
-
-  gap: $spacing-sm;
-
-  padding: $spacing-md $spacing-lg;
-}

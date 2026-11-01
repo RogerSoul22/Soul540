@@ -1,5 +1,5 @@
 import { useCardapiosController } from './hooks/use-cardapios-controller';
-import { ConfirmModal } from '../../../../../packages/ui/src/index';
+import { Button, ConfirmModal, PageHeader } from '../../../../../packages/pentagono/src/index';
 import { SOUL540_MENUS } from '../../data/soul540Menus';
 import MenuEditorModal from './components/MenuEditorModal';
 import CustomMenuList from './components/CustomMenuList';
@@ -55,15 +55,17 @@ export default function Cardapios() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <div>
-          <h1 className={styles.title}>Cardápios</h1>
-          <p className={styles.subtitle}>Menus Soul540 e cardápios personalizados de eventos</p>
-        </div>
-        <button className={styles.btnPrimary} onClick={openCreate}>
-          + Novo cardápio
-        </button>
-      </header>
+      <PageHeader
+        title="Cardápios"
+        subtitle="Menus Soul540 e cardápios personalizados de eventos"
+        actions={
+          <>
+            <Button variant="primary" onClick={openCreate}>
+              + Novo cardápio
+            </Button>
+          </>
+        }
+      />
       <StaticMenuGrid
         menus={SOUL540_MENUS}
         overrides={overrides}

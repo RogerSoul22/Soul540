@@ -2,34 +2,6 @@
 
 @use '../../../styles/mixins' as *;
 
-.closeBtn {
-  @include flex-center;
-
-  width: 30px;
-
-  height: 30px;
-
-  border-radius: $radius-sm;
-
-  border: none;
-
-  background: none;
-
-  color: $text-muted;
-
-  cursor: pointer;
-
-  transition: all $transition-fast;
-
-  flex-shrink: 0;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.06);
-
-    color: $text-primary;
-  }
-}
-
 .panelBody {
   padding: $spacing-xl;
 
@@ -112,10 +84,6 @@
   flex-direction: column;
 
   gap: 6px;
-}
-
-.detailFull {
-  grid-column: 1 / -1;
 }
 
 .detailLabel {

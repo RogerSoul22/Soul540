@@ -1,3 +1,4 @@
+import { Button, EmptyState, Heading, Input } from '../../../../../../packages/pentagono/src/index';
 import type { MenuRecord as Menu } from '../../../../../../packages/screens/src/index';
 import styles from '../styles/Cardapios.module.scss';
 
@@ -22,10 +23,13 @@ export default function CustomMenuList({
     <section className={styles.customSection}>
       <div className={styles.sectionHeader}>
         <div>
-          <h2 className={styles.sectionTitle}>Cardápios personalizados</h2>
+          <Heading level={2} variant="section" className={styles.sectionTitle}>
+            Cardápios personalizados
+          </Heading>
           <p className={styles.sectionSubtitle}>Criados para eventos específicos.</p>
         </div>
-        <input
+        <Input
+          variant="search"
           className={styles.searchInput}
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
@@ -33,14 +37,16 @@ export default function CustomMenuList({
         />
       </div>
       {!menus.length ? (
-        <p className={styles.emptyState}>Nenhum cardápio personalizado encontrado.</p>
+        <EmptyState variant="compact" title="Nenhum cardápio personalizado encontrado." className={styles.emptyState} />
       ) : (
         <div className={styles.grid}>
           {menus.map((menu) => (
             <article key={menu.id} className={styles.card}>
               <div className={styles.cardMeta}>
                 <div className={styles.cardIdentity}>
-                  <h3 className={styles.cardName}>{menu.name}</h3>
+                  <Heading level={3} variant="section" className={styles.cardName}>
+                    {menu.name}
+                  </Heading>
                   {menu.eventId && <p className={styles.cardEvent}>{eventMap[menu.eventId]}</p>}
                 </div>
                 <div className={styles.cardStats}>
@@ -60,15 +66,25 @@ export default function CustomMenuList({
                 ))}
               </div>
               <div className={styles.cardFooter}>
-                <button className={styles.cardPrimaryButton} onClick={() => onPreview(menu)}>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className={styles.cardPrimaryButton}
+                  onClick={() => onPreview(menu)}
+                >
                   Visualizar
-                </button>
-                <button className={styles.cardSecondaryButton} onClick={() => onEdit(menu)}>
+                </Button>
+                <Button variant="outline" className={styles.cardSecondaryButton} onClick={() => onEdit(menu)}>
                   Editar
-                </button>
-                <button className={styles.cardDangerButton} onClick={() => onDelete(menu.id)}>
+                </Button>
+                <Button
+                  variant="danger"
+                  size="sm"
+                  className={styles.cardDangerButton}
+                  onClick={() => onDelete(menu.id)}
+                >
                   Excluir
-                </button>
+                </Button>
               </div>
             </article>
           ))}

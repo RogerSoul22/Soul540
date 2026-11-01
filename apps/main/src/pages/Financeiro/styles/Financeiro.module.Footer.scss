@@ -13,35 +13,6 @@
   box-shadow: $shadow-lg;
 }
 
-.modalHeader {
-  @include flex-between;
-  padding: $spacing-lg $spacing-xl;
-  border-bottom: 1px solid $border;
-}
-
-.modalTitle {
-  font-size: $font-size-lg;
-  font-weight: $font-weight-semibold;
-  color: $text-primary;
-}
-
-.modalClose {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: none;
-  border: none;
-  color: $text-muted;
-  cursor: pointer;
-  border-radius: $radius-xs;
-  &:hover {
-    color: $text-primary;
-    background: rgba(255, 255, 255, 0.06);
-  }
-}
-
 .modalBody {
   padding: $spacing-xl;
   display: flex;
@@ -112,28 +83,3 @@
 }
 
 // section
-.pageMonthFilter {
-  display: flex;
-
-  align-items: flex-end;
-
-  gap: $spacing-sm;
-
-  padding: $spacing-md 0 $spacing-sm;
-
-  margin-bottom: $spacing-md;
-
-  flex-wrap: wrap;
-}
-
-.pageMonthField {
-  display: flex;
-
-  flex-direction: column;
-
-  gap: 6px;
-
-  min-width: 240px;
-
-  max-width: 320px;
-}

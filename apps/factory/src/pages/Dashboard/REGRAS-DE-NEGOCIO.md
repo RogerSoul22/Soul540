@@ -33,4 +33,3 @@ A visualização e as ações dependem da permissão da página e das permissõe
 - Definir quais indicadores são oficiais.
 - Definir atualização em tempo real ou periodicidade.
 - Definir metas e alertas exibidos.
-

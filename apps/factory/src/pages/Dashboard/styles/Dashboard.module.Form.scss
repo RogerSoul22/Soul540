@@ -1,10 +1,6 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
-.kpiSubSuccess {
-  color: #4ade80;
-}
-
 // Calendar
 .calendarSection {
   margin-bottom: $spacing-md;
@@ -37,18 +33,6 @@
 }
 
 // Sections
-.sectionsGrid {
-  display: grid;
-
-  grid-template-columns: repeat(2, 1fr);
-
-  gap: $spacing-md;
-
-  @include tablet {
-    grid-template-columns: 1fr;
-  }
-}
-
 .section {
   @include card;
 
@@ -67,22 +51,6 @@
   padding-bottom: $spacing-md;
 
   border-bottom: 1px solid $border;
-}
-
-.sectionIcon {
-  @include flex-center;
-
-  width: 26px;
-
-  height: 26px;
-
-  border-radius: $radius-xs;
-
-  background: rgba($accent, 0.08);
-
-  color: $accent;
-
-  flex-shrink: 0;
 }
 
 .sectionTitle {

@@ -1,3 +1,4 @@
+import { Card } from '../../../../../../packages/pentagono/src/index';
 import type { PizzaEvent } from '../../../types/Event';
 import styles from '../styles/Eventos.module.scss';
 
@@ -10,7 +11,7 @@ export default function EventDetailsDocuments({ event }: { event: PizzaEvent }) 
           <p className={styles.detailSectionTitle}>Documentos</p>
           <div className={styles.docGrid}>
             {event.paymentProofName && (
-              <div className={styles.docCard}>
+              <Card className={styles.docCard}>
                 <div className={styles.docCardHeader}>
                   <span className={styles.detailLabel}>Comprovante de Pagamento</span>
                   {event.paymentProofData && (
@@ -61,10 +62,10 @@ export default function EventDetailsDocuments({ event }: { event: PizzaEvent }) 
                     <span>{event.paymentProofName}</span>
                   </div>
                 )}
-              </div>
+              </Card>
             )}
             {event.contractPdfName && (
-              <div className={styles.docCard}>
+              <Card className={styles.docCard}>
                 <div className={styles.docCardHeader}>
                   <span className={styles.detailLabel}>Contrato</span>
                   {event.contractPdfData && (
@@ -111,7 +112,7 @@ export default function EventDetailsDocuments({ event }: { event: PizzaEvent }) 
                     <span>{event.contractPdfName}</span>
                   </div>
                 )}
-              </div>
+              </Card>
             )}
           </div>
         </div>

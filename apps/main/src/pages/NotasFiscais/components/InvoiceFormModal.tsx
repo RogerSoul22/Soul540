@@ -1,5 +1,5 @@
 import type { FormEvent } from 'react';
-import { Modal } from '../../../../../../packages/ui/src/index';
+import { Button, Modal } from '../../../../../../packages/pentagono/src/index';
 import type { InvoiceFormState } from '../types/invoice-types';
 import type { InvoiceItem } from '../../../../../../packages/contracts/src/index';
 import InvoiceFormFields from './InvoiceFormFields';
@@ -47,12 +47,12 @@ export default function InvoiceFormModal({
           onRemoveItem={onRemoveItem}
         />
         <div className={styles.formActions}>
-          <button className={styles.btnCancel} type="button" onClick={onClose}>
+          <Button variant="ghost" type="button" onClick={onClose}>
             Cancelar
-          </button>
-          <button className={styles.btnPrimary} type="submit">
+          </Button>
+          <Button variant="primary" type="submit">
             {editing ? 'Salvar Alterações' : 'Salvar Nota Fiscal'}
-          </button>
+          </Button>
         </div>
       </form>
     </Modal>

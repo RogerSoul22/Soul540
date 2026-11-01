@@ -1,3 +1,4 @@
+import { Button, Modal } from '../../../../../../packages/pentagono/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
 import FinanceOfxItemsList from './FinanceOfxItemsList';
 import styles from '../styles/Financeiro.module.scss';
@@ -22,42 +23,43 @@ export default function FinanceOfxImportModal({ controller }: { controller: Fina
   const duplicateCount = ofxItems.filter((item) => item.decision === 'duplicate').length;
 
   return (
-    <div className={styles.overlay} onClick={() => setShowOfxModal(false)}>
-      <div className={styles.xmlModal} onClick={(event) => event.stopPropagation()}>
-        <div className={styles.modalHeader}>
-          <div>
-            <h2 className={styles.modalTitle}>Importar extrato OFX</h2>
+    <Modal
+      title="Importar extrato OFX"
+      onClose={() => setShowOfxModal(false)}
+      closeOnOverlay
+      maxWidth={700}
+      className={styles.xmlModal}
+      subtitle={
+        <>
+          <p className={styles.xmlSupplier}>
+            Conta: <strong>{ofxBankAccount || 'Não informada'}</strong>
+          </p>
+          {ofxStatementBalance !== undefined && Number.isFinite(ofxStatementBalance) && (
             <p className={styles.xmlSupplier}>
-              Conta: <strong>{ofxBankAccount || 'Não informada'}</strong>
+              Saldo informado pelo banco: <strong>{formatBRL(ofxStatementBalance)}</strong>
             </p>
-            {ofxStatementBalance !== undefined && Number.isFinite(ofxStatementBalance) && (
-              <p className={styles.xmlSupplier}>
-                Saldo informado pelo banco: <strong>{formatBRL(ofxStatementBalance)}</strong>
-              </p>
-            )}
-          </div>
-          <button className={styles.modalClose} onClick={() => setShowOfxModal(false)} aria-label="Fechar">
-            ×
-          </button>
-        </div>
-        <div className={styles.modalBody} style={{ padding: '16px 24px', gap: 12 }}>
-          <FinanceOfxItemsList controller={controller} duplicateCount={duplicateCount} />
-        </div>
-        <div className={styles.modalFooter}>
-          <button className={styles.btnCancel} onClick={() => setShowOfxModal(false)}>
-            Cancelar
-          </button>
-          <button
-            className={styles.btnPrimary}
-            onClick={handleOfxImport}
-            disabled={ofxPreviewing || ofxImporting || selectedItems.length === 0}
-          >
-            {ofxImporting
-              ? 'Importando...'
-              : 'Importar ' + selectedItems.length + (selectedItems.length === 1 ? ' movimento' : ' movimentos')}
-          </button>
-        </div>
+          )}
+        </>
+      }
+      flush
+    >
+      <div className={styles.modalBody} style={{ padding: '16px 24px', gap: 12 }}>
+        <FinanceOfxItemsList controller={controller} duplicateCount={duplicateCount} />
       </div>
-    </div>
+      <div className={styles.modalFooter}>
+        <Button variant="ghost" onClick={() => setShowOfxModal(false)}>
+          Cancelar
+        </Button>
+        <Button
+          variant="primary"
+          onClick={handleOfxImport}
+          disabled={ofxPreviewing || ofxImporting || selectedItems.length === 0}
+        >
+          {ofxImporting
+            ? 'Importando...'
+            : 'Importar ' + selectedItems.length + (selectedItems.length === 1 ? ' movimento' : ' movimentos')}
+        </Button>
+      </div>
+    </Modal>
   );
 }

@@ -1,3 +1,4 @@
+import { Button } from '../../../../pentagono/src/index';
 import type { Contractor } from './contractor-types';
 import styles from './styles/ContractorDirectoryScreen.module.scss';
 
@@ -26,7 +27,8 @@ export default function ContractorCategorySection({
           const selected = selectedCategory === category;
           const count = contractors.filter((contractor) => contractor.category === category).length;
           return (
-            <button
+            <Button
+              variant="chip"
               className={`${styles.categoryCard} ${selected ? styles.categoryCardActive : ''}`}
               key={category}
               onClick={() => onSelect(selected ? null : category)}
@@ -46,12 +48,12 @@ export default function ContractorCategorySection({
               >
                 ×
               </span>
-            </button>
+            </Button>
           );
         })}
-        <button className={styles.addCategory} onClick={onOpenEditor}>
+        <Button variant="dashed" className={styles.addCategory} onClick={onOpenEditor}>
           + Nova categoria
-        </button>
+        </Button>
       </div>
     </section>
   );

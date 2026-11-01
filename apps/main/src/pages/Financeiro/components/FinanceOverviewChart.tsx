@@ -1,3 +1,4 @@
+import { Card, Heading } from '../../../../../../packages/pentagono/src/index';
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
@@ -5,7 +6,7 @@ import styles from '../styles/Financeiro.module.scss';
 
 function Gauge({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className={styles.gaugeCard}>
+    <Card className={styles.gaugeCard}>
       <div className={styles.gaugeHeader}>
         <span>{label}</span>
         <strong>{value.toFixed(1)}%</strong>
@@ -13,7 +14,7 @@ function Gauge({ label, value, color }: { label: string; value: number; color: s
       <div className={styles.gaugeTrack}>
         <span style={{ width: Math.min(100, Math.max(0, value)) + '%', background: color }} />
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -22,7 +23,9 @@ export default function FinanceOverviewChart({ controller }: { controller: Finan
   return (
     <>
       <div className={styles.chartSection}>
-        <h3 className={styles.sectionTitle}>Receita x despesas por mês</h3>
+        <Heading level={3} variant="section" className={styles.sectionTitle}>
+          Receita x despesas por mês
+        </Heading>
         <div className={styles.chartContainer}>
           {!monthlyData.length ? (
             <p className={styles.agendamentosEmpty}>Nenhum lançamento no período.</p>

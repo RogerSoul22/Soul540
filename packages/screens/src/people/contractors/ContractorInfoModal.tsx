@@ -1,3 +1,4 @@
+import { Button } from '../../../../pentagono/src/index';
 import ContractorModalFrame from './ContractorModalFrame';
 import styles from './styles/ContractorModalFrame.module.scss';
 
@@ -7,9 +8,9 @@ export default function ContractorInfoModal({ open, onClose }: { open: boolean; 
     <ContractorModalFrame
       footer={
         <span>
-          <button className={styles.primaryButton} onClick={onClose}>
+          <Button variant="primary" onClick={onClose}>
             Entendido
-          </button>
+          </Button>
         </span>
       }
       onClose={onClose}

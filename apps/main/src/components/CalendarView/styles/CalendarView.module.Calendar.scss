@@ -35,20 +35,6 @@
   border-bottom: 1px solid $border;
 }
 
-.monthTitle {
-  font-family: $font-display;
-
-  font-size: $font-size-2xl;
-
-  font-weight: $font-weight-semibold;
-
-  color: $text-primary;
-
-  letter-spacing: -0.5px;
-
-  text-transform: capitalize;
-}
-
 .monthTitleWrap {
   position: relative;
 }
@@ -100,9 +86,11 @@
 .monthTitleChevron {
   align-self: center;
 
-  color: $text-muted;
+  display: inline-flex;
 
-  opacity: 0.5;
+  color: $text-secondary;
+
+  opacity: 0.85;
 
   transition: opacity $transition-fast;
 

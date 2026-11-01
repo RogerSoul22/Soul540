@@ -1,3 +1,4 @@
+import { Button } from '../../../../../packages/pentagono/src/index';
 import { IconAlertTriangle } from './CalendarEventIcons';
 import type { PizzaEvent } from '../../../../../packages/contracts/src/index';
 import styles from './styles/CalendarView.module.scss';
@@ -25,12 +26,12 @@ export function FactoryCalendarEventDelete({
         </div>
       </div>
       <div className={styles.panelActions}>
-        <button className={styles.btnCancel} onClick={onCancel}>
+        <Button variant="ghost" onClick={onCancel}>
           Cancelar
-        </button>
-        <button className={styles.btnDeleteConfirm} onClick={onConfirm}>
+        </Button>
+        <Button variant="danger" onClick={onConfirm}>
           Excluir
-        </button>
+        </Button>
       </div>
     </>
   );

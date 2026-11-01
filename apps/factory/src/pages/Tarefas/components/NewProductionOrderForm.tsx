@@ -1,3 +1,4 @@
+import { Button, Input, Select } from '../../../../../../packages/pentagono/src/index';
 import { useEffect, useMemo, useState } from 'react';
 import styles from '../styles/Tarefas.module.scss';
 import { formatQty, uid } from '../support/task-formatters';
@@ -108,9 +109,8 @@ export default function NewProductionOrderForm({ onSave, ingredients, insumos, e
   return (
     <form onSubmit={handleSubmit}>
       <div className={styles.formGroup}>
-        <label className={styles.label}>Agendamento vinculado</label>
-        <select
-          className={styles.input}
+        <Select
+          label="Agendamento vinculado"
           value={selectedEventId}
           onChange={(event) => handleEventChange(event.target.value)}
         >
@@ -121,12 +121,11 @@ export default function NewProductionOrderForm({ onSave, ingredients, insumos, e
               {event.city ? ` (${event.city})` : ''}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
       <div className={styles.formGroup}>
-        <label className={styles.label}>Filial</label>
-        <input
-          className={styles.input}
+        <Input
+          label="Filial"
           value={filial}
           onChange={(event) => setFilial(event.target.value)}
           placeholder="Nome da filial"
@@ -146,13 +145,9 @@ export default function NewProductionOrderForm({ onSave, ingredients, insumos, e
         removeItem={(index) => setItens((current) => current.filter((_, itemIndex) => itemIndex !== index))}
       />
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 8 }}>
-        <button
-          type="submit"
-          className={styles.btnPrimary}
-          disabled={!filial.trim() || !itens.length || !allItems.length}
-        >
+        <Button variant="primary" type="submit" disabled={!filial.trim() || !itens.length || !allItems.length}>
           Criar Pedido
-        </button>
+        </Button>
       </div>
     </form>
   );

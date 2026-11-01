@@ -1,3 +1,4 @@
+import { Input, Label, Textarea } from '../../../../../../packages/pentagono/src/index';
 import type { EventFormController } from '../types/event-form-controller';
 import styles from '../styles/Eventos.module.scss';
 
@@ -8,7 +9,7 @@ export default function EventFormExtras({ controller }: { controller: EventFormC
       <div className={styles.formSection}>
         <p className={styles.formSectionTitle}>Extras</p>
         <div className={styles.formGroup}>
-          <label className={styles.label}>Cardápio</label>
+          <Label className={styles.label}>Cardápio</Label>
           <div style={{ position: 'relative' }}>
             <div
               className={styles.input}
@@ -71,7 +72,7 @@ export default function EventFormExtras({ controller }: { controller: EventFormC
                       .map((s) => s.trim())
                       .includes(name);
                     return (
-                      <label
+                      <Label
                         key={name}
                         style={{
                           display: 'flex',
@@ -83,7 +84,7 @@ export default function EventFormExtras({ controller }: { controller: EventFormC
                           background: selected ? 'rgba(255,193,7,0.08)' : 'transparent',
                         }}
                       >
-                        <input
+                        <Input
                           type="checkbox"
                           checked={selected}
                           onChange={() => {
@@ -96,7 +97,7 @@ export default function EventFormExtras({ controller }: { controller: EventFormC
                           }}
                         />
                         <span style={{ fontSize: 13, color: '#e2e8f0' }}>{name}</span>
-                      </label>
+                      </Label>
                     );
                   })}
                 </div>
@@ -105,9 +106,8 @@ export default function EventFormExtras({ controller }: { controller: EventFormC
           </div>
         </div>
         <div className={styles.formGroup}>
-          <label className={styles.label}>Observacoes</label>
-          <textarea
-            className={styles.textarea}
+          <Textarea
+            label="Observacoes"
             rows={3}
             value={form.notes}
             onChange={(e) => setForm({ ...form, notes: e.target.value })}

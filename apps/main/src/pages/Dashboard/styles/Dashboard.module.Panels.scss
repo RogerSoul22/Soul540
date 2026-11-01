@@ -2,22 +2,6 @@
 
 @use '../../../styles/mixins' as *;
 
-.sectionIcon {
-  @include flex-center;
-
-  width: 26px;
-
-  height: 26px;
-
-  border-radius: $radius-xs;
-
-  background: rgba($accent, 0.08);
-
-  color: $accent;
-
-  flex-shrink: 0;
-}
-
 .sectionTitle {
   font-size: $font-size-sm;
 
@@ -54,66 +38,9 @@
   }
 }
 
-.listItemUrgent {
-  border-left-color: #ef4444;
-
-  background: rgba(239, 68, 68, 0.04);
-
-  &:hover {
-    background: rgba(239, 68, 68, 0.07);
-  }
-}
-
 .listItemInfo {
   flex: 1;
 
   min-width: 0;
 }
 
-.listItemName {
-  font-size: $font-size-sm;
-
-  font-weight: $font-weight-medium;
-
-  color: $text-primary;
-
-  @include text-ellipsis;
-}
-
-.listItemDetail {
-  font-size: $font-size-xs;
-
-  color: $text-muted;
-
-  margin-top: 3px;
-
-  @include text-ellipsis;
-
-  @include mobile {
-    margin-top: 0;
-
-    white-space: normal;
-  }
-}
-
-.listItemActions {
-  display: flex;
-
-  align-items: center;
-
-  gap: $spacing-sm;
-
-  flex-shrink: 0;
-
-  margin-left: $spacing-md;
-
-  @include mobile {
-    width: 100%;
-
-    margin-left: 0;
-
-    padding-top: 4px;
-
-    border-top: 1px solid $border-faint;
-  }
-}

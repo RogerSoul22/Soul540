@@ -7,7 +7,7 @@ import {
   parseCurrency,
   toContractForm,
 } from '../../../../../packages/screens/src/index';
-import { ConfirmModal } from '../../../../../packages/ui/src/index';
+import { Button, ConfirmModal, PageHeader } from '../../../../../packages/pentagono/src/index';
 import ContractDocument from './components/ContractDocument';
 import ContractFormModal from './components/ContractFormModal';
 import ContractList from './components/ContractList';
@@ -79,21 +79,23 @@ export default function Contratos() {
   const eventList = events.map((event) => ({ id: event.id, name: event.name }));
   return (
     <div className={styles.page}>
-      <div className={styles.header}>
-        <div>
-          <h1 className={styles.title}>Contratos</h1>
-          <p className={styles.subtitle}>Gerencie contratos e acordos com clientes</p>
-        </div>
-        <button
-          className={styles.btnPrimary}
-          onClick={() => {
-            setEditingId('new');
-            setForm(emptyContractForm);
-          }}
-        >
-          + Novo Contrato
-        </button>
-      </div>
+      <PageHeader
+        title="Contratos"
+        subtitle="Gerencie contratos e acordos com clientes"
+        actions={
+          <>
+            <Button
+              variant="primary"
+              onClick={() => {
+                setEditingId('new');
+                setForm(emptyContractForm);
+              }}
+            >
+              + Novo Contrato
+            </Button>
+          </>
+        }
+      />
       <ContractList
         contracts={filtered}
         events={eventList}

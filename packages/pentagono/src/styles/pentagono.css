@@ -1,0 +1,13 @@
+/* Entrada única de estilos do Pentágono: cada portal importa este arquivo uma vez. */
+@layer reset, pentagono;
+
+@import './tokens.css';
+@import './data-skeleton.css';
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --pentagono-transition-fast: 0s;
+    --pentagono-transition-base: 0s;
+    --pentagono-transition-smooth: 0s;
+  }
+}

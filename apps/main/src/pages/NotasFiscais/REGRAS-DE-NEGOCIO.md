@@ -37,4 +37,3 @@ A visualização e as ações dependem da permissão da página e das permissõe
 - Definir cancelamento e carta de correção.
 - Definir prazo fiscal e permissões de emissão.
 - Definir tratamento de notas rejeitadas e inutilização.
-

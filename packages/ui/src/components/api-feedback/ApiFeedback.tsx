@@ -1,3 +1,4 @@
+import { Button } from '../../../../pentagono/src/index';
 import { useEffect, useState } from 'react';
 
 type ApiErrorDetail = { message?: string; status?: number; kind?: 'error' | 'success' };
@@ -38,13 +39,18 @@ export default function ApiFeedback() {
       <strong>{kind === 'success' ? 'Concluído' : 'Não foi possível concluir'}</strong>
       <p style={{ margin: '4px 0 10px' }}>{message}</p>
       {kind !== 'success' && (
-        <button type="button" onClick={() => window.location.reload()}>
+        <Button variant="outline" type="button" onClick={() => window.location.reload()}>
           Tentar novamente
-        </button>
+        </Button>
       )}
-      <button type="button" onClick={() => setMessage(null)} style={{ marginLeft: kind === 'success' ? 0 : 8 }}>
+      <Button
+        variant="outline"
+        type="button"
+        onClick={() => setMessage(null)}
+        style={{ marginLeft: kind === 'success' ? 0 : 8 }}
+      >
         Fechar
-      </button>
+      </Button>
     </div>
   );
 }

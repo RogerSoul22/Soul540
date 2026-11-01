@@ -1,3 +1,4 @@
+import { Button, Input, Label, Select, Textarea } from '../../../../pentagono/src/index';
 import type { ReactNode } from 'react';
 import { formatCpf, formatPhone, formatRg } from './employee-formatters';
 import { days, dayLabels, roleLabels, type EmployeeForm, type UpdateEmployeeForm } from './employee-types';
@@ -17,14 +18,15 @@ export default function EmployeeEditorFields({ form, onChange, onToggleDay }: Em
       <FormField label="Dias disponíveis">
         <div className={styles.dayPicker}>
           {days.map((day) => (
-            <button
+            <Button
+              variant="chip"
               key={day}
               type="button"
               className={`${styles.dayButton} ${form.availableDays.includes(day) ? styles.activeDay : ''}`}
               onClick={() => onToggleDay(day)}
             >
               {dayLabels[day]}
-            </button>
+            </Button>
           ))}
         </div>
       </FormField>
@@ -37,7 +39,7 @@ function BasicFields({ form, onChange }: { form: EmployeeForm; onChange: UpdateE
     <>
       <div className={styles.grid}>
         <FormField label="Nome *">
-          <input
+          <Input
             className={styles.input}
             value={form.name}
             onChange={(event) => onChange('name', event.target.value)}
@@ -45,7 +47,7 @@ function BasicFields({ form, onChange }: { form: EmployeeForm; onChange: UpdateE
           />
         </FormField>
         <FormField label="Cargo">
-          <select
+          <Select
             className={styles.input}
             value={form.role}
             onChange={(event) => onChange('role', event.target.value as EmployeeForm['role'])}
@@ -55,12 +57,12 @@ function BasicFields({ form, onChange }: { form: EmployeeForm; onChange: UpdateE
                 {label}
               </option>
             ))}
-          </select>
+          </Select>
         </FormField>
       </div>
       <div className={styles.grid}>
         <FormField label="Telefone (WhatsApp)">
-          <input
+          <Input
             className={styles.input}
             value={form.phone}
             onChange={(event) => onChange('phone', formatPhone(event.target.value))}
@@ -68,7 +70,7 @@ function BasicFields({ form, onChange }: { form: EmployeeForm; onChange: UpdateE
           />
         </FormField>
         <FormField label="Status">
-          <select
+          <Select
             className={styles.input}
             value={form.status}
             onChange={(event) => onChange('status', event.target.value as EmployeeForm['status'])}
@@ -77,7 +79,7 @@ function BasicFields({ form, onChange }: { form: EmployeeForm; onChange: UpdateE
             <option value="ferias">Férias</option>
             <option value="afastado">Afastado</option>
             <option value="desligado">Desligado</option>
-          </select>
+          </Select>
         </FormField>
       </div>
     </>
@@ -89,7 +91,7 @@ function PersonalFields({ form, onChange }: { form: EmployeeForm; onChange: Upda
     <>
       <div className={styles.grid}>
         <FormField label="CPF">
-          <input
+          <Input
             className={styles.input}
             value={form.cpf}
             onChange={(event) => onChange('cpf', formatCpf(event.target.value))}
@@ -97,7 +99,7 @@ function PersonalFields({ form, onChange }: { form: EmployeeForm; onChange: Upda
           />
         </FormField>
         <FormField label="RG">
-          <input
+          <Input
             className={styles.input}
             value={form.rg}
             onChange={(event) => onChange('rg', formatRg(event.target.value))}
@@ -106,7 +108,7 @@ function PersonalFields({ form, onChange }: { form: EmployeeForm; onChange: Upda
         </FormField>
       </div>
       <FormField label="Endereço">
-        <input
+        <Input
           className={styles.input}
           value={form.address}
           onChange={(event) => onChange('address', event.target.value)}
@@ -114,7 +116,7 @@ function PersonalFields({ form, onChange }: { form: EmployeeForm; onChange: Upda
         />
       </FormField>
       <FormField label="Chave Pix">
-        <input
+        <Input
           className={styles.input}
           value={form.pixKey}
           onChange={(event) => onChange('pixKey', event.target.value)}
@@ -122,7 +124,7 @@ function PersonalFields({ form, onChange }: { form: EmployeeForm; onChange: Upda
         />
       </FormField>
       <FormField label="Comissão por evento (%)">
-        <input
+        <Input
           className={styles.input}
           type="number"
           min="0"
@@ -133,7 +135,7 @@ function PersonalFields({ form, onChange }: { form: EmployeeForm; onChange: Upda
         />
       </FormField>
       <FormField label="Observação">
-        <textarea
+        <Textarea
           className={`${styles.input} ${styles.textarea}`}
           value={form.notes}
           onChange={(event) => onChange('notes', event.target.value)}
@@ -147,9 +149,9 @@ function PersonalFields({ form, onChange }: { form: EmployeeForm; onChange: Upda
 
 function FormField({ children, label }: { children: ReactNode; label: string }) {
   return (
-    <label className={styles.formGroup}>
+    <Label className={styles.formGroup}>
       <span className={styles.label}>{label}</span>
       {children}
-    </label>
+    </Label>
   );
 }

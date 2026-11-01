@@ -9,10 +9,10 @@
 .controls select {
   min-height: 40px;
   padding: 9px 12px;
-  border: 1px solid #29354a;
+  border: 1px solid var(--border);
   border-radius: 6px;
-  color: #e5e7eb;
-  background: #172033;
+  color: var(--text-primary);
+  background: var(--bg-card);
 }
 
 .searchInput {
@@ -22,7 +22,7 @@
 }
 .empty {
   padding: 48px;
-  color: #94a3b8;
+  color: var(--text-secondary);
   text-align: center;
 }
 .letterSection {
@@ -48,9 +48,9 @@
   gap: 8px;
   min-width: 0;
   padding: 16px;
-  border: 1px solid #29354a;
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: #172033;
+  background: var(--bg-card);
   cursor: pointer;
 }
 
@@ -76,7 +76,7 @@
 .cardActions a,
 .cardActions button {
   border: 0;
-  color: #94a3b8;
+  color: var(--text-secondary);
   background: transparent;
   font: inherit;
   font-size: 12px;
@@ -91,7 +91,7 @@
 
 .card > span {
   overflow: hidden;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;

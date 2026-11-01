@@ -115,14 +115,3 @@
 }
 
 // Mobile row header
-.rowMobileTop {
-  display: none;
-
-  @include mobile {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-  }
-}

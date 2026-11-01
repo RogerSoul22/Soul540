@@ -1,5 +1,5 @@
 import { notifyFeedback } from '../../../../api-client/src/index';
-import { Button } from '../../../../ui/src/index';
+import { Button, InfoButton, PageHeader } from '../../../../pentagono/src/index';
 import { useEffect, useMemo, useState } from 'react';
 import PermissionAccessPanel from './PermissionAccessPanel';
 import { CreateUserModal, PasswordModal } from './PermissionModals';
@@ -84,20 +84,22 @@ export default function PermissionDirectoryScreen({
 
   return (
     <main className={styles.page}>
-      <header className={styles.header}>
-        <div>
-          <div className={styles.titleRow}>
-            <h1 className={styles.title}>Permissões</h1>
-            <Button type="button" variant="ghost" className={styles.btnInfo} onClick={() => setShowInfo(true)}>
-              i
+      <PageHeader
+        title="Permissões"
+        subtitle="Gerencie usuários e controle o acesso às páginas"
+        titleExtra={
+          <>
+            <InfoButton onClick={() => setShowInfo(true)} />
+          </>
+        }
+        actions={
+          <>
+            <Button type="button" className={styles.btnPrimary} onClick={() => setShowCreate(true)}>
+              + Novo Usuário
             </Button>
-          </div>
-          <p className={styles.subtitle}>Gerencie usuários e controle o acesso às páginas</p>
-        </div>
-        <Button type="button" className={styles.btnPrimary} onClick={() => setShowCreate(true)}>
-          + Novo Usuário
-        </Button>
-      </header>
+          </>
+        }
+      />
       <div className={styles.layout}>
         <PermissionUserList
           currentUnit={authUser?.isAdmin ? currentUnit : '__none__'}

@@ -211,6 +211,15 @@ importers:
         specifier: file:../contracts
         version: link:../contracts
 
+  packages/pentagono:
+    dependencies:
+      react:
+        specifier: ^18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.1
+        version: 18.3.1(react@18.3.1)
+
   packages/screens:
     dependencies:
       '@soul540/api-client':

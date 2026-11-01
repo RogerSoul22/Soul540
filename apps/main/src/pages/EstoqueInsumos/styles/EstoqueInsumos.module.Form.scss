@@ -2,21 +2,6 @@
 
 @use '../../../styles/mixins' as *;
 
-.modalClose {
-  @include flex-center;
-  width: 32px;
-  height: 32px;
-  background: none;
-  border: none;
-  color: $text-muted;
-  border-radius: $radius-xs;
-  cursor: pointer;
-  &:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: $text-primary;
-  }
-}
-
 .modalBody {
   padding: $spacing-xl;
   display: flex;
@@ -37,16 +22,6 @@
   @include mobile {
     grid-template-columns: 1fr;
   }
-}
-
-.viewField {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  background: $bg-tertiary;
-  border: 1px solid $border;
-  border-radius: $radius-sm;
-  padding: $spacing-sm $spacing-md;
 }
 
 .viewLabel {
@@ -113,25 +88,6 @@
 }
 
 // XML import
-.btnSecondary {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  padding: 10px $spacing-md;
-  background: rgba(255, 255, 255, 0.05);
-  color: $text-primary;
-  font-size: $font-size-sm;
-  font-weight: $font-weight-medium;
-  border: 1px solid $border;
-  border-radius: $radius-sm;
-  cursor: pointer;
-  transition: all $transition-fast;
-  &:hover {
-    background: rgba(255, 255, 255, 0.09);
-    border-color: $border-accent;
-  }
-}
-
 .xmlModal {
   background: $bg-secondary;
   border: 1px solid $border;

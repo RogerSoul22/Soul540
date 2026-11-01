@@ -1,16 +1,6 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
-.viewField {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  background: $bg-tertiary;
-  border: 1px solid $border;
-  border-radius: $radius-sm;
-  padding: $spacing-sm $spacing-md;
-}
-
 .viewLabel {
   font-size: 11px;
   font-weight: $font-weight-semibold;

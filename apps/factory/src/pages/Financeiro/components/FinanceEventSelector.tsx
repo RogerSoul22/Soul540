@@ -1,3 +1,4 @@
+import { Button, Input } from '../../../../../../packages/pentagono/src/index';
 import type { FactoryFinanceController } from '../types/finance-controller-types';
 import styles from '../styles/Financeiro.module.scss';
 
@@ -16,7 +17,7 @@ export default function FinanceEventSelector({ controller }: { controller: Facto
   } = controller;
   return (
     <div className={styles.eventCombo} ref={eventComboRef}>
-      <input
+      <Input
         type="text"
         className={`${styles.formSelect} ${styles.eventComboInput}`}
         placeholder="Buscar evento..."
@@ -30,7 +31,9 @@ export default function FinanceEventSelector({ controller }: { controller: Facto
         onFocus={openEventDropdown}
       />
       {(eventSearch || formEventId) && (
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           type="button"
           className={styles.eventClearBtn}
           onClick={() => {
@@ -41,7 +44,7 @@ export default function FinanceEventSelector({ controller }: { controller: Facto
           title="Limpar"
         >
           ×
-        </button>
+        </Button>
       )}
       {showEventDropdown && (
         <div
@@ -57,7 +60,8 @@ export default function FinanceEventSelector({ controller }: { controller: Facto
             <div className={styles.eventDropdownEmpty}>Nenhum evento encontrado</div>
           ) : (
             eventDropdownOptions.map((option) => (
-              <button
+              <Button
+                variant="chip"
                 key={option.id}
                 type="button"
                 className={`${styles.eventOption} ${formEventId === option.id ? styles.eventOptionSelected : ''}`}
@@ -69,7 +73,7 @@ export default function FinanceEventSelector({ controller }: { controller: Facto
                 }}
               >
                 {option.name}
-              </button>
+              </Button>
             ))
           )}
         </div>

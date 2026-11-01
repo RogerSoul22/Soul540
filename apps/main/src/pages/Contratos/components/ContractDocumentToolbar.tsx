@@ -1,3 +1,4 @@
+import { Button } from '../../../../../../packages/pentagono/src/index';
 import type { ContractDocumentModel } from '../types/contract-document-types';
 import styles from '../styles/ContractDocument.module.scss';
 
@@ -17,7 +18,9 @@ export function ContractDocumentToolbar({
         <span className={styles.contractClient}>{model.clientName}</span>
       </div>
       <div className={styles.topBarActions}>
-        <button
+        <Button
+          variant="secondary"
+          size="sm"
           className={`${styles.btnBar} ${model.editing ? styles.btnBarActive : ''}`}
           onClick={() => model.setEditing((v) => !v)}
         >
@@ -51,8 +54,8 @@ export function ContractDocumentToolbar({
             </svg>
           )}
           <span>{model.editing ? 'Visualizar' : 'Editar'}</span>
-        </button>
-        <button className={styles.btnBar} onClick={() => window.print()}>
+        </Button>
+        <Button variant="secondary" size="sm" className={styles.btnBar} onClick={() => window.print()}>
           <svg
             width="13"
             height="13"
@@ -68,8 +71,10 @@ export function ContractDocumentToolbar({
             <rect x="6" y="14" width="12" height="8" />
           </svg>
           <span>Imprimir</span>
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="primary"
+          size="sm"
           className={`${styles.btnBar} ${styles.btnBarPrimary}`}
           onClick={onGeneratePdf}
           disabled={model.generating}
@@ -89,8 +94,8 @@ export function ContractDocumentToolbar({
             <line x1="12" y1="15" x2="12" y2="3" />
           </svg>
           <span>{model.generating ? 'Gerando...' : 'Gerar PDF'}</span>
-        </button>
-        <button className={styles.btnBarClose} onClick={onClose}>
+        </Button>
+        <Button variant="ghost" size="icon" onClick={onClose}>
           <svg
             width="18"
             height="18"
@@ -104,7 +109,7 @@ export function ContractDocumentToolbar({
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
-        </button>
+        </Button>
       </div>
     </div>
   );

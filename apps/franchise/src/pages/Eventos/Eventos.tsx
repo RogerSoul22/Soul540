@@ -1,4 +1,5 @@
-import { ConfirmModal } from '../../../../../packages/ui/src/index';
+import { ConfirmModal, SkeletonContent } from '../../../../../packages/pentagono/src/index';
+import { useApp } from '../../contexts/AppContext';
 import styles from './styles/Eventos.module.scss';
 import EventDetailsModal from './components/EventDetailsModal';
 import EventosFilters from './components/EventosFilters';
@@ -10,13 +11,18 @@ import { useEventosController } from './hooks/use-eventos-controller';
 
 export default function Eventos() {
   const controller = useEventosController();
+  const { dataLoading } = useApp();
   const { deleteTargetId, events, confirmDelete, setDeleteTargetId } = controller;
   const deletedEvent = events.find((event) => event.id === deleteTargetId);
   return (
     <div className={styles.page}>
       <EventosHeader controller={controller} />
       <EventosFilters controller={controller} />
-      <EventosSections controller={controller} />
+      {dataLoading ? (
+        <SkeletonContent variant="list" label="Carregando eventos..." />
+      ) : (
+        <EventosSections controller={controller} />
+      )}
       <EventFormModal controller={controller} />
       <EventDetailsModal controller={controller} />
       <EventosInfoModal controller={controller} />

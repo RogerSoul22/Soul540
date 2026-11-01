@@ -61,7 +61,7 @@ export function useMainAppContext(): AppContextData {
     refreshTaskHistory,
   };
 
-  useMainAppData(state);
+  const dataLoading = useMainAppData(state);
 
   return {
     events,
@@ -70,6 +70,7 @@ export function useMainAppContext(): AppContextData {
     invoices,
     tasks,
     taskHistory,
+    dataLoading,
     ...useMainFinanceActions(state),
     ...useMainInvoiceActions(state),
     ...useMainEventActions(state),

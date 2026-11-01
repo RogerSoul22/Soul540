@@ -91,33 +91,6 @@
   box-shadow: $shadow-lg;
 }
 
-.modalHeader {
-  @include flex-between;
-  padding: $spacing-lg $spacing-xl;
-  border-bottom: 1px solid $border;
-}
-
-.modalTitle {
-  font-size: $font-size-lg;
-  font-weight: $font-weight-semibold;
-  color: $text-primary;
-}
-
-.modalClose {
-  @include flex-center;
-  width: 32px;
-  height: 32px;
-  background: none;
-  border: none;
-  color: $text-muted;
-  border-radius: $radius-xs;
-  cursor: pointer;
-  &:hover {
-    background: rgba(255, 255, 255, 0.06);
-    color: $text-primary;
-  }
-}
-
 .modalBody {
   padding: $spacing-xl;
   display: flex;

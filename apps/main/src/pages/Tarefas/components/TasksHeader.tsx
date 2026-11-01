@@ -1,3 +1,4 @@
+import { Button, InfoButton, PageHeader } from '../../../../../../packages/pentagono/src/index';
 import { ROUTES } from '../../../routes';
 import type { ViewMode } from '../types/task-types';
 import styles from '../styles/Tarefas.module.scss';
@@ -11,41 +12,43 @@ type Props = {
 
 export default function TasksHeader({ viewMode, onViewMode, onCreate, onInfo }: Props) {
   return (
-    <div className={styles.header}>
-      <div>
-        <div className={styles.titleRow}>
-          <h1 className={styles.title}>Tarefas</h1>
-          <button className={styles.btnInfo} onClick={onInfo} title="Como usar esta página">
-            i
-          </button>
-        </div>
-        <p className={styles.subtitle}>Gerencie e acompanhe o progresso das tarefas</p>
-      </div>
-      <div className={styles.headerActions}>
-        <div className={styles.viewToggle}>
-          <button
-            className={styles.viewBtn + (viewMode === 'kanban' ? ' ' + styles.viewBtnActive : '')}
-            onClick={() => onViewMode('kanban')}
+    <PageHeader
+      title="Tarefas"
+      subtitle="Gerencie e acompanhe o progresso das tarefas"
+      titleExtra={
+        <>
+          <InfoButton label="Como usar esta página" onClick={onInfo} />
+        </>
+      }
+      actions={
+        <>
+          <div className={styles.viewToggle}>
+            <Button
+              variant="chip"
+              className={styles.viewBtn + (viewMode === 'kanban' ? ' ' + styles.viewBtnActive : '')}
+              onClick={() => onViewMode('kanban')}
+            >
+              Kanban
+            </Button>
+            <Button
+              variant="chip"
+              className={styles.viewBtn + (viewMode === 'list' ? ' ' + styles.viewBtnActive : '')}
+              onClick={() => onViewMode('list')}
+            >
+              Lista
+            </Button>
+          </div>
+          <Button variant="primary" onClick={onCreate}>
+            + Nova Tarefa
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => window.open(ROUTES.CHECKLIST_ENVIO, '_blank', 'noopener,noreferrer')}
           >
-            Kanban
-          </button>
-          <button
-            className={styles.viewBtn + (viewMode === 'list' ? ' ' + styles.viewBtnActive : '')}
-            onClick={() => onViewMode('list')}
-          >
-            Lista
-          </button>
-        </div>
-        <button className={styles.btnPrimary} onClick={onCreate}>
-          + Nova Tarefa
-        </button>
-        <button
-          className={styles.btnSecondary}
-          onClick={() => window.open(ROUTES.CHECKLIST_ENVIO, '_blank', 'noopener,noreferrer')}
-        >
-          Checklist envio
-        </button>
-      </div>
-    </div>
+            Checklist envio
+          </Button>
+        </>
+      }
+    />
   );
 }

@@ -14,6 +14,7 @@ export interface AppContextData {
   invoices: Invoice[];
   tasks: Task[];
   taskHistory: TaskHistoryEntry[];
+  dataLoading: boolean;
   addTaskHistory: (entry: Omit<TaskHistoryEntry, 'id'>) => Promise<void>;
   deleteTaskHistory: (id: string) => Promise<void>;
   refreshTaskHistory: () => void;

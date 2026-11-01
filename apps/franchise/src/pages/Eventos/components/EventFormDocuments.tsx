@@ -1,3 +1,4 @@
+import { Input, Label } from '../../../../../../packages/pentagono/src/index';
 import type { EventFormController } from '../types/event-form-controller';
 import styles from '../styles/Eventos.module.scss';
 
@@ -11,8 +12,8 @@ export default function EventFormDocuments({ controller }: { controller: EventFo
           <p className={styles.formSectionTitle}>Documentos</p>
           <div className={styles.formGrid2}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Comprovante de Pagamento</label>
-              <label className={`${styles.fileUploadBtn} ${form.paymentProofName ? styles.fileSelected : ''}`}>
+              <Label className={styles.label}>Comprovante de Pagamento</Label>
+              <Label className={`${styles.fileUploadBtn} ${form.paymentProofName ? styles.fileSelected : ''}`}>
                 <svg
                   width="14"
                   height="14"
@@ -28,12 +29,12 @@ export default function EventFormDocuments({ controller }: { controller: EventFo
                   <line x1="12" y1="3" x2="12" y2="15" />
                 </svg>
                 {form.paymentProofName || 'Selecionar arquivo'}
-                <input type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={handlePaymentFile} />
-              </label>
+                <Input type="file" accept="image/*,.pdf" style={{ display: 'none' }} onChange={handlePaymentFile} />
+              </Label>
             </div>
             <div className={styles.formGroup}>
-              <label className={styles.label}>Contrato (PDF)</label>
-              <label className={`${styles.fileUploadBtn} ${form.contractPdfName ? styles.fileSelected : ''}`}>
+              <Label className={styles.label}>Contrato (PDF)</Label>
+              <Label className={`${styles.fileUploadBtn} ${form.contractPdfName ? styles.fileSelected : ''}`}>
                 <svg
                   width="14"
                   height="14"
@@ -48,8 +49,8 @@ export default function EventFormDocuments({ controller }: { controller: EventFo
                   <polyline points="14 2 14 8 20 8" />
                 </svg>
                 {form.contractPdfName || 'Selecionar PDF'}
-                <input type="file" accept=".pdf" style={{ display: 'none' }} onChange={handleContractFile} />
-              </label>
+                <Input type="file" accept=".pdf" style={{ display: 'none' }} onChange={handleContractFile} />
+              </Label>
             </div>
           </div>
         </div>
@@ -59,9 +60,8 @@ export default function EventFormDocuments({ controller }: { controller: EventFo
       <div className={styles.formSection}>
         <p className={styles.formSectionTitle}>Criacao</p>
         <div className={styles.formGroup}>
-          <label className={styles.label}>Seu Nome Completo</label>
-          <input
-            className={styles.input}
+          <Input
+            label="Seu Nome Completo"
             value={form.createdBy}
             onChange={(e) => setForm({ ...form, createdBy: e.target.value })}
             placeholder="Nome de quem esta criando o agendamento"

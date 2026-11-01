@@ -1,3 +1,4 @@
+import { Button } from '../../../../pentagono/src/index';
 import InventoryModalFrame from './InventoryModalFrame';
 import frameStyles from './styles/InventoryModalFrame.module.scss';
 import styles from './styles/InventoryInfoModal.module.scss';
@@ -10,9 +11,9 @@ export default function InventoryInfoModal({ onClose, open }: { onClose: () => v
       footer={
         <>
           <span />
-          <button className={frameStyles.primaryButton} onClick={onClose}>
+          <Button variant="primary" onClick={onClose}>
             Entendido
-          </button>
+          </Button>
         </>
       }
       onClose={onClose}

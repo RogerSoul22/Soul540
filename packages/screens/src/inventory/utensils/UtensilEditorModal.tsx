@@ -1,3 +1,4 @@
+import { Button, Input, Label, Select } from '../../../../pentagono/src/index';
 import type { UtensilForm } from './utensil-types';
 import { formatCurrency } from './currency';
 import InventoryModalFrame from './InventoryModalFrame';
@@ -33,12 +34,12 @@ export default function UtensilEditorModal({
     <InventoryModalFrame
       footer={
         <>
-          <button className={frameStyles.cancelButton} onClick={onClose}>
+          <Button variant="ghost" onClick={onClose}>
             Cancelar
-          </button>
-          <button className={frameStyles.primaryButton} onClick={onSubmit} disabled={!form.name}>
+          </Button>
+          <Button variant="primary" onClick={onSubmit} disabled={!form.name}>
             {editingId ? 'Salvar' : 'Adicionar'}
-          </button>
+          </Button>
         </>
       }
       onClose={onClose}
@@ -46,7 +47,7 @@ export default function UtensilEditorModal({
     >
       <div className={styles.grid}>
         <FormGroup label="Nome *">
-          <input
+          <Input
             className={styles.input}
             value={form.name}
             onChange={(event) => update('name', event.target.value)}
@@ -54,7 +55,7 @@ export default function UtensilEditorModal({
           />
         </FormGroup>
         <FormGroup label="Categoria">
-          <select
+          <Select
             className={styles.input}
             value={form.category}
             onChange={(event) => update('category', event.target.value)}
@@ -65,12 +66,12 @@ export default function UtensilEditorModal({
                 {category}
               </option>
             ))}
-          </select>
+          </Select>
         </FormGroup>
       </div>
       <div className={styles.grid}>
         <FormGroup label="Quantidade">
-          <input
+          <Input
             className={styles.input}
             type="number"
             min="0"
@@ -79,7 +80,7 @@ export default function UtensilEditorModal({
           />
         </FormGroup>
         <FormGroup label="Valor unitário (R$)">
-          <input
+          <Input
             className={styles.input}
             type="text"
             value={form.unitValue}
@@ -90,7 +91,7 @@ export default function UtensilEditorModal({
       </div>
       <div className={styles.grid}>
         <FormGroup label="Localização">
-          <input
+          <Input
             className={styles.input}
             value={form.location}
             onChange={(event) => update('location', event.target.value)}
@@ -98,7 +99,7 @@ export default function UtensilEditorModal({
           />
         </FormGroup>
         <FormGroup label="Status">
-          <select
+          <Select
             className={styles.input}
             value={form.status}
             onChange={(event) => update('status', event.target.value as UtensilForm['status'])}
@@ -107,7 +108,7 @@ export default function UtensilEditorModal({
             <option value="em_uso">Em Uso</option>
             <option value="manutencao">Manutenção</option>
             <option value="descartado">Descartado</option>
-          </select>
+          </Select>
         </FormGroup>
       </div>
     </InventoryModalFrame>
@@ -116,9 +117,9 @@ export default function UtensilEditorModal({
 
 function FormGroup({ children, label }: { children: React.ReactNode; label: string }) {
   return (
-    <label className={styles.group}>
+    <Label className={styles.group}>
       <span className={styles.label}>{label}</span>
       {children}
-    </label>
+    </Label>
   );
 }

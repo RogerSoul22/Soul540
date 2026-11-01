@@ -1,3 +1,4 @@
+import { Button, Input, Select } from '../../../../../../packages/pentagono/src/index';
 import type { Dispatch, SetStateAction } from 'react';
 import styles from '../styles/Tarefas.module.scss';
 import { formatQty } from '../support/task-formatters';
@@ -35,7 +36,7 @@ export default function OrderItemsFields({
     <div className={styles.formGroup}>
       <div className={styles.label}>Itens do pedido</div>
       <div className={styles.formGrid2}>
-        <select
+        <Select
           className={styles.input}
           value={itemKey}
           onChange={(event) => setItemKey(event.target.value)}
@@ -69,17 +70,17 @@ export default function OrderItemsFields({
               )}
             </>
           )}
-        </select>
-        <input
+        </Select>
+        <Input
           className={styles.input}
           type="number"
           min={0}
           value={itemQtd}
           onChange={(event) => setItemQtd(Number(event.target.value) || 0)}
         />
-        <button type="button" className={styles.btnPrimary} onClick={addItem} disabled={!itemKey || !allItems.length}>
+        <Button variant="primary" type="button" onClick={addItem} disabled={!itemKey || !allItems.length}>
           Adicionar
-        </button>
+        </Button>
       </div>
       <ul style={{ margin: 0, paddingLeft: 18 }}>
         {itens.map((item, index) => (
@@ -98,9 +99,9 @@ export default function OrderItemsFields({
                 {formatQty(item.quantidade)} {item.measure}
               </small>
             </span>
-            <button type="button" className={styles.btnDelete} onClick={() => removeItem(index)}>
+            <Button variant="danger" type="button" onClick={() => removeItem(index)}>
               Remover
-            </button>
+            </Button>
           </li>
         ))}
       </ul>

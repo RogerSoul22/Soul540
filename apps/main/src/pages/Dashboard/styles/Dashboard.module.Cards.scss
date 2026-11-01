@@ -88,18 +88,6 @@
 }
 
 // Sections
-.sectionsGrid {
-  display: grid;
-
-  grid-template-columns: repeat(2, 1fr);
-
-  gap: $spacing-md;
-
-  @include tablet {
-    grid-template-columns: 1fr;
-  }
-}
-
 .section {
   @include card;
 

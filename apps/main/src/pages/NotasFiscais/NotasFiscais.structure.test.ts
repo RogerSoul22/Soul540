@@ -18,7 +18,8 @@ test('renders fiscal certificate configuration inside the invoices page', () => 
 });
 
 test('keeps certificate states in the integrated fiscal section', () => {
-  const section = source('./components/FiscalConfigurationSection.tsx');
+  const section =
+    source('./components/FiscalConfigurationSection.tsx') + source('./components/FiscalCertificateSummary.tsx');
 
   assert.match(section, /useConfiguracaoFiscal/);
   assert.match(section, /summary\.certificateHolder/);

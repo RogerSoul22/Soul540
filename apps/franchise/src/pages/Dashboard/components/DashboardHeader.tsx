@@ -1,3 +1,4 @@
+import { Button, InfoButton, PageHeader } from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/Dashboard.module.scss';
 
 type Props = {
@@ -8,27 +9,28 @@ type Props = {
 };
 
 export default function DashboardHeader({ today, greeting, urgentTaskCount, onInfo }: Props) {
+  const plural = urgentTaskCount > 1 ? 's' : '';
+
   return (
-    <div className={styles.header}>
-      <p className={styles.dateLabel}>{today}</p>
-      <div className={styles.titleRow}>
-        <h1 className={styles.title}>{greeting}</h1>
-        <button className={styles.btnInfo} onClick={onInfo} title="Sobre o Dashboard" aria-label="Sobre o Dashboard">
-          <span aria-hidden="true">i</span>
-        </button>
-      </div>
-      {urgentTaskCount > 0 ? (
-        <p className={styles.subtitle}>
-          Você tem{' '}
-          <strong>
-            {urgentTaskCount} tarefa{urgentTaskCount > 1 ? 's' : ''} urgente
-            {urgentTaskCount > 1 ? 's' : ''}
-          </strong>{' '}
-          pendente{urgentTaskCount > 1 ? 's' : ''} hoje.
-        </p>
-      ) : (
-        <p className={styles.subtitle}>Nenhuma urgência no momento — tudo sob controle.</p>
-      )}
-    </div>
+    <PageHeader
+      variant="greeting"
+      className={styles.header}
+      eyebrow={today}
+      title={greeting}
+      titleExtra={<InfoButton label="Sobre o Dashboard" onClick={onInfo} />}
+      subtitle={
+        urgentTaskCount > 0 ? (
+          <>
+            Você tem{' '}
+            <strong>
+              {urgentTaskCount} tarefa{plural} urgente{plural}
+            </strong>{' '}
+            pendente{plural} hoje.
+          </>
+        ) : (
+          'Nenhuma urgência no momento — tudo sob controle.'
+        )
+      }
+    />
   );
 }

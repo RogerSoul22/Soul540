@@ -33,4 +33,3 @@ A visualização e as ações dependem da permissão da página e das permissõe
 - Definir lista oficial de itens obrigatórios.
 - Definir se checklist concluído altera o status do evento ou pedido.
 - Definir prazo e alertas de atraso.
-

@@ -1,3 +1,4 @@
+import { Button } from '../../../../../../packages/pentagono/src/index';
 import FinancePeriodFilter from '../../../../../../shared/finance/components/FinancePeriodFilter';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
 import styles from '../styles/Financeiro.module.scss';
@@ -19,13 +20,14 @@ export default function FinanceiroTabs({ controller }: { controller: FinanceiroC
     <>
       <div className={styles.tabs}>
         {tabs.map(([key, label]) => (
-          <button
+          <Button
+            variant="chip"
             key={key}
             className={`${styles.tab} ${activeTab === key ? styles.tabActive : ''}`}
             onClick={() => setActiveTab(key)}
           >
             {label}
-          </button>
+          </Button>
         ))}
       </div>
       <FinancePeriodFilter period={financePeriod} onChange={setFinancePeriod} accentColor="#f5a000" />

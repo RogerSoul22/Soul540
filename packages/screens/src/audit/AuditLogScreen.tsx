@@ -1,3 +1,4 @@
+import { Button, PageHeader } from '../../../pentagono/src/index';
 import { useEffect, useState } from 'react';
 import { actionColors, actionLabels, resourceLabels, type AuditEntry } from './audit-types';
 import AuditLogFilters from './AuditLogFilters';
@@ -62,22 +63,26 @@ export default function AuditLogScreen({ apiFetch, csvPrefix, styles, unitLabels
   }
   return (
     <div className={styles.page}>
-      <div className={styles.header}>
-        <div>
-          <h1 className={styles.title}>Log de Auditoria</h1>
-          <p className={styles.subtitle}>
+      <PageHeader
+        title="Log de Auditoria"
+        subtitle={
+          <>
             {total} registro{total !== 1 ? 's' : ''} encontrado{total !== 1 ? 's' : ''}
-          </p>
-        </div>
-        <button
-          className={styles.btnExport}
-          onClick={exportCsv}
-          disabled={!items.length}
-          title="Exportar página atual em CSV"
-        >
-          Exportar CSV
-        </button>
-      </div>
+          </>
+        }
+        actions={
+          <>
+            <Button
+              variant="secondary"
+              onClick={exportCsv}
+              disabled={!items.length}
+              title="Exportar página atual em CSV"
+            >
+              Exportar CSV
+            </Button>
+          </>
+        }
+      />
       <AuditLogFilters
         styles={styles}
         unitLabels={unitLabels}
@@ -95,19 +100,25 @@ export default function AuditLogScreen({ apiFetch, csvPrefix, styles, unitLabels
       <AuditLogTable items={items} loading={loading} styles={styles} unitLabels={unitLabels} formatDate={formatDate} />
       {totalPages > 1 && (
         <div className={styles.pagination}>
-          <button className={styles.pageBtn} disabled={page <= 1} onClick={() => setPage((current) => current - 1)}>
+          <Button
+            variant="outline"
+            className={styles.pageBtn}
+            disabled={page <= 1}
+            onClick={() => setPage((current) => current - 1)}
+          >
             ← Anterior
-          </button>
+          </Button>
           <span className={styles.pageInfo}>
             Página {page} de {totalPages}
           </span>
-          <button
+          <Button
+            variant="outline"
             className={styles.pageBtn}
             disabled={page >= totalPages}
             onClick={() => setPage((current) => current + 1)}
           >
             Próxima →
-          </button>
+          </Button>
         </div>
       )}
     </div>

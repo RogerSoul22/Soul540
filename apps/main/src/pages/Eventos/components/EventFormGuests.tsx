@@ -1,3 +1,4 @@
+import { Input } from '../../../../../../packages/pentagono/src/index';
 import type { EventFormController } from '../types/event-form-controller';
 import styles from '../styles/Eventos.module.scss';
 
@@ -10,9 +11,8 @@ export default function EventFormGuests({ controller }: { controller: EventFormC
         <p className={styles.formSectionTitle}>Convidados</p>
         <div className={styles.formGrid2}>
           <div className={styles.formGroup}>
-            <label className={styles.label}>Total de Convidados</label>
-            <input
-              className={styles.input}
+            <Input
+              label="Total de Convidados"
               type="number"
               value={form.guestCount}
               onChange={(e) => setForm({ ...form, guestCount: e.target.value })}
@@ -21,9 +21,8 @@ export default function EventFormGuests({ controller }: { controller: EventFormC
             />
           </div>
           <div className={styles.formGroup}>
-            <label className={styles.label}>Acima de 12 anos</label>
-            <input
-              className={styles.input}
+            <Input
+              label="Acima de 12 anos"
               type="number"
               value={form.guestsAdult}
               onChange={(e) => setForm({ ...form, guestsAdult: e.target.value })}
@@ -34,9 +33,8 @@ export default function EventFormGuests({ controller }: { controller: EventFormC
         </div>
         <div className={styles.formGrid2}>
           <div className={styles.formGroup}>
-            <label className={styles.label}>De 8 até 12 anos</label>
-            <input
-              className={styles.input}
+            <Input
+              label="De 8 até 12 anos"
               type="number"
               value={form.guestsTeen}
               onChange={(e) => setForm({ ...form, guestsTeen: e.target.value })}
@@ -45,9 +43,8 @@ export default function EventFormGuests({ controller }: { controller: EventFormC
             />
           </div>
           <div className={styles.formGroup}>
-            <label className={styles.label}>Abaixo de 7 anos</label>
-            <input
-              className={styles.input}
+            <Input
+              label="Abaixo de 7 anos"
               type="number"
               value={form.guestsChild}
               onChange={(e) => setForm({ ...form, guestsChild: e.target.value })}

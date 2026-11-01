@@ -15,5 +15,3 @@
     "preview": "cd ../.. && vite preview --config apps/franchise/vite.config.ts"
   }
 }
-
-

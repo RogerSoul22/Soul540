@@ -1,15 +1,10 @@
 @use '../../../styles/variables' as *;
-
 @use '../../../styles/mixins' as *;
 
-// Portals grid
 .portalsGrid {
   display: grid;
-
-  grid-template-columns: 1fr 1fr;
-
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: $spacing-md;
-
   margin-bottom: $spacing-xl;
 
   @include mobile {
@@ -18,116 +13,131 @@
 }
 
 .portalCard {
-  @include card;
-
-  padding: $spacing-lg;
-
-  display: flex;
-
-  flex-direction: column;
-
-  gap: $spacing-md;
+  --portal-accent: #f59e0b;
 
   position: relative;
-
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  padding: $spacing-lg;
   overflow: hidden;
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--portal-accent) 14%, transparent), transparent 55%),
+    $bg-card;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  transition:
+    transform $transition-base,
+    border-color $transition-base,
+    box-shadow $transition-base;
 
   &::before {
     content: '';
-
     position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: var(--portal-accent);
+  }
 
-    top: 0;
-    left: 0;
-    right: 0;
-
-    height: 2px;
+  &:hover {
+    border-color: color-mix(in srgb, var(--portal-accent) 45%, transparent);
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
   }
 }
 
-.portalAmber::before {
-  background: linear-gradient(90deg, $accent, #fbbf24);
+.portalAmber {
+  --portal-accent: #f59e0b;
 }
 
-.portalBlue::before {
-  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+.portalBlue {
+  --portal-accent: #3b82f6;
 }
 
 .portalTop {
   display: flex;
-
   align-items: center;
-
-  gap: $spacing-sm;
+  gap: $spacing-md;
 }
 
 .portalIcon {
-  width: 36px;
-
-  height: 36px;
-
-  border-radius: $radius-sm;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
+  display: grid;
   flex-shrink: 0;
-
-  background: rgba(255, 255, 255, 0.06);
-
-  color: $text-secondary;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  color: var(--portal-accent);
+  font-size: 22px;
+  background: color-mix(in srgb, var(--portal-accent) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--portal-accent) 30%, transparent);
+  border-radius: $radius-md;
 }
 
-.portalAmber .portalIcon {
-  background: rgba($accent, 0.1);
-  color: $accent;
-}
-
-.portalBlue .portalIcon {
-  background: rgba(59, 130, 246, 0.1);
-  color: #60a5fa;
+.portalHeading {
+  flex: 1;
+  min-width: 0;
 }
 
 .portalLabel {
-  font-size: $font-size-sm;
-
-  font-weight: $font-weight-semibold;
-
+  overflow: hidden;
   color: $text-primary;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  letter-spacing: -0.2px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .portalSub {
-  font-size: $font-size-xs;
-
-  color: $text-muted;
-
   margin-top: 2px;
+  color: $text-muted;
+  font-size: $font-size-sm;
 }
 
-.portalStatus {
+.portalDetails {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-sm;
+}
+
+.portalDetail {
   display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: $spacing-sm $spacing-md;
+  background: $bg-tertiary;
+  border-radius: $radius-sm;
 
-  align-items: center;
+  dt {
+    color: $text-muted;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
 
-  gap: 6px;
-
-  margin-left: auto;
+  dd {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: $text-primary;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+  }
 }
 
 .statusDot {
   width: 8px;
-
   height: 8px;
-
   border-radius: 50%;
-
-  background: rgba(255, 255, 255, 0.2);
 }
 
 .statusOnline {
   background: #22c55e;
   box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
+}
+
+.statusPending {
+  background: #f59e0b;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
 }

@@ -33,4 +33,3 @@ A visualização e as ações dependem da permissão da página e das permissõe
 - Definir quais intenções podem alterar dados.
 - Definir se confirmação é obrigatória para cada tipo de ação.
 - Implementar autorização e filtros de tenant nas ações do chat.
-

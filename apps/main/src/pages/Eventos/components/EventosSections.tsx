@@ -1,3 +1,4 @@
+import { Button, EmptyState, Heading } from '../../../../../../packages/pentagono/src/index';
 import EventCard from './EventCard';
 import type { EventosController } from '../hooks/use-eventos-controller';
 import { eventValue, groupByMonth } from '../support/event-listing';
@@ -27,12 +28,15 @@ export default function EventosSections({ controller }: { controller: EventosCon
   const hasEvents = Object.values(filtered).some((events) => events.length > 0);
   if (!hasEvents)
     return (
-      <div className={styles.empty}>
-        <p>Nenhum evento encontrado.</p>
-        <button className={styles.emptyBtn} onClick={openCreate}>
-          Criar primeiro agendamento
-        </button>
-      </div>
+      <EmptyState
+        className={styles.empty}
+        title="Nenhum evento encontrado."
+        action={
+          <Button variant="outline" className={styles.emptyBtn} onClick={openCreate}>
+            Criar primeiro agendamento
+          </Button>
+        }
+      />
     );
   return (
     <div className={styles.sections}>
@@ -42,11 +46,11 @@ export default function EventosSections({ controller }: { controller: EventosCon
         const total = events.reduce((sum, event) => sum + eventValue(event), 0);
         return (
           <div key={key} className={styles.section}>
-            <button className={styles.sectionHeader} onClick={() => toggleSection(key)}>
+            <Button variant="outline" className={styles.sectionHeader} onClick={() => toggleSection(key)}>
               <div className={styles.sectionHeaderLeft}>
-                <h2 className={styles.sectionTitle} style={{ color: accent }}>
+                <Heading level={2} variant="section" className={styles.sectionTitle} style={{ color: accent }}>
                   {label}
-                </h2>
+                </Heading>
                 <span className={styles.sectionCount}>
                   {events.length} evento{events.length !== 1 ? 's' : ''}
                 </span>
@@ -69,7 +73,7 @@ export default function EventosSections({ controller }: { controller: EventosCon
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
               </div>
-            </button>
+            </Button>
             {!isCollapsed &&
               (events.length === 0 ? (
                 <p className={styles.sectionEmpty}>Nenhum evento.</p>
@@ -79,7 +83,8 @@ export default function EventosSections({ controller }: { controller: EventosCon
                   const monthTotal = group.events.reduce((sum, event) => sum + eventValue(event), 0);
                   return (
                     <div key={group.key} className={styles.monthGroup}>
-                      <button
+                      <Button
+                        variant="chip"
                         className={`${styles.monthCard} ${isOpen ? styles.monthCardOpen : ''}`}
                         onClick={() => toggleMonth(group.key)}
                       >
@@ -95,7 +100,7 @@ export default function EventosSections({ controller }: { controller: EventosCon
                             ⌄
                           </span>
                         </div>
-                      </button>
+                      </Button>
                       {isOpen && (
                         <div className={styles.monthCardBody}>
                           {group.events.map((event) => (

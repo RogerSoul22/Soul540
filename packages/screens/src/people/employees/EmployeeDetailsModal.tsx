@@ -1,4 +1,4 @@
-import { Badge } from '../../../../ui/src/index';
+import { Badge, Button, Heading } from '../../../../pentagono/src/index';
 import EmployeeModalFrame from './EmployeeModalFrame';
 import frameStyles from './styles/EmployeeModalFrame.module.scss';
 import { dayLabels, days, employeeStatusConfig, roleLabels, type Employee } from './employee-types';
@@ -19,18 +19,18 @@ export default function EmployeeDetailsModal({ employee, onClose, onEdit }: Empl
     <EmployeeModalFrame
       footer={
         <>
-          <button className={frameStyles.cancelButton} onClick={onClose}>
+          <Button variant="ghost" onClick={onClose}>
             Fechar
-          </button>
-          <button
-            className={frameStyles.primaryButton}
+          </Button>
+          <Button
+            variant="primary"
             onClick={() => {
               onClose();
               onEdit(employee);
             }}
           >
             Editar
-          </button>
+          </Button>
         </>
       }
       onClose={onClose}
@@ -60,7 +60,9 @@ function EmployeeTitle({
 }) {
   return (
     <div className={styles.titleGroup}>
-      <h2 className={styles.title}>{employee.name}</h2>
+      <Heading level={2} variant="section" className={styles.title}>
+        {employee.name}
+      </Heading>
       <div className={styles.badges}>
         <Badge variant="blue">{roleLabels[employee.role]}</Badge>
         <Badge variant={statusColor}>{statusLabel}</Badge>

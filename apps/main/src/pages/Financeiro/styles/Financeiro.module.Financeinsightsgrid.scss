@@ -74,24 +74,8 @@
   background: #dc5962;
 }
 
-.financeRankingItemButton {
-  width: 100%;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
-}
-
 .financeRankingItemButton:hover .financeRankingItem span {
   color: #a85f00;
-}
-
-.originCards {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  margin-top: 14px;
 }
 
 .originCards > div {

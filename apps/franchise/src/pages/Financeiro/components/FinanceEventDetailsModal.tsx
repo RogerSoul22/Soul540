@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 import type { PizzaEvent } from '../../../types/Event';
-import { Modal } from '../../../../../../packages/ui/src/index';
+import { Button, Modal } from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/Financeiro.module.scss';
 
 type FinanceEventDetailsController = {
@@ -75,8 +75,8 @@ export default function FinanceEventDetailsModal({ controller }: FinanceEventDet
           </div>
           <div className={styles.eventDetailActions}>
             {selectedFinancialEvent.financialStatus === 'closed' ? (
-              <button
-                className={styles.btnExport}
+              <Button
+                variant="secondary"
                 type="button"
                 onClick={async () => {
                   await reopenEventFinance(selectedFinancialEvent.id);
@@ -84,10 +84,10 @@ export default function FinanceEventDetailsModal({ controller }: FinanceEventDet
                 }}
               >
                 Reabrir financeiro
-              </button>
+              </Button>
             ) : (
-              <button
-                className={styles.btnExport}
+              <Button
+                variant="secondary"
                 type="button"
                 onClick={async () => {
                   await closeEventFinance(selectedFinancialEvent.id);
@@ -95,7 +95,7 @@ export default function FinanceEventDetailsModal({ controller }: FinanceEventDet
                 }}
               >
                 Fechar financeiro
-              </button>
+              </Button>
             )}
           </div>
         </Modal>

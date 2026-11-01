@@ -2,7 +2,8 @@ import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { apiFetch } from '../../lib/api';
-import { Button, Input, useTheme } from '../../../../../packages/ui/src/index';
+import { useTheme } from '../../../../../packages/ui/src/index';
+import { Button, Card, Heading, Input, PageHeader, ThemeSwitch } from '../../../../../packages/pentagono/src/index';
 import styles from './styles/Usuario.module.scss';
 
 export default function Usuario() {
@@ -44,17 +45,14 @@ export default function Usuario() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.header}>
-        <div className={styles.headerLeft}>
-          <h1 className={styles.title}>Minha Conta</h1>
-          <p className={styles.subtitle}>Gerencie seu perfil</p>
-        </div>
-      </div>
+      <PageHeader title="Minha Conta" subtitle="Gerencie seu perfil" />
 
-      <div className={styles.profileCard}>
+      <Card className={styles.profileCard}>
         <div className={styles.profileAvatar}>{user?.name?.charAt(0) || 'A'}</div>
         <div className={styles.profileInfo}>
-          <h2 className={styles.profileName}>{user?.name || 'Administrador'}</h2>
+          <Heading level={2} variant="section" className={styles.profileName}>
+            {user?.name || 'Administrador'}
+          </Heading>
           <p className={styles.profileRole}>
             {user?.role === 'admin' ? 'Administrador' : user?.role === 'manager' ? 'Gerente' : 'Equipe'}
           </p>
@@ -71,14 +69,16 @@ export default function Usuario() {
             );
           })}
         </div>
-      </div>
+      </Card>
 
       {(saved || passwordSaved) && <div className={styles.toast}>Salvo com sucesso!</div>}
 
       <div className={styles.tabContent}>
         <form className={styles.form} onSubmit={handleSaveProfile}>
           <div className={styles.formSection}>
-            <h3 className={styles.formSectionTitle}>Dados Pessoais</h3>
+            <Heading level={3} variant="section" className={styles.formSectionTitle}>
+              Dados Pessoais
+            </Heading>
             <div className={styles.formGrid}>
               <Input
                 label="Nome Completo"
@@ -104,7 +104,9 @@ export default function Usuario() {
           </div>
 
           <div className={styles.formSection}>
-            <h3 className={styles.formSectionTitle}>Seguranca</h3>
+            <Heading level={3} variant="section" className={styles.formSectionTitle}>
+              Seguranca
+            </Heading>
             <div className={styles.passwordRow}>
               <div className={styles.formField} style={{ flex: 1 }}>
                 <Input label="Senha Atual" type="password" value="********" readOnly />
@@ -133,21 +135,15 @@ export default function Usuario() {
           </div>
 
           <div className={styles.formSection}>
-            <h3 className={styles.formSectionTitle}>Aparencia</h3>
+            <Heading level={3} variant="section" className={styles.formSectionTitle}>
+              Aparencia
+            </Heading>
             <div className={styles.settingRow}>
               <div className={styles.settingInfo}>
                 <span className={styles.settingLabel}>Modo Escuro</span>
                 <span className={styles.settingDesc}>Tema escuro para o sistema</span>
               </div>
-              <Button
-                type="button"
-                variant="ghost"
-                className={styles.toggle}
-                aria-pressed={isDark}
-                onClick={toggleTheme}
-              >
-                {isDark ? 'Ativado' : 'Desativado'}
-              </Button>
+              <ThemeSwitch isDark={isDark} onToggle={toggleTheme} />
             </div>
           </div>
 

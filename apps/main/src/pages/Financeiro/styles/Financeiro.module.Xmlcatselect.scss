@@ -43,35 +43,6 @@
   }
 }
 
-.walletBreakdown {
-  display: grid;
-
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  gap: 8px;
-
-  margin-top: 12px;
-
-  div {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding: 10px;
-    border: 1px solid #e1e8f1;
-    border-radius: 5px;
-    background: #f8fafc;
-  }
-
-  span {
-    color: #64748b;
-    font-size: 11px;
-  }
-
-  strong {
-    font-size: 14px;
-  }
-}
-
 .ofxType {
   flex-shrink: 0;
   padding: 3px 7px;

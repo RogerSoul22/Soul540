@@ -1,0 +1,7 @@
+@layer pentagono {
+  .label {
+    color: var(--pentagono-color-text-secondary);
+    font-size: var(--pentagono-text-sm);
+    font-weight: var(--pentagono-font-medium);
+  }
+}

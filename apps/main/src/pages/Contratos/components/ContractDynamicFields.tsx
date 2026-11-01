@@ -1,3 +1,4 @@
+import { Input, Label, Textarea } from '../../../../../../packages/pentagono/src/index';
 import type { FormData } from '../types/contract-types';
 import styles from '../styles/Contratos.module.scss';
 
@@ -11,16 +12,16 @@ export default function ContractDynamicFields({ fields, form, onChange }: Props)
     <>
       {fields.map(([field, label, multiline]) => (
         <div key={field} className={styles.formGroup}>
-          <label className={styles.label}>{label}</label>
+          <Label className={styles.label}>{label}</Label>
           {multiline ? (
-            <textarea
+            <Textarea
               className={styles.input}
               rows={2}
               value={String(form[field])}
               onChange={(event) => onChange(field, event.target.value)}
             />
           ) : (
-            <input
+            <Input
               className={styles.input}
               value={String(form[field])}
               onChange={(event) => onChange(field, event.target.value)}

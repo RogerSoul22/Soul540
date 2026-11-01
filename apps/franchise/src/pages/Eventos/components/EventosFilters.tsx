@@ -1,3 +1,4 @@
+import { Button, Input } from '../../../../../../packages/pentagono/src/index';
 import type { EventosController } from '../hooks/use-eventos-controller';
 import styles from '../styles/Eventos.module.scss';
 
@@ -31,7 +32,8 @@ export default function EventosFilters({ controller }: { controller: EventosCont
           <circle cx="11" cy="11" r="8" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
-        <input
+        <Input
+          variant="search"
           className={styles.searchInput}
           placeholder="Buscar eventos..."
           value={search}
@@ -40,30 +42,33 @@ export default function EventosFilters({ controller }: { controller: EventosCont
       </div>
       <div className={styles.unitFilter}>
         {(['all', 'main', 'franchise'] as const).map((filter) => (
-          <button
+          <Button
+            variant="chip"
             key={filter}
             className={`${styles.unitFilterBtn} ${sourceFilter === filter ? styles.unitFilterBtnActive : ''}`}
             onClick={() => setSourceFilter(filter)}
           >
             {filter === 'all' ? 'Todos' : filter === 'main' ? 'Sorocaba' : 'Itu'}
-          </button>
+          </Button>
         ))}
       </div>
       <div className={styles.unitFilter}>
         {(['all', 'feirinha', 'evento_avulso'] as const).map((filter) => (
-          <button
+          <Button
+            variant="chip"
             key={filter}
             className={`${styles.unitFilterBtn} ${modalityFilter === filter ? styles.unitFilterBtnActive : ''}`}
             onClick={() => setModalityFilter(filter)}
           >
             {filter === 'all' ? 'Todas modalidades' : filter === 'feirinha' ? 'Feirinhas' : 'Eventos avulsos'}
-          </button>
+          </Button>
         ))}
       </div>
       <div className={styles.dateFilterWrap}>
         <div className={styles.dateFilterToggle}>
           {(['month', 'date'] as const).map((mode) => (
-            <button
+            <Button
+              variant="chip"
               key={mode}
               className={`${styles.dateFilterModeBtn} ${dateFilterMode === mode ? styles.dateFilterModeBtnActive : ''}`}
               onClick={() => {
@@ -72,10 +77,10 @@ export default function EventosFilters({ controller }: { controller: EventosCont
               }}
             >
               {mode === 'month' ? 'Mês' : 'Data'}
-            </button>
+            </Button>
           ))}
         </div>
-        <input
+        <Input
           type={dateFilterMode}
           className={styles.filterDate}
           value={dateFilter}
@@ -83,9 +88,15 @@ export default function EventosFilters({ controller }: { controller: EventosCont
           title={dateFilterMode === 'month' ? 'Filtrar por mês' : 'Filtrar por data'}
         />
         {dateFilter && (
-          <button className={styles.clearDateBtn} onClick={() => setDateFilter('')} title="Limpar filtro">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={styles.clearDateBtn}
+            onClick={() => setDateFilter('')}
+            title="Limpar filtro"
+          >
             ✕
-          </button>
+          </Button>
         )}
       </div>
     </div>

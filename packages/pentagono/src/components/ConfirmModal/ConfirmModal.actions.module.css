@@ -1,0 +1,47 @@
+.cancel,
+.confirm,
+.confirmDanger {
+  font-family: inherit;
+  font-size: var(--pentagono-text-sm);
+  border-radius: var(--pentagono-radius-sm);
+  cursor: pointer;
+}
+
+.cancel {
+  padding: 10px var(--pentagono-space-3);
+  color: var(--pentagono-color-text-muted);
+  background: none;
+  border: none;
+  transition: color var(--pentagono-transition-fast);
+}
+
+.cancel:hover {
+  color: var(--pentagono-color-text);
+}
+
+.confirm {
+  padding: 10px var(--pentagono-space-4);
+  color: var(--pentagono-color-on-brand);
+  font-weight: var(--pentagono-font-semibold);
+  background: var(--pentagono-color-brand);
+  border: none;
+  transition: background var(--pentagono-transition-fast);
+}
+
+.confirm:hover {
+  background: var(--pentagono-color-brand-hover);
+}
+
+.confirmDanger {
+  padding: 10px var(--pentagono-space-4);
+  color: #f87171;
+  font-weight: var(--pentagono-font-semibold);
+  background: var(--pentagono-color-danger-soft);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  transition: all var(--pentagono-transition-fast);
+}
+
+.confirmDanger:hover {
+  background: rgba(239, 68, 68, 0.22);
+  border-color: rgba(239, 68, 68, 0.5);
+}

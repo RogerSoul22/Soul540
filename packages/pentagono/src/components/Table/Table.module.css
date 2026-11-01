@@ -1,0 +1,49 @@
+/* Camada: classes da página (fora de @layer) sempre vencem o padrão do Pentágono. */
+@layer pentagono {
+  .wrap {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--pentagono-color-text);
+    font-size: var(--pentagono-text-sm);
+  }
+
+  .headCell {
+    padding: 12px var(--pentagono-space-3);
+    color: var(--pentagono-color-text-muted);
+    font-size: var(--pentagono-text-xs);
+    font-weight: var(--pentagono-font-semibold);
+    letter-spacing: 1px;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--pentagono-color-border);
+  }
+
+  .row {
+    border-bottom: 1px solid var(--pentagono-color-border-subtle);
+    transition: background var(--pentagono-transition-fast);
+  }
+
+  .interactive {
+    cursor: pointer;
+  }
+
+  .interactive:hover {
+    background: var(--pentagono-color-hover);
+  }
+
+  .cell {
+    padding: 12px var(--pentagono-space-3);
+    vertical-align: middle;
+  }
+
+  .compact .headCell,
+  .compact .cell {
+    padding: var(--pentagono-space-2) var(--pentagono-space-3);
+  }
+}

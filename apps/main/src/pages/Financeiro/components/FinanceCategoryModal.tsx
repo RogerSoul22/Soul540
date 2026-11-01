@@ -1,5 +1,4 @@
-import { Button } from '../../../../../../packages/ui/src/index';
-import { Modal } from '../../../../../../packages/ui/src/index';
+import { Button, Input, Modal, Select } from '../../../../../../packages/pentagono/src/index';
 import { DRE_SECTIONS } from '../../../../../../shared/finance/financeCategories';
 import type { DreSection } from '../../../../../../packages/contracts/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
@@ -22,10 +21,9 @@ export default function FinanceCategoryModal({ controller }: { controller: Finan
     <Modal title="Nova Categoria" size="sm" onClose={() => setShowCategoryModal(false)}>
       <div className={styles.form}>
         <div className={styles.formField}>
-          <label className={styles.formLabel}>Nome da categoria</label>
-          <input
+          <Input
+            label="Nome da categoria"
             type="text"
-            className={styles.formInput}
             value={newCategoryLabel}
             onChange={(event) => setNewCategoryLabel(event.target.value)}
             placeholder="Ex: Manutenção de Fornos"
@@ -33,9 +31,8 @@ export default function FinanceCategoryModal({ controller }: { controller: Finan
           />
         </div>
         <div className={styles.formField}>
-          <label className={styles.formLabel}>Seção do DRE</label>
-          <select
-            className={styles.formSelect}
+          <Select
+            label="Seção do DRE"
             value={newCategorySection}
             onChange={(event) => setNewCategorySection(event.target.value as DreSection)}
           >
@@ -44,7 +41,7 @@ export default function FinanceCategoryModal({ controller }: { controller: Finan
                 {section.label}
               </option>
             ))}
-          </select>
+          </Select>
           <p className={styles.formHint}>Define em qual linha do DRE essa categoria entra na exportação.</p>
         </div>
         <div className={styles.formActions}>

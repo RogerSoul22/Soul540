@@ -1,3 +1,4 @@
+import { Button, EmptyState, Heading, Input, Select } from '../../../../../../packages/pentagono/src/index';
 import type { SuppliesController } from '../hooks/use-supplies-controller';
 import { statusConfig, type SupplyStatus } from '../types/supply-types';
 import styles from '../styles/EstoqueInsumos.module.scss';
@@ -21,13 +22,14 @@ export default function SupplyCatalog({ controller }: { controller: SuppliesCont
   return (
     <>
       <div className={styles.filters}>
-        <input
+        <Input
+          variant="search"
           className={styles.searchInput}
           placeholder="Buscar por nome ou categoria"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         />
-        <select
+        <Select
           className={styles.select}
           value={statusFilter}
           onChange={(event) => setStatusFilter(event.target.value as 'all' | SupplyStatus)}
@@ -37,27 +39,29 @@ export default function SupplyCatalog({ controller }: { controller: SuppliesCont
           <option value="estoque_baixo">Estoque baixo</option>
           <option value="sem_estoque">Sem estoque</option>
           <option value="vencido">Vencido</option>
-        </select>
+        </Select>
       </div>
       <div className={styles.categories}>
-        <button
+        <Button
+          variant="chip"
           className={selectedCategory === null ? styles.categoryActive : styles.category}
           onClick={() => setSelectedCategory(null)}
         >
           Todos ({supplies.length})
-        </button>
+        </Button>
         {categories.map((category) => (
-          <button
+          <Button
+            variant="chip"
             key={category}
             className={selectedCategory === category ? styles.categoryActive : styles.category}
             onClick={() => setSelectedCategory(category)}
           >
             {category} ({supplies.filter((supply) => supply.category === category).length})
-          </button>
+          </Button>
         ))}
       </div>
       {!filtered.length ? (
-        <div className={styles.emptyState}>Nenhum insumo encontrado.</div>
+        <EmptyState title="Nenhum insumo encontrado." />
       ) : (
         <div className={styles.grid}>
           {filtered.map((supply) => {
@@ -70,7 +74,9 @@ export default function SupplyCatalog({ controller }: { controller: SuppliesCont
               >
                 <div className={styles.cardHeader}>
                   <div>
-                    <h3 className={styles.cardTitle}>{supply.name}</h3>
+                    <Heading level={3} variant="section" className={styles.cardTitle}>
+                      {supply.name}
+                    </Heading>
                     <p className={styles.cardCategory}>{supply.category || 'Sem categoria'}</p>
                   </div>
                   <span className={styles.statusPill + ' ' + styles[status.color]}>{status.label}</span>
@@ -93,33 +99,34 @@ export default function SupplyCatalog({ controller }: { controller: SuppliesCont
                   </span>
                 </div>
                 <div className={styles.cardActions}>
-                  <button
-                    className={styles.btnEdit}
+                  <Button
+                    variant="secondary"
+                    size="sm"
                     onClick={(event) => {
                       event.stopPropagation();
                       openEdit(supply);
                     }}
                   >
                     Editar
-                  </button>
-                  <button
-                    className={styles.btnDelete}
+                  </Button>
+                  <Button
+                    variant="danger"
                     onClick={(event) => {
                       event.stopPropagation();
                       setDeleteSupply(supply.id);
                     }}
                   >
                     Excluir
-                  </button>
+                  </Button>
                 </div>
               </article>
             );
           })}
         </div>
       )}
-      <button className={styles.cardAdd} onClick={openCreate}>
+      <Button variant="dashed" className={styles.cardAdd} onClick={openCreate}>
         + Adicionar insumo
-      </button>
+      </Button>
     </>
   );
 }

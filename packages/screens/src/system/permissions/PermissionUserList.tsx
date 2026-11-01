@@ -1,3 +1,4 @@
+import { Button, Input } from '../../../../pentagono/src/index';
 import { unitLabels, type AppUser, type StyleMap } from './permission-types';
 
 interface PermissionUserListProps {
@@ -24,14 +25,16 @@ export default function PermissionUserList({
   return (
     <section className={styles.userList}>
       <p className={styles.listTitle}>Usuários ({users.length})</p>
-      <input
+      <Input
+        variant="search"
         className={styles.searchInput}
         onChange={(event) => onSearch(event.target.value)}
         placeholder="Buscar usuários..."
         value={search}
       />
       {users.map((user) => (
-        <button
+        <Button
+          variant="outline"
           className={`${styles.userCard} ${selectedId === user.id ? styles.userCardActive : ''}`}
           key={user.id}
           onClick={() => onSelect(user)}
@@ -56,7 +59,7 @@ export default function PermissionUserList({
               Senha
             </span>
           ) : null}
-        </button>
+        </Button>
       ))}
     </section>
   );

@@ -31,4 +31,3 @@ A visualização e as ações dependem da permissão da página e das permissõe
 
 - Definir retenção e arquivamento dos registros.
 - Definir se dados sensíveis devem ser mascarados na visualização.
-

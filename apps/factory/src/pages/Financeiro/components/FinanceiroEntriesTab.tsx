@@ -1,3 +1,4 @@
+import { Button, Input } from '../../../../../../packages/pentagono/src/index';
 import type { useFinanceiroController } from '../hooks/use-financeiro-controller';
 
 type Controller = ReturnType<typeof useFinanceiroController>;
@@ -18,7 +19,8 @@ export default function FinanceiroEntriesTab({ controller }: Props) {
       <div className={styles.filterRow}>
         <div className={styles.filterGroup}>
           {(['all', 'revenue', 'cost', 'pending'] as FilterType[]).map((type) => (
-            <button
+            <Button
+              variant="chip"
               key={type}
               className={`${styles.filterBtn} ${filterType === type ? styles.filterBtnActive : ''}`}
               onClick={() => {
@@ -27,10 +29,11 @@ export default function FinanceiroEntriesTab({ controller }: Props) {
               }}
             >
               {type === 'all' ? 'Todos' : type === 'revenue' ? 'Receitas' : type === 'pending' ? 'Pendentes' : 'Custos'}
-            </button>
+            </Button>
           ))}
         </div>
-        <input
+        <Input
+          variant="search"
           type="text"
           className={styles.searchInput}
           placeholder="Buscar por descricao, categoria..."
@@ -40,7 +43,7 @@ export default function FinanceiroEntriesTab({ controller }: Props) {
             setLancamentosPage(1);
           }}
         />
-        <button className={styles.btnExport} onClick={exportCSV} title="Exportar lancamentos filtrados para CSV">
+        <Button variant="secondary" onClick={exportCSV} title="Exportar lancamentos filtrados para CSV">
           <svg
             width="14"
             height="14"
@@ -56,8 +59,8 @@ export default function FinanceiroEntriesTab({ controller }: Props) {
             <line x1="12" y1="15" x2="12" y2="3" />
           </svg>
           Exportar CSV
-        </button>
-        <button className={styles.btnExport} onClick={exportDRE} title="Exportar DRE mensal por secao">
+        </Button>
+        <Button variant="secondary" onClick={exportDRE} title="Exportar DRE mensal por secao">
           <svg
             width="14"
             height="14"
@@ -74,7 +77,7 @@ export default function FinanceiroEntriesTab({ controller }: Props) {
             <line x1="16" y1="17" x2="8" y2="17" />
           </svg>
           Exportar DRE
-        </button>
+        </Button>
       </div>
 
       <FinanceiroEntriesTable controller={controller} />

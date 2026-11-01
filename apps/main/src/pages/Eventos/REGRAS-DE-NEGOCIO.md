@@ -37,4 +37,3 @@ A visualização e as ações dependem da permissão da página e das permissõe
 - Aprovar máquina de estados.
 - Definir política de cancelamento com sinal pago.
 - Definir fechamento financeiro, reabertura e exclusão/arquivamento.
-

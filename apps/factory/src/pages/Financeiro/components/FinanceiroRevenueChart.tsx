@@ -1,3 +1,4 @@
+import { Heading } from '../../../../../../packages/pentagono/src/index';
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
 import styles from '../styles/Financeiro.module.scss';
@@ -16,7 +17,9 @@ type Props = {
 export default function FinanceiroRevenueChart({ monthlyData }: Props) {
   return (
     <div className={styles.chartSection}>
-      <h3 className={styles.sectionTitle}>Receita x Despesas por Mes</h3>
+      <Heading level={3} variant="section" className={styles.sectionTitle}>
+        Receita x Despesas por Mes
+      </Heading>
       <div className={styles.chartContainer}>
         <ResponsiveContainer width="100%" height={320}>
           <BarChart data={monthlyData} barGap={4} barCategoryGap="15%">

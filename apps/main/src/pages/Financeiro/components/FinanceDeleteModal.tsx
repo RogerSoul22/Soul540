@@ -1,5 +1,5 @@
 import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
-import { Modal } from '../../../../../../packages/ui/src/index';
+import { Button, Modal } from '../../../../../../packages/pentagono/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
 import styles from '../styles/Financeiro.module.scss';
 
@@ -23,17 +23,17 @@ export default function FinanceDeleteModal({ controller }: { controller: Finance
           </span>
         </div>
         <div className={styles.eventDetailActions}>
-          <button
-            className={styles.btnExport}
+          <Button
+            variant="secondary"
             type="button"
             disabled={deletingFinance}
             onClick={() => setFinancePendingDelete(null)}
           >
             Cancelar
-          </button>
-          <button className={styles.btnDanger} type="button" disabled={deletingFinance} onClick={confirmFinanceDelete}>
+          </Button>
+          <Button variant="danger" type="button" disabled={deletingFinance} onClick={confirmFinanceDelete}>
             {deletingFinance ? 'Processando...' : 'Confirmar exclusão'}
-          </button>
+          </Button>
         </div>
       </div>
     </Modal>

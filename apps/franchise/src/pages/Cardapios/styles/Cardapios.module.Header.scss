@@ -33,13 +33,6 @@
 }
 
 // Custom Preview
-.previewBody {
-  padding: $spacing-xl;
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-lg;
-}
-
 .previewHeader {
   font-size: $font-size-sm;
   color: $text-muted;
@@ -60,43 +53,10 @@
   text-align: center;
 }
 
-.previewCat {
-}
-
-.previewCatName {
-  font-size: $font-size-sm;
-  font-weight: $font-weight-semibold;
-  color: $text-primary;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding-bottom: $spacing-sm;
-  border-bottom: 1px solid $border;
-  margin-bottom: $spacing-sm;
-}
-
 .previewItem {
   @include flex-between;
   padding: $spacing-sm 0;
   gap: $spacing-md;
-}
-
-.previewItemName {
-  font-size: $font-size-sm;
-  font-weight: $font-weight-medium;
-  color: $text-primary;
-}
-
-.previewItemDesc {
-  font-size: $font-size-xs;
-  color: $text-muted;
-  margin-top: 2px;
-}
-
-.previewItemPrice {
-  font-size: $font-size-sm;
-  font-weight: $font-weight-semibold;
-  color: $accent;
-  flex-shrink: 0;
 }
 
 .previewFooter {

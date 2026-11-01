@@ -34,4 +34,3 @@ A visualização e as ações dependem da permissão da página e das permissõe
 - Definir aprovação de comissão.
 - Definir comissão sobre sinal, saldo ou valor total.
 - Definir histórico de alterações de remuneração.
-

@@ -1,9 +1,10 @@
+import { Backdrop, Button } from '../../../../../packages/pentagono/src/index';
 import { format, isSameDay, isSameMonth, isToday, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { MouseEvent } from 'react';
 import type { PizzaEvent } from '../../types/Event';
 import styles from './styles/CalendarView.module.scss';
-import { IconChevronLeft, IconChevronRight } from './CalendarIcons';
+import { IconChevronDown, IconChevronLeft, IconChevronRight } from './CalendarIcons';
 import { getEventColor, isEventStart, MONTHS_PT, WEEK_DAYS } from './calendar-utils';
 import CalendarMonthDayCell from './CalendarMonthDayCell';
 
@@ -46,35 +47,46 @@ export default function CalendarMonthView({
     <div className={styles.wrapper}>
       <div className={styles.header}>
         <div className={styles.monthTitleWrap}>
-          <button className={styles.monthTitleBtn} onClick={onOpenPicker} title="Ir para um mês específico">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={styles.monthTitleBtn}
+            onClick={onOpenPicker}
+            title="Ir para um mês específico"
+          >
             <span className={styles.monthTitleText}>{format(currentMonth, 'MMMM', { locale: ptBR })}</span>
             <span className={styles.monthYear}>{format(currentMonth, ' yyyy')}</span>
-            <span className={styles.monthTitleChevron}>⌄</span>
-          </button>
+            <span className={styles.monthTitleChevron}>
+              <IconChevronDown />
+            </span>
+          </Button>
           {showPicker && (
             <>
-              <div className={styles.pickerOverlay} onClick={onClosePicker} />
+              <Backdrop className={styles.pickerOverlay} onClick={onClosePicker} />
               <div className={styles.picker}>
                 <div className={styles.pickerYearRow}>
-                  <button
+                  <Button
+                    variant="chip"
                     className={styles.pickerYearBtn}
                     onClick={() => onPickerYearChange(pickerYear - 1)}
                     aria-label="Ano anterior"
                   >
                     <IconChevronLeft />
-                  </button>
+                  </Button>
                   <span className={styles.pickerYearLabel}>{pickerYear}</span>
-                  <button
+                  <Button
+                    variant="chip"
                     className={styles.pickerYearBtn}
                     onClick={() => onPickerYearChange(pickerYear + 1)}
                     aria-label="Próximo ano"
                   >
                     <IconChevronRight />
-                  </button>
+                  </Button>
                 </div>
                 <div className={styles.pickerMonths}>
                   {MONTHS_PT.map((name, index) => (
-                    <button
+                    <Button
+                      variant="chip"
                       key={name}
                       className={[
                         styles.pickerMonth,
@@ -87,7 +99,7 @@ export default function CalendarMonthView({
                       onClick={() => onSelectPickerMonth(index)}
                     >
                       {name}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -95,16 +107,16 @@ export default function CalendarMonthView({
           )}
         </div>
         <div className={styles.headerRight}>
-          <button className={styles.todayBtn} onClick={onToday}>
+          <Button variant="chip" className={styles.todayBtn} onClick={onToday}>
             Hoje
-          </button>
+          </Button>
           <div className={styles.navBtns}>
-            <button className={styles.navBtn} onClick={onPreviousMonth} aria-label="Mês anterior">
+            <Button variant="outline" className={styles.navBtn} onClick={onPreviousMonth} aria-label="Mês anterior">
               <IconChevronLeft />
-            </button>
-            <button className={styles.navBtn} onClick={onNextMonth} aria-label="Próximo mês">
+            </Button>
+            <Button variant="outline" className={styles.navBtn} onClick={onNextMonth} aria-label="Próximo mês">
               <IconChevronRight />
-            </button>
+            </Button>
           </div>
         </div>
       </div>

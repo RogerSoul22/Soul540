@@ -1,3 +1,4 @@
+import { Button, EmptyState, Heading } from '../../../../../../packages/pentagono/src/index';
 import type { FinanceEntry } from '../../../../../../packages/contracts/src/index';
 import { FIXED_CATEGORIES, VARIABLE_CATEGORIES } from '../../../../../../shared/finance/financeCategories';
 import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
@@ -25,20 +26,23 @@ export default function FinanceExpensesTab({
       <div className={styles.filterRow}>
         <div className={styles.filterGroup}>
           {(['all', 'fixed', 'variable'] as CostFilter[]).map((f) => (
-            <button
+            <Button
+              variant="chip"
               key={f}
               className={`${styles.filterBtn} ${costFilter === f ? styles.filterBtnActive : ''}`}
               onClick={() => setCostFilter(f)}
             >
               {f === 'all' ? 'Todas' : f === 'fixed' ? 'Fixas' : 'Variaveis'}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
 
       {/* Category totals list */}
       <div className={styles.chartSection}>
-        <h3 className={styles.sectionTitle}>Total por Categoria</h3>
+        <Heading level={3} variant="section" className={styles.sectionTitle}>
+          Total por Categoria
+        </Heading>
         {(() => {
           const cats =
             costFilter === 'fixed'
@@ -58,28 +62,33 @@ export default function FinanceExpensesTab({
           const max = totals[0]?.total || 1;
           if (totals.length === 0)
             return (
-              <div className={styles.emptyStateBox}>
-                <svg
-                  width="32"
-                  height="32"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  style={{ color: '#64748b', marginBottom: 8 }}
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="8" x2="12" y2="12" />
-                  <line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-                <p className={styles.emptyStateTitle}>Nenhuma despesa no período selecionado.</p>
-                <p className={styles.emptyStateHint}>
-                  Registre despesas clicando em <strong>+ Novo Lançamento</strong> e escolhendo o tipo{' '}
-                  <strong>Custo</strong>.
-                </p>
-              </div>
+              <EmptyState
+                className={styles.emptyStateBox}
+                icon={
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ color: '#64748b', marginBottom: 8 }}
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                }
+                title="Nenhuma despesa no período selecionado."
+                description={
+                  <>
+                    Registre despesas clicando em <strong>+ Novo Lançamento</strong> e escolhendo o tipo{' '}
+                    <strong>Custo</strong>.
+                  </>
+                }
+              />
             );
           return (
             <div className={styles.catList}>

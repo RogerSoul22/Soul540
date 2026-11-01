@@ -1,4 +1,4 @@
-import { Button } from '../../../../ui/src/index';
+import { Button } from '../../../../pentagono/src/index';
 import type { AppUser, PermissionDirectoryConfig, StyleMap } from './permission-types';
 
 type Props = {

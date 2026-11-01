@@ -116,13 +116,6 @@
   margin-top: 4px;
 }
 
-.catItem {
-  @include flex-between;
-  padding: 6px $spacing-sm;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: $radius-xs;
-}
-
 .catName {
   font-size: $font-size-sm;
   color: $text-secondary;

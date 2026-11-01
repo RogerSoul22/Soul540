@@ -80,27 +80,3 @@
   }
 }
 
-.btnEdit {
-  flex: 1;
-
-  padding: 8px;
-
-  background: rgba(255, 255, 255, 0.04);
-
-  border: 1px solid $border;
-
-  border-radius: $radius-xs;
-
-  color: $text-secondary;
-
-  font-size: $font-size-sm;
-
-  cursor: pointer;
-
-  transition: all $transition-fast;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: $text-primary;
-  }
-}

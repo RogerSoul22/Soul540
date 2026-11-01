@@ -1,4 +1,4 @@
-import { Badge } from '../../../../ui/src/index';
+import { Badge, Button } from '../../../../pentagono/src/index';
 import { displayCategory } from './contractor-formatters';
 import ContractorModalFrame from './ContractorModalFrame';
 import { contractorStatusConfig, type Contractor } from './contractor-types';
@@ -27,18 +27,18 @@ export default function ContractorDetailsModal({
     <ContractorModalFrame
       footer={
         <>
-          <button className={styles.cancelButton} onClick={onClose}>
+          <Button variant="ghost" onClick={onClose}>
             Fechar
-          </button>
-          <button
-            className={styles.primaryButton}
+          </Button>
+          <Button
+            variant="primary"
             onClick={() => {
               onClose();
               onEdit(contractor);
             }}
           >
             Editar
-          </button>
+          </Button>
         </>
       }
       onClose={onClose}

@@ -32,30 +32,6 @@
   }
 }
 
-.btnBarClose {
-  padding: 6px;
-
-  border-radius: 6px;
-
-  border: none;
-
-  background: none;
-
-  color: rgba(255, 255, 255, 0.4);
-
-  cursor: pointer;
-
-  display: flex;
-
-  align-items: center;
-
-  transition: color 0.15s;
-
-  &:hover {
-    color: #fff;
-  }
-}
-
 // ——— Scroll area ———
 .scrollArea {
   flex: 1;

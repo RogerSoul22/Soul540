@@ -1,0 +1,42 @@
+/* Dados da API ainda carregando: preserva o tamanho do elemento final. */
+[data-skeleton]:not([data-skeleton='false']) {
+  color: transparent !important;
+  border-color: transparent !important;
+  background-image: linear-gradient(
+    90deg,
+    var(--pentagono-color-border) 20%,
+    var(--pentagono-color-surface-raised) 50%,
+    var(--pentagono-color-border) 80%
+  ) !important;
+  background-position: 0 0;
+  background-size: 200% 100% !important;
+  border-radius: var(--pentagono-radius-control);
+  box-shadow: none !important;
+  pointer-events: none;
+  user-select: none;
+  animation: pentagono-data-skeleton 1.4s ease-in-out infinite;
+}
+
+[data-skeleton]:not([data-skeleton='false']) * {
+  visibility: hidden;
+}
+
+[data-skeleton]:not([data-skeleton='false']):empty {
+  min-height: 1em;
+}
+
+@keyframes pentagono-data-skeleton {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-skeleton]:not([data-skeleton='false']) {
+    animation: none;
+  }
+}

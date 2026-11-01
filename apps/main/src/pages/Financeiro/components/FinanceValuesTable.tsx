@@ -1,3 +1,12 @@
+import {
+  EmptyState,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeadCell,
+  TableRow,
+} from '../../../../../../packages/pentagono/src/index';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
@@ -20,26 +29,26 @@ function safeDate(value: string) {
 }
 
 export default function FinanceValuesTable({ events, finances, onSelect }: FinanceValuesTableProps) {
-  if (events.length === 0) return <div className={styles.emptyState}>Nenhum evento com valor cadastrado.</div>;
+  if (events.length === 0) return <EmptyState title="Nenhum evento com valor cadastrado." />;
   return (
     <div className={styles.tableWrap}>
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Evento</th>
-            <th>Situação</th>
-            <th>Data</th>
-            <th>Valor Estimado</th>
-            <th>Deslocamento</th>
-            <th>Sinal Recebido</th>
-            <th>Valor Final</th>
-            <th>Custos vinculados</th>
-            <th>Resultado</th>
-            <th>Pagamento</th>
-            <th>Diferença</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table variant="plain" className={styles.table}>
+        <TableHead>
+          <TableRow>
+            <TableHeadCell>Evento</TableHeadCell>
+            <TableHeadCell>Situação</TableHeadCell>
+            <TableHeadCell>Data</TableHeadCell>
+            <TableHeadCell>Valor Estimado</TableHeadCell>
+            <TableHeadCell>Deslocamento</TableHeadCell>
+            <TableHeadCell>Sinal Recebido</TableHeadCell>
+            <TableHeadCell>Valor Final</TableHeadCell>
+            <TableHeadCell>Custos vinculados</TableHeadCell>
+            <TableHeadCell>Resultado</TableHeadCell>
+            <TableHeadCell>Pagamento</TableHeadCell>
+            <TableHeadCell>Diferença</TableHeadCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {events.map((event) => {
             const estimated = event.budget || 0;
             const travel = event.travelCost || 0;
@@ -51,7 +60,7 @@ export default function FinanceValuesTable({ events, finances, onSelect }: Finan
             const result = (finalValue || estimated) - costs;
             const difference = finalValue - estimated;
             return (
-              <tr
+              <TableRow
                 key={event.id}
                 className={styles.clickableRow}
                 onClick={() => onSelect(event)}
@@ -64,8 +73,8 @@ export default function FinanceValuesTable({ events, finances, onSelect }: Finan
                   }
                 }}
               >
-                <td>{event.name}</td>
-                <td>
+                <TableCell>{event.name}</TableCell>
+                <TableCell>
                   <span className={styles.financialStatus}>
                     {event.financialStatus === 'closed'
                       ? 'Fechado'
@@ -75,18 +84,20 @@ export default function FinanceValuesTable({ events, finances, onSelect }: Finan
                           ? 'Parcial'
                           : 'Em aberto'}
                   </span>
-                </td>
-                <td>{safeDate(event.date)}</td>
-                <td>{estimated > 0 ? formatBRL(estimated) : '—'}</td>
-                <td>{travel > 0 ? <span className={styles.amber}>{formatBRL(travel)}</span> : '—'}</td>
-                <td>{deposit > 0 ? <span className={styles.green}>{formatBRL(deposit)}</span> : '—'}</td>
-                <td>{finalValue > 0 ? <span className={styles.green}>{formatBRL(finalValue)}</span> : '—'}</td>
-                <td>{costs > 0 ? <span className={styles.red}>{formatBRL(costs)}</span> : '—'}</td>
-                <td>
+                </TableCell>
+                <TableCell>{safeDate(event.date)}</TableCell>
+                <TableCell>{estimated > 0 ? formatBRL(estimated) : '—'}</TableCell>
+                <TableCell>{travel > 0 ? <span className={styles.amber}>{formatBRL(travel)}</span> : '—'}</TableCell>
+                <TableCell>{deposit > 0 ? <span className={styles.green}>{formatBRL(deposit)}</span> : '—'}</TableCell>
+                <TableCell>
+                  {finalValue > 0 ? <span className={styles.green}>{formatBRL(finalValue)}</span> : '—'}
+                </TableCell>
+                <TableCell>{costs > 0 ? <span className={styles.red}>{formatBRL(costs)}</span> : '—'}</TableCell>
+                <TableCell>
                   <span className={result >= 0 ? styles.green : styles.red}>{formatBRL(result)}</span>
-                </td>
-                <td>{event.paymentMethod || '—'}</td>
-                <td>
+                </TableCell>
+                <TableCell>{event.paymentMethod || '—'}</TableCell>
+                <TableCell>
                   {estimated > 0 && finalValue > 0 ? (
                     <span className={difference >= 0 ? styles.green : styles.red}>
                       {difference >= 0 ? '+' : ''}
@@ -95,12 +106,12 @@ export default function FinanceValuesTable({ events, finances, onSelect }: Finan
                   ) : (
                     '—'
                   )}
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             );
           })}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }

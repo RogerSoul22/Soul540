@@ -1,0 +1,84 @@
+/* Camada: classes da página (fora de @layer) sempre vencem o padrão do Pentágono. */
+@layer pentagono {
+  .checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pentagono-space-2);
+    color: var(--pentagono-color-text-secondary);
+    font-size: var(--pentagono-text-sm);
+    cursor: pointer;
+  }
+
+  .input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--pentagono-color-brand);
+    cursor: pointer;
+  }
+
+  .input:focus-visible {
+    outline: 2px solid var(--pentagono-color-brand-glow);
+    outline-offset: 2px;
+  }
+
+  .input:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .description {
+    color: var(--pentagono-color-text-muted);
+    font-size: var(--pentagono-text-xs);
+  }
+
+  .switch .input {
+    appearance: none;
+    position: relative;
+    flex-shrink: 0;
+    width: 36px;
+    height: 20px;
+    background: var(--pentagono-color-surface-muted);
+    border: 1px solid var(--pentagono-color-border);
+    border-radius: var(--pentagono-radius-full);
+    transition: background var(--pentagono-transition-fast);
+  }
+
+  .switch .input::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    background: var(--pentagono-color-text-secondary);
+    border-radius: 50%;
+    transition: transform var(--pentagono-transition-fast);
+  }
+
+  .switch .input:checked {
+    background: var(--pentagono-color-brand);
+    border-color: var(--pentagono-color-brand);
+  }
+
+  .switch .input:checked::after {
+    background: var(--pentagono-color-on-brand);
+    transform: translateX(16px);
+  }
+
+  .card {
+    display: flex;
+    padding: var(--pentagono-space-3);
+    border: 1px solid var(--pentagono-color-border);
+    border-radius: var(--pentagono-radius-md);
+  }
+
+  .card:has(.input:checked) {
+    background: var(--pentagono-color-brand-soft);
+    border-color: var(--pentagono-color-brand);
+  }
+}

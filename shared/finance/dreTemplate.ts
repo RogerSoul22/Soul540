@@ -138,5 +138,7 @@ export function buildDreTemplateValues(
 }
 
 export const DRE_TEMPLATE_INPUT_CELLS = Object.values(MONTH_COLUMNS).flatMap((column) =>
-  [...new Set([...Object.values(CATEGORY_ROWS), ...Object.values(SECTION_FALLBACK_ROWS)])].map((row) => `${column}${row}`),
+  [...new Set([...Object.values(CATEGORY_ROWS), ...Object.values(SECTION_FALLBACK_ROWS)])].map(
+    (row) => `${column}${row}`,
+  ),
 );

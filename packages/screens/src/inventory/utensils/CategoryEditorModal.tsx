@@ -1,3 +1,4 @@
+import { Button, Input, Label } from '../../../../pentagono/src/index';
 import type { RefObject } from 'react';
 import InventoryModalFrame from './InventoryModalFrame';
 import frameStyles from './styles/InventoryModalFrame.module.scss';
@@ -26,21 +27,21 @@ export default function CategoryEditorModal({
     <InventoryModalFrame
       footer={
         <>
-          <button className={frameStyles.cancelButton} onClick={onClose}>
+          <Button variant="ghost" onClick={onClose}>
             Cancelar
-          </button>
-          <button className={frameStyles.primaryButton} onClick={onSubmit} disabled={!newCategory.trim()}>
+          </Button>
+          <Button variant="primary" onClick={onSubmit} disabled={!newCategory.trim()}>
             Adicionar
-          </button>
+          </Button>
         </>
       }
       maxWidth={400}
       onClose={onClose}
       title="Nova categoria"
     >
-      <label className={styles.group}>
+      <Label className={styles.group}>
         <span className={styles.label}>Nome da categoria</span>
-        <input
+        <Input
           ref={inputRef}
           className={styles.input}
           value={newCategory}
@@ -51,7 +52,7 @@ export default function CategoryEditorModal({
           }}
           placeholder="Ex: Fornos, Utensílios..."
         />
-      </label>
+      </Label>
     </InventoryModalFrame>
   );
 }

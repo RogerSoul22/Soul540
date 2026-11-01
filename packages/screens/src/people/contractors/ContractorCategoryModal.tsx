@@ -1,3 +1,4 @@
+import { Button, Input } from '../../../../pentagono/src/index';
 import { useState, type RefObject } from 'react';
 import ContractorModalFrame from './ContractorModalFrame';
 import styles from './styles/ContractorModalFrame.module.scss';
@@ -24,12 +25,12 @@ export default function ContractorCategoryModal({ inputRef, isOpen, onClose, onS
     <ContractorModalFrame
       footer={
         <>
-          <button className={styles.cancelButton} onClick={close}>
+          <Button variant="ghost" onClick={close}>
             Cancelar
-          </button>
-          <button className={styles.primaryButton} disabled={!name.trim()} onClick={submit}>
+          </Button>
+          <Button variant="primary" disabled={!name.trim()} onClick={submit}>
             Adicionar
-          </button>
+          </Button>
         </>
       }
       onClose={close}
@@ -37,8 +38,8 @@ export default function ContractorCategoryModal({ inputRef, isOpen, onClose, onS
       width="narrow"
     >
       <div className={styles.field}>
-        <label>Nome da categoria</label>
-        <input
+        <Input
+          label="Nome da categoria"
           onChange={(event) => setName(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === 'Enter') void submit();

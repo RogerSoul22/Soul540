@@ -2,7 +2,7 @@
 
 .page {
   padding: 48px 32px;
-  color: #e5e7eb;
+  color: var(--text-primary);
   animation: fadeIn 0.4s ease;
 }
 
@@ -23,28 +23,18 @@
 
 .title {
   margin: 0;
-  color: #f8fafc;
+  color: var(--text-primary);
   font-size: 30px;
 }
 .subtitle {
   margin: 6px 0 0;
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
-.infoButton {
-  width: 28px;
-  height: 28px;
-  border: 0;
-  border-radius: 50%;
-  color: #94a3b8;
-  background: transparent;
-  cursor: pointer;
-}
-
 .infoButton:hover {
-  color: #f8fafc;
-  background: #ffffff12;
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
 }
 
 .primaryButton,
@@ -55,11 +45,6 @@
   cursor: pointer;
 }
 
-.primaryButton {
-  border: 0;
-  color: #0a0f1e;
-  background: #f4b400;
-}
 .exportButton {
   border: 1px solid #f4b40055;
   color: #f4b400;
@@ -77,19 +62,19 @@
   display: grid;
   gap: 8px;
   padding: 20px;
-  border: 1px solid #29354a;
+  border: 1px solid var(--border);
   border-top-width: 3px;
   border-radius: 10px;
-  background: #172033;
+  background: var(--bg-card);
 }
 
 .kpiCard span {
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 12px;
   text-transform: uppercase;
 }
 .kpiCard strong {
-  color: #f8fafc;
+  color: var(--text-primary);
   font-size: 30px;
 }
 .blue {
@@ -103,7 +88,7 @@
   margin-bottom: 32px;
 }
 .sectionLabel {
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
@@ -128,14 +113,14 @@
   position: relative;
   display: grid;
   gap: 5px;
-  border: 1px solid #29354a;
+  border: 1px solid var(--border);
   border-left: 3px solid transparent;
-  color: #f8fafc;
-  background: #172033;
+  color: var(--text-primary);
+  background: var(--bg-card);
 }
 
 .categoryCard small {
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 .categoryCardActive {
   border-left-color: #f4b400;
@@ -143,8 +128,8 @@
 }
 
 .addCategory {
-  border: 1px dashed #475569;
-  color: #94a3b8;
+  border: 1px dashed var(--border);
+  color: var(--text-secondary);
   background: transparent;
   text-align: center;
 }
@@ -157,9 +142,8 @@
   position: absolute;
   top: 8px;
   right: 8px;
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 .deleteCategory:hover {
   color: #f87171;
 }
-

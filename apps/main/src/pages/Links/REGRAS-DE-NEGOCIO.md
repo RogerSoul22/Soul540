@@ -31,4 +31,3 @@ A visualização e as ações dependem da permissão da página e das permissõe
 
 - Definir quais portais cada perfil pode visualizar.
 - Definir se a troca de contexto exige novo login.
-

@@ -1,3 +1,4 @@
+import { Button, Input, Select } from '../../../../../../packages/pentagono/src/index';
 import type { ChangeEvent } from 'react';
 import type { InvoiceItem } from '../../../../../../packages/contracts/src/index';
 import type { InvoiceFormState } from '../types/invoice-types';
@@ -33,17 +34,17 @@ export default function InvoiceFormFields({
     <>
       <div className={styles.formRow}>
         <InvoiceFormField label="Tipo de Nota">
-          <select
+          <Select
             className={styles.formSelect}
             value={form.type}
             onChange={(event) => onChange('type', event.target.value as InvoiceFormState['type'])}
           >
             <option value="nfse">NFS-e (Serviço)</option>
             <option value="nfe">NF-e (Produto)</option>
-          </select>
+          </Select>
         </InvoiceFormField>
         <InvoiceFormField label="Data de Emissão">
-          <input
+          <Input
             className={styles.formInput}
             type="date"
             value={form.issueDate}
@@ -54,7 +55,7 @@ export default function InvoiceFormFields({
       </div>
       {form.type === 'nfse' && (
         <InvoiceFormField label="Código de Serviço Municipal">
-          <input
+          <Input
             className={styles.formInput}
             value={form.serviceCode}
             onChange={(event) => onChange('serviceCode', event.target.value)}
@@ -63,7 +64,7 @@ export default function InvoiceFormFields({
       )}
       <div className={styles.formRow}>
         <InvoiceFormField label="Evento">
-          <select
+          <Select
             className={styles.formSelect}
             value={form.eventId}
             onChange={(event) => onChange('eventId', event.target.value)}
@@ -75,10 +76,10 @@ export default function InvoiceFormFields({
                 {event.name}
               </option>
             ))}
-          </select>
+          </Select>
         </InvoiceFormField>
         <InvoiceFormField label="Taxa ISS (%)">
-          <input
+          <Input
             className={styles.formInput}
             type="number"
             value={form.taxRate}
@@ -90,7 +91,7 @@ export default function InvoiceFormFields({
       </div>
       <div className={styles.formRow}>
         <InvoiceFormField label="Nome do Cliente">
-          <input
+          <Input
             className={styles.formInput}
             value={form.clientName}
             onChange={(event) => onChange('clientName', event.target.value)}
@@ -98,7 +99,7 @@ export default function InvoiceFormFields({
           />
         </InvoiceFormField>
         <InvoiceFormField label="Documento (CPF/CNPJ)">
-          <input
+          <Input
             className={styles.formInput}
             value={form.clientDocument}
             onChange={(event) => onChange('clientDocument', maskCpfCnpj(event.target.value))}
@@ -107,7 +108,7 @@ export default function InvoiceFormFields({
         </InvoiceFormField>
       </div>
       <InvoiceFormField label="Email do Cliente">
-        <input
+        <Input
           className={styles.formInput}
           type="email"
           value={form.clientEmail}
@@ -128,9 +129,9 @@ export default function InvoiceFormFields({
             onRemove={onRemoveItem}
           />
         ))}
-        <button type="button" className={styles.addItemBtn} onClick={onAddItem}>
+        <Button variant="dashed" type="button" className={styles.addItemBtn} onClick={onAddItem}>
           + Adicionar Item
-        </button>
+        </Button>
       </div>
       <InvoiceFormFooterFields
         form={form}

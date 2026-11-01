@@ -1,3 +1,4 @@
+import { Button } from '../../../../../packages/pentagono/src/index';
 import { useState, type MouseEvent } from 'react';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -55,9 +56,9 @@ export default function CalendarEventModal({ event, onClose, onUpdate, onDelete 
             {mode === 'edit' && <p className={styles.panelTitle}>Editar evento</p>}
             {mode === 'delete' && <p className={styles.panelTitle}>Excluir evento</p>}
           </div>
-          <button className={styles.closeBtn} onClick={onClose} aria-label="Fechar">
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Fechar">
             <IconX />
-          </button>
+          </Button>
         </div>
         {mode === 'view' && <FactoryCalendarEventView event={event} onClose={onClose} />}
         {mode === 'edit' && (

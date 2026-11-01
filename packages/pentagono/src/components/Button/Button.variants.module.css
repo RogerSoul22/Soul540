@@ -1,0 +1,99 @@
+/* Variações de uso (filtro, aba, navegação, ação de lista). Camada: a página sempre vence. */
+@layer pentagono {
+  .chip,
+  .tab,
+  .nav,
+  .outline,
+  .dashed,
+  .link {
+    padding: 0;
+    font-weight: var(--pentagono-font-medium);
+    background: transparent;
+  }
+
+  .chip {
+    padding: 6px 12px;
+    color: var(--pentagono-color-text-secondary);
+    border: 1px solid var(--pentagono-color-border);
+    border-radius: var(--pentagono-radius-full);
+  }
+
+  .chip:hover:not(:disabled) {
+    color: var(--pentagono-color-text);
+    background: var(--pentagono-color-hover);
+  }
+
+  .chip.active,
+  .chip[aria-pressed='true'] {
+    color: var(--pentagono-color-brand);
+    background: var(--pentagono-color-brand-soft);
+    border-color: var(--pentagono-color-brand);
+  }
+
+  .tab {
+    padding: 10px 16px;
+    color: var(--pentagono-color-text-muted);
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+  }
+
+  .tab:hover:not(:disabled) {
+    color: var(--pentagono-color-text);
+  }
+
+  .tab.active,
+  .tab[aria-current='true'] {
+    color: var(--pentagono-color-text);
+    border-bottom-color: var(--pentagono-color-brand);
+  }
+
+  .nav {
+    justify-content: flex-start;
+    width: 100%;
+    padding: 10px 12px;
+    color: var(--pentagono-color-text-secondary);
+  }
+
+  .nav:hover:not(:disabled) {
+    color: var(--pentagono-color-text);
+    background: var(--pentagono-color-hover);
+  }
+
+  .nav.active,
+  .nav[aria-current='true'] {
+    color: var(--pentagono-color-brand);
+    background: var(--pentagono-color-brand-soft);
+  }
+
+  .outline {
+    padding: 6px 12px;
+    color: var(--pentagono-color-text-secondary);
+    background: var(--pentagono-color-surface);
+    border: 1px solid var(--pentagono-color-border);
+  }
+
+  .outline:hover:not(:disabled) {
+    color: var(--pentagono-color-text);
+    background: var(--pentagono-color-hover);
+    border-color: var(--pentagono-color-text-muted);
+  }
+
+  .dashed {
+    padding: 10px 14px;
+    color: var(--pentagono-color-text-secondary);
+    border: 1px dashed var(--pentagono-color-border);
+  }
+
+  .dashed:hover:not(:disabled) {
+    color: var(--pentagono-color-brand);
+    border-color: var(--pentagono-color-brand);
+  }
+
+  .link {
+    color: var(--pentagono-color-brand);
+  }
+
+  .link:hover:not(:disabled) {
+    text-decoration: underline;
+  }
+}

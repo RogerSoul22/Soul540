@@ -1,3 +1,4 @@
+import { Input } from '../../../../../../packages/pentagono/src/index';
 import type { InvoiceFormState } from '../types/invoice-types';
 import InvoiceFormField from './InvoiceFormField';
 import styles from '../styles/NotasFiscais.module.scss';
@@ -12,14 +13,14 @@ export default function InvoiceAddressFields({ form, onChange }: Props) {
       <p className={styles.itemsSectionTitle}>Endereço do Cliente</p>
       <div className={styles.formRow}>
         <InvoiceFormField label="Logradouro">
-          <input
+          <Input
             className={styles.formInput}
             value={form.address}
             onChange={(event) => onChange('address', event.target.value)}
           />
         </InvoiceFormField>
         <InvoiceFormField label="Número">
-          <input
+          <Input
             className={styles.formInput}
             value={form.addressNumber}
             onChange={(event) => onChange('addressNumber', event.target.value)}
@@ -28,14 +29,14 @@ export default function InvoiceAddressFields({ form, onChange }: Props) {
       </div>
       <div className={styles.formRow}>
         <InvoiceFormField label="Bairro">
-          <input
+          <Input
             className={styles.formInput}
             value={form.district}
             onChange={(event) => onChange('district', event.target.value)}
           />
         </InvoiceFormField>
         <InvoiceFormField label="CEP">
-          <input
+          <Input
             className={styles.formInput}
             value={form.postalCode}
             onChange={(event) => onChange('postalCode', event.target.value)}
@@ -44,14 +45,14 @@ export default function InvoiceAddressFields({ form, onChange }: Props) {
       </div>
       <div className={styles.formRow}>
         <InvoiceFormField label="Cidade">
-          <input
+          <Input
             className={styles.formInput}
             value={form.city}
             onChange={(event) => onChange('city', event.target.value)}
           />
         </InvoiceFormField>
         <InvoiceFormField label="Estado (UF)">
-          <input
+          <Input
             className={styles.formInput}
             value={form.state}
             onChange={(event) => onChange('state', event.target.value)}

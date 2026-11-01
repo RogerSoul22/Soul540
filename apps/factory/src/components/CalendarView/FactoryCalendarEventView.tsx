@@ -1,3 +1,4 @@
+import { Button } from '../../../../../packages/pentagono/src/index';
 import { ptBR } from 'date-fns/locale';
 import { buildWhatsAppUrl } from './calendar-utils';
 import { safeFormat, WHATSAPP_ICON_PATH } from './calendar-event-factory-utils';
@@ -117,9 +118,9 @@ export function FactoryCalendarEventView({ event, onClose }: { event: PizzaEvent
             WhatsApp
           </a>
         )}
-        <button className={styles.btnCancel} onClick={onClose}>
+        <Button variant="ghost" onClick={onClose}>
           Fechar
-        </button>
+        </Button>
       </div>
     </>
   );

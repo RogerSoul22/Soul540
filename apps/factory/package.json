@@ -15,5 +15,3 @@
     "preview": "cd ../.. && vite preview --config apps/factory/vite.config.ts"
   }
 }
-
-

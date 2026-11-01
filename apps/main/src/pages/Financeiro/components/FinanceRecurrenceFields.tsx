@@ -1,3 +1,4 @@
+import { Input, Label, Select } from '../../../../../../packages/pentagono/src/index';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
@@ -30,12 +31,11 @@ export default function FinanceRecurrenceFields({
       <div className={styles.formSection}>
         <div className={styles.formRow}>
           <div className={styles.formField}>
-            <label className={styles.formLabel}>Parcelar em quantas vezes?</label>
-            <input
+            <Input
+              label="Parcelar em quantas vezes?"
               type="number"
               min="1"
               max="60"
-              className={styles.formInput}
               value={formInstallments}
               onChange={(event) => {
                 setFormInstallments(event.target.value);
@@ -45,8 +45,8 @@ export default function FinanceRecurrenceFields({
             <p className={styles.formHint}>1 = lançamento único</p>
           </div>
           <div className={styles.formField}>
-            <label className={styles.recurrenceToggle}>
-              <input
+            <Label className={styles.recurrenceToggle}>
+              <Input
                 type="checkbox"
                 checked={formRecurring}
                 onChange={(event) => {
@@ -59,7 +59,7 @@ export default function FinanceRecurrenceFields({
                 <strong>Repetir lançamento</strong>
                 <small>Crie automaticamente as próximas ocorrências.</small>
               </span>
-            </label>
+            </Label>
           </div>
         </div>
       </div>
@@ -69,12 +69,11 @@ export default function FinanceRecurrenceFields({
     <div className={styles.formSection}>
       <div className={styles.formRow}>
         <div className={styles.formField}>
-          <label className={styles.formLabel}>Parcelar em quantas vezes?</label>
-          <input
+          <Input
+            label="Parcelar em quantas vezes?"
             type="number"
             min="1"
             max="60"
-            className={styles.formInput}
             value={formInstallments}
             onChange={(event) => {
               setFormInstallments(event.target.value);
@@ -82,8 +81,8 @@ export default function FinanceRecurrenceFields({
             }}
           />
         </div>
-        <label className={styles.recurrenceToggle}>
-          <input
+        <Label className={styles.recurrenceToggle}>
+          <Input
             type="checkbox"
             checked={formRecurring}
             onChange={(event) => {
@@ -96,14 +95,14 @@ export default function FinanceRecurrenceFields({
             <strong>Repetir lançamento</strong>
             <small>Crie automaticamente as próximas ocorrências.</small>
           </span>
-        </label>
+        </Label>
       </div>
       {formRecurring && (
         <div className={styles.recurrencePanel}>
           <div className={styles.recurrenceFields}>
-            <label>
+            <Label>
               <span>Repetir a cada</span>
-              <input
+              <Input
                 type="number"
                 min="1"
                 max="365"
@@ -111,10 +110,10 @@ export default function FinanceRecurrenceFields({
                 value={formRecurrenceInterval}
                 onChange={(event) => setFormRecurrenceInterval(event.target.value)}
               />
-            </label>
-            <label>
+            </Label>
+            <Label>
               <span>Frequência</span>
-              <select
+              <Select
                 className={styles.formSelect}
                 value={formRecurrenceFrequency}
                 onChange={(event) => setFormRecurrenceFrequency(event.target.value as RecurrenceFrequency)}
@@ -123,12 +122,12 @@ export default function FinanceRecurrenceFields({
                 <option value="weekly">Semana(s)</option>
                 <option value="monthly">Mês(es)</option>
                 <option value="yearly">Ano(s)</option>
-              </select>
-            </label>
-            <label>
+              </Select>
+            </Label>
+            <Label>
               <span>Terminar após</span>
               <span className={styles.occurrenceInput}>
-                <input
+                <Input
                   type="number"
                   min="1"
                   max="366"
@@ -138,7 +137,7 @@ export default function FinanceRecurrenceFields({
                 />
                 <span>ocorrências</span>
               </span>
-            </label>
+            </Label>
           </div>
           <div className={styles.recurrencePreview}>
             <div>

@@ -1,3 +1,4 @@
+import { Input, Select, TableCell, TableRow } from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/Tarefas.module.scss';
 import { MEASURES } from '../support/task-formatters';
 import ProductionRemoveButton from './ProductionRemoveButton';
@@ -13,17 +14,19 @@ export default function ProductionInsumoRows({ items, onUpdate, onRemove }: Prop
   return (
     <>
       {items.map((item) => (
-        <tr key={item.id}>
-          <td>
-            <input
+        <TableRow key={item.id}>
+          <TableCell>
+            <Input
+              variant="inline"
               className={styles.cellInput}
               value={item.name}
               onChange={(event) => onUpdate(item.id, 'name', event.target.value)}
               placeholder="Ex: Caixa"
             />
-          </td>
-          <td>
-            <select
+          </TableCell>
+          <TableCell>
+            <Select
+              variant="inline"
               className={styles.cellSelect}
               value={item.measure}
               onChange={(event) => onUpdate(item.id, 'measure', event.target.value)}
@@ -33,10 +36,11 @@ export default function ProductionInsumoRows({ items, onUpdate, onRemove }: Prop
                   {measure}
                 </option>
               ))}
-            </select>
-          </td>
-          <td>
-            <input
+            </Select>
+          </TableCell>
+          <TableCell>
+            <Input
+              variant="inline"
               className={`${styles.cellInput} ${styles.cellNumber}`}
               type="number"
               step="0.01"
@@ -44,11 +48,11 @@ export default function ProductionInsumoRows({ items, onUpdate, onRemove }: Prop
               onChange={(event) => onUpdate(item.id, 'cost', parseFloat(event.target.value) || 0)}
               placeholder="0,00"
             />
-          </td>
-          <td>
+          </TableCell>
+          <TableCell>
             <ProductionRemoveButton onClick={() => onRemove(item.id)} />
-          </td>
-        </tr>
+          </TableCell>
+        </TableRow>
       ))}
     </>
   );

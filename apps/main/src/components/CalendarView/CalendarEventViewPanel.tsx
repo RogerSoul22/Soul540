@@ -1,3 +1,4 @@
+import { Button } from '../../../../../packages/pentagono/src/index';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { ReactNode } from 'react';
@@ -93,22 +94,22 @@ export default function CalendarEventViewPanel({ event, onEdit, onDelete, onFina
         </div>
       </div>
       <div className={styles.panelActions}>
-        <button className={styles.btnDelete} onClick={onDelete}>
+        <Button variant="danger" onClick={onDelete}>
           Excluir
-        </button>
+        </Button>
         {event.phone && (
           <a className={styles.btnWhatsapp} href={buildWhatsAppUrl(event)} target="_blank" rel="noopener noreferrer">
             WhatsApp
           </a>
         )}
         {event.status !== 'completed' && (
-          <button className={styles.btnFinalize} onClick={onFinalize}>
+          <Button variant="primary" size="sm" className={styles.btnFinalize} onClick={onFinalize}>
             ✓ Finalizar
-          </button>
+          </Button>
         )}
-        <button className={styles.btnEdit} onClick={onEdit}>
+        <Button variant="secondary" size="sm" onClick={onEdit}>
           Editar
-        </button>
+        </Button>
       </div>
     </>
   );

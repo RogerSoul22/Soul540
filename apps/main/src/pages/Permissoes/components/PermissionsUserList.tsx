@@ -1,3 +1,4 @@
+import { Button, EmptyState, Input } from '../../../../../../packages/pentagono/src/index';
 import type { AppUser } from '../types/permissions-types';
 import { groupUsersByUnit, getInitials } from '../support/permissions-utils';
 import styles from '../styles/Permissoes.module.scss';
@@ -33,7 +34,8 @@ export default function PermissionsUserList({
         Usuários ({filteredUsers.length}/{users.length})
       </p>
       <div className={styles.searchWrap}>
-        <input
+        <Input
+          variant="search"
           className={styles.searchInput}
           placeholder="Buscar usuários..."
           value={search}
@@ -57,7 +59,8 @@ export default function PermissionsUserList({
               <div className={styles.userMeta}>
                 {user.isAdmin && <span className={styles.badgeAdmin}>Admin</span>}
                 {canChangePassword(user) && (
-                  <button
+                  <Button
+                    variant="outline"
                     className={styles.btnEye}
                     onClick={(event) => {
                       event.stopPropagation();
@@ -66,10 +69,12 @@ export default function PermissionsUserList({
                     title="Alterar senha"
                   >
                     Senha
-                  </button>
+                  </Button>
                 )}
                 {!isReadOnly(user) && (
-                  <button
+                  <Button
+                    variant="danger"
+                    size="sm"
                     className={styles.btnDeleteUser}
                     onClick={(event) => {
                       event.stopPropagation();
@@ -78,15 +83,19 @@ export default function PermissionsUserList({
                     title="Remover usuário"
                   >
                     ×
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
           ))}
         </div>
       ))}
-      {users.length === 0 && <p className={styles.empty}>Nenhum usuário cadastrado.</p>}
-      {users.length > 0 && filteredUsers.length === 0 && <p className={styles.empty}>Nenhum usuário encontrado.</p>}
+      {users.length === 0 && (
+        <EmptyState variant="compact" title="Nenhum usuário cadastrado." className={styles.empty} />
+      )}
+      {users.length > 0 && filteredUsers.length === 0 && (
+        <EmptyState variant="compact" title="Nenhum usuário encontrado." className={styles.empty} />
+      )}
     </div>
   );
 }

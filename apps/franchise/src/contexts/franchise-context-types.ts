@@ -14,6 +14,7 @@ export interface FranchiseContextData {
   financeCategories: FinanceCategoryEntry[];
   tasks: Task[];
   taskHistory: TaskHistoryEntry[];
+  dataLoading: boolean;
   addTaskHistory: (entry: Omit<TaskHistoryEntry, 'id'>) => Promise<void>;
   deleteTaskHistory: (id: string) => Promise<void>;
   addFinance: (entry: Omit<FinanceEntry, 'id'>) => Promise<FinanceEntry>;

@@ -1,3 +1,4 @@
+import { Card, Heading } from '../../../../../../packages/pentagono/src/index';
 import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
 import styles from '../styles/Financeiro.module.scss';
@@ -14,9 +15,11 @@ function Ranking({
   total: number;
 }) {
   return (
-    <div className={styles.agendamentosCard}>
+    <Card className={styles.agendamentosCard}>
       <div className={styles.agendamentosHeader}>
-        <h3 className={styles.sectionTitle}>{title}</h3>
+        <Heading level={3} variant="section" className={styles.sectionTitle}>
+          {title}
+        </Heading>
         <strong>{formatBRL(total)}</strong>
       </div>
       {!items.length ? (
@@ -39,7 +42,7 @@ function Ranking({
           ))}
         </div>
       )}
-    </div>
+    </Card>
   );
 }
 
@@ -73,7 +76,9 @@ export default function FinanceOverviewInsights({ controller }: { controller: Fi
       {commissionSummary.length > 0 && (
         <div className={styles.agendamentosCard + ' ' + styles.commissionSection}>
           <div className={styles.agendamentosHeader}>
-            <h3 className={styles.sectionTitle}>Comissões</h3>
+            <Heading level={3} variant="section" className={styles.sectionTitle}>
+              Comissões
+            </Heading>
             <strong>{formatBRL(commissionSummary.reduce((sum, item) => sum + item.amount, 0))}</strong>
           </div>
           <div className={styles.commissionGrid}>

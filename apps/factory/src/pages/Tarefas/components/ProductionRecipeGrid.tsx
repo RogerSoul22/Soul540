@@ -1,3 +1,11 @@
+import {
+  Button,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeadCell,
+  TableRow,
+} from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/Tarefas.module.scss';
 import { formatR$ } from '../support/task-formatters';
 import ProductionIngredientRows from './ProductionIngredientRows';
@@ -34,33 +42,33 @@ export default function ProductionRecipeGrid({
           <span className={styles.blockSub}>por kg de massa</span>
         </div>
         <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Massa</th>
-                <th>Medida</th>
-                <th>Quantidade</th>
-                <th>Custo (R$/un)</th>
-                <th>Custo Massa</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
+          <Table variant="plain" className={styles.table}>
+            <TableHead>
+              <TableRow>
+                <TableHeadCell>Massa</TableHeadCell>
+                <TableHeadCell>Medida</TableHeadCell>
+                <TableHeadCell>Quantidade</TableHeadCell>
+                <TableHeadCell>Custo (R$/un)</TableHeadCell>
+                <TableHeadCell>Custo Massa</TableHeadCell>
+                <TableHeadCell />
+              </TableRow>
+            </TableHead>
+            <TableBody>
               <ProductionIngredientRows
                 items={ingredients}
                 onUpdate={onUpdateIngredient}
                 onRemove={onRemoveIngredient}
               />
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
         <div className={styles.totalRow}>
           <span>Custo total por kg</span>
           <strong>R$ {formatR$(ingredientTotal)}</strong>
         </div>
-        <button className={styles.btnAdd} onClick={onAddIngredient}>
+        <Button variant="dashed" className={styles.btnAdd} onClick={onAddIngredient}>
           ï¼‹ Adicionar ingrediente
-        </button>
+        </Button>
       </div>
       <div className={styles.recipeBlock}>
         <div className={styles.blockHeader}>
@@ -68,23 +76,23 @@ export default function ProductionRecipeGrid({
           <span className={styles.blockSub}>materiais e embalagens</span>
         </div>
         <div className={`${styles.tableWrap} ${styles.insumosTableWrap}`}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Insumo</th>
-                <th>Medida</th>
-                <th>Custo (R$/un)</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
+          <Table variant="plain" className={styles.table}>
+            <TableHead>
+              <TableRow>
+                <TableHeadCell>Insumo</TableHeadCell>
+                <TableHeadCell>Medida</TableHeadCell>
+                <TableHeadCell>Custo (R$/un)</TableHeadCell>
+                <TableHeadCell />
+              </TableRow>
+            </TableHead>
+            <TableBody>
               <ProductionInsumoRows items={insumos} onUpdate={onUpdateInsumo} onRemove={onRemoveInsumo} />
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
-        <button className={styles.btnAdd} onClick={onAddInsumo}>
+        <Button variant="dashed" className={styles.btnAdd} onClick={onAddInsumo}>
           ï¼‹ Adicionar insumo
-        </button>
+        </Button>
       </div>
     </div>
   );

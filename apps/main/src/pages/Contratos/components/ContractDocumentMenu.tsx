@@ -1,3 +1,12 @@
+import {
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeadCell,
+  TableRow,
+} from '../../../../../../packages/pentagono/src/index';
 import { ContractDocumentField as EF } from './ContractDocumentField';
 import type { ContractDocumentModel } from '../types/contract-document-types';
 import styles from '../styles/ContractDocument.module.scss';
@@ -23,17 +32,17 @@ export function ContractDocumentMenu({ model }: { model: ContractDocumentModel }
           <p className={styles.annexSection}>
             <EF value={cat.name} onChange={(v) => model.updateCatName(ci, v)} editing={model.editing} />
           </p>
-          <table className={styles.menuTable}>
-            <thead>
-              <tr>
-                <th>{cat.headers[0]}</th>
-                <th>{cat.headers[1]}</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table variant="plain" className={styles.menuTable}>
+            <TableHead>
+              <TableRow>
+                <TableHeadCell>{cat.headers[0]}</TableHeadCell>
+                <TableHeadCell>{cat.headers[1]}</TableHeadCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {cat.items.map((item, ii) => (
-                <tr key={ii}>
-                  <td>
+                <TableRow key={ii}>
+                  <TableCell>
                     <EF
                       value={item.name}
                       onChange={(v) => model.updateItemField(ci, ii, 'name', v)}
@@ -53,8 +62,8 @@ export function ContractDocumentMenu({ model }: { model: ContractDocumentModel }
                         </em>
                       </>
                     )}
-                  </td>
-                  <td>
+                  </TableCell>
+                  <TableCell>
                     <EF
                       value={item.description}
                       onChange={(v) => model.updateItemField(ci, ii, 'description', v)}
@@ -62,31 +71,33 @@ export function ContractDocumentMenu({ model }: { model: ContractDocumentModel }
                       placeholder="—"
                     />
                     {model.editing && (
-                      <button
+                      <Button
+                        variant="danger"
+                        size="sm"
                         className={styles.menuRemoveBtn}
                         onClick={() => model.removeItem(ci, ii)}
                         title="Remover linha"
                       >
                         ×
-                      </button>
+                      </Button>
                     )}
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
           {model.editing && (
-            <button className={styles.menuAddBtn} onClick={() => model.addItem(ci)}>
+            <Button variant="dashed" className={styles.menuAddBtn} onClick={() => model.addItem(ci)}>
               + Adicionar item
-            </button>
+            </Button>
           )}
         </div>
       ))}
 
       {model.editing && (
-        <button className={styles.menuAddBtn} style={{ marginTop: 12 }} onClick={model.addCategory}>
+        <Button variant="dashed" className={styles.menuAddBtn} style={{ marginTop: 12 }} onClick={model.addCategory}>
           + Adicionar categoria
-        </button>
+        </Button>
       )}
 
       {(model.menuObs || model.editing) && (

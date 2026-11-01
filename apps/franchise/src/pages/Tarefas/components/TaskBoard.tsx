@@ -1,7 +1,7 @@
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { Task, TaskStatus } from '../../../../../../shared/contracts/types';
-import { Badge } from '../../../../../../packages/ui/src/index';
+import { Badge, Button, EmptyState } from '../../../../../../packages/pentagono/src/index';
 import {
   taskPriorityLabels as priorityLabels,
   taskStatusLabels as statusLabels,
@@ -79,7 +79,7 @@ function TaskList(props: Props) {
   return (
     <div className={styles.listView}>
       {props.filtered.length === 0 ? (
-        <div className={styles.empty}>Nenhuma tarefa encontrada.</div>
+        <EmptyState title="Nenhuma tarefa encontrada." />
       ) : (
         props.filtered.map((task) => {
           const index = props.columns.findIndex((column) => column.id === task.status);
@@ -110,9 +110,9 @@ function TaskList(props: Props) {
                   onMove={(status) => props.onMove(task.id, status)}
                 />
                 <Badge variant={STATUS_COLORS[task.status]}>{statusLabels[task.status]}</Badge>
-                <button className={styles.btnDelete} onClick={() => props.onDelete(task.id)}>
+                <Button variant="danger" onClick={() => props.onDelete(task.id)}>
                   Excluir
-                </button>
+                </Button>
               </div>
             </div>
           );

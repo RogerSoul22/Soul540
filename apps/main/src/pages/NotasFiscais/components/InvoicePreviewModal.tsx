@@ -1,5 +1,13 @@
 import { format, parseISO } from 'date-fns';
-import { Modal } from '../../../../../../packages/ui/src/index';
+import {
+  Modal,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeadCell,
+  TableRow,
+} from '../../../../../../packages/pentagono/src/index';
 import type { Invoice, InvoiceItem } from '../../../../../../packages/contracts/src/index';
 import styles from '../styles/NotasFiscais.module.scss';
 
@@ -34,26 +42,26 @@ export default function InvoicePreviewModal({ invoice, eventName, onClose }: Pro
             <p style={{ wordBreak: 'break-all', fontSize: '10px' }}>Chave: {invoice.chaveAcesso}</p>
           )}
         </PreviewSection>
-        <table className={styles.previewTable}>
-          <thead>
-            <tr>
-              <th>Descrição</th>
-              <th>Qtd</th>
-              <th>Valor Unit.</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table variant="plain" className={styles.previewTable}>
+          <TableHead>
+            <TableRow>
+              <TableHeadCell>Descrição</TableHeadCell>
+              <TableHeadCell>Qtd</TableHeadCell>
+              <TableHeadCell>Valor Unit.</TableHeadCell>
+              <TableHeadCell>Total</TableHeadCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
             {invoice.items.map((item: InvoiceItem, index) => (
-              <tr key={index}>
-                <td>{item.description}</td>
-                <td>{item.quantity}</td>
-                <td>R$ {item.unitPrice.toLocaleString('pt-BR')}</td>
-                <td>R$ {(item.quantity * item.unitPrice).toLocaleString('pt-BR')}</td>
-              </tr>
+              <TableRow key={index}>
+                <TableCell>{item.description}</TableCell>
+                <TableCell>{item.quantity}</TableCell>
+                <TableCell>R$ {item.unitPrice.toLocaleString('pt-BR')}</TableCell>
+                <TableCell>R$ {(item.quantity * item.unitPrice).toLocaleString('pt-BR')}</TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
         <div className={styles.previewTotals}>
           <div className={styles.previewTotalRow}>
             <span>Subtotal:</span>

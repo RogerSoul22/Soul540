@@ -9,10 +9,19 @@ type Props = {
   onAddBulk: () => void;
 };
 
-export function ChecklistEditor({ newItem, bulkItems, onNewItemChange, onBulkItemsChange, onAddSingle, onAddBulk }: Props) {
+export function ChecklistEditor({
+  newItem,
+  bulkItems,
+  onNewItemChange,
+  onBulkItemsChange,
+  onAddSingle,
+  onAddBulk,
+}: Props) {
   return (
     <article className={styles.panel}>
-      <div className={styles.groupHeader}><h2 className={styles.groupTitle}>Montar checklist</h2></div>
+      <div className={styles.groupHeader}>
+        <h2 className={styles.groupTitle}>Montar checklist</h2>
+      </div>
       <div className={styles.panelBody}>
         <div className={styles.addRow}>
           <input
@@ -27,9 +36,13 @@ export function ChecklistEditor({ newItem, bulkItems, onNewItemChange, onBulkIte
             }}
             placeholder="Digite um item para adicionar"
           />
-          <button className={styles.button} type="button" onClick={onAddSingle}>Adicionar item</button>
+          <button className={styles.button} type="button" onClick={onAddSingle}>
+            Adicionar item
+          </button>
         </div>
-        <label className={styles.label} htmlFor="bulk-checklist">Colar lista de itens</label>
+        <label className={styles.label} htmlFor="bulk-checklist">
+          Colar lista de itens
+        </label>
         <textarea
           id="bulk-checklist"
           className={styles.textarea}
@@ -37,7 +50,9 @@ export function ChecklistEditor({ newItem, bulkItems, onNewItemChange, onBulkIte
           onChange={(event) => onBulkItemsChange(event.target.value)}
           placeholder={'Um item por linha\nConfirmar endereco\nSeparar guardanapos\nLevar gas reserva'}
         />
-        <button className={styles.buttonGhost} type="button" onClick={onAddBulk}>Adicionar lista</button>
+        <button className={styles.buttonGhost} type="button" onClick={onAddBulk}>
+          Adicionar lista
+        </button>
       </div>
     </article>
   );

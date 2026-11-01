@@ -1,3 +1,4 @@
+import { Button } from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/Tarefas.module.scss';
 import { ALL_STATUSES, formatQty, formatR$ } from '../support/task-formatters';
 import type { Pedido, PedidoStatus } from '../types/task-types';
@@ -54,9 +55,9 @@ export default function ProductionOrderCard({ pedido, draggedId, onDelete, onMov
             <span>R$ {formatR$(pedido.totalCost)}</span>
           </div>
         </div>
-        <button className={styles.taskDelete} onClick={() => onDelete(pedido.id)}>
+        <Button variant="danger" size="sm" className={styles.taskDelete} onClick={() => onDelete(pedido.id)}>
           <DeleteIcon />
-        </button>
+        </Button>
       </div>
       <div className={styles.taskDesc}>
         Itens: {pedido.itens.map((item) => `${item.nome} ${formatQty(item.quantidade)} ${item.measure}`).join(', ')}
@@ -77,23 +78,25 @@ export default function ProductionOrderCard({ pedido, draggedId, onDelete, onMov
         <div className={styles.taskRecipeFooter}>Custo estimado: R$ {formatR$(pedido.totalCost)}</div>
       </div>
       <div className={styles.taskMoveRow}>
-        <button
+        <Button
+          variant="outline"
           className={styles.taskMoveBtn}
           disabled={!previousStatus}
           onClick={() => previousStatus && onMove(pedido.id, previousStatus.id)}
           title={previousStatus?.label}
         >
           ‹
-        </button>
+        </Button>
         <span className={styles.taskMoveLabel}>{ALL_STATUSES[statusIndex]?.label}</span>
-        <button
+        <Button
+          variant="outline"
           className={styles.taskMoveBtn}
           disabled={!nextStatus}
           onClick={() => nextStatus && onMove(pedido.id, nextStatus.id)}
           title={nextStatus?.label}
         >
           ›
-        </button>
+        </Button>
       </div>
     </div>
   );

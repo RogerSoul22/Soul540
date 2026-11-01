@@ -1,3 +1,4 @@
+import { Button, Input, Label } from '../../../../../../packages/pentagono/src/index';
 import type { EventFormController } from '../types/event-form-controller';
 import styles from '../styles/Eventos.module.scss';
 import EventFormModality from './EventFormModality';
@@ -8,41 +9,44 @@ export default function EventFormBasics({ controller }: { controller: EventFormC
     <>
       {/* — Categoria — */}
       <div className={styles.statusToggle}>
-        <button
+        <Button
+          variant="chip"
           type="button"
           className={`${styles.statusBtn} ${form.status === 'planning' ? styles.statusBtnActive : ''}`}
           onClick={() => setForm({ ...form, status: 'planning' })}
         >
           Orçamento
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="chip"
           type="button"
           className={`${styles.statusBtn} ${form.status === 'confirmed' ? styles.statusBtnActive : ''}`}
           onClick={() => setForm({ ...form, status: 'confirmed' })}
         >
           Fechado
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="chip"
           type="button"
           className={`${styles.statusBtn} ${form.status === 'completed' ? styles.statusBtnActive : ''}`}
           onClick={() => setForm({ ...form, status: 'completed' })}
         >
           Finalizado
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="chip"
           type="button"
           className={`${styles.statusBtn} ${form.status === 'cancelled' ? styles.statusBtnActive : ''}`}
           onClick={() => setForm({ ...form, status: 'cancelled' })}
         >
           Cancelado
-        </button>
+        </Button>
       </div>
 
       {/* — Identificação — */}
       <div className={styles.formGroup}>
-        <label className={styles.label}>Nome do Evento *</label>
-        <input
-          className={styles.input}
+        <Input
+          label="Nome do Evento *"
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           placeholder="Ex: Casamento Silva"
@@ -52,9 +56,8 @@ export default function EventFormBasics({ controller }: { controller: EventFormC
       <EventFormModality controller={controller} />
 
       <div className={styles.formGroup}>
-        <label className={styles.label}>O que estamos celebrando</label>
-        <input
-          className={styles.input}
+        <Input
+          label="O que estamos celebrando"
           value={form.celebration}
           onChange={(e) => setForm({ ...form, celebration: e.target.value })}
           placeholder="Ex: Casamento, Aniversário, Confraternização..."
@@ -63,18 +66,16 @@ export default function EventFormBasics({ controller }: { controller: EventFormC
 
       <div className={styles.formGrid2}>
         <div className={styles.formGroup}>
-          <label className={styles.label}>Data Inicial *</label>
-          <input
-            className={styles.input}
+          <Input
+            label="Data Inicial *"
             type="date"
             value={form.date}
             onChange={(e) => setForm({ ...form, date: e.target.value })}
           />
         </div>
         <div className={styles.formGroup}>
-          <label className={styles.label}>Data Final</label>
-          <input
-            className={styles.input}
+          <Input
+            label="Data Final"
             type="date"
             value={form.endDate}
             onChange={(e) => setForm({ ...form, endDate: e.target.value })}
@@ -84,18 +85,16 @@ export default function EventFormBasics({ controller }: { controller: EventFormC
 
       <div className={styles.formGrid2}>
         <div className={styles.formGroup}>
-          <label className={styles.label}>Horario de Inicio</label>
-          <input
-            className={styles.input}
+          <Input
+            label="Horario de Inicio"
             type="time"
             value={form.time}
             onChange={(e) => setForm({ ...form, time: e.target.value })}
           />
         </div>
         <div className={styles.formGroup}>
-          <label className={styles.label}>Equipe chega</label>
-          <input
-            className={styles.input}
+          <Input
+            label="Equipe chega"
             type="time"
             value={form.teamArrivalTime}
             onChange={(e) => setForm({ ...form, teamArrivalTime: e.target.value })}
@@ -108,18 +107,16 @@ export default function EventFormBasics({ controller }: { controller: EventFormC
         <p className={styles.formSectionTitle}>Local</p>
         <div className={styles.formGrid2}>
           <div className={styles.formGroup}>
-            <label className={styles.label}>Cidade</label>
-            <input
-              className={styles.input}
+            <Input
+              label="Cidade"
               value={form.city}
               onChange={(e) => setForm({ ...form, city: e.target.value })}
               placeholder="Ex: São Paulo"
             />
           </div>
           <div className={styles.formGroup}>
-            <label className={styles.label}>Telefone de Contato</label>
-            <input
-              className={styles.input}
+            <Input
+              label="Telefone de Contato"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: formatPhone(e.target.value) })}
               placeholder="(11) 99999-0000"
@@ -127,17 +124,16 @@ export default function EventFormBasics({ controller }: { controller: EventFormC
           </div>
         </div>
         <div className={styles.formGroup}>
-          <label className={styles.label}>Endereco do Evento *</label>
-          <input
-            className={styles.input}
+          <Input
+            label="Endereco do Evento *"
             value={form.location}
             onChange={(e) => setForm({ ...form, location: e.target.value })}
             placeholder="Ex: Salao Premium - Centro SP"
           />
         </div>
         <div className={styles.formGroup}>
-          <label className={styles.label}>Imagem do Local</label>
-          <label className={`${styles.fileUploadBtn} ${form.locationImageName ? styles.fileSelected : ''}`}>
+          <Label className={styles.label}>Imagem do Local</Label>
+          <Label className={`${styles.fileUploadBtn} ${form.locationImageName ? styles.fileSelected : ''}`}>
             <svg
               width="14"
               height="14"
@@ -153,8 +149,8 @@ export default function EventFormBasics({ controller }: { controller: EventFormC
               <polyline points="21 15 16 10 5 21" />
             </svg>
             {form.locationImageName || 'Enviar foto do local das pizzas'}
-            <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleLocationImageFile} />
-          </label>
+            <Input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleLocationImageFile} />
+          </Label>
           <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
             Nos ajuda a dimensionar os equipamentos necessários
           </p>

@@ -1,21 +1,24 @@
+import { Button, PageHeader } from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/Permissoes.module.scss';
 
 type Props = { onCreate: () => void };
 
+const READ_ONLY_NOTICE =
+  'Administradores de outros sistemas têm permissões somente leitura nesta tela. ' +
+  'Usuários comuns de qualquer sistema podem ser editados livremente.';
+
 export default function PermissionsHeader({ onCreate }: Props) {
   return (
-    <div className={styles.header}>
-      <div>
-        <h1 className={styles.title}>Permissões</h1>
-        <p className={styles.subtitle}>Gerencie usuários e controle o acesso às páginas</p>
-        <p className={styles.systemNotice}>
-          Administradores de outros sistemas têm permissões somente leitura nesta tela. Usuários comuns de qualquer
-          sistema podem ser editados livremente.
-        </p>
-      </div>
-      <button className={styles.btnPrimary} onClick={onCreate}>
-        + Novo Usuário
-      </button>
-    </div>
+    <PageHeader
+      className={styles.header}
+      title="Permissões"
+      subtitle="Gerencie usuários e controle o acesso às páginas"
+      notice={READ_ONLY_NOTICE}
+      actions={
+        <Button variant="primary" onClick={onCreate}>
+          + Novo Usuário
+        </Button>
+      }
+    />
   );
 }

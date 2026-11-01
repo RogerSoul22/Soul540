@@ -1,3 +1,4 @@
+import { Spinner } from '../../../packages/pentagono/src/index';
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -33,17 +34,7 @@ function AppLoading() {
         background: 'var(--bg-primary)',
       }}
     >
-      <div
-        style={{
-          width: 32,
-          height: 32,
-          border: '3px solid rgba(245,158,11,0.2)',
-          borderTopColor: '#f59e0b',
-          borderRadius: '50%',
-          animation: 'spin 0.8s linear infinite',
-        }}
-      />
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <Spinner />
     </div>
   );
 }
@@ -75,44 +66,44 @@ export default function App() {
           <AuthProvider>
             <AppProvider>
               <Suspense fallback={<AppLoading />}>
-              <Routes>
-                <Route element={<PublicRoute />}>
-                  <Route path={ROUTES.LOGIN} element={<Login />} />
-                </Route>
-                <Route path={ROUTES.CHECKLIST_ENVIO} element={<ChecklistEnvio />} />
-                <Route element={<PrivateRoute />}>
-                  <Route element={<Layout />}>
-                    <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
-                    <Route element={<PermissionRoute routeKey="funcionarios" />}>
-                      <Route path={ROUTES.FUNCIONARIOS} element={<Funcionarios />} />
-                    </Route>
-                    <Route element={<PermissionRoute routeKey="contratantes" />}>
-                      <Route path={ROUTES.CONTRATANTES} element={<Contratantes />} />
-                    </Route>
-                    <Route element={<PermissionRoute routeKey="eventos" />}>
-                      <Route path={ROUTES.EVENTOS} element={<Eventos />} />
-                    </Route>
-                    <Route element={<PermissionRoute routeKey="estoque-insumos" />}>
-                      <Route path={ROUTES.ESTOQUE_INSUMOS} element={<EstoqueInsumos />} />
-                    </Route>
-                    <Route element={<PermissionRoute routeKey="estoque-utensilios" />}>
-                      <Route path={ROUTES.ESTOQUE_UTENSILIOS} element={<EstoqueUtensilios />} />
-                    </Route>
-                    <Route element={<PermissionRoute routeKey="__admin__" />}>
-                      <Route path={ROUTES.PERMISSOES} element={<Permissoes />} />
-                      <Route path={ROUTES.AUDITORIA} element={<Auditoria />} />
-                    </Route>
-                    <Route element={<PermissionRoute routeKey="financeiro" />}>
-                      <Route path={ROUTES.FINANCEIRO} element={<Financeiro />} />
-                    </Route>
-                    <Route element={<PermissionRoute routeKey="tarefas" />}>
-                      <Route path={ROUTES.TAREFAS} element={<Tarefas />} />
-                    </Route>
-                    <Route path={ROUTES.USUARIO} element={<MinhaConta />} />
+                <Routes>
+                  <Route element={<PublicRoute />}>
+                    <Route path={ROUTES.LOGIN} element={<Login />} />
                   </Route>
-                </Route>
-                <Route path="*" element={<Navigate to={ROUTES.LOGIN} replace />} />
-              </Routes>
+                  <Route path={ROUTES.CHECKLIST_ENVIO} element={<ChecklistEnvio />} />
+                  <Route element={<PrivateRoute />}>
+                    <Route element={<Layout />}>
+                      <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
+                      <Route element={<PermissionRoute routeKey="funcionarios" />}>
+                        <Route path={ROUTES.FUNCIONARIOS} element={<Funcionarios />} />
+                      </Route>
+                      <Route element={<PermissionRoute routeKey="contratantes" />}>
+                        <Route path={ROUTES.CONTRATANTES} element={<Contratantes />} />
+                      </Route>
+                      <Route element={<PermissionRoute routeKey="eventos" />}>
+                        <Route path={ROUTES.EVENTOS} element={<Eventos />} />
+                      </Route>
+                      <Route element={<PermissionRoute routeKey="estoque-insumos" />}>
+                        <Route path={ROUTES.ESTOQUE_INSUMOS} element={<EstoqueInsumos />} />
+                      </Route>
+                      <Route element={<PermissionRoute routeKey="estoque-utensilios" />}>
+                        <Route path={ROUTES.ESTOQUE_UTENSILIOS} element={<EstoqueUtensilios />} />
+                      </Route>
+                      <Route element={<PermissionRoute routeKey="__admin__" />}>
+                        <Route path={ROUTES.PERMISSOES} element={<Permissoes />} />
+                        <Route path={ROUTES.AUDITORIA} element={<Auditoria />} />
+                      </Route>
+                      <Route element={<PermissionRoute routeKey="financeiro" />}>
+                        <Route path={ROUTES.FINANCEIRO} element={<Financeiro />} />
+                      </Route>
+                      <Route element={<PermissionRoute routeKey="tarefas" />}>
+                        <Route path={ROUTES.TAREFAS} element={<Tarefas />} />
+                      </Route>
+                      <Route path={ROUTES.USUARIO} element={<MinhaConta />} />
+                    </Route>
+                  </Route>
+                  <Route path="*" element={<Navigate to={ROUTES.LOGIN} replace />} />
+                </Routes>
               </Suspense>
             </AppProvider>
           </AuthProvider>

@@ -15,6 +15,7 @@ export interface FactoryContextData {
   financeCategories: FinanceCategoryEntry[];
   tasks: Task[];
   invoices: Invoice[];
+  dataLoading: boolean;
   addFinance: (entry: Omit<FinanceEntry, 'id'>) => Promise<FinanceEntry>;
   updateFinance: (id: string, data: Partial<FinanceEntry>) => Promise<void>;
   settleFinance: (

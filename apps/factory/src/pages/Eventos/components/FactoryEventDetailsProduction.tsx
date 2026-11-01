@@ -1,3 +1,4 @@
+import { Button, Input, Select, Textarea } from '../../../../../../packages/pentagono/src/index';
 import type { FactoryEventController } from '../hooks/use-factory-event-controller';
 import styles from '../styles/Eventos.module.scss';
 
@@ -22,7 +23,7 @@ export default function FactoryEventDetailsProduction({ controller }: { controll
           <div className={styles.productionGrid}>
             <div>
               <span className={styles.detailLabel}>Status</span>
-              <select
+              <Select
                 className={styles.input}
                 value={productionForm.factoryProductionStatus}
                 onChange={(e) =>
@@ -36,11 +37,11 @@ export default function FactoryEventDetailsProduction({ controller }: { controll
                 <option value="preparing">Em preparo</option>
                 <option value="ready">Pronto</option>
                 <option value="delivered">Entregue</option>
-              </select>
+              </Select>
             </div>
             <div>
               <span className={styles.detailLabel}>Massas</span>
-              <input
+              <Input
                 className={styles.input}
                 type="number"
                 value={productionForm.factoryDoughBalls}
@@ -49,7 +50,7 @@ export default function FactoryEventDetailsProduction({ controller }: { controll
             </div>
             <div>
               <span className={styles.detailLabel}>Molho (kg)</span>
-              <input
+              <Input
                 className={styles.input}
                 type="number"
                 value={productionForm.factorySauceKg}
@@ -58,7 +59,7 @@ export default function FactoryEventDetailsProduction({ controller }: { controll
             </div>
             <div>
               <span className={styles.detailLabel}>Queijo (kg)</span>
-              <input
+              <Input
                 className={styles.input}
                 type="number"
                 value={productionForm.factoryCheeseKg}
@@ -67,7 +68,7 @@ export default function FactoryEventDetailsProduction({ controller }: { controll
             </div>
             <div>
               <span className={styles.detailLabel}>Embalagens</span>
-              <input
+              <Input
                 className={styles.input}
                 type="number"
                 value={productionForm.factoryPackagingUnits}
@@ -76,7 +77,7 @@ export default function FactoryEventDetailsProduction({ controller }: { controll
             </div>
             <div>
               <span className={styles.detailLabel}>Realizado (pizzas)</span>
-              <input
+              <Input
                 className={styles.input}
                 type="number"
                 value={productionForm.actualPizzas}
@@ -84,15 +85,15 @@ export default function FactoryEventDetailsProduction({ controller }: { controll
               />
             </div>
           </div>
-          <textarea
+          <Textarea
             className={styles.textarea}
             value={productionForm.factoryProductionNotes}
             onChange={(e) => setProductionForm((prev) => ({ ...prev, factoryProductionNotes: e.target.value }))}
             placeholder="Observações internas da produção"
           />
-          <button className={styles.btnPrimary} type="button" onClick={saveProduction}>
+          <Button variant="primary" type="button" onClick={saveProduction}>
             Salvar produção
-          </button>
+          </Button>
         </div>
       )}
     </>

@@ -1,3 +1,4 @@
+import { Card } from '../../../../../../packages/pentagono/src/index';
 type Props = {
   data?: string;
   downloadName?: string;
@@ -8,7 +9,7 @@ type Props = {
 
 export default function FactoryEventDocumentCard({ data, downloadName, label, name, styles }: Props) {
   return (
-    <div className={styles.docCard}>
+    <Card className={styles.docCard}>
       <div className={styles.docCardHeader}>
         <span className={styles.detailLabel}>{label}</span>
         {data && (
@@ -32,6 +33,6 @@ export default function FactoryEventDocumentCard({ data, downloadName, label, na
           <span>{name || 'Arquivo'}</span>
         </div>
       )}
-    </div>
+    </Card>
   );
 }

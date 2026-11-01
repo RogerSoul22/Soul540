@@ -1,3 +1,4 @@
+import { Button, Modal } from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/Eventos.module.scss';
 import FactoryEventDetailsAdditional from './FactoryEventDetailsAdditional';
 import FactoryEventDetailsBasics from './FactoryEventDetailsBasics';
@@ -10,31 +11,27 @@ export default function FactoryEventDetailsModal({ controller }: { controller: F
   const { viewingEvent, setViewingEvent, employeeMap } = controller;
   if (!viewingEvent) return null;
   return (
-    <div className={styles.overlay} onClick={() => setViewingEvent(null)}>
-      <div className={styles.detailModal} onClick={(event) => event.stopPropagation()}>
-        <div className={styles.modalHeader}>
-          <h2 className={styles.modalTitle}>{viewingEvent.name}</h2>
-          <button className={styles.modalClose} onClick={() => setViewingEvent(null)}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
-        </div>
-        <div className={styles.detailBody}>
-          <FactoryEventDetailsBasics event={viewingEvent} />
-          <FactoryEventDetailsOperations event={viewingEvent} employeeMap={employeeMap} />
-          <FactoryEventDetailsProduction controller={controller} />
-          <FactoryEventDetailsAdditional event={viewingEvent} />
-          <FactoryEventDetailsDocuments event={viewingEvent} />
-        </div>
-        <div className={styles.modalFooter}>
-          <span />
-          <button className={styles.btnCancel} onClick={() => setViewingEvent(null)}>
-            Fechar
-          </button>
-        </div>
+    <Modal
+      title={viewingEvent.name}
+      onClose={() => setViewingEvent(null)}
+      closeOnOverlay
+      maxWidth={640}
+      className={styles.detailModal}
+      flush
+    >
+      <div className={styles.detailBody}>
+        <FactoryEventDetailsBasics event={viewingEvent} />
+        <FactoryEventDetailsOperations event={viewingEvent} employeeMap={employeeMap} />
+        <FactoryEventDetailsProduction controller={controller} />
+        <FactoryEventDetailsAdditional event={viewingEvent} />
+        <FactoryEventDetailsDocuments event={viewingEvent} />
       </div>
-    </div>
+      <div className={styles.modalFooter}>
+        <span />
+        <Button variant="ghost" onClick={() => setViewingEvent(null)}>
+          Fechar
+        </Button>
+      </div>
+    </Modal>
   );
 }

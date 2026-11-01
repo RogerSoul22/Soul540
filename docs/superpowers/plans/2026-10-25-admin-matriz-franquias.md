@@ -31,12 +31,14 @@
 ### Task 1: Política de autenticação por sistema
 
 **Files:**
+
 - Create: `apps/api/src/modules/identity/auth-system-policy.ts`
 - Test: `apps/api/src/modules/identity/auth-system-policy.test.ts`
 - Modify: `apps/api/src/modules/identity/auth.routes.ts`
 - Modify: `apps/api/src/infrastructure/middleware/auth.ts`
 
 **Interfaces:**
+
 - Produces `isGlobalAdmin(user)` and `canAccessSystem(user, requestedSystem)` for login and authenticated API requests.
 
 - [ ] Escrever testes para administrador global bloqueado no sistema `franchise`, permitido no `main`, administrador local de franquia permitido no próprio sistema e usuário comum bloqueado fora da unidade.
@@ -47,6 +49,7 @@
 ### Task 2: Relatórios administrativos de eventos e financeiro
 
 **Files:**
+
 - Modify: `apps/api/src/infrastructure/franchise-scope.ts`
 - Modify: `apps/api/src/infrastructure/event-tenant.ts`
 - Modify: `apps/api/src/modules/events/events.routes.ts`
@@ -55,6 +58,7 @@
 - Test: `apps/api/src/modules/franchise-reporting.test.ts`
 
 **Interfaces:**
+
 - `GET /api/events?scope=franchise` selects the franchise event store for an administrator global.
 - `GET /api/finances?scope=franchise` selects all franchise finance entries for an administrator global.
 - `scope=combined` remains available for consolidated reporting.
@@ -68,6 +72,7 @@
 ### Task 3: Visão consolidada no sistema Principal
 
 **Files:**
+
 - Modify: `apps/main/src/contexts/use-main-app-data.ts`
 - Modify: `apps/main/src/pages/Financeiro/hooks/use-financeiro-effects.ts`
 - Modify: `apps/main/src/pages/Eventos/hooks/use-eventos-controller.ts`
@@ -76,6 +81,7 @@
 - Modify: `packages/contracts/src/events.ts`
 
 **Interfaces:**
+
 - Principal solicita franquias com `X-System: main` e query explícita de relatório.
 - Eventos com `source=franchise` são apresentados como consulta somente leitura.
 
@@ -88,6 +94,7 @@
 ### Task 4: Verificação final e documentação
 
 **Files:**
+
 - Modify: `docs/HANDOFF_CONTINUACAO_MIGRACAO.md`
 - Modify: `.superpowers/sdd/2026-10-25-multifranquias/progress.md`
 

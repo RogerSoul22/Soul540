@@ -28,12 +28,14 @@
 ### Task 1: Integrar a seção de certificado à página de notas
 
 **Files:**
+
 - Create: `apps/main/src/pages/NotasFiscais/components/FiscalConfigurationSection.tsx`
 - Modify: `apps/main/src/pages/NotasFiscais/NotasFiscais.tsx`
 - Move/reuse styles: `apps/main/src/pages/NotasFiscais/styles/ConfiguracaoFiscal.module.scss` and its partials
 - Test: `apps/main/src/pages/NotasFiscais/NotasFiscais.structure.test.ts`
 
 **Interfaces:**
+
 - Consumes: `useConfiguracaoFiscal`, `isCertificateFile`, certificate formatters and `ConfirmModal`.
 - Produces: `FiscalConfigurationSection` rendered by `NotasFiscais`.
 
@@ -46,6 +48,7 @@
 ### Task 2: Remove the duplicate fiscal route and menu entry
 
 **Files:**
+
 - Modify: `apps/main/src/routes.ts`
 - Modify: `apps/main/src/App.tsx`
 - Modify: `apps/main/src/components/Sidebar/sidebar-group-sistema.tsx`
@@ -53,6 +56,7 @@
 - Modify: `apps/main/src/pages/ConfiguracaoFiscal/ConfiguracaoFiscal.structure.test.ts`
 
 **Interfaces:**
+
 - Consumes: `NotasFiscais` as the single fiscal UI entry point.
 - Produces: no standalone `/configuracao-fiscal` route or sidebar item.
 
@@ -65,6 +69,7 @@
 ### Task 3: Full verification
 
 **Files:**
+
 - Verify: all changed files from Tasks 1–2.
 
 - [ ] **Step 1: Run the complete test suite** with `node --import tsx --test` over `apps`, `packages`, `shared`, `infra` and `scripts` test files; expect zero failures.

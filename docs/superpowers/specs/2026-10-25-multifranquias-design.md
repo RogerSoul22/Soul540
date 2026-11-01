@@ -109,4 +109,3 @@ Registros de franquia passam a conter `franchiseId`, incluindo eventos, lançame
 - A migração é manual e idempotente: `pnpm migrate:franchise-tenants -- --slug itu` faz prévia; acrescente `--apply` somente após validar os órfãos.
 
 Na prévia local de 2026-10-25 foram encontrados 31 eventos, 101 lançamentos financeiros, 1 contrato, 203 auditorias e 1 usuário de franquia sem vínculo. Nenhum documento foi alterado.
-

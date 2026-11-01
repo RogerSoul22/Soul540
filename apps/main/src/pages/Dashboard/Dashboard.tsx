@@ -22,10 +22,11 @@ import DashboardCalendarHeader from './components/DashboardCalendarHeader';
 import DashboardOperationalPanels from './components/DashboardOperationalPanels';
 import DashboardInfoModal from './components/DashboardInfoModal';
 import type { UnitFilter } from './types/dashboard-types';
+import { SkeletonContent } from '../../../../../packages/pentagono/src/index';
 import styles from './styles/Dashboard.module.scss';
 
 export default function Dashboard() {
-  const { events, tasks, finances } = useApp();
+  const { events, tasks, finances, dataLoading } = useApp();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showInfo, setShowInfo] = useState(false);
@@ -103,14 +104,20 @@ export default function Dashboard() {
           unitFilter={unitFilter}
           onUnitFilterChange={setUnitFilter}
         />{' '}
-        <DashboardOperationalPanels
-          operationalAlerts={operationalAlerts}
-          teamSchedule={teamSchedule}
-          financialClosings={financialClosings}
-          supplyForecasts={supplyForecasts}
-          onNavigate={navigate}
-        />
-        <CalendarView events={filteredEvents} month={calendarMonth} onMonthChange={setCalendarMonth} />
+        {dataLoading ? (
+          <SkeletonContent variant="cards" label="Carregando painéis..." />
+        ) : (
+          <DashboardOperationalPanels
+            operationalAlerts={operationalAlerts}
+            teamSchedule={teamSchedule}
+            financialClosings={financialClosings}
+            supplyForecasts={supplyForecasts}
+            onNavigate={navigate}
+          />
+        )}
+        <div data-skeleton={dataLoading}>
+          <CalendarView events={filteredEvents} month={calendarMonth} onMonthChange={setCalendarMonth} />
+        </div>
       </div>
       {showInfo && <DashboardInfoModal onClose={() => setShowInfo(false)} />}
     </div>

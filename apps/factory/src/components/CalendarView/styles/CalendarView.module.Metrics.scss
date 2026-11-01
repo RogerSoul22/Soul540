@@ -1,24 +1,6 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
-.allDayEventStatus {
-  font-size: 10px;
-
-  font-weight: $font-weight-semibold;
-
-  padding: 2px 10px;
-
-  border-radius: $radius-full;
-
-  border: 1px solid transparent;
-
-  white-space: nowrap;
-
-  flex-shrink: 0;
-
-  letter-spacing: 0.2px;
-}
-
 // section
 .timeGrid {
   overflow-y: auto;

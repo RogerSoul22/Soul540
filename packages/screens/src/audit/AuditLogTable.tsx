@@ -1,3 +1,13 @@
+import {
+  EmptyState,
+  SkeletonContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeadCell,
+  TableRow,
+} from '../../../pentagono/src/index';
 import { actionColors, actionLabels, resourceLabels, type AuditEntry } from './audit-types';
 import type { AuditLogStyles } from './AuditLogScreen';
 
@@ -13,28 +23,28 @@ export default function AuditLogTable({ items, loading, styles, unitLabels, form
   return (
     <div className={styles.tableWrap}>
       {loading ? (
-        <div className={styles.empty}>Carregando...</div>
+        <SkeletonContent variant="table" label="Carregando registros..." />
       ) : items.length === 0 ? (
-        <div className={styles.empty}>Nenhum registro encontrado.</div>
+        <EmptyState title="Nenhum registro encontrado." />
       ) : (
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Data/Hora</th>
-              <th>Usuário</th>
-              <th>Sistema</th>
-              <th>Ação</th>
-              <th>Recurso</th>
-              <th>Descrição</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table variant="plain" className={styles.table}>
+          <TableHead>
+            <TableRow>
+              <TableHeadCell>Data/Hora</TableHeadCell>
+              <TableHeadCell>Usuário</TableHeadCell>
+              <TableHeadCell>Sistema</TableHeadCell>
+              <TableHeadCell>Ação</TableHeadCell>
+              <TableHeadCell>Recurso</TableHeadCell>
+              <TableHeadCell>Descrição</TableHeadCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
             {items.map((entry) => (
-              <tr key={entry.id}>
-                <td className={styles.mono}>{formatDate(entry.timestamp)}</td>
-                <td>{entry.userName}</td>
-                <td>{unitLabels[entry.userUnit] || entry.userUnit}</td>
-                <td>
+              <TableRow key={entry.id}>
+                <TableCell className={styles.mono}>{formatDate(entry.timestamp)}</TableCell>
+                <TableCell>{entry.userName}</TableCell>
+                <TableCell>{unitLabels[entry.userUnit] || entry.userUnit}</TableCell>
+                <TableCell>
                   <span
                     className={styles.badge}
                     style={{
@@ -45,13 +55,13 @@ export default function AuditLogTable({ items, loading, styles, unitLabels, form
                   >
                     {actionLabels[entry.action]}
                   </span>
-                </td>
-                <td>{resourceLabels[entry.resource] || entry.resource}</td>
-                <td className={styles.desc}>{entry.description}</td>
-              </tr>
+                </TableCell>
+                <TableCell>{resourceLabels[entry.resource] || entry.resource}</TableCell>
+                <TableCell className={styles.desc}>{entry.description}</TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       )}
     </div>
   );

@@ -1,46 +1,49 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+// Camada abaixo do Pentágono: o reset nunca anula o estilo dos componentes.
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-html {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-body {
-  line-height: 1.5;
-}
+  body {
+    line-height: 1.5;
+  }
 
-img,
-svg {
-  display: block;
-  max-width: 100%;
-}
+  img,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
 
-input,
-button,
-textarea,
-select {
-  font: inherit;
-  color: inherit;
-}
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
 
-button {
-  cursor: pointer;
-  border: none;
-  background: none;
-}
+  button {
+    cursor: pointer;
+    border: none;
+    background: none;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 
-ul,
-ol {
-  list-style: none;
+  ul,
+  ol {
+    list-style: none;
+  }
 }

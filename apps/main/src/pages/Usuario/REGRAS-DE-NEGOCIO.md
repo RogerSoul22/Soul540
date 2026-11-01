@@ -34,4 +34,3 @@ A visualização e as ações dependem da permissão da página e das permissõe
 - Definir desativação e reativação.
 - Definir transferência de usuário entre unidades.
 - Definir política de exclusão de administrador.
-

@@ -1,4 +1,4 @@
-import { ConfirmModal } from '../../../../ui/src/index';
+import { ConfirmModal } from '../../../../pentagono/src/index';
 import CategoryEditorModal from './CategoryEditorModal';
 import InventoryInfoModal from './InventoryInfoModal';
 import UtensilDetailsModal from './UtensilDetailsModal';

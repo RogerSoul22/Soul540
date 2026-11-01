@@ -1,4 +1,4 @@
-import { Badge } from '../../../../ui/src/index';
+import { Badge, Button } from '../../../../pentagono/src/index';
 import InventoryModalFrame from './InventoryModalFrame';
 import frameStyles from './styles/InventoryModalFrame.module.scss';
 import type { Utensil } from './utensil-types';
@@ -20,18 +20,18 @@ export default function UtensilDetailsModal({ item, onClose, onEdit }: UtensilDe
     <InventoryModalFrame
       footer={
         <>
-          <button className={frameStyles.cancelButton} onClick={onClose}>
+          <Button variant="ghost" onClick={onClose}>
             Fechar
-          </button>
-          <button
-            className={frameStyles.primaryButton}
+          </Button>
+          <Button
+            variant="primary"
             onClick={() => {
               onClose();
               onEdit(item);
             }}
           >
             Editar
-          </button>
+          </Button>
         </>
       }
       onClose={onClose}

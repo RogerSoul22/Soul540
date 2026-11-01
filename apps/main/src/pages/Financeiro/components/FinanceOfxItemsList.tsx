@@ -1,3 +1,4 @@
+import { Button, Input, Select } from '../../../../../../packages/pentagono/src/index';
 import { format, isValid, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
@@ -50,9 +51,9 @@ export default function FinanceOfxItemsList({
           {ofxItems.filter((item) => item.selected).length} de {ofxItems.length} movimentos selecionados
           {duplicateCount > 0 ? ' - ' + duplicateCount + ' já importado(s)' : ''}
         </span>
-        <button className={styles.xmlToggleAll} onClick={toggleAll}>
+        <Button variant="ghost" size="sm" className={styles.xmlToggleAll} onClick={toggleAll}>
           {allSelected ? 'Desmarcar todos' : 'Selecionar todos'}
-        </button>
+        </Button>
       </div>
       <div className={styles.xmlList}>
         {ofxItems.map((item) => {
@@ -60,7 +61,7 @@ export default function FinanceOfxItemsList({
           const disabled = !item.selected || item.decision === 'duplicate' || item.decision === 'ambiguous';
           return (
             <div key={item.id} className={styles.xmlRow + ' ' + (disabled ? styles.xmlRowDisabled : '')}>
-              <input
+              <Input
                 type="checkbox"
                 checked={item.selected}
                 disabled={item.decision === 'duplicate' || item.decision === 'ambiguous'}
@@ -82,7 +83,8 @@ export default function FinanceOfxItemsList({
                   {decisionLabel(item.decision)}
                 </span>
               </div>
-              <select
+              <Select
+                variant="compact"
                 className={styles.xmlCatSelect}
                 value={item.category}
                 disabled={item.decision !== 'create_unclassified'}
@@ -107,7 +109,7 @@ export default function FinanceOfxItemsList({
                       ))}
                     </optgroup>
                   ))}
-              </select>
+              </Select>
             </div>
           );
         })}

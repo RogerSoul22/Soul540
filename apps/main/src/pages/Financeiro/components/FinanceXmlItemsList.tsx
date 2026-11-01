@@ -1,3 +1,4 @@
+import { Button, Input, Select } from '../../../../../../packages/pentagono/src/index';
 import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
 import styles from '../styles/Financeiro.module.scss';
@@ -10,7 +11,9 @@ export default function FinanceXmlItemsList({ controller }: { controller: Financ
         <span className={styles.xmlCount}>
           {xmlItems.filter((item) => item.selected).length} de {xmlItems.length} itens selecionados
         </span>
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           className={styles.xmlToggleAll}
           onClick={() => {
             const allSelected = xmlItems.every((item) => item.selected);
@@ -18,12 +21,12 @@ export default function FinanceXmlItemsList({ controller }: { controller: Financ
           }}
         >
           {xmlItems.every((item) => item.selected) ? 'Desmarcar todos' : 'Selecionar todos'}
-        </button>
+        </Button>
       </div>
       <div className={styles.xmlList}>
         {xmlItems.map((item) => (
           <div key={item.id} className={styles.xmlRow + ' ' + (!item.selected ? styles.xmlRowDisabled : '')}>
-            <input
+            <Input
               type="checkbox"
               checked={item.selected}
               onChange={(event) =>
@@ -41,7 +44,8 @@ export default function FinanceXmlItemsList({ controller }: { controller: Financ
                 <strong>{formatBRL(item.totalValue)}</strong>
               </span>
             </div>
-            <select
+            <Select
+              variant="compact"
               className={styles.xmlCatSelect}
               value={item.category}
               onChange={(event) =>
@@ -64,7 +68,7 @@ export default function FinanceXmlItemsList({ controller }: { controller: Financ
                     ))}
                   </optgroup>
                 ))}
-            </select>
+            </Select>
           </div>
         ))}
       </div>

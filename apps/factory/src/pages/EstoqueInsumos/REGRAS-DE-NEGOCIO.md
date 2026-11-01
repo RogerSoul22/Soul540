@@ -36,4 +36,3 @@ A visualização e as ações dependem da permissão da página e das permissõe
 - Criar livro de movimentos.
 - Definir custo médio ou custo da última compra.
 - Definir consumo automático pela produção e estorno de consumo.
-

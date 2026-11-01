@@ -1,7 +1,7 @@
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { TaskHistoryEntry } from '../../../../../../shared/contracts/types';
-import { Badge } from '../../../../../../packages/ui/src/index';
+import { Badge, Button } from '../../../../../../packages/pentagono/src/index';
 import { taskPriorityLabels as priorityLabels } from '../../../../../../packages/screens/src/index';
 import { PRIORITY_COLORS } from '../types/task-types';
 import styles from '../styles/Tarefas.module.scss';
@@ -18,9 +18,9 @@ type Props = {
 export default function TaskHistory({ entries, eventMap, expanded, onToggle, onReopen, onDelete }: Props) {
   return (
     <div className={styles.historySection}>
-      <button className={styles.historyToggle} onClick={onToggle}>
+      <Button variant="ghost" size="sm" className={styles.historyToggle} onClick={onToggle}>
         {expanded ? '⌃' : '⌄'} Histórico de Concluídas <span className={styles.historyCount}>{entries.length}</span>
-      </button>
+      </Button>
       {expanded && (
         <div className={styles.historyList}>
           {entries.length === 0 ? (
@@ -49,12 +49,18 @@ export default function TaskHistory({ entries, eventMap, expanded, onToggle, onR
                 </div>
                 <div className={styles.historyItemActions}>
                   <Badge variant={PRIORITY_COLORS[entry.priority]}>{priorityLabels[entry.priority]}</Badge>
-                  <button className={styles.historyReopenBtn} onClick={() => onReopen(entry)}>
+                  <Button variant="ghost" size="sm" className={styles.historyReopenBtn} onClick={() => onReopen(entry)}>
                     Reabrir
-                  </button>
-                  <button className={styles.taskDelete} onClick={() => onDelete(entry.id)} title="Remover do histórico">
+                  </Button>
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    className={styles.taskDelete}
+                    onClick={() => onDelete(entry.id)}
+                    title="Remover do histórico"
+                  >
                     ×
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))

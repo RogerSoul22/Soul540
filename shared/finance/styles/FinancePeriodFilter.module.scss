@@ -12,7 +12,7 @@
   color: var(--text-secondary, #64748b);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: .45px;
+  letter-spacing: 0.45px;
   text-transform: uppercase;
 }
 
@@ -37,10 +37,21 @@
   font-size: 24px;
   line-height: 1;
 
-  &:first-child { border-radius: 5px 0 0 5px; }
-  &:last-child { border-radius: 0 5px 5px 0; }
-  &:hover:not(:disabled) { color: var(--finance-period-accent); background: var(--bg-elevated, #f7faff); }
-  &:disabled { cursor: not-allowed; color: var(--text-muted, #b6c2d1); background: var(--bg-tertiary, #f5f7fa); }
+  &:first-child {
+    border-radius: 5px 0 0 5px;
+  }
+  &:last-child {
+    border-radius: 0 5px 5px 0;
+  }
+  &:hover:not(:disabled) {
+    color: var(--finance-period-accent);
+    background: var(--bg-elevated, #f7faff);
+  }
+  &:disabled {
+    cursor: not-allowed;
+    color: var(--text-muted, #b6c2d1);
+    background: var(--bg-tertiary, #f5f7fa);
+  }
 }
 
 .periodButton {
@@ -60,10 +71,18 @@
   font-weight: 600;
   white-space: nowrap;
 
-  &:hover, &:focus-visible { border-color: var(--finance-period-accent); outline: none; }
+  &:hover,
+  &:focus-visible {
+    border-color: var(--finance-period-accent);
+    outline: none;
+  }
 }
 
-.chevron { margin-left: 10px; color: var(--finance-period-accent); font-size: 16px; }
+.chevron {
+  margin-left: 10px;
+  color: var(--finance-period-accent);
+  font-size: 16px;
+}
 
 .menu {
   position: absolute;
@@ -75,7 +94,7 @@
   border: 1px solid var(--border, #d5dfeb);
   border-radius: 6px;
   background: var(--bg-card, #fff);
-  box-shadow: 0 12px 26px rgba(28, 54, 90, .16);
+  box-shadow: 0 12px 26px rgba(28, 54, 90, 0.16);
 }
 
 .option {
@@ -90,10 +109,16 @@
   font-size: 12px;
   text-align: left;
 
-  &:hover { background: var(--bg-tertiary, #f1f6fc); }
+  &:hover {
+    background: var(--bg-tertiary, #f1f6fc);
+  }
 }
 
-.optionActive { background: color-mix(in srgb, var(--finance-period-accent) 13%, var(--bg-card, white)); color: var(--finance-period-accent); font-weight: 700; }
+.optionActive {
+  background: color-mix(in srgb, var(--finance-period-accent) 13%, var(--bg-card, white));
+  color: var(--finance-period-accent);
+  font-weight: 700;
+}
 
 .customDates {
   display: grid;
@@ -122,7 +147,10 @@
     background: var(--bg-input, #fff);
     font: inherit;
 
-    &:focus { border-color: var(--finance-period-accent); outline: none; }
+    &:focus {
+      border-color: var(--finance-period-accent);
+      outline: none;
+    }
   }
 }
 
@@ -152,7 +180,17 @@
 }
 
 @media (max-width: 560px) {
-  .filter { align-items: flex-start; flex-direction: column; width: 100%; }
-  .controlRow { width: 100%; }
-  .menu { left: 0; right: auto; width: 100%; }
+  .filter {
+    align-items: flex-start;
+    flex-direction: column;
+    width: 100%;
+  }
+  .controlRow {
+    width: 100%;
+  }
+  .menu {
+    left: 0;
+    right: auto;
+    width: 100%;
+  }
 }

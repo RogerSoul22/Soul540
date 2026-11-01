@@ -15,7 +15,7 @@ import {
 } from '../../../../../../packages/screens/src/index';
 
 export function useDashboardController() {
-  const { events, tasks, finances } = useApp();
+  const { events, tasks, finances, dataLoading } = useApp();
   const { user } = useAuth();
   const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [employees, setEmployees] = useState<OperationalEmployee[]>([]);
@@ -62,6 +62,7 @@ export function useDashboardController() {
 
   return {
     events,
+    dataLoading,
     user,
     calendarMonth,
     setCalendarMonth,

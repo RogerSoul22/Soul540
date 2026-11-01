@@ -1,0 +1,114 @@
+/* Camada: classes da página (fora de @layer) sempre vencem o padrão do Pentágono. */
+@layer pentagono {
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--pentagono-space-2);
+    font-family: inherit;
+    font-size: var(--pentagono-text-sm);
+    font-weight: var(--pentagono-font-semibold);
+    letter-spacing: 0.01em;
+    border: none;
+    border-radius: var(--pentagono-radius-control);
+    cursor: pointer;
+    transition: all var(--pentagono-transition-base);
+  }
+
+  .md {
+    padding: 11px 20px;
+  }
+
+  .sm {
+    padding: 8px 14px;
+    font-size: var(--pentagono-text-xs);
+  }
+
+  .icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+  }
+
+  .button:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  .button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--pentagono-color-brand-glow);
+  }
+
+  .primary {
+    color: var(--pentagono-color-on-brand);
+    background: linear-gradient(135deg, var(--pentagono-color-brand), var(--pentagono-color-brand-end));
+    box-shadow: 0 1px 3px var(--pentagono-color-brand-glow);
+  }
+
+  .primary:hover:not(:disabled) {
+    box-shadow: 0 4px 20px var(--pentagono-color-brand-glow);
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+
+  .primary:active:not(:disabled) {
+    filter: brightness(0.95);
+    transform: translateY(0);
+  }
+
+  .secondary {
+    color: var(--pentagono-color-text-secondary);
+    background: transparent;
+    border: 1px solid var(--pentagono-color-border);
+  }
+
+  .secondary:hover:not(:disabled) {
+    color: var(--pentagono-color-text);
+    background: var(--pentagono-color-hover);
+    border-color: var(--pentagono-color-text-muted);
+  }
+
+  .ghost {
+    color: var(--pentagono-color-text-muted);
+    background: transparent;
+  }
+
+  .ghost:hover:not(:disabled) {
+    color: var(--pentagono-color-text);
+    background: var(--pentagono-color-hover);
+  }
+
+  .danger {
+    color: var(--pentagono-color-danger);
+    background: var(--pentagono-color-danger-soft);
+    border: 1px solid var(--pentagono-color-danger-soft);
+  }
+
+  .danger:hover:not(:disabled) {
+    border-color: var(--pentagono-color-danger);
+  }
+
+  .fullWidth {
+    width: 100%;
+  }
+
+  .loading {
+    pointer-events: none;
+  }
+
+  .spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

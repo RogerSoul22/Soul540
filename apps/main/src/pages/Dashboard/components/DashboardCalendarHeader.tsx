@@ -1,3 +1,4 @@
+import { Button } from '../../../../../../packages/pentagono/src/index';
 import type { UnitFilter } from '../types/dashboard-types';
 import styles from '../styles/Dashboard.module.scss';
 
@@ -26,21 +27,26 @@ export default function DashboardCalendarHeader({
           </span>
         </div>
         <div className={styles.calendarHeaderRight}>
-          <button className={styles.btnNewSchedule} onClick={() => onNavigate('/eventos?action=new')}>
+          <Button variant="dashed" className={styles.btnNewSchedule} onClick={() => onNavigate('/eventos?action=new')}>
             Novo Agendamento
-          </button>
-          <button className={styles.btnNewEntry} onClick={() => onNavigate('/financeiro?action=new&type=cost')}>
+          </Button>
+          <Button
+            variant="dashed"
+            className={styles.btnNewEntry}
+            onClick={() => onNavigate('/financeiro?action=new&type=cost')}
+          >
             Lançar Despesa
-          </button>
+          </Button>
           <div className={styles.unitFilter}>
             {(['all', 'main', 'franchise'] as UnitFilter[]).map((filter) => (
-              <button
+              <Button
+                variant="chip"
                 key={filter}
                 className={styles.unitFilterBtn + (unitFilter === filter ? ' ' + styles.unitFilterBtnActive : '')}
                 onClick={() => onUnitFilterChange(filter)}
               >
                 {filter === 'all' ? 'Todos' : filter === 'main' ? 'Sorocaba' : 'Itu'}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

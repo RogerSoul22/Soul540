@@ -30,11 +30,13 @@
 ### Task 1: Criptografia autenticada e contrato do certificado
 
 **Files:**
+
 - Create: `apps/api/src/infrastructure/crypto/secret-cipher.ts`
 - Create: `apps/api/src/infrastructure/crypto/secret-cipher.test.ts`
 - Create: `apps/api/src/modules/fiscal/main-certificate-types.ts`
 
 **Interfaces:**
+
 - Produces `SecretCipher.encrypt(value: string, context: string): string` and `SecretCipher.decrypt(payload: string, context: string): string`.
 - Produces `MainCertificateSummary` and `OpenedMainCertificate` types used by the service and routes.
 
@@ -46,12 +48,14 @@
 ### Task 2: Modelo e serviço do cofre principal
 
 **Files:**
+
 - Create: `apps/api/src/modules/fiscal/main-certificate.model.ts`
 - Create: `apps/api/src/modules/fiscal/main-certificate.service.ts`
 - Create: `apps/api/src/modules/fiscal/main-certificate.test.ts`
 - Delete or replace: `apps/api/src/infrastructure/services/cert.ts`
 
 **Interfaces:**
+
 - `getMainCertificateSummary(): Promise<MainCertificateSummary>`.
 - `saveMainCertificate(input: { certificateBase64: string; password: string }): Promise<MainCertificateSummary>`.
 - `removeMainCertificate(): Promise<void>`.
@@ -69,6 +73,7 @@
 ### Task 3: API routes, access control and NF-e integration
 
 **Files:**
+
 - Create: `apps/api/src/modules/fiscal/main-certificate.routes.ts`
 - Create: `apps/api/src/modules/fiscal/main-certificate.routes.test.ts`
 - Modify: `apps/api/src/app.ts`
@@ -77,6 +82,7 @@
 - Modify: `apps/api/src/infrastructure/services/nfe-xml.ts`
 
 **Interfaces:**
+
 - `GET /api/fiscal/certificado` returns only summary metadata.
 - `PUT /api/fiscal/certificado` accepts `{ certificado: string, senha: string }` and returns summary.
 - `DELETE /api/fiscal/certificado` clears the matrix certificate.
@@ -92,6 +98,7 @@
 ### Task 4: Configuração fiscal no sistema principal
 
 **Files:**
+
 - Create: `apps/main/src/pages/ConfiguracaoFiscal/ConfiguracaoFiscal.tsx`
 - Create: `apps/main/src/pages/ConfiguracaoFiscal/hooks/use-configuracao-fiscal.ts`
 - Create: `apps/main/src/pages/ConfiguracaoFiscal/styles/ConfiguracaoFiscal.module.scss`
@@ -100,6 +107,7 @@
 - Modify: `apps/main/src/components/Sidebar/sidebar-group-sistema.tsx`
 
 **Interfaces:**
+
 - The page calls `GET`, `PUT` and `DELETE /api/fiscal/certificado` through `apiFetch` with `X-System: main`.
 - The form accepts only `.pfx` and `.p12`, sends Base64 plus password, and renders status, titular, CNPJ and expiration only.
 - The route is wrapped by the existing `__admin__` permission guard.
@@ -113,6 +121,7 @@
 ### Task 5: Migration, environment documentation and full verification
 
 **Files:**
+
 - Create: `apps/api/src/scripts/migrate-main-certificate.ts`
 - Modify: `package.json`
 - Modify: `.env.example`

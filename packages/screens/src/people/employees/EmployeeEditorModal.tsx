@@ -1,3 +1,4 @@
+import { Button } from '../../../../pentagono/src/index';
 import EmployeeEditorFields from './EmployeeEditorFields';
 import EmployeeModalFrame from './EmployeeModalFrame';
 import frameStyles from './styles/EmployeeModalFrame.module.scss';
@@ -36,12 +37,12 @@ export default function EmployeeEditorModal({
     <EmployeeModalFrame
       footer={
         <>
-          <button className={frameStyles.cancelButton} onClick={onClose}>
+          <Button variant="ghost" onClick={onClose}>
             Cancelar
-          </button>
-          <button className={frameStyles.primaryButton} onClick={onSubmit} disabled={!form.name}>
+          </Button>
+          <Button variant="primary" onClick={onSubmit} disabled={!form.name}>
             {editingId ? 'Salvar' : 'Adicionar'}
-          </button>
+          </Button>
         </>
       }
       onClose={onClose}

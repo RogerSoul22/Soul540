@@ -2,7 +2,7 @@ import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
 import { getDerivedFinanceLabel } from '../../../../../../shared/finance/financePolicy';
-import { Modal } from '../../../../../../packages/ui/src/index';
+import { Button, Modal } from '../../../../../../packages/pentagono/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
 import styles from '../styles/Financeiro.module.scss';
 
@@ -107,8 +107,8 @@ export default function FinanceEntryDetailsModal({ controller }: { controller: F
         <p>{selectedFinance.description || 'Sem descrição'}</p>
       </div>
       <div className={styles.eventDetailActions}>
-        <button
-          className={styles.btnExport}
+        <Button
+          variant="secondary"
           type="button"
           onClick={() => {
             const entry = selectedFinance;
@@ -117,10 +117,10 @@ export default function FinanceEntryDetailsModal({ controller }: { controller: F
           }}
         >
           Editar
-        </button>
-        <button className={styles.btnDanger} type="button" onClick={() => requestFinanceDelete(selectedFinance)}>
+        </Button>
+        <Button variant="danger" type="button" onClick={() => requestFinanceDelete(selectedFinance)}>
           Excluir
-        </button>
+        </Button>
       </div>
     </Modal>
   );

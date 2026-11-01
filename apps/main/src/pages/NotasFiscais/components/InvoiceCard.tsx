@@ -1,6 +1,6 @@
 import { format, parseISO } from 'date-fns';
 import type { Invoice } from '../../../../../../packages/contracts/src/index';
-import { Badge } from '../../../../../../packages/ui/src/index';
+import { Badge, Button, Card } from '../../../../../../packages/pentagono/src/index';
 import { statusColors, statusLabels } from '../types/invoice-types';
 import styles from '../styles/NotasFiscais.module.scss';
 
@@ -20,7 +20,7 @@ export default function InvoiceCard({ invoice, eventName, onPreview, onEmit, onE
   const errored = invoice.emissaoStatus === 'erro' || invoice.nfeioStatus === 'error';
 
   return (
-    <div className={styles.card} onClick={onPreview}>
+    <Card className={styles.card} interactive onClick={onPreview}>
       <div className={styles.cardHeader}>
         <span className={styles.cardId}>{invoice.id.toUpperCase()}</span>
         <Badge variant={statusColors[invoice.status]}>{statusLabels[invoice.status]}</Badge>
@@ -38,9 +38,9 @@ export default function InvoiceCard({ invoice, eventName, onPreview, onEmit, onE
       </div>
       <div className={styles.nfeioSection} onClick={(event) => event.stopPropagation()}>
         {!invoice.nfeioStatus && !invoice.emissaoStatus && invoice.status !== 'cancelada' && (
-          <button className={styles.emitBtn} onClick={onEmit}>
+          <Button variant="outline" className={styles.emitBtn} onClick={onEmit}>
             Emitir Nota Fiscal
-          </button>
+          </Button>
         )}
         {processing && <Badge variant="amber">Processando...</Badge>}
         {issued && (
@@ -72,33 +72,40 @@ export default function InvoiceCard({ invoice, eventName, onPreview, onEmit, onE
         {errored && (
           <div className={styles.nfeioError}>
             <Badge variant="red">Erro na Emissão</Badge>
-            <button className={styles.retryBtn} onClick={onEmit}>
+            <Button variant="outline" className={styles.retryBtn} onClick={onEmit}>
               Tentar novamente
-            </button>
+            </Button>
           </div>
         )}
       </div>
       <div className={styles.cardFooter} onClick={(event) => event.stopPropagation()}>
         <span className={styles.cardLabel}>{invoice.clientDocument}</span>
         <div className={styles.cardActions}>
-          <button className={styles.actionBtn} onClick={onEdit} title="Editar">
+          <Button variant="outline" className={styles.actionBtn} onClick={onEdit} title="Editar">
             ✏
-          </button>
+          </Button>
           {invoice.status === 'rascunho' && (
-            <button
+            <Button
+              variant="outline"
               className={styles.actionBtn + ' ' + styles.actionBtnWarning}
               onClick={onCancel}
               title="Cancelar nota"
             >
               !
-            </button>
+            </Button>
           )}
-          <button className={styles.actionBtn + ' ' + styles.actionBtnDanger} onClick={onDelete} title="Excluir">
+          <Button
+            variant="danger"
+            size="sm"
+            className={styles.actionBtn + ' ' + styles.actionBtnDanger}
+            onClick={onDelete}
+            title="Excluir"
+          >
             X
-          </button>
+          </Button>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }
 

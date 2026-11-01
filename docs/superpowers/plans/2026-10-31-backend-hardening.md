@@ -47,6 +47,7 @@
 ### Task 1: JWT seguro e autenticação consistente
 
 **Files:**
+
 - Create: `apps/api/src/infrastructure/security/jwt-secret.ts`
 - Modify: `apps/api/src/modules/identity/auth.routes.ts`
 - Modify: `apps/api/src/infrastructure/middleware/auth.ts`
@@ -54,6 +55,7 @@
 - Test: `apps/api/src/modules/identity/auth-system-policy.test.ts`
 
 **Interfaces:**
+
 - Produces `getJwtSecret(): string`, que lança erro de configuração quando `JWT_SECRET` não existe ou tem menos de 32 bytes.
 - Consumes `normalizeSystem` e `canAccessSystem` já existentes.
 
@@ -66,6 +68,7 @@
 ### Task 2: Autorização centralizada e rotas administrativas
 
 **Files:**
+
 - Create: `apps/api/src/infrastructure/middleware/permissions.ts`
 - Modify: `apps/api/src/modules/identity/franchises.routes.ts`
 - Modify: `apps/api/src/modules/operations/auditlog.routes.ts`
@@ -75,6 +78,7 @@
 - Test: `apps/api/src/modules/operations/auditlog.routes.test.ts`
 
 **Interfaces:**
+
 - Produces `requirePermission(permission: string, mode?: 'read' | 'write')` e `requireGlobalAdmin()`.
 - Mantém `requireAdmin` compatível como atalho para `isAdmin`.
 
@@ -87,10 +91,12 @@
 ### Task 3: Permissões nos módulos de dados e produção
 
 **Files:**
+
 - Modify: rotas de eventos, tarefas, funcionários, contratantes, contratos, menus, suprimentos, utensílios, financeiro, invoices e produção.
 - Test: testes de autorização por módulo.
 
 **Interfaces:**
+
 - Consumes `requirePermission` da Task 2.
 - Produces matriz estável: `eventos`, `tarefas`, `funcionarios`, `contratantes`, `contratos`, `cardapios`, `estoque`, `financeiro`, `notas-fiscais` e `producao`.
 
@@ -103,6 +109,7 @@
 ### Task 4: Eventos combinados e dados da fábrica
 
 **Files:**
+
 - Modify: `apps/api/src/modules/events/events.finance.ts`
 - Modify: `apps/api/src/modules/events/events.routes.ts`
 - Modify: `apps/api/src/modules/operations/dashboard.routes.ts`
@@ -111,6 +118,7 @@
 - Test: `apps/api/src/modules/operations/dashboard.routes.test.ts`
 
 **Interfaces:**
+
 - Produces `findEventForRequest(req, id, source?)`, que escolhe explicitamente `main`, `franchise` ou `factory`.
 - Mantém atualização da fábrica limitada a `pickFactoryOperationalUpdate`.
 
@@ -124,10 +132,12 @@
 ### Task 5: Chat seguro e validação de entrada
 
 **Files:**
+
 - Modify: `apps/api/src/modules/operations/chat.routes.ts`
 - Test: `apps/api/src/modules/operations/chat.routes.test.ts`
 
 **Interfaces:**
+
 - Consumes `requirePermission` da Task 2.
 - Produces lista fechada de ações válidas e parâmetros validados antes de `executeAction`.
 
@@ -140,6 +150,7 @@
 ### Task 6: Erros, limites e rate limit
 
 **Files:**
+
 - Create: `apps/api/src/infrastructure/http/errors.ts`
 - Create: `apps/api/src/infrastructure/middleware/rate-limit.ts`
 - Modify: `apps/api/src/infrastructure/http/response-envelope.ts`
@@ -147,6 +158,7 @@
 - Test: testes de envelope, erro e rate limit.
 
 **Interfaces:**
+
 - Produces `ApiError(code, message, status, details?)` e `normalizeApiError(error)`.
 - Produces `createRateLimit(options)` com janela e máximo configuráveis.
 
@@ -160,11 +172,13 @@
 ### Task 7: Exclusão segura e correção dos textos
 
 **Files:**
+
 - Modify: franquias, eventos, invoices, contratantes, contratos e demais rotas com entidades históricas.
 - Modify: mensagens mojibake em `apps/api/src/**/*.ts`.
 - Test: testes de inativação e snapshot de mensagens públicas.
 
 **Interfaces:**
+
 - Mantém respostas HTTP existentes, mas troca exclusão de entidades históricas por `status: 'inativa'`/`deletedAt` conforme o schema já disponível.
 
 - [ ] **Step 1: Escrever testes falhando** para preservar franquia, nota e evento após exclusão lógica e para mensagens com acentuação correta.
@@ -176,6 +190,7 @@
 ### Task 8: Verificação integral
 
 **Files:**
+
 - Modify: somente correções descobertas nos testes finais.
 - Test: suíte completa da API e checks do workspace.
 

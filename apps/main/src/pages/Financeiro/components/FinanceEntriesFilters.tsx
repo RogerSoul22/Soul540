@@ -1,3 +1,4 @@
+import { Button, Input } from '../../../../../../packages/pentagono/src/index';
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
 import styles from '../styles/Financeiro.module.scss';
 
@@ -37,18 +38,20 @@ export default function FinanceEntriesFilters({ controller }: { controller: Fina
     <div className={styles.filterRow}>
       <div className={styles.filterGroup}>
         {(Object.keys(labels) as FilterType[]).map((type) => (
-          <button
+          <Button
+            variant="chip"
             key={type}
             className={styles.filterBtn + ' ' + (filterType === type ? styles.filterBtnActive : '')}
             onClick={() => changeFilter(type)}
           >
             {labels[type]}
-          </button>
+          </Button>
         ))}
       </div>
       <div className={styles.filterGroup}>
         {(['all', 'feirinha', 'evento_avulso'] as const).map((modality) => (
-          <button
+          <Button
+            variant="chip"
             key={modality}
             className={styles.filterBtn + ' ' + (modalityFilter === modality ? styles.filterBtnActive : '')}
             onClick={() => {
@@ -57,22 +60,23 @@ export default function FinanceEntriesFilters({ controller }: { controller: Fina
             }}
           >
             {modality === 'all' ? 'Todas modalidades' : modality === 'feirinha' ? 'Feirinhas' : 'Eventos avulsos'}
-          </button>
+          </Button>
         ))}
       </div>
-      <input
+      <Input
+        variant="search"
         type="text"
         className={styles.searchInput}
         placeholder="Buscar por descrição, categoria..."
         value={search}
         onChange={(event) => changeSearch(event.target.value)}
       />
-      <button className={styles.btnExport} onClick={exportCSV} title="Exportar lançamentos filtrados">
+      <Button variant="secondary" onClick={exportCSV} title="Exportar lançamentos filtrados">
         Exportar CSV
-      </button>
-      <button className={styles.btnExport} onClick={exportDRE} title="Exportar no padrão DRE">
+      </Button>
+      <Button variant="secondary" onClick={exportDRE} title="Exportar no padrão DRE">
         Exportar DRE
-      </button>
+      </Button>
     </div>
   );
 }

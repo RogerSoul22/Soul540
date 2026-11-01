@@ -29,16 +29,21 @@ export function getReportingUnit(source: string | undefined, relevantDate: strin
   return sourceUnit;
 }
 
-export function getFinanceReportingAllocations(entry: FinanceWithSource, view: FinanceReportingView): ReportingAllocation[] {
+export function getFinanceReportingAllocations(
+  entry: FinanceWithSource,
+  view: FinanceReportingView,
+): ReportingAllocation[] {
   if (isCancelledFinance(entry)) return [];
   const source = getSourceUnit(entry.source);
   if (view === 'competence') {
-    return [{
-      source,
-      reportingUnit: getReportingUnit(source, entry.date),
-      date: entry.date,
-      amountCents: getFinanceAmountCents(entry),
-    }];
+    return [
+      {
+        source,
+        reportingUnit: getReportingUnit(source, entry.date),
+        date: entry.date,
+        amountCents: getFinanceAmountCents(entry),
+      },
+    ];
   }
 
   return getEffectiveSettlements(entry).map((settlement) => ({

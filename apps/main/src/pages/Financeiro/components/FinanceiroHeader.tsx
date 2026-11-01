@@ -1,5 +1,5 @@
 import type { FinanceiroController } from '../hooks/use-financeiro-controller';
-import { Button } from '../../../../../../packages/ui/src/index';
+import { Button, InfoButton, Input, PageHeader } from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/Financeiro.module.scss';
 
 const infoTitle =
@@ -23,81 +23,77 @@ export default function FinanceiroHeader({ controller }: { controller: Financeir
   } = controller;
 
   return (
-    <div className={styles.header}>
-      <div className={styles.headerLeft}>
-        <div className={styles.titleRow}>
-          <h1 className={styles.title}>Financeiro</h1>
-          <button className={styles.btnInfo} onClick={() => setShowInfo(true)} title={infoTitle}>
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+    <PageHeader
+      title="Financeiro"
+      subtitle="Controle completo de receitas, despesas e indicadores"
+      titleExtra={
+        <>
+          <InfoButton label={infoTitle} onClick={() => setShowInfo(true)} />
+        </>
+      }
+      actions={
+        <>
+          <div className={styles.scopeToggle}>
+            <Button
+              variant="chip"
+              className={`${styles.scopeBtn} ${dataScope === 'main' ? styles.scopeBtnActive : ''}`}
+              onClick={() => setDataScope('main')}
+              title="Exibir apenas dados do sistema principal"
             >
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="16" x2="12" y2="12" />
-              <line x1="12" y1="8" x2="12.01" y2="8" />
-            </svg>
-          </button>
-        </div>
-        <p className={styles.subtitle}>Controle completo de receitas, despesas e indicadores</p>
-      </div>
+              Sorocaba
+            </Button>
+            <Button
+              variant="chip"
+              className={`${styles.scopeBtn} ${dataScope === 'franchise' ? styles.scopeBtnActive : ''}`}
+              onClick={() => setDataScope('franchise')}
+              title="Exibir dados de todas as franquias"
+            >
+              Franquias
+            </Button>
+            <Button
+              variant="chip"
+              className={`${styles.scopeBtn} ${dataScope === 'factory' ? styles.scopeBtnActive : ''}`}
+              onClick={() => setDataScope('factory')}
+              title={factoryTitle}
+            >
+              Fábrica
+            </Button>
+            <Button
+              variant="chip"
+              className={`${styles.scopeBtn} ${dataScope === 'combined' ? styles.scopeBtnActive : ''}`}
+              onClick={() => setDataScope('combined')}
+              title={combinedTitle}
+            >
+              Consolidado
+            </Button>
+          </div>
 
-      <div className={styles.headerActions}>
-        <div className={styles.scopeToggle}>
-          <button
-            className={`${styles.scopeBtn} ${dataScope === 'main' ? styles.scopeBtnActive : ''}`}
-            onClick={() => setDataScope('main')}
-            title="Exibir apenas dados do sistema principal"
-          >
-            Sorocaba
-          </button>
-          <button
-            className={`${styles.scopeBtn} ${dataScope === 'franchise' ? styles.scopeBtnActive : ''}`}
-            onClick={() => setDataScope('franchise')}
-            title="Exibir dados de todas as franquias"
-          >
-            Franquias
-          </button>
-          <button
-            className={`${styles.scopeBtn} ${dataScope === 'factory' ? styles.scopeBtnActive : ''}`}
-            onClick={() => setDataScope('factory')}
-            title={factoryTitle}
-          >
-            Fábrica
-          </button>
-          <button
-            className={`${styles.scopeBtn} ${dataScope === 'combined' ? styles.scopeBtnActive : ''}`}
-            onClick={() => setDataScope('combined')}
-            title={combinedTitle}
-          >
-            Consolidado
-          </button>
-        </div>
+          <Input ref={xmlInputRef} type="file" accept=".xml" hidden onChange={handleXmlFile} />
+          <Button variant="secondary" size="sm" className={styles.btnXml} onClick={() => xmlInputRef.current?.click()}>
+            Importar XML
+          </Button>
 
-        <input ref={xmlInputRef} type="file" accept=".xml" hidden onChange={handleXmlFile} />
-        <button className={styles.btnXml} onClick={() => xmlInputRef.current?.click()}>
-          Importar XML
-        </button>
+          <Input ref={ofxInputRef} type="file" accept=".ofx,application/x-ofx" hidden onChange={handleOfxFile} />
+          <Button
+            variant="secondary"
+            size="sm"
+            className={styles.btnXml}
+            onClick={() => ofxInputRef.current?.click()}
+            title={ofxTitle}
+          >
+            Importar OFX
+          </Button>
 
-        <input ref={ofxInputRef} type="file" accept=".ofx,application/x-ofx" hidden onChange={handleOfxFile} />
-        <button className={styles.btnXml} onClick={() => ofxInputRef.current?.click()} title={ofxTitle}>
-          Importar OFX
-        </button>
-
-        <Button
-          onClick={() => {
-            resetForm();
-            setShowForm(true);
-          }}
-        >
-          {newFinanceLabel}
-        </Button>
-      </div>
-    </div>
+          <Button
+            onClick={() => {
+              resetForm();
+              setShowForm(true);
+            }}
+          >
+            {newFinanceLabel}
+          </Button>
+        </>
+      }
+    />
   );
 }

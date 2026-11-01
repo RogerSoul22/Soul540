@@ -43,7 +43,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     refreshTaskHistory,
   };
 
-  useFranchiseAppData(state);
+  const dataLoading = useFranchiseAppData(state);
   return (
     <AppContext.Provider
       value={{
@@ -53,6 +53,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         financeCategories,
         tasks,
         taskHistory,
+        dataLoading,
         ...useFranchiseFinanceActions(state),
         ...useFranchiseEventActions(state),
         ...useFranchiseTaskActions(state),

@@ -27,34 +27,6 @@
 }
 
 // section
-.btnEdit {
-  flex: 1;
-
-  padding: 9px $spacing-md;
-
-  border-radius: $radius-sm;
-
-  border: 1px solid $border;
-
-  background: rgba(255, 255, 255, 0.04);
-
-  color: $text-primary;
-
-  font-size: $font-size-sm;
-
-  font-weight: $font-weight-medium;
-
-  cursor: pointer;
-
-  transition: all $transition-base;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.07);
-
-    border-color: rgba(255, 255, 255, 0.15);
-  }
-}
-
 .btnWhatsapp {
   display: flex;
   align-items: center;

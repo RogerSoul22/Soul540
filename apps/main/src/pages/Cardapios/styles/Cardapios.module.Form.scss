@@ -67,12 +67,6 @@
   border-bottom: 1px solid $border;
 }
 
-.categoriesTitle {
-  font-size: $font-size-sm;
-  font-weight: $font-weight-semibold;
-  color: $text-primary;
-}
-
 .btnAddCat {
   padding: 6px 12px;
   background: rgba($accent, 0.1);
@@ -84,35 +78,6 @@
   cursor: pointer;
   &:hover {
     background: rgba($accent, 0.2);
-  }
-}
-
-.catBlock {
-  padding: $spacing-md;
-  border-bottom: 1px solid $border;
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.catBlockHeader {
-  @include flex-between;
-  gap: $spacing-sm;
-  margin-bottom: $spacing-sm;
-}
-
-.catNameInput {
-  flex: 1;
-  background: $bg-input;
-  border: 1px solid $border;
-  border-radius: $radius-xs;
-  padding: 6px 10px;
-  font-size: $font-size-sm;
-  font-weight: $font-weight-semibold;
-  color: $text-primary;
-  &:focus {
-    outline: none;
-    border-color: $border-accent;
   }
 }
 
@@ -136,18 +101,3 @@
   align-items: center;
 }
 
-.itemInput {
-  background: $bg-input;
-  border: 1px solid $border;
-  border-radius: $radius-xs;
-  padding: 6px 8px;
-  font-size: $font-size-xs;
-  color: $text-primary;
-  &::placeholder {
-    color: $text-muted;
-  }
-  &:focus {
-    outline: none;
-    border-color: $border-accent;
-  }
-}

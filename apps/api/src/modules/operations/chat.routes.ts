@@ -45,11 +45,10 @@ router.post('/', async (req: any, res: any) => {
     const reply = await callGroq([
       {
         role: 'system',
-        content:
-          [
-            'Você é um assistente amigável do Soul540. Responda em português brasileiro de forma clara e',
-            'concisa. Formate listas com bullet points quando apropriado.',
-          ].join(' '),
+        content: [
+          'Você é um assistente amigável do Soul540. Responda em português brasileiro de forma clara e',
+          'concisa. Formate listas com bullet points quando apropriado.',
+        ].join(' '),
       },
       { role: 'user', content: message },
       {

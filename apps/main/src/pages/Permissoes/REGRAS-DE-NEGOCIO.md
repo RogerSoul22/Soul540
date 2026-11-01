@@ -34,4 +34,3 @@ A visualização e as ações dependem da permissão da página e das permissõe
 - Definir catálogo oficial de páginas.
 - Definir catálogo de ações.
 - Definir regra para administrador e revogação imediata.
-

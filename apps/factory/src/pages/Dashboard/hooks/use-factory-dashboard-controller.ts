@@ -15,7 +15,7 @@ import {
 import type { ProductionOrder } from '../types/dashboard-types';
 
 export function useFactoryDashboardController() {
-  const { events, tasks, finances } = useApp();
+  const { events, tasks, finances, dataLoading } = useApp();
   const { user } = useAuth();
   const [employees, setEmployees] = useState<OperationalEmployee[]>([]);
   const [productionOrders, setProductionOrders] = useState<ProductionOrder[]>([]);
@@ -69,6 +69,7 @@ export function useFactoryDashboardController() {
 
   return {
     events,
+    dataLoading,
     user,
     urgentTaskCount,
     now,

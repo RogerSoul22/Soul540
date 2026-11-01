@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import CalendarView from '../../components/CalendarView/CalendarView';
+import { SkeletonContent } from '../../../../../packages/pentagono/src/index';
 import styles from './styles/Dashboard.module.scss';
 import FactoryDashboardHeader from './components/FactoryDashboardHeader';
 import FactoryDashboardInfoModal from './components/FactoryDashboardInfoModal';
@@ -13,6 +14,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [showInfo, setShowInfo] = useState(false);
   const controller = useFactoryDashboardController();
+  const dataLoading = controller.dataLoading;
   const { now } = controller;
   const today = format(now, "EEEE, d 'de' MMMM", { locale: ptBR });
   const currentMonth = format(now, 'MMMM', { locale: ptBR });
@@ -32,14 +34,20 @@ export default function Dashboard() {
             {controller.monthEventCount} evento{controller.monthEventCount !== 1 ? 's' : ''}
           </span>
         </div>
-        <FactoryDashboardPanels
-          operationalAlerts={controller.operationalAlerts}
-          activeProductionOrders={controller.activeProductionOrders}
-          teamSchedule={controller.teamSchedule}
-          financialClosings={controller.financialClosings}
-          onNavigate={navigate}
-        />
-        <CalendarView events={controller.events} />
+        {dataLoading ? (
+          <SkeletonContent variant="cards" label="Carregando painéis..." />
+        ) : (
+          <FactoryDashboardPanels
+            operationalAlerts={controller.operationalAlerts}
+            activeProductionOrders={controller.activeProductionOrders}
+            teamSchedule={controller.teamSchedule}
+            financialClosings={controller.financialClosings}
+            onNavigate={navigate}
+          />
+        )}
+        <div data-skeleton={dataLoading}>
+          <CalendarView events={controller.events} />
+        </div>
       </div>
       {showInfo && <FactoryDashboardInfoModal onClose={() => setShowInfo(false)} />}
     </div>

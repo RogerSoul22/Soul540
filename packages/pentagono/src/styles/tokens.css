@@ -1,0 +1,92 @@
+/*
+ * Tokens do Pentágono (Soul540).
+ * Camada 1: variáveis de tema dos portais (--bg-*, --text-*, --border*), definidas em cada
+ * global.scss por html[data-theme]. Camada 2: --pentagono-*, o único contrato que os
+ * componentes leem. Os fallbacks reproduzem o tema escuro para o Pentágono funcionar isolado.
+ */
+:root {
+  --pentagono-color-background: var(--bg-primary, #0a0f1e);
+  --pentagono-color-surface: var(--bg-secondary, #111827);
+  --pentagono-color-surface-muted: var(--bg-tertiary, #1f2937);
+  --pentagono-color-surface-raised: var(--bg-elevated, #1a2235);
+  --pentagono-color-input: var(--bg-input, #151c2c);
+  --pentagono-color-card: var(--bg-card, #111827);
+
+  --pentagono-color-text: var(--text-primary, #f1f5f9);
+  --pentagono-color-text-secondary: var(--text-secondary, #94a3b8);
+  --pentagono-color-text-muted: #64748b;
+  --pentagono-color-on-brand: var(--bg-primary, #0a0f1e);
+
+  --pentagono-color-brand: #f59e0b;
+  --pentagono-color-brand-hover: #eab308;
+  --pentagono-color-brand-end: #f97316;
+  --pentagono-color-brand-soft: rgba(245, 158, 11, 0.12);
+  --pentagono-color-brand-glow: rgba(245, 158, 11, 0.25);
+
+  --pentagono-color-danger: #ef4444;
+  --pentagono-color-danger-soft: rgba(239, 68, 68, 0.12);
+  --pentagono-color-success: #22c55e;
+  --pentagono-color-success-soft: rgba(34, 197, 94, 0.12);
+  --pentagono-color-info: #3b82f6;
+  --pentagono-color-info-soft: rgba(59, 130, 246, 0.12);
+  --pentagono-color-purple: #a855f7;
+  --pentagono-color-purple-soft: rgba(168, 85, 247, 0.12);
+
+  --pentagono-color-border: var(--border, #1e293b);
+  --pentagono-color-border-subtle: var(--border-subtle, rgba(30, 41, 59, 0.6));
+  --pentagono-color-border-faint: var(--border-faint, rgba(30, 41, 59, 0.5));
+  --pentagono-color-hover: rgba(255, 255, 255, 0.05);
+  --pentagono-color-overlay: rgba(0, 0, 0, 0.7);
+  --pentagono-color-focus: rgba(245, 158, 11, 0.1);
+
+  --pentagono-font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --pentagono-font-display: 'Cormorant', Georgia, serif;
+  --pentagono-text-xs: 0.75rem;
+  --pentagono-text-sm: 0.875rem;
+  --pentagono-text-base: 1rem;
+  --pentagono-text-lg: 1.125rem;
+  --pentagono-text-xl: 1.25rem;
+  --pentagono-text-2xl: 1.5rem;
+  --pentagono-font-medium: 500;
+  --pentagono-font-semibold: 600;
+  --pentagono-font-bold: 700;
+
+  --pentagono-space-1: 4px;
+  --pentagono-space-2: 8px;
+  --pentagono-space-3: 16px;
+  --pentagono-space-4: 24px;
+  --pentagono-space-5: 32px;
+  --pentagono-space-6: 48px;
+  --pentagono-space-7: 64px;
+
+  --pentagono-radius-xs: 6px;
+  --pentagono-radius-sm: 8px;
+  --pentagono-radius-md: 12px;
+  --pentagono-radius-lg: 16px;
+  --pentagono-radius-xl: 20px;
+  --pentagono-radius-full: 9999px;
+  --pentagono-radius-control: var(--pentagono-radius-sm);
+  --pentagono-radius-card: var(--pentagono-radius-lg);
+
+  --pentagono-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --pentagono-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --pentagono-shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --pentagono-shadow-modal: 0 24px 64px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  --pentagono-shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.03);
+
+  --pentagono-transition-fast: 0.15s ease;
+  --pentagono-transition-base: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --pentagono-transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  --pentagono-z-modal: 100;
+}
+
+html[data-theme='light'] {
+  --pentagono-color-hover: rgba(15, 23, 42, 0.05);
+  --pentagono-color-overlay: rgba(15, 23, 42, 0.5);
+  --pentagono-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.1);
+  --pentagono-shadow-md: 0 4px 16px rgba(15, 23, 42, 0.1);
+  --pentagono-shadow-lg: 0 12px 40px rgba(15, 23, 42, 0.14);
+  --pentagono-shadow-modal: 0 24px 64px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(15, 23, 42, 0.04);
+  --pentagono-shadow-card: 0 2px 8px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(15, 23, 42, 0.04);
+}

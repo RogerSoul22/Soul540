@@ -19,7 +19,9 @@ export function ChecklistProgressPanel({ eventName, progress, completed, totalIt
         <div className={styles.progressTrack}>
           <div className={styles.progressFill} style={{ width: `${progress}%` }} />
         </div>
-        <p className={styles.progressText}>{completed} de {totalItems} itens conferidos{feedback ? ` - ${feedback}` : ''}</p>
+        <p className={styles.progressText}>
+          {completed} de {totalItems} itens conferidos{feedback ? ` - ${feedback}` : ''}
+        </p>
       </div>
     </div>
   );

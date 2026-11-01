@@ -1,5 +1,4 @@
-import { Button } from '../../../../../../packages/ui/src/index';
-import { Modal } from '../../../../../../packages/ui/src/index';
+import { Button, Modal } from '../../../../../../packages/pentagono/src/index';
 import type { Invoice } from '../../../../../../packages/contracts/src/index';
 import styles from '../styles/NotasFiscais.module.scss';
 

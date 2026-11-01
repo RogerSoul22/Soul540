@@ -115,12 +115,8 @@ export function getAvailabilityConflicts(
 export function getEventFinancialClosing(event: PizzaEvent, finances: FinanceEntry[] = []): EventFinancialClosing {
   const estimatedRevenue = event.finalValue && event.finalValue > 0 ? event.finalValue : event.budget || 0;
   const eventFinances = finances.filter((entry) => entry.eventId === event.id);
-  const realizedRevenue = eventFinances
-    .filter(isRealizedRevenue)
-    .reduce((sum, entry) => sum + (entry.amount || 0), 0);
-  const realizedCosts = eventFinances
-    .filter(isRealizedExpense)
-    .reduce((sum, entry) => sum + (entry.amount || 0), 0);
+  const realizedRevenue = eventFinances.filter(isRealizedRevenue).reduce((sum, entry) => sum + (entry.amount || 0), 0);
+  const realizedCosts = eventFinances.filter(isRealizedExpense).reduce((sum, entry) => sum + (entry.amount || 0), 0);
   const realizedResult = realizedRevenue - realizedCosts;
   const difference = realizedResult - estimatedRevenue;
 
@@ -139,9 +135,13 @@ export function getEventSupplyForecast(event: Partial<PizzaEvent>): EventSupplyF
   const guests = categorizedGuests > 0 ? categorizedGuests : event.guestCount || 0;
   const menuText = (event.menu || []).join(' ').toLowerCase();
   const menuFactor = menuText.includes('raffinato') ? 1.12 : menuText.includes('superiore') ? 1.06 : 1;
-  const basePizzas = event.estimatedPizzas && event.estimatedPizzas > 0
-    ? event.estimatedPizzas
-    : Math.ceil((((event.guestsAdult || guests) * 0.42) + ((event.guestsTeen || 0) * 0.32) + ((event.guestsChild || 0) * 0.16)) * menuFactor);
+  const basePizzas =
+    event.estimatedPizzas && event.estimatedPizzas > 0
+      ? event.estimatedPizzas
+      : Math.ceil(
+          ((event.guestsAdult || guests) * 0.42 + (event.guestsTeen || 0) * 0.32 + (event.guestsChild || 0) * 0.16) *
+            menuFactor,
+        );
   const pizzas = Math.max(0, basePizzas);
 
   return {

@@ -1,3 +1,4 @@
+import { Input, Label, Select } from '../../../../../../packages/pentagono/src/index';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { FactoryFinanceController } from '../types/finance-controller-types';
@@ -23,12 +24,11 @@ export default function FinanceRecurrenceFields({ controller }: { controller: Fa
     <div className={styles.formSection}>
       <div className={styles.formRow}>
         <div className={styles.formField}>
-          <label className={styles.formLabel}>Parcelar em quantas vezes?</label>
-          <input
+          <Input
+            label="Parcelar em quantas vezes?"
             type="number"
             min="1"
             max="60"
-            className={styles.formInput}
             value={formInstallments}
             onChange={(event) => {
               setFormInstallments(event.target.value);
@@ -38,9 +38,9 @@ export default function FinanceRecurrenceFields({ controller }: { controller: Fa
           <p className={styles.formHint}>1 = à vista. Acima disso gera parcelas mensais (1/N, 2/N...).</p>
         </div>
         <div className={styles.formField}>
-          <label className={styles.formLabel}>
+          <Label className={styles.formLabel}>
             <span>
-              <input
+              <Input
                 type="checkbox"
                 checked={formRecurring}
                 onChange={(event) => {
@@ -52,12 +52,12 @@ export default function FinanceRecurrenceFields({ controller }: { controller: Fa
               />
               Lançamento recorrente
             </span>
-          </label>
+          </Label>
           {formRecurring && (
             <div className={styles.recurrenceConfig}>
-              <label>
+              <Label>
                 Repetir a cada
-                <input
+                <Input
                   type="number"
                   min="1"
                   max="365"
@@ -65,10 +65,10 @@ export default function FinanceRecurrenceFields({ controller }: { controller: Fa
                   value={formRecurrenceInterval}
                   onChange={(event) => setFormRecurrenceInterval(event.target.value)}
                 />
-              </label>
-              <label>
+              </Label>
+              <Label>
                 Frequência
-                <select
+                <Select
                   className={styles.formSelect}
                   value={formRecurrenceFrequency}
                   onChange={(event) => setFormRecurrenceFrequency(event.target.value as typeof formRecurrenceFrequency)}
@@ -77,11 +77,11 @@ export default function FinanceRecurrenceFields({ controller }: { controller: Fa
                   <option value="monthly">Mensal</option>
                   <option value="weekly">Semanal</option>
                   <option value="yearly">Anual</option>
-                </select>
-              </label>
-              <label>
+                </Select>
+              </Label>
+              <Label>
                 Terminar após
-                <input
+                <Input
                   type="number"
                   min="1"
                   max="366"
@@ -89,7 +89,7 @@ export default function FinanceRecurrenceFields({ controller }: { controller: Fa
                   value={formRecurrenceTotal}
                   onChange={(event) => setFormRecurrenceTotal(event.target.value)}
                 />
-              </label>
+              </Label>
               <div className={styles.recurrenceSummary}>
                 <strong>Recorrências previstas</strong>
                 <span>
