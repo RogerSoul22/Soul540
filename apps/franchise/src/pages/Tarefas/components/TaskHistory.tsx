@@ -19,7 +19,21 @@ export default function TaskHistory({ entries, eventMap, expanded, onToggle, onR
   return (
     <div className={styles.historySection}>
       <Button variant="ghost" size="sm" className={styles.historyToggle} onClick={onToggle}>
-        {expanded ? '⌃' : '⌄'} Histórico de Concluídas <span className={styles.historyCount}>{entries.length}</span>
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+          style={{ flexShrink: 0, transform: expanded ? 'rotate(180deg)' : undefined, transition: 'transform 0.2s' }}
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+        Histórico de Concluídas <span className={styles.historyCount}>{entries.length}</span>
       </Button>
       {expanded && (
         <div className={styles.historyList}>

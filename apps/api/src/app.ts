@@ -8,7 +8,7 @@ import 'dotenv/config';
 import eventsRouter from './modules/events/events.routes';
 import { financeCategoryRoutes, invoiceRoutes } from './modules/finance/finance.routes';
 import financeRouter from './modules/finance/finance.routes';
-import { authRoutes, franchiseRoutes, userRoutes } from './modules/identity/identity.routes';
+import { accountPasswordRoutes, authRoutes, franchiseRoutes, userRoutes } from './modules/identity/identity.routes';
 import {
   auditLogRoutes,
   chatRoutes,
@@ -62,6 +62,8 @@ app.get('/api/health', (_req, res) => res.json({ ok: true }));
 app.use('/api/auth/login', createRateLimit({ windowMs: 15 * 60 * 1000, max: 10 }));
 app.use('/api/auth', authRoutes);
 app.use('/api', authMiddleware);
+app.use('/api/account', createRateLimit({ windowMs: 15 * 60 * 1000, max: 10 }));
+app.use('/api/account', accountPasswordRoutes);
 
 app.use('/api/events', eventsRouter);
 app.use('/api/tasks', taskRoutes);

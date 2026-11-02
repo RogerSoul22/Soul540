@@ -57,6 +57,7 @@ export default function EventCardActions({ event, whatsappUrl, onEdit, onDelete,
       {!readOnly && (
         <Button
           variant="danger"
+          size="sm"
           onClick={(click) => {
             click.stopPropagation();
             onDelete(event.id);

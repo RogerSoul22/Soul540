@@ -11,9 +11,8 @@ export default function FactoryEventsInfoModal({ controller }: { controller: Fac
         <div className={styles.infoSection}>
           <p className={styles.infoSectionTitle}>O que é esta página?</p>
           <p className={styles.infoText}>
-            A página de <strong>Eventos</strong> exibe todos os agendamentos de pizza da unidade principal e das
-            franquias. A fábrica tem acesso somente de leitura — não é possível criar, editar ou excluir eventos por
-            aqui.
+            A página de <strong>Eventos</strong> exibe todos os eventos de pizza da unidade principal e das franquias. A
+            fábrica tem acesso somente de leitura — não é possível criar, editar ou excluir eventos por aqui.
           </p>
         </div>
         <div className={styles.infoSection}>

@@ -16,6 +16,7 @@ const Financeiro = lazy(() => import('./pages/Financeiro/Financeiro'));
 const NotasFiscais = lazy(() => import('./pages/NotasFiscais/NotasFiscais'));
 const Usuario = lazy(() => import('./pages/Usuario/Usuario'));
 const Eventos = lazy(() => import('./pages/Eventos/Eventos'));
+const EventosStatus = lazy(() => import('./pages/Eventos/EventosStatus'));
 const Tarefas = lazy(() => import('./pages/Tarefas/Tarefas'));
 const ChecklistEnvio = lazy(() => import('./pages/ChecklistEnvio/ChecklistEnvio'));
 const Funcionarios = lazy(() => import('./pages/Funcionarios/Funcionarios'));
@@ -90,6 +91,7 @@ export default function App() {
                       </Route>
                       <Route element={<PermissionRoute routeKey="eventos" />}>
                         <Route path={ROUTES.EVENTOS} element={<Eventos />} />
+                        <Route path={ROUTES.EVENTOS_STATUS} element={<EventosStatus />} />
                       </Route>
                       <Route element={<PermissionRoute routeKey="tarefas" />}>
                         <Route path={ROUTES.TAREFAS} element={<Tarefas />} />

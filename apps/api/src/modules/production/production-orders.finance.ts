@@ -81,7 +81,7 @@ export async function findProductionEvent(
 }
 
 function getProductionOrderFinanceDescription(doc: any) {
-  const appointment = doc.eventName ? ` - Agendamento: ${doc.eventName}` : '';
+  const appointment = doc.eventName ? ` - Evento: ${doc.eventName}` : '';
   return `Pedido #${doc.orderNumber || doc.id} - ${doc.filial}${appointment}`;
 }
 

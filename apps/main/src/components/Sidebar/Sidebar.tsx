@@ -55,7 +55,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
             <div key={group.label} className={styles.navGroup}>
               <span className={styles.navGroupLabel}>{group.label}</span>
               {visibleItems.map((item) => {
-                const isActive = location.pathname === item.path;
+                const isActive = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
                 return (
                   <Button
                     variant="nav"

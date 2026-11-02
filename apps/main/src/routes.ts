@@ -5,6 +5,7 @@ export const ROUTES = {
   NOTAS_FISCAIS: '/notas-fiscais',
   USUARIO: '/usuario',
   EVENTOS: '/eventos',
+  EVENTOS_STATUS: '/eventos/:status',
   TAREFAS: '/tarefas',
   CHECKLIST_ENVIO: '/checklist-envio',
   FUNCIONARIOS: '/funcionarios',

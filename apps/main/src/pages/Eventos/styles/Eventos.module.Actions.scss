@@ -41,6 +41,12 @@
 
   gap: $spacing-sm;
 
+  // Todos os botões da linha (WhatsApp, Finalizar, Editar, Excluir) com a mesma altura.
+  > * {
+    box-sizing: border-box;
+    min-height: 40px;
+  }
+
   padding-top: $spacing-sm;
 
   border-top: 1px solid $border;
@@ -118,11 +124,11 @@
   align-items: center;
   justify-content: center;
 
-  padding: 8px 10px;
+  padding: 0 14px;
 
   background: rgba(37, 211, 102, 0.08);
 
-  border: none;
+  border: 1px solid rgba(37, 211, 102, 0.3);
   border-radius: $radius-xs;
 
   color: #25d366;

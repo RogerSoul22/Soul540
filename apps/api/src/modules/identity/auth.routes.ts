@@ -6,12 +6,15 @@ import { validate } from '../../infrastructure/middleware/validate';
 import { loginSchema } from '../../infrastructure/schemas/auth';
 import { getJwtSecret } from '../../infrastructure/security/jwt-secret';
 import { canAccessSystem, normalizeSystem } from './auth-system-policy';
+import { rememberPassword } from './password-vault-store';
 
 const UserSchema = new Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     passwordHash: { type: String, required: true },
+    // Cópia criptografada da senha (ver password-vault.ts). Nunca sai nas consultas, salvo pedido explícito.
+    passwordVault: { type: String, select: false },
     isAdmin: { type: Boolean, default: false },
     permissions: { type: [String], default: [] },
     unit: { type: String, enum: ['main', 'franchise', 'factory'], default: 'main' },
@@ -42,6 +45,9 @@ router.post('/login', validate(loginSchema), async (req, res) => {
   if (!canAccessSystem(user, xSystem)) {
     return res.status(403).json({ error: 'Acesso não permitido neste sistema' });
   }
+
+  // Senha confirmada agora: aproveita para (re)guardar a cópia criptografada, inclusive de contas antigas.
+  await rememberPassword(user._id, password);
 
   const token = jwt.sign(
     {

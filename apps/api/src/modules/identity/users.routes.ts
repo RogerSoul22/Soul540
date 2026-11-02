@@ -8,6 +8,7 @@ import { logAudit } from '../../infrastructure/audit-log';
 import { requireAdmin } from '../../infrastructure/middleware/auth';
 import { requireFranchiseId } from '../../infrastructure/franchise-context';
 import { assertFranchiseUserLink, getActiveFranchiseOrThrow } from './franchise-policy';
+import { rememberPassword } from './password-vault-store';
 
 const router = Router();
 
@@ -57,6 +58,7 @@ router.post('/', validate(createUserSchema), async (req, res) => {
       unit: targetUnit,
       ...(targetFranchiseId && { franchiseId: targetFranchiseId }),
     });
+    await rememberPassword(user._id, password);
     const { passwordHash: _, passwordPlain: __, ...safe } = user.toJSON();
     await logAudit({
       req,
@@ -77,6 +79,10 @@ router.put('/:id', validate(updateUserSchema), async (req, res) => {
   const user = await UserModel.findOne({ _id: req.params.id, deletedAt: { $exists: false } });
   if (!user) return res.status(404).json({ error: 'not found' });
   const { name, isAdmin, permissions, password, unit, franchiseId } = req.body;
+  // A própria senha só troca informando a atual (POST /api/account/password); aqui é só a de outras pessoas.
+  if (password && String(user._id) === String((req as any).user?._id)) {
+    return res.status(400).json({ error: 'Para trocar a sua senha, informe a senha atual em Minha conta.' });
+  }
   const targetUnit = unit || user.unit;
   const targetFranchiseId =
     getTenantUnit(req) === 'franchise' ? requireFranchiseId(req) : franchiseId || user.franchiseId?.toString();
@@ -103,6 +109,7 @@ router.put('/:id', validate(updateUserSchema), async (req, res) => {
   if (password) {
     update.passwordHash = await bcrypt.hash(password, 10);
   }
+  if (password) await rememberPassword(req.params.id, password);
   const updated = await UserModel.findOneAndUpdate({ _id: req.params.id, deletedAt: { $exists: false } }, update, {
     new: true,
   }).select('-passwordHash -passwordPlain');

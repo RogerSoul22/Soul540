@@ -10,6 +10,8 @@ export { Checkbox } from './Checkbox/Checkbox';
 export type { CheckboxProps, CheckboxVariant } from './Checkbox/type';
 export { ConfirmModal } from './ConfirmModal/ConfirmModal';
 export type { ConfirmModalProps } from './ConfirmModal/type';
+export { DatePicker } from './DatePicker/DatePicker';
+export type { DatePickerProps, DatePickerType } from './DatePicker/type';
 export { DocumentViewer } from './DocumentViewer/DocumentViewer';
 export type { DocumentViewerProps, DocumentViewerVariant } from './DocumentViewer/type';
 export { EmptyState } from './EmptyState/EmptyState';

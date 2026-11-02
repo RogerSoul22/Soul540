@@ -62,3 +62,20 @@ test('document viewers and popover backdrops come from the pentagono, not hand-m
 test('headings in screens use the Heading component', () => {
   assert.deepEqual(offenders(/<h[1-6](?=[\s>])/), []);
 });
+
+test('text inputs clear themselves with an X, except types where clearing makes no sense', () => {
+  assert.match(component('Input', 'type.ts'), /clearable\?: boolean/);
+  const hook = component('Input', 'use-clearable.ts');
+  assert.match(hook, /'text', 'search', 'email', 'tel', 'url', 'password'/);
+  assert.doesNotMatch(hook.split('CLEARABLE_TYPES = new Set')[1].split(']')[0], /checkbox|radio|file|date|number/);
+  assert.match(component('Input', 'ClearButton.tsx'), /aria-label="Limpar campo"/);
+  assert.match(component('Input', 'Input.tsx'), /<ClearButton/);
+});
+
+test('date and month fields open the pentagono calendar instead of the browser picker', () => {
+  assert.match(component('Input', 'Input.tsx'), /type === 'date' \|\| type === 'month'/);
+  assert.match(component('Input', 'Input.tsx'), /<DatePicker/);
+  assert.match(component('DatePicker', 'DatePicker.tsx'), /aria-haspopup="dialog"/);
+  assert.match(component('DatePicker', 'DatePickerPanel.tsx'), /Escape/);
+  assert.match(component('DatePicker', 'type.ts'), /type: DatePickerType/);
+});

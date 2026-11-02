@@ -1,5 +1,5 @@
 import type { User } from '../../../../packages/contracts/src/index';
-import { apiFetch } from '../lib/api';
+import { ApiRequestError, apiFetch } from '../lib/api';
 import { tokenStorage } from './token-storage';
 import type { LoginCredentials } from './credentials';
 
@@ -21,16 +21,18 @@ export class AuthRepository {
     tokenStorage.clear();
   }
 
+  // O servidor decide quem pode entrar neste sistema: o usuário guardado no navegador nunca basta, senão uma
+  // sessão de outro sistema (Itu, Fábrica) entraria aqui só porque o navegador é o mesmo.
   async getCurrentUser(): Promise<User | null> {
-    const cached = tokenStorage.getUser<User>();
-    if (cached) return cached;
-
     try {
       const response = await apiFetch('/api/auth/me');
       const data = await response.json();
       tokenStorage.setUser(data.user);
       return data.user;
-    } catch {
+    } catch (error) {
+      // Sem conexão com o servidor: mantém o usuário guardado. Sessão expirada ou acesso a outro sistema: sai.
+      if (error instanceof ApiRequestError && error.status === 0) return tokenStorage.getUser<User>();
+      tokenStorage.clear();
       return null;
     }
   }

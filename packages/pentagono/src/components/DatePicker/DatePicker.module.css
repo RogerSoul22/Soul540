@@ -1,0 +1,75 @@
+/* Camada: classes da página (fora de @layer) sempre vencem o padrão do Pentágono. */
+@layer pentagono {
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .label {
+    color: var(--pentagono-color-text-secondary);
+    font-size: var(--pentagono-text-sm);
+    font-weight: var(--pentagono-font-medium);
+  }
+
+  .trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--pentagono-space-2);
+    min-height: 40px;
+    padding: 9px 12px;
+    color: var(--pentagono-color-text);
+    font: inherit;
+    font-size: var(--pentagono-text-sm);
+    text-align: left;
+    background: var(--pentagono-color-input);
+    border: 1px solid var(--pentagono-color-border);
+    border-radius: var(--pentagono-radius-control);
+    cursor: pointer;
+    transition: all var(--pentagono-transition-base);
+  }
+
+  .trigger:hover:not(:disabled) {
+    border-color: var(--pentagono-color-text-muted);
+  }
+
+  .trigger:focus-visible,
+  .trigger[aria-expanded='true'] {
+    outline: none;
+    border-color: var(--pentagono-color-brand);
+    box-shadow: 0 0 0 3px var(--pentagono-color-focus);
+  }
+
+  .trigger:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .value {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  .placeholder {
+    flex: 1;
+    min-width: 0;
+    color: var(--pentagono-color-text-muted);
+    white-space: nowrap;
+  }
+
+  .icon {
+    flex-shrink: 0;
+    color: var(--pentagono-color-text-muted);
+  }
+
+  .native {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+}

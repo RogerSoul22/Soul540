@@ -12,7 +12,7 @@ export default function EventFormModal({ controller }: { controller: EventFormCo
   const { showModal, editingId, closeModal, handleSubmit, form } = controller;
   if (!showModal) return null;
   return (
-    <Modal title={editingId ? 'Editar Agendamento' : 'Novo Agendamento'} onClose={closeModal} maxWidth={600} flush>
+    <Modal title={editingId ? 'Editar Evento' : 'Novo Evento'} onClose={closeModal} maxWidth={600} flush>
       <div className={styles.modalBody}>
         <EventFormBasics controller={controller} />
         <EventFormTeam controller={controller} />
@@ -26,7 +26,7 @@ export default function EventFormModal({ controller }: { controller: EventFormCo
           Cancelar
         </Button>
         <Button variant="primary" onClick={handleSubmit} disabled={!form.name || !form.date || !form.location}>
-          {editingId ? 'Salvar' : 'Criar Agendamento'}
+          {editingId ? 'Salvar' : 'Criar Evento'}
         </Button>
       </div>
     </Modal>

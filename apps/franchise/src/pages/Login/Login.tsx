@@ -14,7 +14,7 @@ const franchiseFeatures: UnitLoginFeature[] = [
         <line x1="3" y1="10" x2="21" y2="10" />
       </svg>
     ),
-    text: 'Gestão de eventos e agendamentos',
+    text: 'Gestão de eventos',
   },
   {
     icon: (

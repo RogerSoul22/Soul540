@@ -11,15 +11,15 @@ export default function EventosInfoModal({ controller }: { controller: EventosCo
         <div className={styles.infoSection}>
           <p className={styles.infoSectionTitle}>O que é esta página?</p>
           <p className={styles.infoText}>
-            A página de <strong>Eventos</strong> centraliza todos os agendamentos de pizza. Cada evento contém
-            informações completas: data, local, equipe, valor do contrato, cardápio e documentos.
+            A página de <strong>Eventos</strong> centraliza todos os eventos de pizza. Cada evento contém informações
+            completas: data, local, equipe, valor do contrato, cardápio e documentos.
           </p>
         </div>
         <div className={styles.infoSection}>
-          <p className={styles.infoSectionTitle}>Como criar um agendamento</p>
+          <p className={styles.infoSectionTitle}>Como criar um evento</p>
           <ol className={styles.infoList}>
             <li>
-              Clique em <strong>Novo Agendamento</strong> no canto superior direito.
+              Clique em <strong>Novo Evento</strong> no canto superior direito.
             </li>
             <li>Preencha nome do evento, data, local e demais informações.</li>
             <li>Selecione os funcionários da equipe e o responsável.</li>
@@ -27,7 +27,7 @@ export default function EventosInfoModal({ controller }: { controller: EventosCo
               Informe o valor do contrato — ele será registrado automaticamente no <strong>Financeiro</strong>.
             </li>
             <li>
-              Clique em <strong>Criar Agendamento</strong> para salvar.
+              Clique em <strong>Criar Evento</strong> para salvar.
             </li>
           </ol>
         </div>

@@ -27,7 +27,7 @@ export default function FactoryEventsList({ controller }: { controller: FactoryE
     <>
       <PageHeader
         title="Eventos"
-        subtitle="Visualize os agendamentos e eventos de pizza"
+        subtitle="Visualize os eventos de pizza"
         titleExtra={
           <>
             <InfoButton label="Como usar esta página" onClick={() => setShowInfo(true)} />

@@ -138,3 +138,14 @@
   flex-wrap: wrap;
   gap: 6px;
 }
+
+.opsEventChip {
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    color: $accent;
+    text-decoration: underline;
+    outline: none;
+  }
+}

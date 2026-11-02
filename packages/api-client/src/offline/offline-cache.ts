@@ -2,7 +2,7 @@ import type { CachedResponse, OfflineStore, QueuedWrite } from './offline-types'
 
 const MAX_BODY_BYTES = 3_000_000;
 // Rotas que dependem do servidor no momento (login, nota fiscal, IA) ou entregam arquivos.
-const NEVER_OFFLINE = /^\/api\/(auth\/(?!me$)|fiscal\/|chat)|\/(export|download|pdf|xml|ofx|import|upload)/i;
+const NEVER_OFFLINE = /^\/api\/(auth\/(?!me$)|account\/|fiscal\/|chat)|\/(export|download|pdf|xml|ofx|import|upload)/i;
 
 export const CACHE_HEADER = 'X-Offline-Cache';
 

@@ -67,21 +67,22 @@
   }
 
   .toggle {
-    padding: 4px 8px;
-    color: var(--pentagono-color-brand);
-    font-family: inherit;
-    font-size: var(--pentagono-text-xs);
-    font-weight: var(--pentagono-font-medium);
-    white-space: nowrap;
+    display: inline-grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 40px;
+    height: 36px;
+    padding: 0;
+    color: var(--pentagono-color-text-muted);
     background: none;
     border: none;
-    border-radius: var(--pentagono-radius-xs);
+    border-radius: var(--pentagono-radius-sm);
     cursor: pointer;
     transition: all var(--pentagono-transition-fast);
   }
 
   .toggle:hover {
-    color: var(--pentagono-color-brand-hover);
+    color: var(--pentagono-color-brand);
     background: var(--pentagono-color-brand-soft);
   }
 
@@ -89,5 +90,30 @@
     color: var(--pentagono-color-danger);
     font-size: var(--pentagono-text-xs);
     font-weight: var(--pentagono-font-medium);
+  }
+
+  .clear {
+    display: inline-grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    color: var(--pentagono-color-text-muted);
+    background: transparent;
+    border: none;
+    border-radius: var(--pentagono-radius-full);
+    cursor: pointer;
+    transition: all var(--pentagono-transition-fast);
+  }
+
+  .clear:hover {
+    color: var(--pentagono-color-text);
+    background: var(--pentagono-color-hover);
+  }
+
+  .clearFloating {
+    position: absolute;
+    z-index: 2;
   }
 }

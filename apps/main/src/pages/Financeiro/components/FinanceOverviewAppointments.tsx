@@ -11,7 +11,7 @@ export default function FinanceOverviewAppointments({ controller }: { controller
     <Card className={styles.agendamentosCard}>
       <div className={styles.agendamentosHeader}>
         <Heading level={3} variant="section" className={styles.sectionTitle}>
-          Valores dos agendamentos
+          Valores dos eventos
         </Heading>
         <div className={styles.agendamentosPills}>
           <div className={styles.agendamentosPill}>
@@ -21,7 +21,7 @@ export default function FinanceOverviewAppointments({ controller }: { controller
         </div>
       </div>
       {!eventsWithFinalValue.length ? (
-        <p className={styles.agendamentosEmpty}>Nenhum agendamento com valor final cadastrado.</p>
+        <p className={styles.agendamentosEmpty}>Nenhum evento com valor final cadastrado.</p>
       ) : (
         <div className={styles.agendamentosList}>
           {eventsWithFinalValue.map((event) => (

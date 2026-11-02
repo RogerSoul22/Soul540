@@ -1,9 +1,9 @@
 import type { FormEvent } from 'react';
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { apiFetch } from '../../lib/api';
 import { useTheme } from '../../../../../packages/ui/src/index';
 import { Button, Card, Heading, Input, PageHeader, ThemeSwitch } from '../../../../../packages/pentagono/src/index';
+import UsuarioSecurity from './UsuarioSecurity';
 import styles from './styles/Usuario.module.scss';
 
 export default function Usuario() {
@@ -13,29 +13,11 @@ export default function Usuario() {
   const [phone, setPhone] = useState('(11) 99999-0000');
   const [address, setAddress] = useState('Rua das Pizzas, 540 - Sao Paulo, SP');
   const [saved, setSaved] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [changingPassword, setChangingPassword] = useState(false);
   const [passwordSaved, setPasswordSaved] = useState(false);
 
   const flash = (setter: (value: boolean) => void) => {
     setter(true);
     setTimeout(() => setter(false), 2000);
-  };
-
-  const handleChangePassword = async () => {
-    if (newPassword.length < 6) return;
-    setChangingPassword(true);
-    try {
-      await apiFetch(`/api/users/${(user as { id?: string } | null)?.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: newPassword }),
-      });
-      setNewPassword('');
-      flash(setPasswordSaved);
-    } finally {
-      setChangingPassword(false);
-    }
   };
 
   const handleSaveProfile = (event: FormEvent) => {
@@ -103,36 +85,7 @@ export default function Usuario() {
             </div>
           </div>
 
-          <div className={styles.formSection}>
-            <Heading level={3} variant="section" className={styles.formSectionTitle}>
-              Seguranca
-            </Heading>
-            <div className={styles.passwordRow}>
-              <div className={styles.formField} style={{ flex: 1 }}>
-                <Input label="Senha Atual" type="password" value="********" readOnly />
-              </div>
-            </div>
-            <div className={styles.passwordRow} style={{ marginTop: 12 }}>
-              <div className={styles.formField} style={{ flex: 1 }}>
-                <Input
-                  label="Nova Senha"
-                  type="password"
-                  value={newPassword}
-                  onChange={(event) => setNewPassword(event.target.value)}
-                  placeholder="Minimo 6 caracteres"
-                />
-              </div>
-              <Button
-                type="button"
-                variant="secondary"
-                className={styles.btnChangePassword}
-                onClick={handleChangePassword}
-                disabled={changingPassword || newPassword.length < 6}
-              >
-                {changingPassword ? 'Salvando...' : 'Alterar Senha'}
-              </Button>
-            </div>
-          </div>
+          <UsuarioSecurity onSaved={() => flash(setPasswordSaved)} />
 
           <div className={styles.formSection}>
             <Heading level={3} variant="section" className={styles.formSectionTitle}>

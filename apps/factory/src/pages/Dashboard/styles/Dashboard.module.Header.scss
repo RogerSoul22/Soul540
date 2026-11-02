@@ -139,3 +139,14 @@
   background: rgba(96, 165, 250, 0.08);
   border-color: rgba(96, 165, 250, 0.24);
 }
+
+.opsEventChip {
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    color: $accent;
+    text-decoration: underline;
+    outline: none;
+  }
+}

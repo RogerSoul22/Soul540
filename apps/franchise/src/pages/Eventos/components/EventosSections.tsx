@@ -35,7 +35,7 @@ export default function EventosSections({ controller }: { controller: EventosCon
         title="Nenhum evento encontrado."
         action={
           <Button variant="outline" className={styles.emptyBtn} onClick={openCreate}>
-            Criar primeiro agendamento
+            Criar primeiro evento
           </Button>
         }
       />

@@ -15,7 +15,7 @@ export default function FactoryDashboardInfoModal({ onClose }: { onClose: () => 
         <div className={styles.infoSection}>
           <p className={styles.infoSectionTitle}>Calendário de eventos</p>
           <ul className={styles.infoList}>
-            <li>Exibe todos os agendamentos cadastrados no mês atual.</li>
+            <li>Exibe todos os eventos cadastrados no mês atual.</li>
             <li>Clique em um evento para ver seus detalhes completos.</li>
             <li>Use as setas para navegar entre os meses.</li>
             <li>O contador mostra quantos eventos há no mês em exibição.</li>

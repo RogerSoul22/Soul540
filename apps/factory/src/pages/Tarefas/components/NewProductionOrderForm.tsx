@@ -110,11 +110,11 @@ export default function NewProductionOrderForm({ onSave, ingredients, insumos, e
     <form onSubmit={handleSubmit}>
       <div className={styles.formGroup}>
         <Select
-          label="Agendamento vinculado"
+          label="Evento vinculado"
           value={selectedEventId}
           onChange={(event) => handleEventChange(event.target.value)}
         >
-          <option value="">Pedido avulso (sem agendamento)</option>
+          <option value="">Pedido avulso (sem evento)</option>
           {events.map((event) => (
             <option key={`${event.source}:${event.id}`} value={event.id}>
               {event.date} - {event.name}

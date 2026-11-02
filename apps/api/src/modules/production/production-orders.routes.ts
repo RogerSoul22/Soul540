@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
 
 router.get('/available-events', async (req, res) => {
   if (getTenantUnit(req) !== 'factory') {
-    return res.status(403).json({ error: 'Apenas a fábrica pode consultar agendamentos de produção' });
+    return res.status(403).json({ error: 'Apenas a fábrica pode consultar eventos de produção' });
   }
   res.json(await listAvailableProductionEvents());
 });
@@ -67,7 +67,7 @@ router.post('/', requirePermission('tarefas', 'write'), async (req, res) => {
   const orderNumber = (last?.orderNumber || 0) + 1;
   const linkedEvent = req.body.eventId ? await findProductionEvent(req.body.eventId, req.body.eventSource) : null;
   if (req.body.eventId && !linkedEvent) {
-    return res.status(400).json({ error: 'Agendamento informado não está disponível para produção' });
+    return res.status(400).json({ error: 'Evento informado não está disponível para produção' });
   }
   const doc = await ProductionOrderModel.create({
     ...injectFranchiseScope(req, req.body),

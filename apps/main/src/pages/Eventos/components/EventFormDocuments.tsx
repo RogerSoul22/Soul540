@@ -64,7 +64,7 @@ export default function EventFormDocuments({ controller }: { controller: EventFo
             label="Seu Nome Completo"
             value={form.createdBy}
             onChange={(e) => setForm({ ...form, createdBy: e.target.value })}
-            placeholder="Nome de quem esta criando o agendamento"
+            placeholder="Nome de quem esta criando o evento"
           />
         </div>
       </div>
