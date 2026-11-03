@@ -1,7 +1,7 @@
 import { Button, EmptyState } from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/Tarefas.module.scss';
 import ProductionOrderCard from './ProductionOrderCard';
-import { ALL_STATUSES, formatQty, formatR$ } from '../support/task-formatters';
+import { ALL_STATUSES, formatQty, formatR$, getOrderKey } from '../support/task-formatters';
 import type { Pedido, PedidoStatus } from '../types/task-types';
 
 type Props = {
@@ -77,7 +77,7 @@ export default function ProductionOrderKanban({
               ) : (
                 pedidosByStatus[column.id].map((pedido) => (
                   <ProductionOrderCard
-                    key={pedido.id}
+                    key={getOrderKey(pedido)}
                     pedido={pedido}
                     draggedId={draggedId}
                     onDelete={onDelete}
@@ -112,7 +112,7 @@ function FinalizedOrders({ pedidos, onDelete }: { pedidos: Pedido[]; onDelete: (
       </div>
       <div className={styles.finalizedList}>
         {pedidos.map((pedido) => (
-          <div key={pedido.id} className={styles.finalizedItem}>
+          <div key={getOrderKey(pedido)} className={styles.finalizedItem}>
             <div className={styles.finalizedHead}>
               {pedido.orderNumber !== undefined && <span className={styles.orderBadge}>#{pedido.orderNumber}</span>}
               <span className={styles.finalizedFilial}>{pedido.filial}</span>
@@ -121,7 +121,7 @@ function FinalizedOrders({ pedidos, onDelete }: { pedidos: Pedido[]; onDelete: (
                 variant="ghost"
                 size="icon"
                 className={styles.finalizedDelete}
-                onClick={() => onDelete(pedido.id)}
+                onClick={() => onDelete(getOrderKey(pedido))}
                 title="Excluir pedido"
                 aria-label={`Excluir pedido ${pedido.orderNumber ?? pedido.filial}`}
               >

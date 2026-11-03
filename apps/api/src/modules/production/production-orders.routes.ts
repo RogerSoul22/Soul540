@@ -12,14 +12,17 @@ import {
   syncFinanceForProductionOrder,
   type ProductionOrderFinanceSyncResult,
 } from './production-orders.finance';
+import { getFactoryProductionOrderFilter } from './production-orders.scope';
 
 const router = Router();
 router.use(requirePermission('tarefas', 'read'));
 router.get('/', async (req, res) => {
   const unit = getTenantUnit(req);
-  const docs = await ProductionOrderModel.find(getFranchiseFilter(req, { unit, deletedAt: { $exists: false } })).sort({
-    createdAt: -1,
-  });
+  const filter =
+    unit === 'factory'
+      ? getFactoryProductionOrderFilter({ deletedAt: { $exists: false } })
+      : getFranchiseFilter(req, { unit, deletedAt: { $exists: false } });
+  const docs = await ProductionOrderModel.find(filter).sort({ createdAt: -1 });
   res.json(docs);
 });
 
@@ -93,9 +96,17 @@ router.post('/', requirePermission('tarefas', 'write'), async (req, res) => {
 
 router.put('/:id', requirePermission('tarefas', 'write'), async (req, res) => {
   const unit = getTenantUnit(req);
+  const filter =
+    unit === 'factory'
+      ? getFactoryProductionOrderFilter(
+          { id: req.params.id, deletedAt: { $exists: false } },
+          req.body.unit,
+        )
+      : getFranchiseFilter(req, { unit, id: req.params.id, deletedAt: { $exists: false } });
+  const { unit: _orderUnit, id: _orderId, franchiseId: _franchiseId, ...update } = req.body;
   const doc = await ProductionOrderModel.findOneAndUpdate(
-    getFranchiseFilter(req, { unit, id: req.params.id, deletedAt: { $exists: false } }),
-    injectFranchiseScope(req, req.body),
+    filter,
+    injectFranchiseScope(req, update),
     { new: true },
   );
 
@@ -106,8 +117,15 @@ router.put('/:id', requirePermission('tarefas', 'write'), async (req, res) => {
 
 router.delete('/:id', requirePermission('tarefas', 'write'), async (req, res) => {
   const unit = getTenantUnit(req);
+  const filter =
+    unit === 'factory'
+      ? getFactoryProductionOrderFilter(
+          { id: req.params.id, deletedAt: { $exists: false } },
+          req.query.unit,
+        )
+      : getFranchiseFilter(req, { unit, id: req.params.id, deletedAt: { $exists: false } });
   const doc = await ProductionOrderModel.findOneAndUpdate(
-    getFranchiseFilter(req, { unit, id: req.params.id, deletedAt: { $exists: false } }),
+    filter,
     { $set: { deletedAt: new Date(), status: 'cancelled' } },
     { new: true },
   );

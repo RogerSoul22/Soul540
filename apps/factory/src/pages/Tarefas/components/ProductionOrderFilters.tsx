@@ -1,5 +1,6 @@
 import { Button, Input, Label, Select } from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/Tarefas.module.scss';
+import { getOrderKey } from '../support/task-formatters';
 import type { OrderSearchMode, Pedido } from '../types/task-types';
 
 type Props = {
@@ -59,7 +60,7 @@ export default function ProductionOrderFilters({
         >
           <option value="">Todos os pedidos</option>
           {orders.map((order) => (
-            <option key={order.id} value={order.id}>
+            <option key={getOrderKey(order)} value={getOrderKey(order)}>
               {order.filial} — #{order.orderNumber ?? 'Sem número'}
             </option>
           ))}

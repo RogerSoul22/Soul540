@@ -31,6 +31,7 @@ export type OrderSearchMode = 'typing' | 'alphabetical';
 
 export type Pedido = {
   id: string;
+  unit?: 'main' | 'franchise' | 'factory';
   orderNumber?: number;
   filial: string;
   eventId?: string;

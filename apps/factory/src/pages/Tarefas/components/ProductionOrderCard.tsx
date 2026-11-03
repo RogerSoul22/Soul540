@@ -1,6 +1,6 @@
 import { Button } from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/Tarefas.module.scss';
-import { ALL_STATUSES, formatQty, formatR$ } from '../support/task-formatters';
+import { ALL_STATUSES, formatQty, formatR$, getOrderKey } from '../support/task-formatters';
 import type { Pedido, PedidoStatus } from '../types/task-types';
 
 type Props = {
@@ -31,15 +31,16 @@ function DeleteIcon() {
 }
 
 export default function ProductionOrderCard({ pedido, draggedId, onDelete, onMove, onDragStart, onDragEnd }: Props) {
+  const orderKey = getOrderKey(pedido);
   const statusIndex = ALL_STATUSES.findIndex((status) => status.id === pedido.status);
   const previousStatus = ALL_STATUSES[statusIndex - 1];
   const nextStatus = ALL_STATUSES[statusIndex + 1];
   return (
     <div
-      className={`${styles.taskCard} ${draggedId === pedido.id ? styles.taskCardDragging : ''}`}
+      className={`${styles.taskCard} ${draggedId === orderKey ? styles.taskCardDragging : ''}`}
       draggable
       onDragStart={(event) => {
-        onDragStart(pedido.id);
+        onDragStart(orderKey);
         event.dataTransfer.effectAllowed = 'move';
       }}
       onDragEnd={onDragEnd}
@@ -55,7 +56,7 @@ export default function ProductionOrderCard({ pedido, draggedId, onDelete, onMov
             <span>R$ {formatR$(pedido.totalCost)}</span>
           </div>
         </div>
-        <Button variant="danger" size="sm" className={styles.taskDelete} onClick={() => onDelete(pedido.id)}>
+        <Button variant="danger" size="sm" className={styles.taskDelete} onClick={() => onDelete(orderKey)}>
           <DeleteIcon />
         </Button>
       </div>
@@ -67,7 +68,7 @@ export default function ProductionOrderCard({ pedido, draggedId, onDelete, onMov
         {pedido.ingredients.length ? (
           <div className={styles.taskRecipeList}>
             {pedido.ingredients.map((item) => (
-              <span key={`${pedido.id}-${item.id}`}>
+              <span key={`${orderKey}-${item.id}`}>
                 {item.name}: {formatQty(item.neededQty)} {item.measure}
               </span>
             ))}
@@ -82,7 +83,7 @@ export default function ProductionOrderCard({ pedido, draggedId, onDelete, onMov
           variant="outline"
           className={styles.taskMoveBtn}
           disabled={!previousStatus}
-          onClick={() => previousStatus && onMove(pedido.id, previousStatus.id)}
+          onClick={() => previousStatus && onMove(orderKey, previousStatus.id)}
           title={previousStatus?.label}
         >
           ‹
@@ -92,7 +93,7 @@ export default function ProductionOrderCard({ pedido, draggedId, onDelete, onMov
           variant="outline"
           className={styles.taskMoveBtn}
           disabled={!nextStatus}
-          onClick={() => nextStatus && onMove(pedido.id, nextStatus.id)}
+          onClick={() => nextStatus && onMove(orderKey, nextStatus.id)}
           title={nextStatus?.label}
         >
           ›

@@ -6,6 +6,7 @@ import ProductionOrderFilters from './components/ProductionOrderFilters';
 import ProductionOrderKanban from './components/ProductionOrderKanban';
 import ProductionRecipeGrid from './components/ProductionRecipeGrid';
 import { useProductionOrdersController } from './hooks/use-production-orders-controller';
+import { getOrderKey } from './support/task-formatters';
 
 export default function Tarefas() {
   const controller = useProductionOrdersController();
@@ -34,6 +35,7 @@ export default function Tarefas() {
     handleMove,
     handleDeletePedido,
   } = controller;
+  const pedidoToDelete = pedidos.find((order) => getOrderKey(order) === deleteConfirmId);
   return (
     <div className={styles.page}>
       <PageHeader
@@ -112,8 +114,7 @@ export default function Tarefas() {
           message={
             <>
               Tem certeza que deseja excluir o pedido de{' '}
-              <strong>{pedidos.find((order) => order.id === deleteConfirmId)?.filial || 'esta filial'}</strong>? Esta
-              ação não pode ser desfeita.
+              <strong>{pedidoToDelete?.filial || 'esta filial'}</strong>? Esta ação não pode ser desfeita.
             </>
           }
           confirmLabel="Excluir"

@@ -14,6 +14,10 @@ export function uid() {
   return Math.random().toString(36).slice(2, 9);
 }
 
+export function getOrderKey(order: Pedido) {
+  return `${order.unit || 'factory'}:${order.id}`;
+}
+
 export function formatR$(value: number) {
   return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
