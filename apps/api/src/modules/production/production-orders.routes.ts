@@ -65,7 +65,7 @@ router.post('/', requirePermission('tarefas', 'write'), async (req, res) => {
   const unit = getTenantUnit(req);
   const last = await ProductionOrderModel.findOne(getFranchiseFilter(req, { unit })).sort({ orderNumber: -1 });
   const orderNumber = (last?.orderNumber || 0) + 1;
-  const linkedEvent = req.body.eventId ? await findProductionEvent(req.body.eventId, req.body.eventSource) : null;
+  const linkedEvent = req.body.eventId ? await findProductionEvent(req.body.eventId, req.body.eventSource, req) : null;
   if (req.body.eventId && !linkedEvent) {
     return res.status(400).json({ error: 'Evento informado não está disponível para produção' });
   }

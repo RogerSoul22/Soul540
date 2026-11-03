@@ -1,8 +1,9 @@
 import { getFranchiseFilter } from '../../infrastructure/franchise-scope';
 import { getTenantUnit } from '../../infrastructure/middleware/tenant';
-import { getEventUnitsForRequest, type EventUnit } from '../../infrastructure/event-tenant';
+import { type EventUnit } from '../../infrastructure/event-tenant';
 import { Finance, FranchiseFinance, FactoryFinance } from '../finance/finance.model';
 import { Event, FranchiseEvent, FactoryEvent } from './events.model';
+import { getFactoryFranchiseFilter } from './factory-event-scope';
 
 export function getEventStoreForUnit(unit: EventUnit) {
   if (unit === 'factory') return { model: FactoryEvent, financeModel: FactoryFinance, financeSource: 'factory' };
@@ -14,19 +15,19 @@ export function getEventStoreForUnit(unit: EventUnit) {
 
 export function getEventUnitsForLookup(req: any, requestedSource?: string): EventUnit[] {
   const tenantUnit = getTenantUnit(req) as EventUnit;
-  const canReadCombined = Boolean(req.user?.isAdmin) && tenantUnit === 'factory';
-  const source = requestedSource as EventUnit | undefined;
-  if (canReadCombined && source && ['main', 'franchise', 'factory'].includes(source)) return [source];
-  if (canReadCombined) return ['factory', 'franchise', 'main'];
+  if (tenantUnit === 'factory') return !requestedSource || requestedSource === 'franchise' ? ['franchise'] : [];
   return [tenantUnit];
 }
 
 export async function findEventForRequest(req: any, id: string, requestedSource?: string) {
+  const tenantUnit = getTenantUnit(req);
   for (const unit of getEventUnitsForLookup(req, requestedSource)) {
     const store = getEventStoreForUnit(unit);
     const filter =
       unit === 'franchise'
-        ? getFranchiseFilter(req, { _id: id, deletedAt: { $exists: false } })
+        ? tenantUnit === 'factory'
+          ? await getFactoryFranchiseFilter({ _id: id, deletedAt: { $exists: false } })
+          : getFranchiseFilter(req, { _id: id, deletedAt: { $exists: false } })
         : { _id: id, deletedAt: { $exists: false } };
     const doc = await store.model.findOne(filter);
     if (doc) return { doc, ...store };

@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import { FactoryFinance } from '../finance/finance-tenant';
 import { Event, FranchiseEvent } from '../events/events.model';
+import { getFactoryFranchiseFilter } from '../events/factory-event-scope';
+import { getTenantUnit } from '../../infrastructure/middleware/tenant';
 import { logAudit } from '../../infrastructure/audit-log';
 import { canChangeForecast } from '../../../../../shared/finance/financePolicy';
 export function getProductionOrderFinanceEventId(unit: string, orderId: string) {
@@ -33,39 +35,40 @@ type AvailableProductionEvent = {
 };
 
 export async function listAvailableProductionEvents(): Promise<AvailableProductionEvent[]> {
-  const eventFilter = { status: { $in: ['confirmed', 'completed'] } };
-  const [mainEvents, franchiseEvents] = await Promise.all([
-    Event.find(eventFilter).select('name date city').lean(),
-    FranchiseEvent.find(eventFilter).select('name date city').lean(),
-  ]);
+  const franchiseEvents = await FranchiseEvent.find(
+    await getFactoryFranchiseFilter({
+      deletedAt: { $exists: false },
+      status: { $in: ['confirmed', 'completed'] },
+    }),
+  )
+    .select('name date city franchiseId')
+    .lean();
 
-  return [
-    ...mainEvents.map((event: any) => ({
-      id: event._id.toString(),
-      source: 'main' as const,
-      name: event.name,
-      date: event.date,
-      city: event.city,
-    })),
-    ...franchiseEvents.map((event: any) => ({
+  return franchiseEvents
+    .map((event: any) => ({
       id: event._id.toString(),
       source: 'franchise' as const,
       name: event.name,
       date: event.date,
       city: event.city,
-    })),
-  ].sort((firstEvent, secondEvent) => firstEvent.date.localeCompare(secondEvent.date));
+      franchiseId: event.franchiseId?.toString(),
+    }))
+    .sort((firstEvent, secondEvent) => firstEvent.date.localeCompare(secondEvent.date));
 }
 
 export async function findProductionEvent(
   eventId: string,
   eventSource: unknown,
+  req?: any,
 ): Promise<AvailableProductionEvent | null> {
   const source = eventSource === 'franchise' ? 'franchise' : eventSource === 'main' ? 'main' : null;
   if (!source || !mongoose.isValidObjectId(eventId)) return null;
+  if (req && getTenantUnit(req) === 'factory' && source !== 'franchise') return null;
 
   const EventModel = source === 'main' ? Event : FranchiseEvent;
-  const event = (await EventModel.findOne({ _id: eventId, status: { $in: ['confirmed', 'completed'] } })
+  const filter = { _id: eventId, status: { $in: ['confirmed', 'completed'] } };
+  const scopedFilter = req && getTenantUnit(req) === 'factory' ? await getFactoryFranchiseFilter(filter) : filter;
+  const event = (await EventModel.findOne(scopedFilter)
     .select('name date city franchiseId')
     .lean()) as any;
   if (!event) return null;

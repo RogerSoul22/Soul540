@@ -2,6 +2,7 @@ import { Router } from 'express';
 import mongoose, { Schema } from 'mongoose';
 import { getTenantUnit } from '../../infrastructure/middleware/tenant';
 import { getFranchiseFilter } from '../../infrastructure/franchise-scope';
+import { getFactoryFranchiseFilter } from '../events/factory-event-scope';
 import {
   Event as ActualEvent,
   FranchiseEvent as ActualFranchiseEvent,
@@ -32,6 +33,7 @@ const FactoryContractor =
 const router = Router();
 
 export function getDashboardEventUnits(req: any): Array<'main' | 'franchise' | 'factory'> {
+  if (getTenantUnit(req) === 'factory') return ['franchise'];
   return [getTenantUnit(req) as 'main' | 'franchise' | 'factory'];
 }
 
@@ -59,17 +61,33 @@ router.get('/', async (req, res) => {
       FranchiseContractor.countDocuments(getFranchiseFilter(req, { status: 'ativo' })),
     ]);
   } else if (unit === 'factory') {
-    // Factory has no event model yet — report 0 for events.
+    // Factory dashboard follows production events from Sorocaba and Itu.
     const eventModels = getDashboardEventUnits(req).map((eventUnit) => {
       if (eventUnit === 'main') return ActualEvent;
       if (eventUnit === 'franchise') return ActualFranchiseEvent;
       return ActualFactoryEvent;
     });
-    const eventFilters = eventModels.map((model) => (model === ActualFranchiseEvent ? getFranchiseFilter(req) : {}));
-    const upcomingFilters = eventModels.map((model) =>
-      model === ActualFranchiseEvent
-        ? getFranchiseFilter(req, { date: { $gte: now }, status: { $nin: ['completed', 'cancelled'] } })
-        : { date: { $gte: now }, status: { $nin: ['completed', 'cancelled'] } },
+    const eventFilters = await Promise.all(
+      eventModels.map((model) =>
+        model === ActualFranchiseEvent
+          ? unit === 'factory'
+            ? getFactoryFranchiseFilter({ deletedAt: { $exists: false } })
+            : getFranchiseFilter(req)
+          : {},
+      ),
+    );
+    const upcomingFilters = await Promise.all(
+      eventModels.map((model) =>
+        model === ActualFranchiseEvent
+          ? unit === 'factory'
+            ? getFactoryFranchiseFilter({
+                deletedAt: { $exists: false },
+                date: { $gte: now },
+                status: { $nin: ['completed', 'cancelled'] },
+              })
+            : getFranchiseFilter(req, { date: { $gte: now }, status: { $nin: ['completed', 'cancelled'] } })
+          : { date: { $gte: now }, status: { $nin: ['completed', 'cancelled'] } },
+      ),
     );
     const [eventTotals, eventUpcoming, operationalCounts] = await Promise.all([
       Promise.all(eventModels.map((model, index) => model.countDocuments(eventFilters[index]))),

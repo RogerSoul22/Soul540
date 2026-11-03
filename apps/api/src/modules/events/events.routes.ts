@@ -3,7 +3,7 @@ import { getFranchiseFilter, injectFranchiseScope } from '../../infrastructure/f
 import { getEventUnitsForRequest, type EventUnit } from '../../infrastructure/event-tenant';
 import { logAudit } from '../../infrastructure/audit-log';
 import { Finance, FranchiseFinance, FactoryFinance } from '../finance/finance-tenant';
-import { Event, FranchiseEvent, FactoryEvent } from './events.model';
+import { Event, FranchiseEvent } from './events.model';
 import {
   calculateEventFinanceAmounts,
   findEventForRequest,
@@ -20,6 +20,7 @@ import { cancelMutableAutomaticFinances, syncEventCommissions } from './events.c
 import { requirePermission } from '../../infrastructure/middleware/permissions';
 import { getTenantUnit } from '../../infrastructure/middleware/tenant';
 import { isFromFactory, isFromFranchise, pickFactoryOperationalUpdate } from './events.policy';
+import { getFactoryFranchiseFilter } from './factory-event-scope';
 
 const router = Router();
 router.use(requirePermission('eventos', 'read'));
@@ -28,7 +29,9 @@ const SLIM = '-locationImageData -paymentProofData -contractPdfData';
 // Lightweight count endpoint — used by portal cards
 router.get('/count', async (req, res) => {
   if (isFromFactory(req)) {
-    const count = await FactoryEvent.countDocuments(getFranchiseFilter(req, { deletedAt: { $exists: false } }));
+    const count = await FranchiseEvent.countDocuments(
+      await getFactoryFranchiseFilter({ deletedAt: { $exists: false } }),
+    );
     return res.json({ count });
   }
   if (isFromFranchise(req)) {
@@ -41,6 +44,14 @@ router.get('/count', async (req, res) => {
 
 router.get('/', async (req, res) => {
   const scope = String(req.query.scope || getTenantUnit(req));
+  if (isFromFactory(req) && scope === 'factory') {
+    const factoryEvents = await FranchiseEvent.find(
+      await getFactoryFranchiseFilter({ deletedAt: { $exists: false } }),
+    )
+      .select(SLIM)
+      .sort({ date: 1 });
+    return res.json(factoryEvents);
+  }
   const stores = getEventUnitsForRequest(req, scope).map(getEventStoreForUnit);
   const groups = await Promise.all(
     stores.map((store) =>

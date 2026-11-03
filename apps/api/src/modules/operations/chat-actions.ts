@@ -1,4 +1,5 @@
-import { Event, FactoryEvent, FranchiseEvent } from '../events/events.model';
+import { Event, FranchiseEvent } from '../events/events.model';
+import { getFactoryFranchiseFilter } from '../events/factory-event-scope';
 import { getTenantUnit } from '../../infrastructure/middleware/tenant';
 import { getFranchiseFilter, injectFranchiseScope } from '../../infrastructure/franchise-scope';
 import { getFinanceFilter, getFinanceModelForUnit } from '../finance/finance-tenant';
@@ -33,10 +34,16 @@ export async function executeChatAction(req: any, action: string, params: any): 
     case 'query_events': {
       assertPermission(req, 'eventos');
       const filter: any = {};
+      if (factory) filter.deletedAt = { $exists: false };
       if (['upcoming', 'completed', 'cancelled'].includes(status)) filter.status = status;
-      const model = franchise ? FranchiseEvent : factory ? FactoryEvent : Event;
+      const model = franchise || factory ? FranchiseEvent : Event;
+      const scopedFilter = factory
+        ? await getFactoryFranchiseFilter(filter)
+        : franchise
+          ? getFranchiseFilter(req, filter)
+          : filter;
       return model
-        .find(franchise ? getFranchiseFilter(req, filter) : filter)
+        .find(scopedFilter)
         .limit(limit)
         .lean();
     }

@@ -11,7 +11,7 @@ Planejar, confirmar, executar e acompanhar eventos comerciais da unidade.
 
 ## Acesso e atores
 
-A fábrica consulta eventos elegíveis para produção e atualiza somente massa, molho, queijo, embalagens, status e outros campos operacionais permitidos.
+A fábrica consulta eventos elegíveis das franquias de Sorocaba e Itu para produção e atualiza somente massa, molho, queijo, embalagens, status e outros campos operacionais permitidos.
 
 A visualização e as ações dependem da permissão da página e das permissões de ação definidas para o usuário.
 

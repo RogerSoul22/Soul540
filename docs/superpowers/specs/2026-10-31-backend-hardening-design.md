@@ -12,7 +12,7 @@ O sistema continuará usando Express, MongoDB/Mongoose e o envelope de respostas
 - Restringir administração de franquias e leitura de auditoria a administradores.
 - Fazer a API validar permissões, sem depender da visibilidade do menu no frontend.
 - Permitir que a fábrica administre campos operacionais de eventos do principal e das franquias sem permitir alterações financeiras indevidas.
-- Manter dashboard e financeiro da fábrica limitados aos dados da fábrica; a consolidação de franquias pertence ao Principal.
+- Mostrar no portal e no dashboard da fábrica os eventos das franquias Sorocaba e Itu; manter o financeiro da fábrica em seu próprio escopo.
 - Restringir operações de produção por permissão explícita.
 - Padronizar erros públicos sem vazar detalhes internos.
 - Reduzir abuso de login/chat e limitar payloads grandes às rotas que realmente precisam deles.
@@ -47,12 +47,13 @@ O sistema continuará usando Express, MongoDB/Mongoose e o envelope de respostas
 
 - Para uma requisição administrativa da fábrica, localizar o evento pelo `source`/unidade solicitado e aplicar o filtro de franquia correto.
 - Permitir apenas o conjunto operacional já definido para a fábrica.
-- A tela, o dashboard, o chat e o financeiro da fábrica usam somente os modelos e dados da unidade `factory`, inclusive para administradores locais.
+- Eventos exibidos e contados na Fábrica são os vinculados às franquias Sorocaba e Itu; tarefas, equipe e contratantes continuam usando os modelos da unidade `factory`.
+- O financeiro da Fábrica usa somente o modelo `FactoryFinance`; o consolidado financeiro do Principal contém Principal e franquias.
 - O escopo `combined` do Principal contém somente os dados principais e das franquias; a Fábrica não entra nesse consolidado.
 - A consolidação de eventos e financeiro das franquias fica no sistema Principal, acessível ao administrador global.
-- A fábrica pode localizar eventos confirmados da Principal ou das franquias para vinculá-los a pedidos de produção e atualizar somente os campos operacionais permitidos.
-- Não permitir leitura de relatórios combinados nem mutações financeiras cruzadas a partir do sistema Fábrica.
-- O dashboard da fábrica conta somente `FactoryEvent` e dados operacionais da fábrica.
+- A fábrica pode localizar eventos confirmados de Sorocaba e Itu para vinculá-los a pedidos de produção e atualizar somente os campos operacionais permitidos.
+- Não permitir leitura de relatórios financeiros combinados nem mutações financeiras cruzadas a partir do sistema Fábrica.
+- O dashboard da Fábrica conta eventos de Sorocaba e Itu e dados operacionais da própria Fábrica.
 - Exigir permissão específica para criação, edição, exclusão e reconciliação de pedidos de produção.
 
 ### Erros, limites e histórico
