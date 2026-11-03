@@ -44,7 +44,7 @@ router.get('/count', async (req, res) => {
 
 router.get('/', async (req, res) => {
   const scope = String(req.query.scope || getTenantUnit(req));
-  if (isFromFactory(req) && scope === 'factory') {
+  if (isFromFactory(req)) {
     const factoryEvents = await FranchiseEvent.find(
       await getFactoryFranchiseFilter({ deletedAt: { $exists: false } }),
     )
