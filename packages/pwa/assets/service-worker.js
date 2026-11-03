@@ -73,14 +73,15 @@ function belongsToAnotherPortal(pathname) {
   return OTHER_PORTALS.some((prefix) => pathname.startsWith(prefix) || `${pathname}/` === prefix);
 }
 
-async function openPage(request) {
+// key: onde a página fica guardada. O painel (SPA) usa o escopo; o portal.html usa o próprio endereço.
+async function openPage(request, key = SCOPE_PATH) {
   const cache = await caches.open(CACHE);
   try {
     const response = await fetch(request);
-    if (response.ok && response.type === 'basic') await cache.put(SCOPE_PATH, response.clone());
+    if (response.ok && response.type === 'basic') await cache.put(key, response.clone());
     return response;
   } catch {
-    const shell = await cache.match(SCOPE_PATH);
+    const shell = await cache.match(key);
     return (
       shell || new Response(OFFLINE_PAGE, { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } })
     );
@@ -107,7 +108,12 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin || url.pathname.startsWith('/api/')) return;
 
   if (request.mode === 'navigate') {
-    // Arquivos (portal.html, planilhas) e páginas dos outros portais seguem direto para a rede.
+    // O portal.html é a página inicial do app instalado: também abre sem rede.
+    if (url.pathname.endsWith('/portal.html') && !belongsToAnotherPortal(url.pathname)) {
+      event.respondWith(openPage(request, request.url));
+      return;
+    }
+    // Outros arquivos (planilhas) e páginas dos outros portais seguem direto para a rede.
     const isFile = url.pathname.split('/').pop().includes('.');
     if (!isFile && !belongsToAnotherPortal(url.pathname)) event.respondWith(openPage(request));
     return;

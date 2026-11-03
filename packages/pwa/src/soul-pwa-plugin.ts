@@ -118,7 +118,9 @@ export function soulPwa(options: SoulPwaOptions): VitePlugin {
       // ainda não abriu também funcionam sem rede.
       const precache = Object.keys(bundle)
         .filter((fileName) => PRECACHED.test(fileName))
-        .map((fileName) => `${base}${fileName}`);
+        .map((fileName) => `${base}${fileName}`)
+        // Página inicial do app instalado (o portal): precisa abrir sem rede.
+        .concat(`${base}portal.html`);
       for (const [fileName, { source }] of Object.entries(files(precache, Date.now().toString(36)))) {
         this.emitFile({ type: 'asset', fileName, source });
       }

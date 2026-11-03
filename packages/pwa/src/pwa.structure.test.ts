@@ -90,3 +90,22 @@ test('every portal shows the offline status banner and the api client keeps the 
   assert.match(client, /offline\?\.remember\(/);
   assert.match(client, /\/api\/auth\/logout/);
 });
+
+test('on phones every portal uses the bottom navigation bar (like dVolt) instead of the side bar', () => {
+  for (const app of ['main', 'franchise', 'factory']) {
+    assert.match(read('apps', app, 'src', 'components', 'Sidebar', 'Sidebar.tsx'), /<MobileNav/, `${app}: MobileNav`);
+  }
+  const nav = read('packages', 'ui', 'src', 'components', 'mobile-nav', 'MobileNav.tsx');
+  assert.match(nav, /Mais opções/);
+  assert.match(nav, /onLogout/);
+  const styles = read('packages', 'ui', 'src', 'components', 'mobile-nav', 'styles', 'MobileNav.module.scss');
+  assert.match(styles, /safe-area-inset-bottom/);
+  assert.match(styles, /--mobile-browser-bottom-inset/);
+});
+
+test('the installed main app starts at the portal page, which also opens offline', () => {
+  assert.match(read('apps', 'main', 'vite.config.ts'), /startUrl: '\/portal\.html'/);
+  const worker = read('packages', 'pwa', 'assets', 'service-worker.js');
+  assert.match(worker, /endsWith\('\/portal\.html'\)/);
+  assert.match(read('packages', 'pwa', 'src', 'soul-pwa-plugin.ts'), /portal\.html/);
+});

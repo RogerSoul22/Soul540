@@ -2,11 +2,11 @@
 
 Cada portal é um app instalável independente, com nome, identidade e escopo próprios.
 
-| Portal    | Nome instalado   | `id` e escopo | Service worker                                              |
-| --------- | ---------------- | ------------- | ----------------------------------------------------------- |
-| Principal | Soul540          | `/`           | `/sw.js`                                                    |
-| Fábrica   | Soul540 Fábrica  | `/fabrica/`   | `/fabrica/sw.js`                                            |
-| Franquia  | Soul540 Franquia | `/itu/`       | `/franchise-assets/sw.js` (com `Service-Worker-Allowed: /`) |
+| Portal    | Nome instalado   | `id` e escopo                | Service worker                                              |
+| --------- | ---------------- | ---------------------------- | ----------------------------------------------------------- |
+| Principal | Soul540          | `/` (abre em `/portal.html`) | `/sw.js`                                                    |
+| Fábrica   | Soul540 Fábrica  | `/fabrica/`                  | `/fabrica/sw.js`                                            |
+| Franquia  | Soul540 Franquia | `/itu/`                      | `/franchise-assets/sw.js` (com `Service-Worker-Allowed: /`) |
 
 ## Como funciona
 

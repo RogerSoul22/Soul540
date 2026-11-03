@@ -3,6 +3,8 @@ export { default as ErrorBoundary } from './components/error-boundary/ErrorBound
 export { default as GaugeChart } from './components/gauge-chart/GaugeChart';
 export { default as HorizontalBarChart } from './components/horizontal-bar-chart/HorizontalBarChart';
 export { default as Logo } from './components/logo/Logo';
+export { default as MobileNav } from './components/mobile-nav/MobileNav';
+export type { MobileNavItem } from './components/mobile-nav/MobileNav';
 export { default as PortalLayout } from './components/portal-layout/PortalLayout';
 export { ThemeContext, ThemeProvider, useTheme } from './theme/ThemeContext';
 export type { Theme, ThemeContextData } from './theme/ThemeContext';

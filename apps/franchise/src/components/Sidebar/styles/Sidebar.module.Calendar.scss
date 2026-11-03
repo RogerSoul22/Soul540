@@ -27,24 +27,9 @@
     pointer-events: none;
   }
 
+  // No celular o menu é o MobileNav (barra fixa embaixo), não a barra lateral.
   @include mobile {
-    width: 100%;
-    height: auto;
-    bottom: 0;
-    top: auto;
-    flex-direction: row;
-    border-right: none;
-    border-top: 1px solid $border;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-    z-index: 100;
-    // Frosted glass effect for bottom nav
-    background: linear-gradient(180deg, var(--sidebar-gradient-top) 0%, $bg-secondary 100%);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-
-    &::before {
-      display: none;
-    }
+    display: none;
   }
 }
 

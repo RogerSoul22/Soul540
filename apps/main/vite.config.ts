@@ -15,7 +15,8 @@ export default defineConfig({
       shortName: 'Soul540',
       description: 'Sistema de gestão principal da Soul540.',
       scope: '/',
-      startUrl: '/',
+      // O app instalado abre no portal (escolha do sistema), e não direto no painel.
+      startUrl: '/portal.html',
     }),
   ],
   css: {
