@@ -116,7 +116,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </aside>
       <MobileNav
         items={mobileItems}
-        primaryPaths={[ROUTES.DASHBOARD, ROUTES.EVENTOS, ROUTES.FINANCEIRO, ROUTES.TAREFAS]}
+        primaryPaths={[ROUTES.DASHBOARD, ROUTES.EVENTOS, ROUTES.FINANCEIRO, '/portal.html']}
         activePath={location.pathname}
         userName={user?.name}
         onSelect={(item) => (item.external ? (window.location.href = item.path) : navigate(item.path))}
