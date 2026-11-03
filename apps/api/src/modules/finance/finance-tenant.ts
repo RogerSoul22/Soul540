@@ -1,6 +1,7 @@
 import { getTenantUnit } from '../../infrastructure/middleware/tenant';
 import { getFranchiseFilter } from '../../infrastructure/franchise-scope';
 import { Finance, FranchiseFinance, FactoryFinance } from './finance.model';
+import { canAccessConsolidatedData } from '../identity/auth-system-policy';
 
 export { Finance, FranchiseFinance, FactoryFinance };
 
@@ -19,14 +20,15 @@ export function getFinanceModelForUnit(unit: string) {
 
 export function getFinanceModelsForRequest(req: any, scope: string) {
   const tenantUnit = getTenantUnit(req);
-  if (!req.user?.isAdmin) return [getFinanceModelForUnit(tenantUnit)];
-  if (scope === 'combined') return [Finance, FranchiseFinance, FactoryFinance];
+  if (!canAccessConsolidatedData(req.user, tenantUnit)) return [getFinanceModelForUnit(tenantUnit)];
+  if (scope === 'combined') return [Finance, FranchiseFinance];
   return [getFinanceModelForUnit(scope)];
 }
 
 export function getFinanceFilter(req: any, model: any, filter: Record<string, unknown> = {}) {
   const requestedFranchise =
-    Boolean(req.user?.isAdmin) && (req.query?.scope === 'franchise' || req.query?.reportingUnit === 'franchise');
+    canAccessConsolidatedData(req.user, getTenantUnit(req)) &&
+    (req.query?.scope === 'franchise' || req.query?.reportingUnit === 'franchise');
   if (model === FranchiseFinance && (getTenantUnit(req) === 'franchise' || requestedFranchise)) {
     return getFranchiseFilter(req, filter);
   }

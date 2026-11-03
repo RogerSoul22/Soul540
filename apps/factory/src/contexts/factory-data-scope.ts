@@ -1,5 +1,5 @@
-export type FactoryEventsScope = 'factory' | 'combined';
+export type FactoryEventsScope = 'factory';
 
-export function getFactoryEventsScope(isAdmin: boolean): FactoryEventsScope {
-  return isAdmin ? 'combined' : 'factory';
+export function getFactoryEventsScope(_isAdmin: boolean): FactoryEventsScope {
+  return 'factory';
 }

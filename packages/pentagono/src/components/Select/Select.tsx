@@ -25,7 +25,7 @@ function Chevron({ open }: { open: boolean }) {
 
 // O <select> nativo continua na tela (invisível) como fonte de valor, onChange e ref; a lista aberta é do Pentágono.
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
-  { label, id, variant = 'default', className = '', children, disabled, ...rest },
+  { label, id, variant = 'default', className = '', children, disabled, searchable = false, ...rest },
   ref,
 ) {
   const native = useRef<HTMLSelectElement | null>(null);
@@ -79,7 +79,13 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
         {children}
       </select>
       {open && native.current && trigger.current && (
-        <SelectMenu native={native.current} anchor={trigger.current} onPick={pick} onClose={close} />
+        <SelectMenu
+          native={native.current}
+          anchor={trigger.current}
+          onPick={pick}
+          onClose={close}
+          searchable={searchable}
+        />
       )}
     </>
   );

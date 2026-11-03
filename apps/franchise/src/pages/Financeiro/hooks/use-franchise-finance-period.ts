@@ -11,6 +11,10 @@ import { filterFinanceByModality } from '../support/finance-modalities';
 import type { FinanceModalityFilter } from '../support/finance-modalities';
 import { normalizeEventModality } from '../../../../../../packages/domain/src/index';
 
+function normalizeSearchText(value: string) {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
+}
+
 type Props = Pick<FranchiseFinanceState, 'events' | 'finances' | 'financePeriod' | 'filterType' | 'search'> & {
   modalityFilter: FinanceModalityFilter;
   categoryLabels: Record<string, string>;
@@ -124,16 +128,16 @@ export function useFranchiseFinancePeriod({
           if (filterType === 'pending' && finance.status !== 'pending') return false;
           if (filterType !== 'all' && filterType !== 'pending' && finance.type !== filterType) return false;
           if (!search) return true;
-          const query = search.toLowerCase();
+          const query = normalizeSearchText(search.trim());
           const event = events.find((item) => item.id === finance.eventId);
           return (
-            finance.description.toLowerCase().includes(query) ||
-            finance.category.toLowerCase().includes(query) ||
-            event?.name.toLowerCase().includes(query)
+            normalizeSearchText(finance.description).includes(query) ||
+            normalizeSearchText(categoryLabels[finance.category] || finance.category).includes(query) ||
+            normalizeSearchText(event?.name || '').includes(query)
           );
         })
         .sort((left, right) => (right.date || '').localeCompare(left.date || '')),
-    [events, filterType, periodFinances, search],
+    [categoryLabels, events, filterType, periodFinances, search],
   );
   const budget = buildFranchiseFinanceBudgetTotals(periodEvents, finances);
   const finalValues = buildFranchiseFinanceFinalValues(periodEvents);

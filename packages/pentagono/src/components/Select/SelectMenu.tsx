@@ -8,6 +8,7 @@ interface SelectMenuProps {
   anchor: HTMLElement;
   onPick: (value: string) => void;
   onClose: () => void;
+  searchable?: boolean;
 }
 
 const MAX_HEIGHT = 280;
@@ -20,8 +21,26 @@ function optionClass(item: Extract<SelectItem, { kind: 'option' }>) {
   return [menu.option, item.selected && menu.selected, item.disabled && menu.disabled].filter(Boolean).join(' ');
 }
 
-export function SelectMenu({ native, anchor, onPick, onClose }: SelectMenuProps) {
+function normalizeSearch(value: string) {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
+}
+
+export function SelectMenu({ native, anchor, onPick, onClose, searchable = false }: SelectMenuProps) {
   const items = useMemo(() => readSelectItems(native), [native]);
+  const [search, setSearch] = useState('');
+  const visibleItems = useMemo(() => {
+    if (!searchable || !search.trim()) return items;
+    const query = normalizeSearch(search.trim());
+    const filtered = items.filter((item) => item.kind === 'option' && normalizeSearch(item.label).includes(query));
+    return items.filter((item, index) => {
+      if (item.kind === 'option') return filtered.includes(item);
+      const nextGroup = items.slice(index + 1).find((next) => next.kind === 'group');
+      return filtered.some((option) => {
+        const optionIndex = items.indexOf(option);
+        return optionIndex > index && (!nextGroup || items.indexOf(nextGroup) > optionIndex);
+      });
+    });
+  }, [items, search, searchable]);
   const [active, setActive] = useState(() => {
     const selected = items.findIndex((item) => item.kind === 'option' && item.selected);
     return selected >= 0 ? selected : (enabledIndexes(items)[0] ?? -1);
@@ -47,7 +66,7 @@ export function SelectMenu({ native, anchor, onPick, onClose }: SelectMenuProps)
 
   useEffect(() => {
     const move = (step: 1 | -1) => {
-      const enabled = enabledIndexes(items);
+      const enabled = enabledIndexes(visibleItems);
       if (!enabled.length) return;
       const position = enabled.indexOf(active);
       setActive(enabled[(position + step + enabled.length) % enabled.length]);
@@ -56,12 +75,23 @@ export function SelectMenu({ native, anchor, onPick, onClose }: SelectMenuProps)
       if (event.key === 'Escape') {
         event.stopPropagation();
         onClose();
+      } else if (searchable && event.target instanceof HTMLInputElement) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          const item = visibleItems[active];
+          if (item?.kind === 'option') onPick(item.value);
+        } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+          event.preventDefault();
+          move(event.key === 'ArrowDown' ? 1 : -1);
+        } else if (event.key === 'Tab') {
+          onClose();
+        }
       } else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
         event.preventDefault();
         move(event.key === 'ArrowDown' ? 1 : -1);
       } else if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
-        const item = items[active];
+        const item = visibleItems[active];
         if (item?.kind === 'option') onPick(item.value);
       } else if (event.key === 'Tab') {
         onClose();
@@ -81,35 +111,64 @@ export function SelectMenu({ native, anchor, onPick, onClose }: SelectMenuProps)
       window.removeEventListener('scroll', outside, true);
       window.removeEventListener('resize', onClose);
     };
-  }, [active, anchor, items, onClose, onPick]);
+  }, [active, anchor, onClose, onPick, searchable, visibleItems]);
+
+  useEffect(() => {
+    const selected = visibleItems.findIndex((item) => item.kind === 'option' && item.selected && !item.disabled);
+    setActive(selected >= 0 ? selected : (enabledIndexes(visibleItems)[0] ?? -1));
+  }, [visibleItems]);
 
   return createPortal(
-    <div ref={listRef} className={menu.menu} style={style} role="listbox">
-      {items.map((item, index) =>
-        item.kind === 'group' ? (
-          <div key={`g-${index}`} className={menu.group}>
-            {item.label}
-          </div>
-        ) : (
-          <div
-            key={`o-${index}`}
-            role="option"
-            aria-selected={item.selected}
-            aria-disabled={item.disabled || undefined}
-            data-active={index === active}
-            className={optionClass(item)}
-            onMouseEnter={() => !item.disabled && setActive(index)}
-            onClick={() => !item.disabled && onPick(item.value)}
-          >
-            <span>{item.label}</span>
-            {item.selected && (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <polyline points="20 6 9 17 4 12" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            )}
-          </div>
-        ),
+    <div ref={listRef} className={menu.menu} style={style}>
+      {searchable && (
+        <input
+          className={menu.searchInput}
+          type="search"
+          aria-label="Buscar opção"
+          placeholder="Buscar..."
+          value={search}
+          autoFocus
+          onChange={(event) => setSearch(event.target.value)}
+        />
       )}
+      <div role="listbox">
+        {visibleItems.length === 0 ? (
+          <div className={menu.empty}>Nenhum resultado encontrado</div>
+        ) : (
+          visibleItems.map((item, index) =>
+            item.kind === 'group' ? (
+              <div key={`g-${index}`} className={menu.group}>
+                {item.label}
+              </div>
+            ) : (
+              <div
+                key={`o-${index}`}
+                role="option"
+                aria-selected={item.selected}
+                aria-disabled={item.disabled || undefined}
+                data-active={index === active}
+                className={optionClass(item)}
+                onMouseEnter={() => !item.disabled && setActive(index)}
+                onClick={() => !item.disabled && onPick(item.value)}
+              >
+                <span>{item.label}</span>
+                {item.selected && (
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                  >
+                    <polyline points="20 6 9 17 4 12" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                )}
+              </div>
+            ),
+          )
+        )}
+      </div>
     </div>,
     document.body,
   );

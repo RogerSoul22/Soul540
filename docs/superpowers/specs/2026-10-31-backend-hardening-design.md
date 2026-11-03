@@ -12,7 +12,7 @@ O sistema continuará usando Express, MongoDB/Mongoose e o envelope de respostas
 - Restringir administração de franquias e leitura de auditoria a administradores.
 - Fazer a API validar permissões, sem depender da visibilidade do menu no frontend.
 - Permitir que a fábrica administre campos operacionais de eventos do principal e das franquias sem permitir alterações financeiras indevidas.
-- Alinhar dashboard e financeiro da fábrica ao escopo combinado de eventos.
+- Manter dashboard e financeiro da fábrica limitados aos dados da fábrica; a consolidação de franquias pertence ao Principal.
 - Restringir operações de produção por permissão explícita.
 - Padronizar erros públicos sem vazar detalhes internos.
 - Reduzir abuso de login/chat e limitar payloads grandes às rotas que realmente precisam deles.
@@ -43,12 +43,16 @@ O sistema continuará usando Express, MongoDB/Mongoose e o envelope de respostas
 - Proteger auditoria com administrador e manter filtro por escopo.
 - Validar permissões também nas ações de mutação iniciadas pelo chat.
 
-### Fábrica e eventos combinados
+### Fábrica e acesso operacional a eventos
 
 - Para uma requisição administrativa da fábrica, localizar o evento pelo `source`/unidade solicitado e aplicar o filtro de franquia correto.
 - Permitir apenas o conjunto operacional já definido para a fábrica.
-- Listar financeiro combinado somente onde o contrato do dashboard exigir; não permitir mutações financeiras cruzadas.
-- Atualizar o dashboard da fábrica para contar `FactoryEvent` e refletir o escopo definido.
+- A tela, o dashboard, o chat e o financeiro da fábrica usam somente os modelos e dados da unidade `factory`, inclusive para administradores locais.
+- O escopo `combined` do Principal contém somente os dados principais e das franquias; a Fábrica não entra nesse consolidado.
+- A consolidação de eventos e financeiro das franquias fica no sistema Principal, acessível ao administrador global.
+- A fábrica pode localizar eventos confirmados da Principal ou das franquias para vinculá-los a pedidos de produção e atualizar somente os campos operacionais permitidos.
+- Não permitir leitura de relatórios combinados nem mutações financeiras cruzadas a partir do sistema Fábrica.
+- O dashboard da fábrica conta somente `FactoryEvent` e dados operacionais da fábrica.
 - Exigir permissão específica para criação, edição, exclusão e reconciliação de pedidos de produção.
 
 ### Erros, limites e histórico
@@ -68,7 +72,7 @@ O sistema continuará usando Express, MongoDB/Mongoose e o envelope de respostas
 
 1. Testes e núcleo de autenticação/autorização.
 2. Proteção das rotas de franquias, auditoria e módulos.
-3. Correção do escopo combinado de eventos/financeiro da fábrica.
+3. Correção do escopo isolado de eventos/financeiro da fábrica e dos acessos consolidados do Principal.
 4. Produção, chat e histórico.
 5. Erros, limites, rate limit e correção de textos.
 6. Verificação completa e revisão final.

@@ -24,9 +24,8 @@ export function useFactoryAppData(state: FactoryState) {
         .then((d) => Array.isArray(d) && state.setTasks(d))
         .catch((error) => console.error('Falha ao carregar dados:', error)),
     );
-    const financeScope = user?.isAdmin ? '?scope=combined' : '';
     pending.push(
-      apiFetch(`/api/finances${financeScope}`)
+      apiFetch('/api/finances')
         .then((r) => r.json())
         .then((d) => Array.isArray(d) && state.setFinances(d))
         .catch((error) => console.error('Falha ao carregar dados:', error)),

@@ -18,6 +18,27 @@
     animation: select-menu-in 0.12s ease-out;
   }
 
+  .searchInput {
+    flex: 0 0 auto;
+    min-height: 36px;
+    padding: 7px 9px;
+    color: var(--pentagono-color-text);
+    font: inherit;
+    background: var(--pentagono-color-surface);
+    border: 1px solid var(--pentagono-color-border);
+    border-radius: var(--pentagono-radius-sm);
+    outline: none;
+  }
+
+  .searchInput:focus {
+    border-color: var(--pentagono-color-brand);
+  }
+
+  .empty {
+    padding: 10px;
+    color: var(--pentagono-color-text-muted);
+  }
+
   .group {
     padding: 8px 10px 4px;
     color: var(--pentagono-color-text-muted);

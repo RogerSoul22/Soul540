@@ -20,16 +20,19 @@ import {
 import { linkOfxTransaction, serializeFinanceEntry } from './finance-settlements';
 import { financeMutationRouter } from './finance-mutations.routes';
 import { requirePermission } from '../../infrastructure/middleware/permissions';
+import { canAccessConsolidatedData } from '../identity/auth-system-policy';
 const router = Router();
 const requireFinanceRead = requirePermission('financeiro', 'read');
 
 router.get('/', requireFinanceRead, async (req, res) => {
   const requestedScope = String(req.query.scope || '');
+  const tenantUnit = getTenantUnit(req);
+  const canConsolidate = canAccessConsolidatedData((req as any).user, tenantUnit);
   const scope =
-    (req as any).user?.isAdmin && ['main', 'franchise', 'factory', 'combined'].includes(requestedScope)
+    canConsolidate && ['main', 'franchise', 'factory', 'combined'].includes(requestedScope)
       ? requestedScope
-      : getTenantUnit(req);
-  const models = scope === 'combined' ? [Finance, FranchiseFinance, FactoryFinance] : [getFinanceModelForUnit(scope)];
+      : tenantUnit;
+  const models = scope === 'combined' ? [Finance, FranchiseFinance] : [getFinanceModelForUnit(scope)];
   const groups = await Promise.all(
     models.map((model) =>
       model
@@ -48,20 +51,28 @@ router.get('/', requireFinanceRead, async (req, res) => {
 
 router.get('/summary', requireFinanceRead, async (req, res) => {
   const requestedScope = String(req.query.scope || '');
-  const isAdmin = (req as any).user?.isAdmin === true;
+  const tenantUnit = getTenantUnit(req);
+  const canConsolidate = canAccessConsolidatedData((req as any).user, tenantUnit);
   const scope =
-    isAdmin && ['main', 'franchise', 'factory', 'combined'].includes(requestedScope)
+    canConsolidate && ['main', 'franchise', 'factory', 'combined'].includes(requestedScope)
       ? requestedScope
-      : getTenantUnit(req);
+      : tenantUnit;
   const view = req.query.view === 'competence' ? 'competence' : 'cash';
   const requestedReportingUnit = typeof req.query.reportingUnit === 'string' ? req.query.reportingUnit : '';
-  const reportingUnit = ['main', 'franchise', 'factory'].includes(requestedReportingUnit)
+  const reportingUnit = canConsolidate && ['main', 'franchise', 'factory'].includes(requestedReportingUnit)
     ? (requestedReportingUnit as 'main' | 'franchise' | 'factory')
     : scope === 'combined'
       ? undefined
       : (scope as 'main' | 'franchise' | 'factory');
-  const models =
-    isAdmin && reportingUnit === 'main' ? [Finance, FranchiseFinance] : getFinanceModelsForRequest(req, scope);
+  const models = canConsolidate
+    ? reportingUnit === 'main'
+      ? [Finance, FranchiseFinance]
+      : reportingUnit === 'franchise'
+        ? [FranchiseFinance]
+        : reportingUnit === 'factory'
+          ? [FactoryFinance]
+          : getFinanceModelsForRequest(req, scope)
+    : getFinanceModelsForRequest(req, scope);
   const start = typeof req.query.start === 'string' ? req.query.start : '';
   const end = typeof req.query.end === 'string' ? req.query.end : '';
   const groups = await Promise.all(

@@ -1,10 +1,10 @@
-import { Event, FranchiseEvent } from '../events/events.model';
+import { Event, FactoryEvent, FranchiseEvent } from '../events/events.model';
 import { getTenantUnit } from '../../infrastructure/middleware/tenant';
 import { getFranchiseFilter, injectFranchiseScope } from '../../infrastructure/franchise-scope';
 import { getFinanceFilter, getFinanceModelForUnit } from '../finance/finance-tenant';
-import { Task, FranchiseTask } from './tasks.routes';
-import { Employee, FranchiseEmployee } from './employees.routes';
-import { Contractor, FranchiseContractor } from './contractors.routes';
+import { FactoryTask, Task, FranchiseTask } from './tasks.routes';
+import { Employee, FactoryEmployee, FranchiseEmployee } from './employees.routes';
+import { Contractor, FactoryContractor, FranchiseContractor } from './contractors.routes';
 import { createFinanceSchema } from '../../infrastructure/schemas/finances';
 import { logAudit } from '../../infrastructure/audit-log';
 import { hasPermission } from '../../infrastructure/middleware/permissions';
@@ -23,6 +23,7 @@ function assertPermission(req: any, permission: string, mode: 'read' | 'write' =
 export async function executeChatAction(req: any, action: string, params: any): Promise<any> {
   const unit = getTenantUnit(req);
   const franchise = unit === 'franchise';
+  const factory = unit === 'factory';
   const limit =
     typeof params.limit === 'number' && Number.isFinite(params.limit)
       ? Math.min(50, Math.max(1, Math.floor(params.limit)))
@@ -33,7 +34,7 @@ export async function executeChatAction(req: any, action: string, params: any): 
       assertPermission(req, 'eventos');
       const filter: any = {};
       if (['upcoming', 'completed', 'cancelled'].includes(status)) filter.status = status;
-      const model = franchise ? FranchiseEvent : Event;
+      const model = franchise ? FranchiseEvent : factory ? FactoryEvent : Event;
       return model
         .find(franchise ? getFranchiseFilter(req, filter) : filter)
         .limit(limit)
@@ -46,7 +47,7 @@ export async function executeChatAction(req: any, action: string, params: any): 
       if (typeof params.priority === 'string' && ['urgent', 'high', 'medium', 'low'].includes(params.priority)) {
         filter.priority = params.priority;
       }
-      const model = franchise ? FranchiseTask : Task;
+      const model = franchise ? FranchiseTask : factory ? FactoryTask : Task;
       return model
         .find(franchise ? getFranchiseFilter(req, filter) : filter)
         .limit(20)
@@ -67,7 +68,7 @@ export async function executeChatAction(req: any, action: string, params: any): 
       assertPermission(req, 'funcionarios');
       const filter: any = {};
       if (status === 'active' || status === 'inactive') filter.status = status === 'active' ? 'ativo' : 'inativo';
-      const model = franchise ? FranchiseEmployee : Employee;
+      const model = franchise ? FranchiseEmployee : factory ? FactoryEmployee : Employee;
       return model
         .find(franchise ? getFranchiseFilter(req, filter) : filter)
         .limit(20)
@@ -77,7 +78,7 @@ export async function executeChatAction(req: any, action: string, params: any): 
       assertPermission(req, 'contratantes');
       const filter: any = {};
       if (status === 'active' || status === 'inactive') filter.status = status === 'active' ? 'ativo' : 'inativo';
-      const model = franchise ? FranchiseContractor : Contractor;
+      const model = franchise ? FranchiseContractor : factory ? FactoryContractor : Contractor;
       return model
         .find(franchise ? getFranchiseFilter(req, filter) : filter)
         .limit(20)
@@ -115,8 +116,8 @@ export async function executeChatAction(req: any, action: string, params: any): 
         .safeParse(params);
       if (!parsed.success)
         throw Object.assign(new Error('Dados da tarefa inválidos'), { status: 400, code: 'invalid_task' });
-      const model = franchise ? FranchiseTask : Task;
-      const task = await model.create(franchise ? injectFranchiseScope(req, parsed.data) : parsed.data);
+      const model = franchise ? FranchiseTask : factory ? FactoryTask : Task;
+      const task = await model.create({ ...injectFranchiseScope(req, parsed.data), source: unit });
       await logAudit({
         req,
         action: 'create',

@@ -6,4 +6,5 @@ export type SelectVariant = 'default' | 'compact' | 'inline';
 export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   variant?: SelectVariant;
+  searchable?: boolean;
 }
