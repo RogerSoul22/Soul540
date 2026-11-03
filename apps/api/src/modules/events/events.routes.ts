@@ -28,11 +28,13 @@ const SLIM = '-locationImageData -paymentProofData -contractPdfData';
 
 // Lightweight count endpoint — used by portal cards
 router.get('/count', async (req, res) => {
-  if (isFromFactory(req)) {
-    const count = await FranchiseEvent.countDocuments(
-      await getFactoryFranchiseFilter({ deletedAt: { $exists: false } }),
+  const scope = String(req.query.scope || getTenantUnit(req));
+  if (isFromFactory(req) || scope === 'combined') {
+    const stores = getEventUnitsForRequest(req, scope).map(getEventStoreForUnit);
+    const counts = await Promise.all(
+      stores.map((store) => store.model.countDocuments({ deletedAt: { $exists: false } })),
     );
-    return res.json({ count });
+    return res.json({ count: counts.reduce((sum, count) => sum + count, 0) });
   }
   if (isFromFranchise(req)) {
     const count = await FranchiseEvent.countDocuments(getFranchiseFilter(req, { deletedAt: { $exists: false } }));
@@ -44,13 +46,18 @@ router.get('/count', async (req, res) => {
 
 router.get('/', async (req, res) => {
   const scope = String(req.query.scope || getTenantUnit(req));
-  if (isFromFactory(req)) {
-    const factoryEvents = await FranchiseEvent.find(
-      await getFactoryFranchiseFilter({ deletedAt: { $exists: false } }),
-    )
-      .select(SLIM)
-      .sort({ date: 1 });
-    return res.json(factoryEvents);
+  if (isFromFactory(req) || scope === 'combined') {
+    const stores = getEventUnitsForRequest(req, scope).map(getEventStoreForUnit);
+    const groups = await Promise.all(
+      stores.map((store) =>
+        store.model
+          .find(getFranchiseFilter(req, { deletedAt: { $exists: false } }))
+          .select(SLIM)
+          .sort({ date: 1 }),
+      ),
+    );
+    const events = groups.flat().sort((a, b) => (a.date > b.date ? 1 : -1));
+    return res.json(events);
   }
   const stores = getEventUnitsForRequest(req, scope).map(getEventStoreForUnit);
   const groups = await Promise.all(

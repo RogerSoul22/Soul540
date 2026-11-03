@@ -33,7 +33,7 @@ const FactoryContractor =
 const router = Router();
 
 export function getDashboardEventUnits(req: any): Array<'main' | 'franchise' | 'factory'> {
-  if (getTenantUnit(req) === 'factory') return ['franchise'];
+  if (getTenantUnit(req) === 'factory') return ['main', 'franchise'];
   return [getTenantUnit(req) as 'main' | 'franchise' | 'factory'];
 }
 

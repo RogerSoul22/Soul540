@@ -15,7 +15,11 @@ export function getEventStoreForUnit(unit: EventUnit) {
 
 export function getEventUnitsForLookup(req: any, requestedSource?: string): EventUnit[] {
   const tenantUnit = getTenantUnit(req) as EventUnit;
-  if (tenantUnit === 'factory') return !requestedSource || requestedSource === 'franchise' ? ['franchise'] : [];
+  if (tenantUnit === 'factory') {
+    if (requestedSource === 'factory') return ['factory'];
+    if (requestedSource === 'main' || requestedSource === 'franchise') return [requestedSource];
+    return ['main', 'franchise'];
+  }
   return [tenantUnit];
 }
 
