@@ -73,9 +73,10 @@ export default function FinanceFormFields({ controller }: { controller: Franchis
               + Nova categoria
             </Button>
           </Label>
-          <select
+          <Select
             id="franchise-finance-category"
             className={styles.formSelect}
+            searchable
             value={formCategory}
             onChange={(event) => setFormCategory(event.target.value)}
             required
@@ -92,7 +93,7 @@ export default function FinanceFormFields({ controller }: { controller: Franchis
                   ))}
                 </optgroup>
               ))}
-          </select>
+          </Select>
         </div>
         <div className={styles.formField}>
           <Input
