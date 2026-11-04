@@ -30,10 +30,16 @@ import {
 import { injectFranchiseScope } from '../../infrastructure/franchise-scope';
 import { appendSettlementToFinance, serializeFinanceEntry } from './finance-settlements';
 import { requirePermission } from '../../infrastructure/middleware/permissions';
+import { findEventForRequest } from '../events/events.finance';
 const router = Router();
 router.use(requirePermission('financeiro', 'write'));
 router.post('/', validate(createFinanceSchema), async (req, res) => {
   const source = getTenantUnit(req) as 'main' | 'franchise' | 'factory';
+  if (typeof req.body.eventId === 'string' && req.body.eventId.trim()) {
+    const event = await findEventForRequest(req, req.body.eventId.trim());
+    if (!event) return res.status(400).json({ error: 'Evento não encontrado ou sem acesso.' });
+    req.body.eventId = event.doc.id || event.doc._id.toString();
+  }
   const normalized = buildManualFinancePayload(req.body, source);
   const Model = getFinanceModelForUnit(source);
   if (isFromFactory(req)) {

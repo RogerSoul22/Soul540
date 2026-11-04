@@ -53,6 +53,7 @@ export function useFinanceiroController() {
   });
 
   const settlement = useFinanceSettlementAction({
+    updateFinance: state.updateFinance,
     settleFinance: state.settleFinance,
   });
 

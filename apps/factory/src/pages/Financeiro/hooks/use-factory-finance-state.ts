@@ -16,6 +16,7 @@ export function useFactoryFinanceState() {
   const [lancamentosPage, setLancamentosPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [savingFinance, setSavingFinance] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [formType, setFormType] = useState<FinanceType>('cost');
   const [formEventId, setFormEventId] = useState('');
@@ -86,6 +87,8 @@ export function useFactoryFinanceState() {
     setShowForm,
     editingId,
     setEditingId,
+    savingFinance,
+    setSavingFinance,
     showInfo,
     setShowInfo,
     formType,

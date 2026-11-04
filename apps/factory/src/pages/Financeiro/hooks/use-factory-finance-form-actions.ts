@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import type { FormEvent } from 'react';
 import {
   advanceFinanceRecurrence as advanceRecurrence,
@@ -10,6 +11,7 @@ import type { FactoryFinanceState } from './use-factory-finance-state';
 type Props = FactoryFinanceState & { recurrencePreview: string[] };
 
 export function useFactoryFinanceFormActions(state: Props) {
+  const submissionInProgress = useRef(false);
   const resetForm = () => {
     state.setEditingId(null);
     state.setFormType('revenue');
@@ -44,7 +46,7 @@ export function useFactoryFinanceFormActions(state: Props) {
   };
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!state.formCategory || !state.formAmount) return;
+    if (!state.formCategory || !state.formAmount || submissionInProgress.current) return;
     const base = {
       eventId: state.formEventId,
       type: state.formType,
@@ -55,52 +57,56 @@ export function useFactoryFinanceFormActions(state: Props) {
       status: state.formStatus,
       paymentMethod: state.formPaymentMethod || undefined,
     };
-    if (state.editingId) {
-      const { eventId: _eventId, ...editable } = base;
-      await state.updateFinance(state.editingId, editable);
+    submissionInProgress.current = true;
+    state.setSavingFinance(true);
+    try {
+      if (state.editingId) {
+        await state.updateFinance(state.editingId, base);
+      } else {
+        const installments = Math.max(1, Number.parseInt(state.formInstallments, 10) || 1);
+        if (installments > 1) {
+          const groupId = `parc-${Date.now()}`;
+          for (let index = 0; index < installments; index += 1) {
+            await state.addFinance({
+              ...base,
+              description: state.formDescription
+                ? `${state.formDescription} (${index + 1}/${installments})`
+                : `Parcela ${index + 1}/${installments}`,
+              date: advanceRecurrence(state.formDate, 'monthly', index),
+              status: index === 0 ? state.formStatus : 'pending',
+              installmentGroupId: groupId,
+              installmentNumber: index + 1,
+              installmentTotal: installments,
+            });
+          }
+        } else if (state.formRecurring) {
+          const recurrenceId = `rec-${Date.now()}`;
+          const interval = Math.max(1, Math.min(365, Number(state.formRecurrenceInterval) || 1));
+          const total = Math.max(1, Math.min(366, Number(state.formRecurrenceTotal) || 1));
+          let current = state.formDate;
+          for (let index = 0; index < total; index += 1) {
+            await state.addFinance({
+              ...base,
+              date: current,
+              status: index === 0 ? state.formStatus : 'pending',
+              recurrenceId,
+              recurrenceFrequency: state.formRecurrenceFrequency,
+              recurrenceEndDate: state.recurrencePreview[state.recurrencePreview.length - 1] || state.formDate,
+              recurrenceInterval: interval,
+              recurrenceTotal: total,
+            });
+            current = advanceRecurrence(current, state.formRecurrenceFrequency, interval);
+          }
+        } else {
+          await state.addFinance(base);
+        }
+      }
       resetForm();
       state.setShowForm(false);
-      return;
+    } finally {
+      submissionInProgress.current = false;
+      state.setSavingFinance(false);
     }
-    const installments = Math.max(1, Number.parseInt(state.formInstallments, 10) || 1);
-    if (installments > 1) {
-      const groupId = `parc-${Date.now()}`;
-      for (let index = 0; index < installments; index += 1) {
-        await state.addFinance({
-          ...base,
-          description: state.formDescription
-            ? `${state.formDescription} (${index + 1}/${installments})`
-            : `Parcela ${index + 1}/${installments}`,
-          date: advanceRecurrence(state.formDate, 'monthly', index),
-          status: index === 0 ? state.formStatus : 'pending',
-          installmentGroupId: groupId,
-          installmentNumber: index + 1,
-          installmentTotal: installments,
-        });
-      }
-    } else if (state.formRecurring) {
-      const recurrenceId = `rec-${Date.now()}`;
-      const interval = Math.max(1, Math.min(365, Number(state.formRecurrenceInterval) || 1));
-      const total = Math.max(1, Math.min(366, Number(state.formRecurrenceTotal) || 1));
-      let current = state.formDate;
-      for (let index = 0; index < total; index += 1) {
-        await state.addFinance({
-          ...base,
-          date: current,
-          status: index === 0 ? state.formStatus : 'pending',
-          recurrenceId,
-          recurrenceFrequency: state.formRecurrenceFrequency,
-          recurrenceEndDate: state.recurrencePreview[state.recurrencePreview.length - 1] || state.formDate,
-          recurrenceInterval: interval,
-          recurrenceTotal: total,
-        });
-        current = advanceRecurrence(current, state.formRecurrenceFrequency, interval);
-      }
-    } else {
-      await state.addFinance(base);
-    }
-    resetForm();
-    state.setShowForm(false);
   };
   return { resetForm, handleEdit, handleSubmit };
 }

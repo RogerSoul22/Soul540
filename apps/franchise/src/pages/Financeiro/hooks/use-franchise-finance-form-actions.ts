@@ -59,8 +59,7 @@ export function useFranchiseFinanceFormActions(state: Props) {
       paymentMethod: state.formPaymentMethod || undefined,
     };
     if (state.editingId) {
-      const { eventId: _eventId, ...editable } = base;
-      await state.updateFinance(state.editingId, editable);
+      await state.updateFinance(state.editingId, base);
       resetForm();
       state.setShowForm(false);
       return;

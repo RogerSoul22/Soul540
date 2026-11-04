@@ -53,7 +53,7 @@ export function buildManualFinancePayload(input: Record<string, any>, source: Fi
     settlementStatus: 'open',
     settledCents: 0,
     settlements: [],
-    eventId: '',
+    eventId: typeof input.eventId === 'string' ? input.eventId.trim() : '',
     origin: 'manual',
     kind: 'manual',
     automatic: false,

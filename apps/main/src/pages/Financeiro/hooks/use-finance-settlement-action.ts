@@ -5,6 +5,7 @@ import { calculateSettlementStatus, getOutstandingCents } from '../../../../../.
 import { fromCents, parseCurrencyInput as parseCurrency } from '../../../../../../packages/domain/src/index';
 
 type SettlementInput = {
+  updateFinance: (id: string, data: Partial<FinanceEntry>) => Promise<void>;
   settleFinance: (
     id: string,
     data: {
@@ -23,7 +24,7 @@ export type SettlementDraft = {
   reason: string;
 };
 
-export function useFinanceSettlementAction({ settleFinance }: SettlementInput) {
+export function useFinanceSettlementAction({ updateFinance, settleFinance }: SettlementInput) {
   const [settlementEntry, setSettlementEntry] = useState<FinanceEntry | null>(null);
   const [settlementDraft, setSettlementDraft] = useState<SettlementDraft>({
     amount: '',
@@ -33,13 +34,17 @@ export function useFinanceSettlementAction({ settleFinance }: SettlementInput) {
   });
 
   const handleEventFinanceStatus = async (entry: FinanceEntry, status: FinanceStatus) => {
-    if (status === 'pending') {
-      notifyFeedback('Para reabrir ou cancelar uma baixa, use a ação correspondente no lançamento.');
-      return;
-    }
     const settlementStatus = calculateSettlementStatus(entry);
     if (settlementStatus === 'cancelled') {
       notifyFeedback('Este lançamento está cancelado.');
+      return;
+    }
+    if (status === 'pending') {
+      try {
+        await updateFinance(entry.id, { status: 'pending' });
+      } catch {
+        notifyFeedback('Não foi possível reabrir o lançamento como pendente.');
+      }
       return;
     }
     if (entry.status === 'paid' || settlementStatus === 'settled') return;

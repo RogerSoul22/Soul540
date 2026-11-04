@@ -97,7 +97,7 @@ export function useFinanceFormActions(dependencies: FinanceFormDependencies) {
       paymentMethod: formPaymentMethod || undefined,
     };
     if (editingFinanceId) {
-      const { eventId: _eventId, ...editableBase } = base;
+      const { status: _status, ...editableBase } = base;
       await updateFinance(editingFinanceId, editableBase);
       resetForm();
       setShowForm(false);

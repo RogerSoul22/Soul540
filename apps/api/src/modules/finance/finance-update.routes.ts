@@ -28,6 +28,7 @@ import {
 } from './finance-tenant';
 import { appendSettlementToFinance, serializeFinanceEntry } from './finance-settlements';
 import { requirePermission } from '../../infrastructure/middleware/permissions';
+import { findEventForRequest } from '../events/events.finance';
 const router = Router();
 router.use(requirePermission('financeiro', 'write'));
 
@@ -95,7 +96,6 @@ router.put('/:id', validate(updateFinanceSchema), async (req, res) => {
     'kind',
     'automatic',
     'source',
-    'eventId',
     'reversedAt',
     'reversedBy',
     'reversalReason',
@@ -107,6 +107,9 @@ router.put('/:id', validate(updateFinanceSchema), async (req, res) => {
     });
   }
   const allowedFields = [
+    'eventId',
+    'type',
+    'modality',
     'category',
     'description',
     'amount',
@@ -126,6 +129,22 @@ router.put('/:id', validate(updateFinanceSchema), async (req, res) => {
     if (Object.prototype.hasOwnProperty.call(req.body, field)) result[field] = req.body[field];
     return result;
   }, {});
+  const editableClassificationFields = ['eventId', 'type', 'modality'];
+  if (
+    editableClassificationFields.some((field) => Object.prototype.hasOwnProperty.call(update, field)) &&
+    (oldDoc.automatic === true ||
+      (oldDoc.origin && oldDoc.origin !== 'manual') ||
+      (oldDoc.kind && oldDoc.kind !== 'manual'))
+  ) {
+    return res.status(409).json({
+      error: 'A origem, o tipo e o evento de lançamentos automáticos não podem ser alterados.',
+    });
+  }
+  if (typeof update.eventId === 'string' && update.eventId.trim()) {
+    const event = await findEventForRequest(req, update.eventId.trim());
+    if (!event) return res.status(400).json({ error: 'Evento não encontrado ou sem acesso.' });
+    update.eventId = event.doc.id || event.doc._id.toString();
+  }
   if (typeof update.category === 'string') {
     update.classificationStatus = getClassificationStatusForCategory(update.category);
   }

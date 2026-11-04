@@ -34,7 +34,11 @@ export function useFranchiseFinanceActions({ state, derived }: Props) {
   });
   const handleEventFinanceStatus = async (entry: FranchiseFinanceState['finances'][number], status: FinanceStatus) => {
     if (status === 'pending') {
-      notifyFeedback('Para reabrir ou cancelar uma baixa, use o comando específico com justificativa.');
+      try {
+        await state.updateFinance(entry.id, { status: 'pending' });
+      } catch (error) {
+        notifyFeedback(error instanceof Error ? error.message : 'NÃ£o foi possÃ­vel reabrir o lanÃ§amento.');
+      }
       return;
     }
     if (entry.status === status) return;
