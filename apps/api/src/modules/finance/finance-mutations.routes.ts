@@ -40,7 +40,7 @@ router.post('/', validate(createFinanceSchema), async (req, res) => {
     if (!event) return res.status(400).json({ error: 'Evento não encontrado ou sem acesso.' });
     req.body.eventId = event.doc.id || event.doc._id.toString();
   }
-  const normalized = buildManualFinancePayload(req.body, source);
+  const normalized = buildManualFinancePayload(req.body, source, getAuthenticatedUserId(req));
   const Model = getFinanceModelForUnit(source);
   if (isFromFactory(req)) {
     const finance = await FactoryFinance.create({ ...normalized, source: 'factory' });

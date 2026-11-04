@@ -31,13 +31,28 @@ export function getClassificationStatusForCategory(category: string): 'classifie
   return category === 'nao-classificado' ? 'unclassified' : 'classified';
 }
 
-export function buildManualFinancePayload(input: Record<string, any>, source: FinanceUnit) {
+export function buildManualFinancePayload(input: Record<string, any>, source: FinanceUnit, settledBy?: string) {
+  const amountCents = toCents(input.amount);
+  if (input.status === 'paid' && !settledBy) throw new Error('Responsável pela baixa é obrigatório');
+  const settlement =
+    input.status === 'paid'
+      ? buildSettlementRecord(
+          {
+            amount: input.amount,
+            settledOn: input.settledOn || input.date,
+            paymentMethod: input.paymentMethod,
+            reason: 'Pago no lançamento',
+            idempotencyKey: randomUUID(),
+          },
+          settledBy as string,
+        )
+      : null;
   return {
     type: input.type,
     category: input.category,
     description: input.description || '',
     amount: input.amount,
-    amountCents: toCents(input.amount),
+    amountCents,
     date: input.date,
     dueDate: input.dueDate,
     paymentMethod: input.paymentMethod,
@@ -49,10 +64,11 @@ export function buildManualFinancePayload(input: Record<string, any>, source: Fi
     recurrenceEndDate: input.recurrenceEndDate,
     recurrenceInterval: input.recurrenceInterval,
     recurrenceTotal: input.recurrenceTotal,
-    status: 'pending',
-    settlementStatus: 'open',
-    settledCents: 0,
-    settlements: [],
+    status: settlement ? ('paid' as const) : ('pending' as const),
+    settlementStatus: settlement ? ('settled' as const) : ('open' as const),
+    settledCents: settlement ? amountCents : 0,
+    settledAt: settlement?.settledAt,
+    settlements: settlement ? [settlement] : [],
     eventId: typeof input.eventId === 'string' ? input.eventId.trim() : '',
     origin: 'manual',
     kind: 'manual',

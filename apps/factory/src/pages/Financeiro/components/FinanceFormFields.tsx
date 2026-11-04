@@ -47,7 +47,7 @@ export default function FinanceFormFields({ controller }: { controller: FactoryF
       </div>
       <div className={styles.formRow}>
         <div className={styles.formField}>
-          <Label className={styles.formLabel}>
+          <Label htmlFor="factory-finance-category" className={styles.formLabel}>
             Categoria
             <Button
               variant="dashed"
@@ -61,7 +61,8 @@ export default function FinanceFormFields({ controller }: { controller: FactoryF
               + Nova categoria
             </Button>
           </Label>
-          <Select
+          <select
+            id="factory-finance-category"
             className={styles.formSelect}
             value={formCategory}
             onChange={(event) => setFormCategory(event.target.value)}
@@ -79,7 +80,7 @@ export default function FinanceFormFields({ controller }: { controller: FactoryF
                   ))}
                 </optgroup>
               ))}
-          </Select>
+          </select>
         </div>
         <div className={styles.formField}>
           <Input
