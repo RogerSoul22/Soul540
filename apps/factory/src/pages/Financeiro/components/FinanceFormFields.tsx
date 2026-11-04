@@ -106,6 +106,7 @@ export default function FinanceFormFields({ controller }: { controller: FactoryF
           <Input
             label="Data"
             type="date"
+            nativeDate
             value={formDate}
             onChange={(event) => setFormDate(event.target.value)}
             required

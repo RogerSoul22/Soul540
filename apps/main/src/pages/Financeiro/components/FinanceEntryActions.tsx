@@ -26,7 +26,7 @@ export function FinanceEntryActions({
   entry: FinanceiroController['filtered'][number];
 }) {
   return (
-    <div style={{ display: 'flex', gap: 4 }}>
+    <div className={styles.entryActions}>
       <Button
         variant="outline"
         className={styles.actionBtn}

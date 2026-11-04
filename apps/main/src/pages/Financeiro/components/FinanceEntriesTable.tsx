@@ -79,20 +79,21 @@ export default function FinanceEntriesTable({ controller }: { controller: Financ
                 <TableCell>{originLabel(entry)}</TableCell>
                 <TableCell>{formatDate(entry.date)}</TableCell>
                 <TableCell>
-                  <Select
-                    variant="compact"
-                    className={
-                      styles.agendamentoStatus +
-                      ' ' +
-                      (entry.status === 'paid' ? styles.statusReceived : styles.statusPending)
-                    }
-                    value={entry.status}
-                    onClick={(event) => event.stopPropagation()}
-                    onChange={(event) => handleEventFinanceStatus(entry, event.target.value as FinanceStatus)}
-                  >
-                    <option value="pending">Pendente</option>
-                    <option value="paid">Pago</option>
-                  </Select>
+                  <div onClick={(event) => event.stopPropagation()} onKeyDown={(event) => event.stopPropagation()}>
+                    <Select
+                      variant="compact"
+                      className={
+                        styles.agendamentoStatus +
+                        ' ' +
+                        (entry.status === 'paid' ? styles.statusReceived : styles.statusPending)
+                      }
+                      value={entry.status}
+                      onChange={(event) => handleEventFinanceStatus(entry, event.target.value as FinanceStatus)}
+                    >
+                      <option value="pending">Pendente</option>
+                      <option value="paid">Pago</option>
+                    </Select>
+                  </div>
                 </TableCell>
                 <TableCell>
                   <span className={entry.type === 'revenue' ? styles.typeRevenue : styles.typeCost}>
