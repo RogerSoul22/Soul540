@@ -47,5 +47,5 @@ test('finance modality filter treats legacy entries as avulso', () => {
     filterFinanceByModality(entries, 'feirinha').map((entry) => entry.id),
     ['feirinha'],
   );
-  assert.equal(getFinanceModalityLabel(undefined), 'Evento avulso');
+  assert.equal(getFinanceModalityLabel(undefined), 'Evento');
 });

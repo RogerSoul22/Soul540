@@ -29,7 +29,7 @@ export default function FinanceiroValuesTab({ controller }: Props) {
               </div>
             </div>
             {eventsWithFinalValue.length === 0 ? (
-              <p className={styles.agendamentosEmpty}>Nenhum evento com valor final cadastrado.</p>
+              <p className={styles.agendamentosEmpty}>Nenhum agendamento com valor final cadastrado.</p>
             ) : (
               <div className={styles.agendamentosList}>
                 {eventsWithFinalValue.map((event) => (

@@ -84,8 +84,17 @@ const TextInput = forwardRef<HTMLInputElement, InputProps>(function TextInput(
 
 // Campos de data e mês abrem o calendário do Pentágono; os demais tipos seguem como campo de texto.
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(props, ref) {
-  const { type, label, variant: _variant, error: _error, icon: _icon, clearable: _clearable, ...rest } = props;
-  if (type === 'date' || type === 'month')
+  const {
+    type,
+    label,
+    nativeDate = false,
+    variant: _variant,
+    error: _error,
+    icon: _icon,
+    clearable: _clearable,
+    ...rest
+  } = props;
+  if (!nativeDate && (type === 'date' || type === 'month'))
     return <DatePicker ref={ref} type={type as 'date' | 'month'} label={label} {...rest} />;
-  return <TextInput ref={ref} {...props} />;
+  return <TextInput ref={ref} type={type} label={label} {...rest} />;
 });

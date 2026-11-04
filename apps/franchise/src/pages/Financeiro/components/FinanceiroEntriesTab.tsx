@@ -51,7 +51,7 @@ export default function FinanceiroEntriesTab({ controller }: Props) {
                 setLancamentosPage(1);
               }}
             >
-              {modality === 'all' ? 'Todas modalidades' : modality === 'feirinha' ? 'Feirinhas' : 'Eventos avulsos'}
+              {modality === 'all' ? 'Todas modalidades' : modality === 'feirinha' ? 'Feirinhas' : 'Eventos'}
             </Button>
           ))}
         </div>

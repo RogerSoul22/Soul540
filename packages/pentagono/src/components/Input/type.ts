@@ -9,6 +9,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: string;
   icon?: ReactNode;
   variant?: InputVariant;
+  nativeDate?: boolean;
   // Mostra um X para limpar o campo quando há texto (campos de texto editáveis). Padrão: desligado.
   clearable?: boolean;
 }

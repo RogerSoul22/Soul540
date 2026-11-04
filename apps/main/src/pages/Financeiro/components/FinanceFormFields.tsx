@@ -49,7 +49,7 @@ export default function FinanceFormFields({ controller }: { controller: Financei
             value={formModality}
             onChange={(event) => setFormModality(event.target.value as typeof formModality)}
           >
-            <option value="evento_avulso">Evento avulso</option>
+            <option value="evento_avulso">Evento</option>
             <option value="feirinha">Feirinha semanal</option>
           </Select>
         </div>
@@ -119,6 +119,7 @@ export default function FinanceFormFields({ controller }: { controller: Financei
           <Input
             label="Data"
             type="date"
+            nativeDate
             value={formDate}
             onChange={(event) => setFormDate(event.target.value)}
             required

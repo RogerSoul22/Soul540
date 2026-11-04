@@ -1,4 +1,4 @@
-import { getEventModalityLabel, normalizeEventModality } from '../../packages/domain/src/index';
+import { normalizeEventModality } from '../../packages/domain/src/index';
 import type { EventModality, FinanceEntry } from '../../packages/contracts/src/index';
 
 export type FinanceModalityFilter = 'all' | EventModality;
@@ -9,5 +9,5 @@ export function filterFinanceByModality(entries: FinanceEntry[], filter: Finance
 }
 
 export function getFinanceModalityLabel(value?: string) {
-  return getEventModalityLabel(value);
+  return normalizeEventModality(value) === 'feirinha' ? 'Feirinha' : 'Evento';
 }

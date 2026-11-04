@@ -97,7 +97,7 @@ export default function FinanceiroOverviewCharts({ controller }: Props) {
       <Card className={styles.agendamentosCard}>
         <div className={styles.agendamentosHeader}>
           <Heading level={3} variant="section" className={styles.sectionTitle} style={{ margin: 0 }}>
-            Valores dos Eventos
+            Valores dos Agendamentos
           </Heading>
           <div className={styles.agendamentosPills}>
             <div className={styles.agendamentosPill}>
@@ -108,7 +108,7 @@ export default function FinanceiroOverviewCharts({ controller }: Props) {
         </div>
 
         {eventsWithFinalValue.length === 0 ? (
-          <p className={styles.agendamentosEmpty}>Nenhum evento com valor final cadastrado.</p>
+          <p className={styles.agendamentosEmpty}>Nenhum agendamento com valor final cadastrado.</p>
         ) : (
           <div className={styles.agendamentosList}>
             {eventsWithFinalValue.map((event) => (
