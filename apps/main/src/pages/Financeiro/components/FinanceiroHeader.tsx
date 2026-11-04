@@ -36,6 +36,7 @@ export default function FinanceiroHeader({ controller }: { controller: Financeir
           <div className={styles.scopeToggle}>
             <Button
               variant="chip"
+              active={dataScope === 'main'}
               className={`${styles.scopeBtn} ${dataScope === 'main' ? styles.scopeBtnActive : ''}`}
               onClick={() => setDataScope('main')}
               title="Exibir apenas dados do sistema principal"
@@ -44,6 +45,7 @@ export default function FinanceiroHeader({ controller }: { controller: Financeir
             </Button>
             <Button
               variant="chip"
+              active={dataScope === 'franchise'}
               className={`${styles.scopeBtn} ${dataScope === 'franchise' ? styles.scopeBtnActive : ''}`}
               onClick={() => setDataScope('franchise')}
               title="Exibir dados de todas as franquias"
@@ -52,6 +54,7 @@ export default function FinanceiroHeader({ controller }: { controller: Financeir
             </Button>
             <Button
               variant="chip"
+              active={dataScope === 'factory'}
               className={`${styles.scopeBtn} ${dataScope === 'factory' ? styles.scopeBtnActive : ''}`}
               onClick={() => setDataScope('factory')}
               title={factoryTitle}
@@ -60,6 +63,7 @@ export default function FinanceiroHeader({ controller }: { controller: Financeir
             </Button>
             <Button
               variant="chip"
+              active={dataScope === 'combined'}
               className={`${styles.scopeBtn} ${dataScope === 'combined' ? styles.scopeBtnActive : ''}`}
               onClick={() => setDataScope('combined')}
               title={combinedTitle}

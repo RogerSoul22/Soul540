@@ -71,6 +71,12 @@
   color: #182235;
 }
 
+.scopeToggle .scopeBtn[aria-pressed='true'],
+.scopeToggle .scopeBtn[aria-pressed='true']:hover {
+  background: #df8e00;
+  color: #182235;
+}
+
 .tabs {
   width: 100%;
   margin-bottom: 18px;
