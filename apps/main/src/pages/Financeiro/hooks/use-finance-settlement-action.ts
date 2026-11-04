@@ -5,6 +5,7 @@ import { calculateSettlementStatus, getOutstandingCents } from '../../../../../.
 import { fromCents, parseCurrencyInput as parseCurrency } from '../../../../../../packages/domain/src/index';
 
 type SettlementInput = {
+  canEdit: boolean;
   updateFinance: (id: string, data: Partial<FinanceEntry>) => Promise<void>;
   settleFinance: (
     id: string,
@@ -24,7 +25,7 @@ export type SettlementDraft = {
   reason: string;
 };
 
-export function useFinanceSettlementAction({ updateFinance, settleFinance }: SettlementInput) {
+export function useFinanceSettlementAction({ canEdit, updateFinance, settleFinance }: SettlementInput) {
   const [settlementEntry, setSettlementEntry] = useState<FinanceEntry | null>(null);
   const [settlementDraft, setSettlementDraft] = useState<SettlementDraft>({
     amount: '',
@@ -34,6 +35,10 @@ export function useFinanceSettlementAction({ updateFinance, settleFinance }: Set
   });
 
   const handleEventFinanceStatus = async (entry: FinanceEntry, status: FinanceStatus) => {
+    if (!canEdit) {
+      notifyFeedback('Este escopo é somente para consulta.');
+      return;
+    }
     const settlementStatus = calculateSettlementStatus(entry);
     if (settlementStatus === 'cancelled') {
       notifyFeedback('Este lançamento está cancelado.');
@@ -66,6 +71,11 @@ export function useFinanceSettlementAction({ updateFinance, settleFinance }: Set
 
   const submitSettlement = async () => {
     if (!settlementEntry) return;
+    if (!canEdit) {
+      notifyFeedback('Este escopo é somente para consulta.');
+      closeSettlement();
+      return;
+    }
     const amount = parseCurrency(settlementDraft.amount);
     if (!Number.isFinite(amount) || amount <= 0) {
       notifyFeedback('Informe um valor de baixa válido.');

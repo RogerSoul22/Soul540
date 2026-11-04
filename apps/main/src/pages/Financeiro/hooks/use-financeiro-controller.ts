@@ -6,9 +6,12 @@ import { useFinancePeriodDerivations } from './use-finance-period-derivations';
 import { useFinanceSettlementAction } from './use-finance-settlement-action';
 import { useFinanceiroEffects } from './use-financeiro-effects';
 import { useFinanceiroState } from './use-financeiro-state';
+import { useAuth } from '../../../hooks/useAuth';
 
 export function useFinanceiroController() {
   const state = useFinanceiroState();
+  const { isAdmin, user } = useAuth();
+  const canAccessConsolidatedData = isAdmin && user?.unit === 'main';
   useFinanceiroEffects(state);
 
   const scope = useFinanceDerivedFilters({
@@ -55,7 +58,20 @@ export function useFinanceiroController() {
   const settlement = useFinanceSettlementAction({
     updateFinance: state.updateFinance,
     settleFinance: state.settleFinance,
+    canEdit: state.dataScope === 'main',
   });
+  const canEditEntries = state.dataScope === 'main';
+  const setDataScope = (scope: typeof state.dataScope) => {
+    if (!canAccessConsolidatedData) return;
+    state.setSelectedFinance(null);
+    state.setFinancePendingDelete(null);
+    state.setShowForm(false);
+    state.setShowXmlModal(false);
+    state.setShowOfxModal(false);
+    forms.resetForm();
+    settlement.closeSettlement();
+    state.setDataScope(scope);
+  };
 
   const handleCreateCategory = async () => {
     if (!state.newCategoryLabel.trim()) return;
@@ -80,6 +96,9 @@ export function useFinanceiroController() {
 
   return {
     ...state,
+    setDataScope,
+    canAccessConsolidatedData,
+    canEditEntries,
     ...scope,
     ...period,
     ...exports,

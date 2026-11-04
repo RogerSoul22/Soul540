@@ -20,6 +20,7 @@ export default function FinanceEntryDetailsModal({ controller }: { controller: F
     categoryLabels,
     handleFinanceEditAction,
     requestFinanceDelete,
+    canEditEntries,
   } = controller;
   if (!selectedFinance) return null;
   const linkedEvent = activeEvents.find((event) => event.id === selectedFinance.eventId);
@@ -106,22 +107,24 @@ export default function FinanceEntryDetailsModal({ controller }: { controller: F
         <span className={styles.eventDetailLabel}>Descrição</span>
         <p>{selectedFinance.description || 'Sem descrição'}</p>
       </div>
-      <div className={styles.eventDetailActions}>
-        <Button
-          variant="secondary"
-          type="button"
-          onClick={() => {
-            const entry = selectedFinance;
-            setSelectedFinance(null);
-            handleFinanceEditAction(entry);
-          }}
-        >
-          Editar
-        </Button>
-        <Button variant="danger" type="button" onClick={() => requestFinanceDelete(selectedFinance)}>
-          Excluir
-        </Button>
-      </div>
+      {canEditEntries && (
+        <div className={styles.eventDetailActions}>
+          <Button
+            variant="secondary"
+            type="button"
+            onClick={() => {
+              const entry = selectedFinance;
+              setSelectedFinance(null);
+              handleFinanceEditAction(entry);
+            }}
+          >
+            Editar
+          </Button>
+          <Button variant="danger" type="button" onClick={() => requestFinanceDelete(selectedFinance)}>
+            Excluir
+          </Button>
+        </div>
+      )}
     </Modal>
   );
 }

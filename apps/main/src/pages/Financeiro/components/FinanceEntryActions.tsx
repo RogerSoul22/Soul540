@@ -25,6 +25,8 @@ export function FinanceEntryActions({
   controller: FinanceiroController;
   entry: FinanceiroController['filtered'][number];
 }) {
+  if (!controller.canEditEntries) return null;
+
   return (
     <div className={styles.entryActions}>
       <Button

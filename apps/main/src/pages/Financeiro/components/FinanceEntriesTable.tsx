@@ -24,6 +24,7 @@ export default function FinanceEntriesTable({ controller }: { controller: Financ
     categoryLabels,
     categoryColors,
     handleEventFinanceStatus,
+    canEditEntries,
   } = controller;
   const pageCount = Math.max(1, Math.ceil(filtered.length / 50));
   const pageItems = filtered.slice((lancamentosPage - 1) * 50, lancamentosPage * 50);
@@ -79,21 +80,25 @@ export default function FinanceEntriesTable({ controller }: { controller: Financ
                 <TableCell>{originLabel(entry)}</TableCell>
                 <TableCell>{formatDate(entry.date)}</TableCell>
                 <TableCell>
-                  <div onClick={(event) => event.stopPropagation()} onKeyDown={(event) => event.stopPropagation()}>
-                    <Select
-                      variant="compact"
-                      className={
-                        styles.agendamentoStatus +
-                        ' ' +
-                        (entry.status === 'paid' ? styles.statusReceived : styles.statusPending)
-                      }
-                      value={entry.status}
-                      onChange={(event) => handleEventFinanceStatus(entry, event.target.value as FinanceStatus)}
-                    >
-                      <option value="pending">Pendente</option>
-                      <option value="paid">Pago</option>
-                    </Select>
-                  </div>
+                  {canEditEntries ? (
+                    <div onClick={(event) => event.stopPropagation()} onKeyDown={(event) => event.stopPropagation()}>
+                      <Select
+                        variant="compact"
+                        className={
+                          styles.agendamentoStatus +
+                          ' ' +
+                          (entry.status === 'paid' ? styles.statusReceived : styles.statusPending)
+                        }
+                        value={entry.status}
+                        onChange={(event) => handleEventFinanceStatus(entry, event.target.value as FinanceStatus)}
+                      >
+                        <option value="pending">Pendente</option>
+                        <option value="paid">Pago</option>
+                      </Select>
+                    </div>
+                  ) : (
+                    <span>{entry.status === 'paid' ? 'Pago' : 'Pendente'}</span>
+                  )}
                 </TableCell>
                 <TableCell>
                   <span className={entry.type === 'revenue' ? styles.typeRevenue : styles.typeCost}>

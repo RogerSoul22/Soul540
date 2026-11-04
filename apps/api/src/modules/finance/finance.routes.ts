@@ -32,7 +32,7 @@ router.get('/', requireFinanceRead, async (req, res) => {
     canConsolidate && ['main', 'franchise', 'factory', 'combined'].includes(requestedScope)
       ? requestedScope
       : tenantUnit;
-  const models = scope === 'combined' ? [Finance, FranchiseFinance] : [getFinanceModelForUnit(scope)];
+  const models = getFinanceModelsForRequest(req, scope);
   const groups = await Promise.all(
     models.map((model) =>
       model

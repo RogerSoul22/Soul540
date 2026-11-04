@@ -21,7 +21,7 @@ export function getFinanceModelForUnit(unit: string) {
 export function getFinanceModelsForRequest(req: any, scope: string) {
   const tenantUnit = getTenantUnit(req);
   if (!canAccessConsolidatedData(req.user, tenantUnit)) return [getFinanceModelForUnit(tenantUnit)];
-  if (scope === 'combined') return [Finance, FranchiseFinance];
+  if (scope === 'combined') return [Finance, FranchiseFinance, FactoryFinance];
   return [getFinanceModelForUnit(scope)];
 }
 

@@ -33,69 +33,86 @@ export default function FinanceiroHeader({ controller }: { controller: Financeir
       }
       actions={
         <>
-          <div className={styles.scopeToggle}>
-            <Button
-              variant="chip"
-              active={dataScope === 'main'}
-              className={`${styles.scopeBtn} ${dataScope === 'main' ? styles.scopeBtnActive : ''}`}
-              onClick={() => setDataScope('main')}
-              title="Exibir apenas dados do sistema principal"
-            >
-              Sorocaba
-            </Button>
-            <Button
-              variant="chip"
-              active={dataScope === 'franchise'}
-              className={`${styles.scopeBtn} ${dataScope === 'franchise' ? styles.scopeBtnActive : ''}`}
-              onClick={() => setDataScope('franchise')}
-              title="Exibir dados de todas as franquias"
-            >
-              Franquias
-            </Button>
-            <Button
-              variant="chip"
-              active={dataScope === 'factory'}
-              className={`${styles.scopeBtn} ${dataScope === 'factory' ? styles.scopeBtnActive : ''}`}
-              onClick={() => setDataScope('factory')}
-              title={factoryTitle}
-            >
-              Fábrica
-            </Button>
-            <Button
-              variant="chip"
-              active={dataScope === 'combined'}
-              className={`${styles.scopeBtn} ${dataScope === 'combined' ? styles.scopeBtnActive : ''}`}
-              onClick={() => setDataScope('combined')}
-              title={combinedTitle}
-            >
-              Consolidado
-            </Button>
-          </div>
+          {controller.canAccessConsolidatedData && (
+            <div className={styles.scopeToggle}>
+              <Button
+                variant="chip"
+                active={dataScope === 'main'}
+                className={`${styles.scopeBtn} ${dataScope === 'main' ? styles.scopeBtnActive : ''}`}
+                onClick={() => setDataScope('main')}
+                title="Exibir apenas dados do sistema principal"
+              >
+                Sorocaba
+              </Button>
+              <Button
+                variant="chip"
+                active={dataScope === 'franchise'}
+                className={`${styles.scopeBtn} ${dataScope === 'franchise' ? styles.scopeBtnActive : ''}`}
+                onClick={() => setDataScope('franchise')}
+                title="Exibir dados de todas as franquias"
+              >
+                Franquias
+              </Button>
+              <Button
+                variant="chip"
+                active={dataScope === 'factory'}
+                className={`${styles.scopeBtn} ${dataScope === 'factory' ? styles.scopeBtnActive : ''}`}
+                onClick={() => setDataScope('factory')}
+                title={factoryTitle}
+              >
+                Fábrica
+              </Button>
+              <Button
+                variant="chip"
+                active={dataScope === 'combined'}
+                className={`${styles.scopeBtn} ${dataScope === 'combined' ? styles.scopeBtnActive : ''}`}
+                onClick={() => setDataScope('combined')}
+                title={combinedTitle}
+              >
+                Consolidado
+              </Button>
+            </div>
+          )}
 
-          <Input ref={xmlInputRef} type="file" accept=".xml" hidden onChange={handleXmlFile} />
-          <Button variant="secondary" size="sm" className={styles.btnXml} onClick={() => xmlInputRef.current?.click()}>
-            Importar XML
-          </Button>
+          {controller.canEditEntries && (
+            <>
+              <Input ref={xmlInputRef} type="file" accept=".xml" hidden onChange={handleXmlFile} />
+              <Button
+                variant="secondary"
+                size="sm"
+                className={styles.btnXml}
+                onClick={() => xmlInputRef.current?.click()}
+              >
+                Importar XML
+              </Button>
 
-          <Input ref={ofxInputRef} type="file" accept=".ofx,application/x-ofx" hidden onChange={handleOfxFile} />
-          <Button
-            variant="secondary"
-            size="sm"
-            className={styles.btnXml}
-            onClick={() => ofxInputRef.current?.click()}
-            title={ofxTitle}
-          >
-            Importar OFX
-          </Button>
+              <Input
+                ref={ofxInputRef}
+                type="file"
+                accept=".ofx,application/x-ofx"
+                hidden
+                onChange={handleOfxFile}
+              />
+              <Button
+                variant="secondary"
+                size="sm"
+                className={styles.btnXml}
+                onClick={() => ofxInputRef.current?.click()}
+                title={ofxTitle}
+              >
+                Importar OFX
+              </Button>
 
-          <Button
-            onClick={() => {
-              resetForm();
-              setShowForm(true);
-            }}
-          >
-            {newFinanceLabel}
-          </Button>
+              <Button
+                onClick={() => {
+                  resetForm();
+                  setShowForm(true);
+                }}
+              >
+                {newFinanceLabel}
+              </Button>
+            </>
+          )}
         </>
       }
     />
