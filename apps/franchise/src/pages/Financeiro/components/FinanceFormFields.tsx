@@ -10,8 +10,6 @@ export default function FinanceFormFields({ controller }: { controller: Franchis
     formModality,
     setFormModality,
     setFormType,
-    setFormEventId,
-    setEventSearch,
     formCategory,
     setFormCategory,
     formAmount,
@@ -36,25 +34,18 @@ export default function FinanceFormFields({ controller }: { controller: Franchis
             label="Tipo"
             value={formType}
             onChange={(event) => {
-              const nextType = event.target.value as FinanceType;
-              setFormType(nextType);
+              setFormType(event.target.value as FinanceType);
               setFormCategory('');
-              if (nextType === 'cost') {
-                setFormEventId('');
-                setEventSearch('');
-              }
             }}
           >
             <option value="revenue">Receita</option>
             <option value="cost">Custo</option>
           </Select>
         </div>
-        {formType === 'revenue' && (
-          <div className={styles.formField}>
-            <Label className={styles.formLabel}>Evento</Label>
-            <FinanceEventSelector controller={controller} />
-          </div>
-        )}
+        <div className={styles.formField}>
+          <Label className={styles.formLabel}>Evento</Label>
+          <FinanceEventSelector controller={controller} />
+        </div>
         <div className={styles.formField}>
           <Select
             label="Modalidade"

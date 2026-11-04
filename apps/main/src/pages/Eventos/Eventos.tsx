@@ -9,13 +9,11 @@ import lista from './styles/EventosLista.module.scss';
 import styles from './styles/EventosOverview.module.scss';
 import { upcomingEvents } from './support/event-periods';
 
-const UPCOMING_LIMIT = 6;
-
 export default function Eventos() {
   const controller = useEventosController();
   const { dataLoading } = useApp();
   const { events, openEdit, setViewingEvent, setDeleteTargetId, updateEvent } = controller;
-  const upcoming = upcomingEvents(events).slice(0, UPCOMING_LIMIT);
+  const upcoming = upcomingEvents(events);
 
   return (
     <div className={styles.page}>

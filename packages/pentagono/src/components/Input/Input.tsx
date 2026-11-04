@@ -8,7 +8,7 @@ import type { InputProps } from './type';
 import { isClearableType, useAnchorPosition, useClearable } from './use-clearable';
 
 const TextInput = forwardRef<HTMLInputElement, InputProps>(function TextInput(
-  { label, error, icon, variant = 'default', type = 'text', id, className = '', clearable = true, style, ...rest },
+  { label, error, icon, variant = 'default', type = 'text', id, className = '', clearable = false, style, ...rest },
   ref,
 ) {
   const [showPassword, setShowPassword] = useState(false);

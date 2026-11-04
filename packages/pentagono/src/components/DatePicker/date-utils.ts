@@ -28,6 +28,29 @@ export function formatDisplay(type: DatePickerType, value: string | undefined | 
     : `${pad(parts.day)}/${pad(parts.month + 1)}/${parts.year}`;
 }
 
+// Converte o que a pessoa digitou para o formato ISO usado pelos formulários.
+export function parseDisplayInput(type: DatePickerType, input: string): string | null {
+  const value = input.trim();
+  if (!value) return '';
+  if (type === 'date') {
+    const match = /^(?:(\d{2})\/(\d{2})\/(\d{4})|(\d{2})(\d{2})(\d{4})|(\d{4})-(\d{2})-(\d{2}))$/.exec(value);
+    if (!match) return null;
+    const [, dayText, monthText, yearText, compactDay, compactMonth, compactYear, isoYear, isoMonth, isoDay] = match;
+    const day = Number(dayText ?? compactDay ?? isoDay);
+    const month = Number(monthText ?? compactMonth ?? isoMonth);
+    const year = Number(yearText ?? compactYear ?? isoYear);
+    if (month < 1 || month > 12 || day < 1 || day > daysInMonth(year, month - 1)) return null;
+    return `${year}-${pad(month)}-${pad(day)}`;
+  }
+  const match = /^(?:(\d{2})\/(\d{4})|(\d{2})(\d{4})|(\d{4})-(\d{2}))$/.exec(value);
+  if (!match) return null;
+  const [, monthText, yearText, compactMonth, compactYear, isoYear, isoMonth] = match;
+  const month = Number(monthText ?? compactMonth ?? isoMonth);
+  const year = Number(yearText ?? compactYear ?? isoYear);
+  if (month < 1 || month > 12) return null;
+  return `${year}-${pad(month)}`;
+}
+
 export const todayParts = (): DateParts => {
   const now = new Date();
   return { year: now.getFullYear(), month: now.getMonth(), day: now.getDate() };
