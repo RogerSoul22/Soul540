@@ -31,6 +31,6 @@ A visualização e as ações dependem da permissão da página e das permissõe
 
 ## Pendências de negócio
 
-- Definir estados de implantação/ativa/suspensa/encerrada.
+- Definir estados de implantação/ativa/suspensa/congelada/encerrada.
 - Definir cobrança, inadimplência e reativação.
 - Definir transferência de unidade e dados.

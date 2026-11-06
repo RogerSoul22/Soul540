@@ -31,6 +31,7 @@ export default function FranchiseFormModal({ form, editing, onChange, onClose, o
               <option value="ativa">Ativa</option>
               <option value="em_implantacao">Em Implantação</option>
               <option value="suspensa">Suspensa</option>
+              <option value="congelada">Congelada</option>
               <option value="encerrada">Encerrada</option>
             </Select>
           </Label>

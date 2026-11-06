@@ -10,7 +10,11 @@ const FranchiseSchema = new Schema(
     city: { type: String, default: '' },
     state: { type: String, default: 'SP' },
     monthlyFee: { type: Number, default: 0 },
-    status: { type: String, enum: ['ativa', 'em_implantacao', 'suspensa', 'encerrada'], default: 'em_implantacao' },
+    status: {
+      type: String,
+      enum: ['ativa', 'em_implantacao', 'suspensa', 'congelada', 'encerrada'],
+      default: 'em_implantacao',
+    },
     openDate: { type: String, default: '' },
     unit: { type: String, default: 'main' },
     deletedAt: { type: Date, index: true },

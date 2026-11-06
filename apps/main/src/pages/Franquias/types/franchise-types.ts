@@ -1,4 +1,4 @@
-export type FranchiseStatus = 'ativa' | 'em_implantacao' | 'suspensa' | 'encerrada';
+export type FranchiseStatus = 'ativa' | 'em_implantacao' | 'suspensa' | 'congelada' | 'encerrada';
 
 export type Franchise = {
   id: string;
