@@ -107,4 +107,8 @@
   gap: $spacing-2xl;
 
   align-items: start;
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
 }
