@@ -7,7 +7,8 @@ import styles from './styles/Franquias.module.scss';
 export default function Franquias() {
   const controller = useFranquiasController();
   const activeFranchises = controller.franchises.filter(
-    (franchise) => franchise.status === 'ativa' || franchise.status === 'em_implantacao',
+    (franchise) =>
+      franchise.status === 'ativa' || franchise.status === 'em_implantacao' || franchise.status === 'congelada',
   );
 
   return (

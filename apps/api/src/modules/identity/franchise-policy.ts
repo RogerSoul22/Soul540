@@ -1,6 +1,6 @@
 import mongoose, { Schema, type Model } from 'mongoose';
 
-export const ACTIVE_FRANCHISE_STATUSES = ['ativa', 'em_implantacao'] as const;
+export const ACTIVE_FRANCHISE_STATUSES = ['ativa', 'em_implantacao', 'congelada'] as const;
 
 const FranchiseSchema = new Schema(
   {

@@ -1,4 +1,4 @@
-import { Badge, Heading } from '../../../../../../packages/pentagono/src/index';
+import { Badge, type BadgeVariant, Heading } from '../../../../../../packages/pentagono/src/index';
 import type { FranchiseStatus, PortalSystem } from '../types/franchise-types';
 import styles from '../styles/Franquias.module.scss';
 
@@ -6,10 +6,17 @@ type Props = { system: PortalSystem; franchiseName?: string; status: FranchiseSt
 
 const SYSTEM_LABEL: Record<PortalSystem, string> = { franchise: 'Franquia', factory: 'Fábrica' };
 
+const STATUS_META: Record<FranchiseStatus, { label: string; variant: BadgeVariant; online: boolean }> = {
+  ativa: { label: 'Ativa', variant: 'green', online: true },
+  em_implantacao: { label: 'Em implantação', variant: 'amber', online: false },
+  congelada: { label: 'Congelada', variant: 'blue', online: false },
+  suspensa: { label: 'Suspensa', variant: 'red', online: false },
+  encerrada: { label: 'Encerrada', variant: 'gray', online: false },
+};
+
 export default function PortalCard({ system, franchiseName, status }: Props) {
   const label = franchiseName || (system === 'franchise' ? 'Franquia Campinas' : 'Portal Fábrica');
-  const active = status === 'ativa';
-  const statusLabel = active ? 'Ativa' : 'Em implantação';
+  const { label: statusLabel, variant, online } = STATUS_META[status] ?? STATUS_META.em_implantacao;
   const accent = system === 'franchise' ? styles.portalAmber : styles.portalBlue;
 
   return (
@@ -24,7 +31,7 @@ export default function PortalCard({ system, franchiseName, status }: Props) {
           </Heading>
           <p className={styles.portalSub}>Portal {SYSTEM_LABEL[system].toLowerCase()}</p>
         </div>
-        <Badge variant={active ? 'green' : 'amber'}>{statusLabel}</Badge>
+        <Badge variant={variant}>{statusLabel}</Badge>
       </header>
       <dl className={styles.portalDetails}>
         <div className={styles.portalDetail}>
@@ -34,7 +41,7 @@ export default function PortalCard({ system, franchiseName, status }: Props) {
         <div className={styles.portalDetail}>
           <dt>Status da franquia</dt>
           <dd>
-            <span className={`${styles.statusDot} ${active ? styles.statusOnline : styles.statusPending}`} />
+            <span className={`${styles.statusDot} ${online ? styles.statusOnline : styles.statusPending}`} />
             {statusLabel}
           </dd>
         </div>

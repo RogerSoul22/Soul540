@@ -19,7 +19,7 @@ router.get('/', requirePermission('franquias', 'read'), async (req, res) => {
 
 router.get('/slug/:slug', async (req, res) => {
   const franchise = await FranchiseModel.findOne({ slug: req.params.slug, deletedAt: { $exists: false } });
-  if (!franchise || !['ativa', 'em_implantacao'].includes(franchise.status)) {
+  if (!franchise || !['ativa', 'em_implantacao', 'congelada'].includes(franchise.status)) {
     return res.status(404).json({ error: 'Franchise not found or inactive' });
   }
   const user = (req as any).user;
