@@ -49,7 +49,10 @@ export default function CalendarEventViewPanel({ event, onEdit, onDelete, onFina
         <div className={styles.detailSection}>
           <p className={styles.detailSectionTitle}>Financeiro</p>
           <div className={styles.detailGrid}>
-            <Detail label="Valor">R$ {event.budget.toLocaleString('pt-BR')}</Detail>
+            <Detail label="Valor">R$ {event.budget.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}</Detail>
             <Detail label="Convidados">{event.guestCount}</Detail>
           </div>
         </div>

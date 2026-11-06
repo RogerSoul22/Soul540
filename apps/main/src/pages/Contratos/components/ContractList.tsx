@@ -76,7 +76,10 @@ export default function ContractList({ contracts, events, search, onSearchChange
                   )}
                 </div>
               </div>
-              <div className={styles.cellValue}>R$ {contract.value.toLocaleString('pt-BR')}</div>
+              <div className={styles.cellValue}>R$ {contract.value.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}</div>
               <div className={styles.cellActions}>
                 <Button variant="secondary" size="sm" onClick={() => onView(contract)}>
                   Ver

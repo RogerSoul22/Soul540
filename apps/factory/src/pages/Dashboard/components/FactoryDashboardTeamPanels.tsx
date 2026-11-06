@@ -70,8 +70,14 @@ export default function FactoryDashboardTeamPanels({ teamSchedule, financialClos
                 <div className={styles.opsItemMain}>
                   <span className={styles.opsEventName}>{event.name}</span>
                   <span className={styles.opsEventDate}>
-                    Est. R$ {closing.estimatedRevenue.toLocaleString('pt-BR')} | Real. R${' '}
-                    {closing.realizedResult.toLocaleString('pt-BR')}
+                    Est. R$ {closing.estimatedRevenue.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})} | Real. R${' '}
+                    {closing.realizedResult.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}
                   </span>
                 </div>
               </OpsEventLink>

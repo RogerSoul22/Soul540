@@ -13,19 +13,28 @@ export default function FactoryEventDetailsOperations({ event, employeeMap }: Pr
           {event.finalValue != null && (
             <div className={styles.detailItem}>
               <span className={styles.detailLabel}>Valor Final</span>
-              <span className={styles.detailValue}>R$ {event.finalValue.toLocaleString('pt-BR')}</span>
+              <span className={styles.detailValue}>R$ {event.finalValue.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}</span>
             </div>
           )}
           {event.budget != null && (
             <div className={styles.detailItem}>
               <span className={styles.detailLabel}>Orçamento</span>
-              <span className={styles.detailValue}>R$ {event.budget.toLocaleString('pt-BR')}</span>
+              <span className={styles.detailValue}>R$ {event.budget.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}</span>
             </div>
           )}
           {event.travelCost != null && event.travelCost > 0 && (
             <div className={styles.detailItem}>
               <span className={styles.detailLabel}>Deslocamento</span>
-              <span className={styles.detailValue}>R$ {event.travelCost.toLocaleString('pt-BR')}</span>
+              <span className={styles.detailValue}>R$ {event.travelCost.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}</span>
             </div>
           )}
           {event.depositValue != null && event.depositValue > 0 && (

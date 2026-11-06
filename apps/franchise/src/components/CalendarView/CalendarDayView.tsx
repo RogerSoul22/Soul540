@@ -62,7 +62,10 @@ export default function CalendarDayView({ selectedDay, dayEvents, onBack, onPrev
                   <div className={styles.allDayEventContent}>
                     <p className={styles.allDayEventName}>{event.name}</p>
                     <p className={styles.allDayEventMeta}>
-                      {event.location} · {event.guestCount} convidados · R$ {event.budget.toLocaleString('pt-BR')}
+                      {event.location} · {event.guestCount} convidados · R$ {event.budget.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}
                     </p>
                   </div>
                 </div>

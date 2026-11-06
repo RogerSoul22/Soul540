@@ -97,7 +97,10 @@ export default function FactoryEventsList({ controller }: { controller: FactoryE
                         </div>
                         <div className={styles.monthCardRight}>
                           {total > 0 && (
-                            <span className={styles.monthCardValue}>R$ {total.toLocaleString('pt-BR')}</span>
+                            <span className={styles.monthCardValue}>R$ {total.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}</span>
                           )}
                           <svg
                             className={`${styles.monthCardChevron} ${isOpen ? styles.monthCardChevronOpen : ''}`}

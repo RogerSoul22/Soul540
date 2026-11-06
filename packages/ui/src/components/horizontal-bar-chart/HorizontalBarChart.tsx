@@ -16,7 +16,10 @@ interface HorizontalBarChartProps {
 export default function HorizontalBarChart({ title, items, formatValue }: HorizontalBarChartProps) {
   const maxValue = Math.max(...items.map((item) => item.value), 1);
   const total = items.reduce((totalValue, item) => totalValue + item.value, 0);
-  const format = formatValue ?? ((value: number) => `R$ ${value.toLocaleString('pt-BR')}`);
+  const format = formatValue ?? ((value: number) => `R$ ${value.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}`);
 
   return (
     <div className={styles.chart}>

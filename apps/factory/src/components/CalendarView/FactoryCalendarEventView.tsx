@@ -52,7 +52,10 @@ export function FactoryCalendarEventView({ event, onClose }: { event: PizzaEvent
           <div className={styles.detailGrid}>
             <div className={styles.detailItem}>
               <span className={styles.detailLabel}>Valor</span>
-              <span className={styles.detailValue}>R$ {(event.budget ?? 0).toLocaleString('pt-BR')}</span>
+              <span className={styles.detailValue}>R$ {(event.budget ?? 0).toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}</span>
             </div>
             <div className={styles.detailItem}>
               <span className={styles.detailLabel}>Convidados</span>

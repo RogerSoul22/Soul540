@@ -14,5 +14,8 @@ export function fromCents(cents: number): number {
   return cents / 100;
 }
 export function formatCurrencyPtBr(value: number): string {
-  return `R$ ${value.toLocaleString('pt-BR')}`;
+  return `R$ ${value.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}`;
 }

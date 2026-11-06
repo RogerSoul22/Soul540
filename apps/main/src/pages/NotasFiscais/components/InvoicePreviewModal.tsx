@@ -56,8 +56,14 @@ export default function InvoicePreviewModal({ invoice, eventName, onClose }: Pro
               <TableRow key={index}>
                 <TableCell>{item.description}</TableCell>
                 <TableCell>{item.quantity}</TableCell>
-                <TableCell>R$ {item.unitPrice.toLocaleString('pt-BR')}</TableCell>
-                <TableCell>R$ {(item.quantity * item.unitPrice).toLocaleString('pt-BR')}</TableCell>
+                <TableCell>R$ {item.unitPrice.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}</TableCell>
+                <TableCell>R$ {(item.quantity * item.unitPrice).toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -65,15 +71,24 @@ export default function InvoicePreviewModal({ invoice, eventName, onClose }: Pro
         <div className={styles.previewTotals}>
           <div className={styles.previewTotalRow}>
             <span>Subtotal:</span>
-            <span>R$ {invoice.subtotal.toLocaleString('pt-BR')}</span>
+            <span>R$ {invoice.subtotal.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}</span>
           </div>
           <div className={styles.previewTotalRow}>
             <span>ISS ({invoice.taxRate}%):</span>
-            <span>R$ {invoice.taxAmount.toLocaleString('pt-BR')}</span>
+            <span>R$ {invoice.taxAmount.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}</span>
           </div>
           <div className={styles.previewTotalRow + ' ' + styles.previewTotalFinal}>
             <span>Total:</span>
-            <span>R$ {invoice.totalValue.toLocaleString('pt-BR')}</span>
+            <span>R$ {invoice.totalValue.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}</span>
           </div>
         </div>
       </div>

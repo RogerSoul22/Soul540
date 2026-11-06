@@ -27,7 +27,10 @@ export function buildEventWhatsAppUrl(event: EventWhatsAppSummary): string {
     `${prefix}Data: ${event.dateLabel}${event.time ? ` às ${event.time}` : ''}`,
     `${locationPrefix}Local: ${event.location}${event.outOfCity ? ' (fora da cidade)' : ''}`,
     `${guestPrefix}Convidados: ${event.guestCount ?? 0}`,
-    `${amountPrefix}Valor: R$ ${(event.budget ?? 0).toLocaleString('pt-BR')}`,
+    `${amountPrefix}Valor: R$ ${(event.budget ?? 0).toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}`,
     ...(event.notes ? [`${notesPrefix}Obs: ${event.notes}`] : []),
   ];
 

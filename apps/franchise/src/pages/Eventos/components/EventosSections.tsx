@@ -63,7 +63,10 @@ export default function EventosSections({ controller }: { controller: EventosCon
               <div className={styles.sectionHeaderRight}>
                 {events.length > 0 && (
                   <span className={styles.sectionTotal} style={{ color: accent }}>
-                    R$ {total.toLocaleString('pt-BR')}
+                    R$ {total.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}
                   </span>
                 )}
                 <svg
@@ -101,7 +104,10 @@ export default function EventosSections({ controller }: { controller: EventosCon
                           </span>
                         </div>
                         <div className={styles.monthCardRight}>
-                          <span className={styles.monthCardValue}>R$ {monthTotal.toLocaleString('pt-BR')}</span>
+                          <span className={styles.monthCardValue}>R$ {monthTotal.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}</span>
                           <span className={`${styles.monthCardChevron} ${isOpen ? styles.monthCardChevronOpen : ''}`}>
                             ⌄
                           </span>

@@ -15,8 +15,17 @@ export default function InvoiceFormFooterFields({ form, subtotal, taxAmount, edi
   return (
     <>
       <div className={styles.formTotal}>
-        Subtotal: R$ {subtotal.toLocaleString('pt-BR')} | ISS: R$ {taxAmount.toLocaleString('pt-BR')} | Total: R
-        {(subtotal + taxAmount).toLocaleString('pt-BR')}
+        Subtotal: R$ {subtotal.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})} | ISS: R$ {taxAmount.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})} | Total: R
+        {(subtotal + taxAmount).toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}
       </div>
       <InvoiceFormField label="Observações">
         <Textarea

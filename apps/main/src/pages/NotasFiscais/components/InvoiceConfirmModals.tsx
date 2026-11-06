@@ -33,7 +33,10 @@ export default function InvoiceConfirmModals({
                 Cliente: <strong>{emitInvoice.clientName}</strong>
               </p>
               <p>
-                Total: <strong>R$ {emitInvoice.totalValue.toLocaleString('pt-BR')}</strong>
+                Total: <strong>R$ {emitInvoice.totalValue.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}</strong>
               </p>
             </div>
             <div className={styles.formActions}>

@@ -30,10 +30,16 @@ export default function InvoiceCard({ invoice, eventName, onPreview, onEmit, onE
         <Info label="Evento" value={eventName || '-'} />
         <Info label="Data Emissão" value={format(parseISO(invoice.issueDate), 'dd/MM/yyyy')} />
         <Info label="Tipo" value={(invoice.type || 'nfse').toUpperCase()} />
-        <Info label={'ISS (' + invoice.taxRate + '%)'} value={'R$ ' + invoice.taxAmount.toLocaleString('pt-BR')} />
+        <Info label={'ISS (' + invoice.taxRate + '%)'} value={'R$ ' + invoice.taxAmount.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})} />
         <div className={styles.cardRow}>
           <span className={styles.cardLabel}>Total</span>
-          <span className={styles.cardValueLg}>R$ {invoice.totalValue.toLocaleString('pt-BR')}</span>
+          <span className={styles.cardValueLg}>R$ {invoice.totalValue.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}</span>
         </div>
       </div>
       <div className={styles.nfeioSection} onClick={(event) => event.stopPropagation()}>

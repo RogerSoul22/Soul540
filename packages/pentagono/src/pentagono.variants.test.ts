@@ -75,7 +75,7 @@ test('text inputs clear themselves with an X, except types where clearing makes 
 test('date and month fields open the pentagono calendar instead of the browser picker', () => {
   assert.match(component('Input', 'Input.tsx'), /type === 'date' \|\| type === 'month'/);
   assert.match(component('Input', 'Input.tsx'), /<DatePicker/);
-  assert.match(component('DatePicker', 'DatePicker.tsx'), /aria-haspopup="dialog"/);
+  assert.match(component('DatePicker', 'DatePickerControl.tsx'), /aria-haspopup="dialog"/);
   assert.match(component('DatePicker', 'DatePickerPanel.tsx'), /Escape/);
   assert.match(component('DatePicker', 'type.ts'), /type: DatePickerType/);
 });

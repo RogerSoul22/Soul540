@@ -1,4 +1,4 @@
-import { useEffect, useState, type FocusEventHandler, type KeyboardEventHandler, type RefObject } from 'react';
+import { useEffect, useState, type FocusEventHandler, type KeyboardEventHandler, type Ref } from 'react';
 import styles from './DatePicker.module.css';
 import { formatDisplay, isOutOfRange, parseDisplayInput, type DatePickerType } from './date-utils';
 
@@ -22,7 +22,7 @@ interface DatePickerControlProps {
   onKeyDown?: KeyboardEventHandler<HTMLInputElement>;
   min?: string;
   max?: string;
-  anchorRef: RefObject<HTMLButtonElement | null>;
+  anchorRef: Ref<HTMLButtonElement>;
   open: boolean;
   onToggle: () => void;
   onValueChange: (value: string) => void;

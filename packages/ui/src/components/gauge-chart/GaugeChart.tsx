@@ -50,7 +50,10 @@ export default function GaugeChart({
         </div>
         <div className={styles.gaugeCenter}>
           <span className={styles.gaugeValue}>
-            {typeof value === 'number' && !suffix.includes('R$') ? value.toFixed(1) : value.toLocaleString('pt-BR')}
+            {typeof value === 'number' && !suffix.includes('R$') ? value.toFixed(1) : value.toLocaleString('pt-BR', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}
             <span className={styles.gaugeSuffix}>{suffix}</span>
           </span>
         </div>
