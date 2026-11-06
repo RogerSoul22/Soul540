@@ -12,7 +12,7 @@ const CACHE_PREFIX = 'soul540-';
 const BUILD_ID = '__BUILD_ID__';
 const CACHE = `${CACHE_PREFIX}${BUILD_ID}-${SCOPE_PATH}`;
 const PRECACHE = '__PRECACHE__'.startsWith('__') ? [] : JSON.parse('__PRECACHE__');
-const OTHER_PORTALS = ['/fabrica/', '/franchise-assets/', '/campinas/', '/franquias/'];
+const OTHER_PORTALS = ['/fabrica/', '/franchise-assets/', '/campinas/', '/franquias/', '/itu-assets/', '/itu/'];
 const ASSET_TYPES = ['script', 'style', 'font', 'image', 'worker'];
 
 const OFFLINE_PAGE = `<!doctype html>

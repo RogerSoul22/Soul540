@@ -23,7 +23,8 @@ export function setupFranchisePwa() {
 
   registerServiceWorker({ swUrl: `${baseUrl}sw.js`, scope });
 
-  if (slug === 'campinas') return;
+  // O manifesto estático do build já descreve a franquia do build (VITE_FRANCHISE_SLUG, padrão Campinas).
+  if (slug === (import.meta.env.VITE_FRANCHISE_SLUG || 'campinas')) return;
   const title = franchiseTitle(slug);
   applyDynamicManifest({
     id: scope,

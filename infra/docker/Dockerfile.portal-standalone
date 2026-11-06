@@ -1,8 +1,12 @@
 # Portal isolado para deploy independente (Coolify). PORTAL = main | factory | franchise
+# Franquia: VITE_FRANCHISE_SLUG (padrão campinas) e FRANCHISE_ASSETS_BASE (padrão /franchise-assets/),
+# ex.: itu + /itu-assets/ para um container só da Itu.
 FROM node:22-alpine AS build
 WORKDIR /app
 
 ARG PORTAL
+ARG VITE_FRANCHISE_SLUG=campinas
+ARG FRANCHISE_ASSETS_BASE=/franchise-assets/
 COPY . .
 
 RUN corepack enable && corepack prepare pnpm@11.2.2 --activate && pnpm install --frozen-lockfile && \

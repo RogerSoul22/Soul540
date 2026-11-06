@@ -8,6 +8,12 @@ describe('franchise portal context', () => {
     assert.equal(getFranchiseBasePath('/campinas/financeiro'), '/campinas');
   });
 
+  it('serves Itu from its own top-level path', () => {
+    assert.equal(getFranchiseSlug('/itu/eventos'), 'itu');
+    assert.equal(getFranchiseBasePath('/itu/eventos'), '/itu');
+    assert.equal(getFranchiseBasePath('/itu'), '/itu');
+  });
+
   it('derives a dynamic path from a franchise slug', () => {
     assert.equal(getFranchiseSlug('/franquias/sorocaba/eventos'), 'sorocaba');
     assert.equal(getFranchiseBasePath('/franquias/sorocaba/eventos'), '/franquias/sorocaba');

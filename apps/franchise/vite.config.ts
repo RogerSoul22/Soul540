@@ -3,6 +3,14 @@ import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { soulPwa } from '../../packages/pwa/src/soul-pwa-plugin';
 
+// Cada container de franquia é o mesmo build com estes dois valores (ver infra/docker/Dockerfile.portal-standalone).
+const franchiseSlug = process.env.VITE_FRANCHISE_SLUG || 'campinas';
+const assetsBase = process.env.FRANCHISE_ASSETS_BASE || '/franchise-assets/';
+const franchiseName = franchiseSlug
+  .split('-')
+  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+  .join(' ');
+
 const franchiseDevSpaFallback = {
   name: 'franchise-dev-spa-fallback',
   configureServer(server: {
@@ -15,12 +23,12 @@ const franchiseDevSpaFallback = {
       const isDirectRoute = req.method === 'GET' && pathname !== '/' && !pathname.includes('.');
       const isDevAsset =
         pathname.startsWith('/api/') ||
-        pathname.startsWith('/franchise-assets/') ||
+        pathname.startsWith(assetsBase) ||
         pathname.startsWith('/@') ||
         pathname.startsWith('/src/') ||
         pathname.startsWith('/node_modules/');
 
-      if (isDirectRoute && !isDevAsset) req.url = '/franchise-assets/';
+      if (isDirectRoute && !isDevAsset) req.url = assetsBase;
       next();
     });
   },
@@ -28,18 +36,18 @@ const franchiseDevSpaFallback = {
 
 export default defineConfig({
   root: __dirname,
-  base: '/franchise-assets/',
+  base: assetsBase,
   plugins: [
     react(),
     franchiseDevSpaFallback,
     soulPwa({
       assetsDir: resolve(__dirname, '../../packages/pwa/assets'),
-      id: '/campinas/',
-      name: 'Soul540 Franquia',
-      shortName: 'Franquia',
-      description: 'Gestão da franquia Soul540.',
-      scope: '/campinas/',
-      startUrl: '/campinas/',
+      id: `/${franchiseSlug}/`,
+      name: `Soul540 Franquia ${franchiseName}`,
+      shortName: franchiseName.slice(0, 12),
+      description: `Gestão da franquia ${franchiseName} da Soul540.`,
+      scope: `/${franchiseSlug}/`,
+      startUrl: `/${franchiseSlug}/`,
     }),
   ],
   css: {

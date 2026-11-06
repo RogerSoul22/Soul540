@@ -14,13 +14,15 @@ function read(...segments: string[]) {
 const portals = [
   { app: 'main', id: "id: '/'", scope: "scope: '/'" },
   { app: 'factory', id: "id: '/fabrica/'", scope: "scope: '/fabrica/'" },
-  { app: 'franchise', id: "id: '/campinas/'", scope: "scope: '/campinas/'" },
+  // A franquia monta id e escopo a partir do slug do build (padrão campinas; o container da Itu usa itu).
+  { app: 'franchise', id: 'id: `/${franchiseSlug}/`', scope: 'scope: `/${franchiseSlug}/`' },
 ];
 
 test('each portal is an independent PWA with its own id, scope and registration', () => {
   for (const { app, id, scope } of portals) {
     const config = read('apps', app, 'vite.config.ts');
     assert.match(config, /soulPwa\(/, `${app}: plugin`);
+    if (app === 'franchise') assert.match(config, /VITE_FRANCHISE_SLUG \|\| 'campinas'/, `${app}: slug padrão`);
     assert.ok(config.includes(id), `${app}: id`);
     assert.ok(config.includes(scope), `${app}: scope`);
     // A franquia registra pelo próprio módulo, que também define o manifesto de cada slug.
@@ -58,13 +60,15 @@ test('the franchise service worker may control /campinas even though it is serve
     assert.match(conf, /location = \/franchise-assets\/sw\.js/, file);
     assert.match(conf, /Service-Worker-Allowed "\/"/, file);
   }
+  // O container da Itu serve os mesmos arquivos sob /itu-assets/.
+  assert.match(read('infra', 'docker', 'nginx-standalone.conf'), /location = \/itu-assets\/sw\.js/);
 });
 
 test('every franchise path gets its own installable identity from the slug', () => {
   const setup = read('apps', 'franchise', 'src', 'franchise-pwa.ts');
   assert.match(setup, /applyDynamicManifest\(/);
   assert.match(setup, /id: scope/);
-  assert.match(setup, /slug === 'campinas'/);
+  assert.match(setup, /slug === \(import\.meta\.env\.VITE_FRANCHISE_SLUG \|\| 'campinas'\)/);
   assert.match(read('apps', 'franchise', 'src', 'main.tsx'), /setupFranchisePwa\(\)/);
 
   const dynamic = read('packages', 'pwa', 'src', 'apply-dynamic-manifest.ts');

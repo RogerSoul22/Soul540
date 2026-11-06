@@ -13,5 +13,5 @@ export const portalConfigs = {
 } as const satisfies Record<PortalId, PortalConfig>;
 
 export function getFranchisePortalPath(slug: string): string {
-  return slug === 'campinas' ? '/campinas' : `/franquias/${slug}`;
+  return ['campinas', 'itu'].includes(slug) ? `/${slug}` : `/franquias/${slug}`;
 }
