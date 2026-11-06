@@ -36,7 +36,7 @@ test('queries that worked are served from the device when the network fails', as
 test('cached data is separated by system and franchise', async () => {
   const { layer } = setup();
   await layer.remember(
-    request({ path: '/api/events', headers: { 'x-system': 'franchise', 'x-franchise-id': 'itu' } }),
+    request({ path: '/api/events', headers: { 'x-system': 'franchise', 'x-franchise-id': 'campinas' } }),
     json([1]),
   );
 
@@ -49,7 +49,7 @@ test('cached data is separated by system and franchise', async () => {
   );
   assert.ok(
     await layer.fallback(
-      request({ path: '/api/events', headers: { 'x-system': 'franchise', 'x-franchise-id': 'itu' } }),
+      request({ path: '/api/events', headers: { 'x-system': 'franchise', 'x-franchise-id': 'campinas' } }),
     ),
   );
 });

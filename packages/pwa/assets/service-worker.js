@@ -1,6 +1,6 @@
 /*
  * Service worker dos portais Soul540. O mesmo arquivo serve os três portais: cada um o registra no
- * próprio escopo (/, /fabrica/, /itu/) e o cache de cada escopo é separado.
+ * próprio escopo (/, /fabrica/, /campinas/) e o cache de cada escopo é separado.
  *
  * - /api nunca passa pelo cache: dados e autenticação sempre vêm da rede.
  * - Páginas: rede primeiro; sem conexão, abre a última versão do portal guardada.
@@ -12,7 +12,7 @@ const CACHE_PREFIX = 'soul540-';
 const BUILD_ID = '__BUILD_ID__';
 const CACHE = `${CACHE_PREFIX}${BUILD_ID}-${SCOPE_PATH}`;
 const PRECACHE = '__PRECACHE__'.startsWith('__') ? [] : JSON.parse('__PRECACHE__');
-const OTHER_PORTALS = ['/fabrica/', '/franchise-assets/', '/itu/', '/franquias/'];
+const OTHER_PORTALS = ['/fabrica/', '/franchise-assets/', '/campinas/', '/franquias/'];
 const ASSET_TYPES = ['script', 'style', 'font', 'image', 'worker'];
 
 const OFFLINE_PAGE = `<!doctype html>

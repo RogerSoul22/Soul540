@@ -6,7 +6,7 @@ Cada portal é um app instalável independente, com nome, identidade e escopo pr
 | --------- | ---------------- | ---------------------------- | ----------------------------------------------------------- |
 | Principal | Soul540          | `/` (abre em `/portal.html`) | `/sw.js`                                                    |
 | Fábrica   | Soul540 Fábrica  | `/fabrica/`                  | `/fabrica/sw.js`                                            |
-| Franquia  | Soul540 Franquia | `/itu/`                      | `/franchise-assets/sw.js` (com `Service-Worker-Allowed: /`) |
+| Franquia  | Soul540 Franquia | `/campinas/`                      | `/franchise-assets/sw.js` (com `Service-Worker-Allowed: /`) |
 
 ## Como funciona
 
@@ -19,7 +19,7 @@ Cada portal é um app instalável independente, com nome, identidade e escopo pr
 
 O build da franquia é um só, mas cada caminho vira um app instalável próprio:
 
-- `/itu/` usa o manifesto estático do build (`id` `/itu/`).
+- `/campinas/` usa o manifesto estático do build (`id` `/campinas/`).
 - `/franquias/<slug>/` recebe, no navegador, um manifesto gerado a partir do slug (`apps/franchise/src/franchise-pwa.ts`): `id` e escopo `/franquias/<slug>/`, nome "Soul540 Franquia <Slug>". O manifesto sai de `buildManifest`, o mesmo construtor do plugin, e é aplicado por `applyDynamicManifest` como um `blob:` com caminhos absolutos.
 - O service worker é o mesmo de `/franchise-assets/sw.js`, registrado no escopo de cada franquia.
 - Instalar duas franquias no mesmo aparelho cria dois apps separados, cada um com cache próprio.
@@ -42,7 +42,7 @@ Duas camadas trabalham juntas:
 - `/api` nunca passa pelo cache: dados e login vêm sempre da rede.
 - Páginas: rede primeiro; sem conexão, abre o último portal guardado, ou uma tela "Sem conexão" com botão para tentar de novo.
 - Scripts, estilos, fontes e imagens: usa o cache e atualiza em segundo plano.
-- O Principal não intercepta as páginas dos outros portais (`/fabrica`, `/itu`, `/franquias`, `/franchise-assets`).
+- O Principal não intercepta as páginas dos outros portais (`/fabrica`, `/campinas`, `/franquias`, `/franchise-assets`).
 - Arquivos (`portal.html`, planilhas) vão direto para a rede.
 
 ## Limites conhecidos

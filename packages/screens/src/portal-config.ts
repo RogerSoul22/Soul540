@@ -9,9 +9,9 @@ export interface PortalConfig {
 export const portalConfigs = {
   main: { id: 'main', unit: 'main', basePath: '/' },
   factory: { id: 'factory', unit: 'factory', basePath: '/fabrica' },
-  franchise: { id: 'franchise', unit: 'franchise', basePath: '/itu' },
+  franchise: { id: 'franchise', unit: 'franchise', basePath: '/campinas' },
 } as const satisfies Record<PortalId, PortalConfig>;
 
 export function getFranchisePortalPath(slug: string): string {
-  return slug === 'itu' ? '/itu' : `/franquias/${slug}`;
+  return slug === 'campinas' ? '/campinas' : `/franquias/${slug}`;
 }

@@ -15,7 +15,7 @@ type FranchiseContextValue = { franchise: FranchisePortalData | null; slug: stri
 
 const FranchiseContext = createContext<FranchiseContextValue>({
   franchise: null,
-  slug: 'itu',
+  slug: 'campinas',
   loading: true,
 });
 

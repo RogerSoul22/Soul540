@@ -50,7 +50,7 @@ export default function PermissionsCreateModal({ form, onClose, onCreate, onForm
           onChange={(event) => update('unit', event.target.value)}
         >
           <option value="main">Principal</option>
-          <option value="franchise">Itu</option>
+          <option value="franchise">Campinas</option>
           <option value="factory">Fábrica</option>
         </Select>
       </div>

@@ -37,7 +37,7 @@ export function exportFranchiseFinanceCsv(
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
   anchor.href = url;
-  anchor.download = `financeiro-itu-${financePeriod.start || 'todos'}_a_${financePeriod.end || 'todos'}.csv`;
+  anchor.download = `financeiro-campinas-${financePeriod.start || 'todos'}_a_${financePeriod.end || 'todos'}.csv`;
   anchor.click();
   URL.revokeObjectURL(url);
 }
@@ -119,7 +119,7 @@ export function exportFranchiseFinanceDre(
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
   anchor.href = url;
-  anchor.download = `dre-itu-${months[0]}_a_${months[months.length - 1]}.csv`;
+  anchor.download = `dre-campinas-${months[0]}_a_${months[months.length - 1]}.csv`;
   anchor.click();
   URL.revokeObjectURL(url);
 }

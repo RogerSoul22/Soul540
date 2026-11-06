@@ -11,8 +11,8 @@ export function franchiseTitle(slug: string): string {
     .join(' ');
 }
 
-// Cada franquia (/itu, /franquias/<slug>) é um app instalável próprio, com id, nome e escopo distintos.
-// O Itu usa o manifesto estático do build; as demais recebem um manifesto gerado a partir do slug.
+// Cada franquia (/campinas, /franquias/<slug>) é um app instalável próprio, com id, nome e escopo distintos.
+// O Campinas usa o manifesto estático do build; as demais recebem um manifesto gerado a partir do slug.
 export function setupFranchisePwa() {
   const basePath = getFranchiseBasePath();
   if (!basePath) return;
@@ -23,7 +23,7 @@ export function setupFranchisePwa() {
 
   registerServiceWorker({ swUrl: `${baseUrl}sw.js`, scope });
 
-  if (slug === 'itu') return;
+  if (slug === 'campinas') return;
   const title = franchiseTitle(slug);
   applyDynamicManifest({
     id: scope,

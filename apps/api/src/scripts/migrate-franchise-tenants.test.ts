@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { ensureItuFranchise, migrateLegacyCollection } from './migrate-franchise-tenants';
+import { ensureCampinasFranchise, migrateLegacyCollection } from './migrate-franchise-tenants';
 
 describe('franchise tenant migration', () => {
   it('reports a dry run without writing legacy documents', async () => {
@@ -37,19 +37,19 @@ describe('franchise tenant migration', () => {
     assert.deepEqual(second, { collection: 'franchisefinances', pending: 0, modified: 0 });
   });
 
-  it('reuses Itu instead of creating a duplicate', async () => {
+  it('reuses Campinas instead of creating a duplicate', async () => {
     let creates = 0;
     const model = {
-      findOne: async () => ({ id: 'itu-id', slug: 'itu' }),
+      findOne: async () => ({ id: 'campinas-id', slug: 'campinas' }),
       create: async () => {
         creates += 1;
         return { id: 'new-id' };
       },
     };
 
-    const franchise = await ensureItuFranchise(model);
+    const franchise = await ensureCampinasFranchise(model);
 
-    assert.equal(franchise.id, 'itu-id');
+    assert.equal(franchise.id, 'campinas-id');
     assert.equal(creates, 0);
   });
 });

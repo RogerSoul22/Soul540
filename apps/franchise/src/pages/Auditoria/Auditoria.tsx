@@ -6,11 +6,11 @@ export default function Auditoria() {
   return (
     <AuditLogScreen
       apiFetch={apiFetch}
-      csvPrefix="auditoria-itu"
+      csvPrefix="auditoria-campinas"
       styles={styles}
       unitLabels={{
         main: 'Principal',
-        franchise: 'Itu',
+        franchise: 'Campinas',
         factory: 'Fábrica',
       }}
     />

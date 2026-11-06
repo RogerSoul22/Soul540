@@ -14,7 +14,7 @@ function read(...segments: string[]) {
 const portals = [
   { app: 'main', id: "id: '/'", scope: "scope: '/'" },
   { app: 'factory', id: "id: '/fabrica/'", scope: "scope: '/fabrica/'" },
-  { app: 'franchise', id: "id: '/itu/'", scope: "scope: '/itu/'" },
+  { app: 'franchise', id: "id: '/campinas/'", scope: "scope: '/campinas/'" },
 ];
 
 test('each portal is an independent PWA with its own id, scope and registration', () => {
@@ -52,7 +52,7 @@ test('icons required for installation exist', () => {
   }
 });
 
-test('the franchise service worker may control /itu even though it is served from /franchise-assets', () => {
+test('the franchise service worker may control /campinas even though it is served from /franchise-assets', () => {
   for (const file of ['nginx-portal.conf', 'nginx-standalone.conf']) {
     const conf = read('infra', 'docker', file);
     assert.match(conf, /location = \/franchise-assets\/sw\.js/, file);
@@ -64,7 +64,7 @@ test('every franchise path gets its own installable identity from the slug', () 
   const setup = read('apps', 'franchise', 'src', 'franchise-pwa.ts');
   assert.match(setup, /applyDynamicManifest\(/);
   assert.match(setup, /id: scope/);
-  assert.match(setup, /slug === 'itu'/);
+  assert.match(setup, /slug === 'campinas'/);
   assert.match(read('apps', 'franchise', 'src', 'main.tsx'), /setupFranchisePwa\(\)/);
 
   const dynamic = read('packages', 'pwa', 'src', 'apply-dynamic-manifest.ts');

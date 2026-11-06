@@ -17,7 +17,7 @@ export type UserForm = {
 
 export const SYSTEM_LABELS: Record<string, string> = {
   main: 'Principal',
-  franchise: 'Itu',
+  franchise: 'Campinas',
   factory: 'Fábrica',
 };
 

@@ -34,12 +34,12 @@ export default defineConfig({
     franchiseDevSpaFallback,
     soulPwa({
       assetsDir: resolve(__dirname, '../../packages/pwa/assets'),
-      id: '/itu/',
+      id: '/campinas/',
       name: 'Soul540 Franquia',
       shortName: 'Franquia',
       description: 'Gestão da franquia Soul540.',
-      scope: '/itu/',
-      startUrl: '/itu/',
+      scope: '/campinas/',
+      startUrl: '/campinas/',
     }),
   ],
   css: {

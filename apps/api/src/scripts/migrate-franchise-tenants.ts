@@ -46,13 +46,20 @@ export async function migrateLegacyCollection(
   return { collection: name, pending, modified: result.modifiedCount };
 }
 
-export async function ensureItuFranchise(model: any = FranchiseModel): Promise<any> {
-  const existing = (await model.findOne({ slug: 'itu' })) || (await model.findOne({ name: 'Itu' }));
+export async function ensureCampinasFranchise(model: any = FranchiseModel): Promise<any> {
+  const existing = (await model.findOne({ slug: 'campinas' })) || (await model.findOne({ name: 'Campinas' }));
   if (existing) {
-    if (!existing.slug && model.updateOne) await model.updateOne({ _id: existing._id }, { $set: { slug: 'itu' } });
+    if (!existing.slug && model.updateOne) await model.updateOne({ _id: existing._id }, { $set: { slug: 'campinas' } });
     return existing;
   }
-  return model.create({ name: 'Itu', slug: 'itu', city: 'Itu', state: 'SP', status: 'ativa', unit: 'main' });
+  return model.create({
+    name: 'Campinas',
+    slug: 'campinas',
+    city: 'Campinas',
+    state: 'SP',
+    status: 'ativa',
+    unit: 'main',
+  });
 }
 
 export function parseMigrationArgs(args: string[] = process.argv.slice(2)) {
@@ -62,14 +69,14 @@ export function parseMigrationArgs(args: string[] = process.argv.slice(2)) {
 }
 
 export async function runMigration({ slug, apply }: { slug: string; apply: boolean }) {
-  if (slug !== 'itu') throw new Error('Only the Itu migration is currently supported');
+  if (slug !== 'campinas') throw new Error('Only the Campinas migration is currently supported');
   await connectDatabase();
   const franchise =
     (await FranchiseModel.findOne({ slug })) ||
-    (await FranchiseModel.findOne({ name: 'Itu' })) ||
-    (apply ? await ensureItuFranchise() : null);
+    (await FranchiseModel.findOne({ name: 'Campinas' })) ||
+    (apply ? await ensureCampinasFranchise() : null);
   if (!franchise) {
-    console.log('Prévia: a franquia Itu será criada quando --apply for informado.');
+    console.log('Prévia: a franquia Campinas será criada quando --apply for informado.');
   }
   const franchiseId = franchise?._id.toString() || '000000000000000000000000';
   const db = mongoose.connection.db!;
@@ -95,7 +102,7 @@ export async function runMigration({ slug, apply }: { slug: string; apply: boole
 if (/[\\/]migrate-franchise-tenants\.(ts|js)$/.test(process.argv[1] || '')) {
   const options = parseMigrationArgs();
   if (!options.slug) {
-    console.error('Usage: pnpm migrate:franchise-tenants -- --slug itu [--apply]');
+    console.error('Usage: pnpm migrate:franchise-tenants -- --slug campinas [--apply]');
     process.exit(1);
   }
   runMigration({ slug: options.slug, apply: options.apply }).catch((error) => {

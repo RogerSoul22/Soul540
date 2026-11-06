@@ -1,6 +1,6 @@
 import { FranchiseModel } from '../identity/franchise-policy';
 
-const FACTORY_FRANCHISE_LOCATIONS = new Set(['sorocaba', 'itu']);
+const FACTORY_FRANCHISE_LOCATIONS = new Set(['sorocaba', 'campinas']);
 
 function normalizeTokens(value: unknown): string[] {
   return String(value || '')

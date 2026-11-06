@@ -50,7 +50,7 @@ export default function ContractDocument({ contract, event, onClose }: ContractD
   const [cancellationDays, setCancellationDays] = useState(contract.cancellationDays?.toString() || '30');
   const [pizzaTeam, setPizzaTeam] = useState<string>(contract.pizzaTeam?.toString() || '');
   const [drinksTeam, setDrinksTeam] = useState<string>(contract.drinksTeam?.toString() || '');
-  const [contractCity, setContractCity] = useState('Itu/SP');
+  const [contractCity, setContractCity] = useState('Campinas/SP');
   const today = format(new Date(), "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
   const createdDate = format(parseISO(contract.createdAt), 'dd/MM/yyyy', {
     locale: ptBR,

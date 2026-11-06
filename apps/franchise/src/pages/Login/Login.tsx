@@ -50,7 +50,7 @@ export default function Login() {
       login={login}
       onSuccess={() => navigate(ROUTES.DASHBOARD)}
       styles={styles}
-      unitName="Itu"
+      unitName="Campinas"
     />
   );
 }

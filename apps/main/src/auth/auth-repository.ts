@@ -22,7 +22,7 @@ export class AuthRepository {
   }
 
   // O servidor decide quem pode entrar neste sistema: o usuário guardado no navegador nunca basta, senão uma
-  // sessão de outro sistema (Itu, Fábrica) entraria aqui só porque o navegador é o mesmo.
+  // sessão de outro sistema (Campinas, Fábrica) entraria aqui só porque o navegador é o mesmo.
   async getCurrentUser(): Promise<User | null> {
     try {
       const response = await apiFetch('/api/auth/me');

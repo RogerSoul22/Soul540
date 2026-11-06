@@ -26,7 +26,7 @@ export interface SoulPwaOptions {
   name: string;
   shortName: string;
   description: string;
-  // Caminhos absolutos que o app instalado controla, ex.: '/', '/fabrica/', '/itu/'.
+  // Caminhos absolutos que o app instalado controla, ex.: '/', '/fabrica/', '/campinas/'.
   scope: string;
   startUrl: string;
   themeColor?: string;
@@ -108,7 +108,7 @@ export function soulPwa(options: SoulPwaOptions): VitePlugin {
         const file = files()[pathname.slice(base.length)];
         if (!file) return next();
         res.setHeader('Content-Type', file.type);
-        // O service worker fica sob o prefixo dos assets, mas pode controlar o escopo do portal (ex.: /itu/).
+        // O service worker fica sob o prefixo dos assets, mas pode controlar o escopo do portal (ex.: /campinas/).
         res.setHeader('Service-Worker-Allowed', '/');
         res.end(file.source);
       });

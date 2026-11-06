@@ -9,7 +9,7 @@ import styles from './styles/Permissoes.module.scss';
 
 const config: PermissionDirectoryConfig = {
   unit: portalConfigs.franchise.unit,
-  displayUnit: 'Itu',
+  displayUnit: 'Campinas',
   groups: [
     { group: 'Principal', items: [{ key: 'dashboard', label: 'Dashboard' }] },
     {

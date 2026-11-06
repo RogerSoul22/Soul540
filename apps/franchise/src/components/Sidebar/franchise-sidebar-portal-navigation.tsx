@@ -2,7 +2,7 @@ import { ROUTES } from '../../routes';
 import type { SidebarNavigationGroup } from './franchise-sidebar-types';
 
 export const franchisePortalGroup: SidebarNavigationGroup = {
-  label: 'Itu',
+  label: 'Campinas',
   items: [
     {
       path: '/portal.html',

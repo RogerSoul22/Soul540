@@ -41,7 +41,7 @@ export interface NewUserForm {
 export const unitLabels: Record<string, string> = {
   main: 'Principal',
   factory: 'Fábrica',
-  franchise: 'Itu',
+  franchise: 'Campinas',
 };
 
 export const emptyNewUserForm: NewUserForm = {

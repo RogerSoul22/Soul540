@@ -20,7 +20,7 @@ describe('franchise policy', () => {
 
   it('rejects a duplicated slug', async () => {
     const model = { findOne: async () => ({ id: 'existing' }) };
-    await assert.rejects(ensureUniqueFranchiseSlug('itu', undefined, model), /already exists/);
+    await assert.rejects(ensureUniqueFranchiseSlug('campinas', undefined, model), /already exists/);
   });
 
   it('rejects inactive or missing franchise access', async () => {

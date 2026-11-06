@@ -91,8 +91,8 @@ app.use('/api/production-recipes', productionRecipesRoutes);
 app.use('/api/production-orders', productionOrdersRoutes);
 
 const franchiseDist = path.join(process.cwd(), 'apps/franchise/dist');
-app.use('/itu', express.static(franchiseDist));
-app.get(['/itu', '/itu/*'], (_req, res) => {
+app.use('/campinas', express.static(franchiseDist));
+app.get(['/campinas', '/campinas/*'], (_req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.sendFile(path.join(franchiseDist, 'index.html'));
 });

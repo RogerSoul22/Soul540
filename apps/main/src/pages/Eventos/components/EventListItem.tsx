@@ -56,7 +56,7 @@ export default function EventListItem({ event, showIssues, onView, onEdit, onDel
             {eventStatusLabels[event.status] ?? event.status}
           </Badge>
           <Badge variant={event.source === 'franchise' ? 'purple' : 'gray'}>
-            {event.source === 'franchise' ? 'Itu' : 'Sorocaba'}
+            {event.source === 'franchise' ? 'Campinas' : 'Sorocaba'}
           </Badge>
         </div>
         <p className={styles.itemMeta}>{[getEventModalityLabel(event.modality), ...meta].join(' · ')}</p>

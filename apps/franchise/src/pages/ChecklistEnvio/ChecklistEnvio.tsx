@@ -2,5 +2,5 @@ import { ChecklistDeliveryScreen } from '../../../../../packages/screens/src/ind
 import { apiFetch } from '../../lib/api';
 
 export default function ChecklistEnvio() {
-  return <ChecklistDeliveryScreen apiFetch={apiFetch} storageScope="itu" systemName="Itu" />;
+  return <ChecklistDeliveryScreen apiFetch={apiFetch} storageScope="campinas" systemName="Campinas" />;
 }

@@ -5,7 +5,7 @@
 A migracao estrutural foi concluida. O repositorio agora usa um workspace pnpm com quatro entradas independentes:
 
 - `apps/main`: sistema principal;
-- `apps/franchise`: portal das franquias, com rota canonica `/itu`;
+- `apps/franchise`: portal das franquias, com rota canonica `/campinas`;
 - `apps/factory`: fabrica, com rota canonica `/fabrica`;
 - `apps/api`: API Express independente.
 
@@ -39,7 +39,7 @@ pnpm build:factory
 O comando idempotente foi executado em 2026-10-31:
 
 ```powershell
-pnpm migrate:franchise-tenants -- --slug itu --apply
+pnpm migrate:franchise-tenants -- --slug campinas --apply
 ```
 
 Resultado: zero pendencias e zero documentos modificados nas colecoes de franquia, auditoria, producao e usuarios.

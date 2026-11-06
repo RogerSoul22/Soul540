@@ -2,5 +2,5 @@ import { ContractorDirectoryScreen } from '../../../../../packages/screens/src/i
 import { apiFetch } from '../../lib/api';
 
 export default function Contratantes() {
-  return <ContractorDirectoryScreen apiFetch={apiFetch} exportFileName="contratantes-itu" />;
+  return <ContractorDirectoryScreen apiFetch={apiFetch} exportFileName="contratantes-campinas" />;
 }

@@ -29,7 +29,7 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       '/api': 'http://localhost:3001',
-      '/itu': {
+      '/campinas': {
         target: 'http://localhost:5174',
         rewrite: () => '/franchise-assets/',
       },

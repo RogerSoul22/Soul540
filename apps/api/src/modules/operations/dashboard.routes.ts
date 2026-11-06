@@ -61,7 +61,7 @@ router.get('/', async (req, res) => {
       FranchiseContractor.countDocuments(getFranchiseFilter(req, { status: 'ativo' })),
     ]);
   } else if (unit === 'factory') {
-    // Factory dashboard follows production events from Sorocaba and Itu.
+    // Factory dashboard follows production events from Sorocaba and Campinas.
     const eventModels = getDashboardEventUnits(req).map((eventUnit) => {
       if (eventUnit === 'main') return ActualEvent;
       if (eventUnit === 'franchise') return ActualFranchiseEvent;

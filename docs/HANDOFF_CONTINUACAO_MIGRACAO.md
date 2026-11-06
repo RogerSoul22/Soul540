@@ -12,7 +12,7 @@ Este documento registra o estado final da migracao. A referencia canonica e `doc
 
 ## Dados e seguranca
 
-- A franquia ativa canonica e Itu, com slug `itu`.
+- A franquia ativa canonica e Campinas, com slug `campinas`.
 - A migracao `franchiseId` foi executada com `--apply` e nao encontrou pendencias.
 - O administrador global nao recebe login ou sessao de franquia.
 - O administrador global pode consultar eventos e financeiro consolidados no Principal.

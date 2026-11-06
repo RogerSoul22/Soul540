@@ -78,7 +78,7 @@ export function CreateUserModal(props: ModalProps) {
         label="Sistema"
         className={props.styles.input}
         disabled
-        value={props.configUnit === 'franchise' ? 'Itu' : 'Fabrica'}
+        value={props.configUnit === 'franchise' ? 'Campinas' : 'Fabrica'}
       />
       <footer className={props.styles.modalFooter}>
         <Button type="button" variant="ghost" className={props.styles.btnCancel} onClick={props.onClose}>

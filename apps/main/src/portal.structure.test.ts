@@ -12,8 +12,8 @@ test('keeps franchise cards out of the public portal', () => {
 
   assert.match(portal, /id="sorocaba-card"/);
   assert.match(portal, /id="fabrica-card"/);
-  assert.doesNotMatch(portal, /id="itu-card"/);
-  assert.doesNotMatch(portal, /Franquia Itu|Acessar Franquia|localhost:5174\/itu/);
+  assert.doesNotMatch(portal, /id="campinas-card"/);
+  assert.doesNotMatch(portal, /Franquia Campinas|Acessar Franquia|localhost:5174\/campinas/);
 
   assert.match(franchisesPage, /const activeFranchises = controller\.franchises\.filter/);
   assert.match(franchisesPage, /activeFranchises\.map\(\(franchise\) =>/);

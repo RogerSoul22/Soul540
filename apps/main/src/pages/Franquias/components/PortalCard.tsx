@@ -7,7 +7,7 @@ type Props = { system: PortalSystem; franchiseName?: string; status: FranchiseSt
 const SYSTEM_LABEL: Record<PortalSystem, string> = { franchise: 'Franquia', factory: 'Fábrica' };
 
 export default function PortalCard({ system, franchiseName, status }: Props) {
-  const label = franchiseName || (system === 'franchise' ? 'Franquia Itu' : 'Portal Fábrica');
+  const label = franchiseName || (system === 'franchise' ? 'Franquia Campinas' : 'Portal Fábrica');
   const active = status === 'ativa';
   const statusLabel = active ? 'Ativa' : 'Em implantação';
   const accent = system === 'franchise' ? styles.portalAmber : styles.portalBlue;

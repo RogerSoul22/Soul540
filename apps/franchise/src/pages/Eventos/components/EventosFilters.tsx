@@ -48,7 +48,7 @@ export default function EventosFilters({ controller }: { controller: EventosCont
             className={`${styles.unitFilterBtn} ${sourceFilter === filter ? styles.unitFilterBtnActive : ''}`}
             onClick={() => setSourceFilter(filter)}
           >
-            {filter === 'all' ? 'Todos' : filter === 'main' ? 'Sorocaba' : 'Itu'}
+            {filter === 'all' ? 'Todos' : filter === 'main' ? 'Sorocaba' : 'Campinas'}
           </Button>
         ))}
       </div>

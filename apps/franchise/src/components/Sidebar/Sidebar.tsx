@@ -62,7 +62,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
         </Button>
         <div className={styles.logo}>
           <img src={LOGO_SRC} alt="Soul540" className={styles.logoImg} />
-          <span className={styles.logoTag}>Itu</span>
+          <span className={styles.logoTag}>Campinas</span>
         </div>
         <nav className={styles.nav}>
           {franchiseSidebarGroups.map((group) => {

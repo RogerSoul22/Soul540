@@ -16,7 +16,7 @@ test('global administrator can access the main system and the factory, but not f
 });
 
 test('local administrator can access only the linked system', () => {
-  const user = { isAdmin: true, unit: 'franchise' as const, franchiseId: 'itu' };
+  const user = { isAdmin: true, unit: 'franchise' as const, franchiseId: 'campinas' };
   assert.equal(canAccessSystem(user, 'franchise'), true);
   assert.equal(canAccessSystem(user, 'main'), false);
 });

@@ -1,7 +1,7 @@
 interface RegisterOptions {
   // Caminho do service worker publicado pelo portal (sempre sob o base do Vite).
   swUrl: string;
-  // Escopo controlado pelo portal, ex.: '/', '/fabrica/', '/itu/'.
+  // Escopo controlado pelo portal, ex.: '/', '/fabrica/', '/campinas/'.
   scope: string;
 }
 
