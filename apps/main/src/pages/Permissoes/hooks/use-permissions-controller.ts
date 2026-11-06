@@ -4,9 +4,12 @@ import { useAuth } from '../../../hooks/useAuth';
 import { apiFetch } from '../../../lib/api';
 import { ALL_KEYS, EMPTY_FORM, SYSTEM_LABELS, type AppUser, type UserForm } from '../types/permissions-types';
 
+type FranchiseOption = { id: string; name: string };
+
 export function usePermissionsController() {
   const { user: authUser } = useAuth();
   const [users, setUsers] = useState<AppUser[]>([]);
+  const [franchises, setFranchises] = useState<FranchiseOption[]>([]);
   const [selected, setSelected] = useState<AppUser | null>(null);
   const [draftPerms, setDraftPerms] = useState<string[]>([]);
   const [draftIsAdmin, setDraftIsAdmin] = useState(false);
@@ -41,6 +44,10 @@ export function usePermissionsController() {
     apiFetch('/api/users')
       .then((response) => response.json())
       .then(setUsers);
+    apiFetch('/api/franchises')
+      .then((response) => response.json())
+      .then((data: FranchiseOption[]) => setFranchises(Array.isArray(data) ? data : []))
+      .catch(() => {});
   }, []);
 
   function selectUser(user: AppUser) {
@@ -83,10 +90,15 @@ export function usePermissionsController() {
 
   async function createUser() {
     if (!form.name.trim() || !form.email.trim() || !form.password) return;
+    if (form.unit === 'franchise' && !form.franchiseId) return;
     const response = await apiFetch('/api/users', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, permissions: form.isAdmin ? ALL_KEYS : [] }),
+      body: JSON.stringify({
+        ...form,
+        franchiseId: form.unit === 'franchise' ? form.franchiseId : undefined,
+        permissions: form.isAdmin ? ALL_KEYS : [],
+      }),
     });
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
@@ -123,6 +135,7 @@ export function usePermissionsController() {
 
   return {
     users,
+    franchises,
     filteredUsers,
     selected,
     draftPerms,

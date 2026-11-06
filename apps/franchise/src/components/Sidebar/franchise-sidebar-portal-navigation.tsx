@@ -1,8 +1,10 @@
+import { franchiseTitle } from '../../franchise-pwa';
+import { getFranchiseSlug } from '../../franchise-path';
 import { ROUTES } from '../../routes';
 import type { SidebarNavigationGroup } from './franchise-sidebar-types';
 
 export const franchisePortalGroup: SidebarNavigationGroup = {
-  label: 'Campinas',
+  label: franchiseTitle(getFranchiseSlug()),
   items: [
     {
       path: '/portal.html',

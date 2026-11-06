@@ -1,6 +1,9 @@
 import { ChecklistDeliveryScreen } from '../../../../../packages/screens/src/index';
+import { franchiseTitle } from '../../franchise-pwa';
+import { getFranchiseSlug } from '../../franchise-path';
 import { apiFetch } from '../../lib/api';
 
 export default function ChecklistEnvio() {
-  return <ChecklistDeliveryScreen apiFetch={apiFetch} storageScope="campinas" systemName="Campinas" />;
+  const slug = getFranchiseSlug();
+  return <ChecklistDeliveryScreen apiFetch={apiFetch} storageScope={slug} systemName={franchiseTitle(slug)} />;
 }

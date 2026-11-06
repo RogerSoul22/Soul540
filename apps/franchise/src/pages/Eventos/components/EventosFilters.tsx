@@ -1,8 +1,11 @@
 import { Button, Input } from '../../../../../../packages/pentagono/src/index';
+import { franchiseTitle } from '../../../franchise-pwa';
+import { getFranchiseSlug } from '../../../franchise-path';
 import type { EventosController } from '../hooks/use-eventos-controller';
 import styles from '../styles/Eventos.module.scss';
 
 export default function EventosFilters({ controller }: { controller: EventosController }) {
+  const franchiseLabel = franchiseTitle(getFranchiseSlug());
   const {
     search,
     setSearch,
@@ -48,7 +51,7 @@ export default function EventosFilters({ controller }: { controller: EventosCont
             className={`${styles.unitFilterBtn} ${sourceFilter === filter ? styles.unitFilterBtnActive : ''}`}
             onClick={() => setSourceFilter(filter)}
           >
-            {filter === 'all' ? 'Todos' : filter === 'main' ? 'Sorocaba' : 'Campinas'}
+            {filter === 'all' ? 'Todos' : filter === 'main' ? 'Sorocaba' : franchiseLabel}
           </Button>
         ))}
       </div>

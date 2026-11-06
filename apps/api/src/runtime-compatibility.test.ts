@@ -14,9 +14,10 @@ test('serves only the canonical Campinas franchise runtime path', () => {
   assert.doesNotMatch(app, /\/itu/);
 });
 
-test('uses the canonical Campinas storage scope in franchise checklist delivery', () => {
+test('derives the franchise checklist storage scope from the current slug instead of a fixed tenant', () => {
   const checklist = source('../../franchise/src/pages/ChecklistEnvio/ChecklistEnvio.tsx');
 
-  assert.match(checklist, /storageScope="campinas"/);
+  assert.match(checklist, /storageScope=\{slug\}/);
+  assert.doesNotMatch(checklist, /storageScope="campinas"/);
   assert.doesNotMatch(checklist, /storageScope="itu"/);
 });

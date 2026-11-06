@@ -2,6 +2,8 @@ import { Button } from '../../../../../packages/pentagono/src/index';
 import { MobileNav } from '../../../../../packages/ui/src/index';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { franchiseTitle } from '../../franchise-pwa';
+import { getFranchiseSlug } from '../../franchise-path';
 import { ROUTES } from '../../routes';
 import styles from './styles/Sidebar.module.scss';
 import { franchiseSidebarGroups } from './franchise-sidebar-navigation';
@@ -62,7 +64,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
         </Button>
         <div className={styles.logo}>
           <img src={LOGO_SRC} alt="Soul540" className={styles.logoImg} />
-          <span className={styles.logoTag}>Campinas</span>
+          <span className={styles.logoTag}>{franchiseTitle(getFranchiseSlug())}</span>
         </div>
         <nav className={styles.nav}>
           {franchiseSidebarGroups.map((group) => {

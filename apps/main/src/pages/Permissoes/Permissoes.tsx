@@ -46,6 +46,7 @@ export default function Permissoes() {
       <PermissionsModals
         showCreate={controller.showModal}
         form={controller.form}
+        franchises={controller.franchises}
         changePasswordTarget={controller.changePwTarget}
         newPassword={controller.newPassword}
         changePasswordSaving={controller.changePwSaving}

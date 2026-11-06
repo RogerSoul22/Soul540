@@ -4,12 +4,14 @@ import {
   type PermissionDirectoryConfig,
 } from '../../../../../packages/screens/src/index';
 import { useAuth } from '../../contexts/AuthContext';
+import { franchiseTitle } from '../../franchise-pwa';
+import { getFranchiseSlug } from '../../franchise-path';
 import { apiFetch } from '../../lib/api';
 import styles from './styles/Permissoes.module.scss';
 
 const config: PermissionDirectoryConfig = {
   unit: portalConfigs.franchise.unit,
-  displayUnit: 'Campinas',
+  displayUnit: franchiseTitle(getFranchiseSlug()),
   groups: [
     { group: 'Principal', items: [{ key: 'dashboard', label: 'Dashboard' }] },
     {

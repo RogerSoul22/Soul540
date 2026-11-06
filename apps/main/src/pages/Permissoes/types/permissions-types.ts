@@ -13,11 +13,12 @@ export type UserForm = {
   password: string;
   isAdmin: boolean;
   unit: string;
+  franchiseId: string;
 };
 
 export const SYSTEM_LABELS: Record<string, string> = {
   main: 'Principal',
-  franchise: 'Campinas',
+  franchise: 'Franquia',
   factory: 'Fábrica',
 };
 
@@ -66,4 +67,5 @@ export const EMPTY_FORM: UserForm = {
   password: '',
   isAdmin: false,
   unit: 'main',
+  franchiseId: '',
 };

@@ -4,12 +4,13 @@ import styles from '../styles/Permissoes.module.scss';
 
 type Props = {
   form: UserForm;
+  franchises: { id: string; name: string }[];
   onClose: () => void;
   onCreate: () => void;
   onFormChange: (form: UserForm) => void;
 };
 
-export default function PermissionsCreateModal({ form, onClose, onCreate, onFormChange }: Props) {
+export default function PermissionsCreateModal({ form, franchises, onClose, onCreate, onFormChange }: Props) {
   const update = (field: keyof UserForm, value: string | boolean) => onFormChange({ ...form, [field]: value });
   return (
     <Modal title="Novo Usuário" onClose={onClose} closeOnOverlay maxWidth={440} flush>
@@ -47,12 +48,27 @@ export default function PermissionsCreateModal({ form, onClose, onCreate, onForm
           label="Sistema"
           className={styles.input}
           value={form.unit}
-          onChange={(event) => update('unit', event.target.value)}
+          onChange={(event) => onFormChange({ ...form, unit: event.target.value, franchiseId: '' })}
         >
           <option value="main">Principal</option>
-          <option value="franchise">Campinas</option>
+          <option value="franchise">Franquia</option>
           <option value="factory">Fábrica</option>
         </Select>
+        {form.unit === 'franchise' && (
+          <Select
+            label="Qual franquia? *"
+            className={styles.input}
+            value={form.franchiseId}
+            onChange={(event) => update('franchiseId', event.target.value)}
+          >
+            <option value="">Selecione...</option>
+            {franchises.map((franchise) => (
+              <option key={franchise.id} value={franchise.id}>
+                {franchise.name}
+              </option>
+            ))}
+          </Select>
+        )}
       </div>
       <div className={styles.modalFooter}>
         <Button type="button" variant="ghost" className={styles.btnCancel} onClick={onClose}>
@@ -62,7 +78,12 @@ export default function PermissionsCreateModal({ form, onClose, onCreate, onForm
           type="button"
           className={styles.btnPrimary}
           onClick={onCreate}
-          disabled={!form.name.trim() || !form.email.trim() || !form.password}
+          disabled={
+            !form.name.trim() ||
+            !form.email.trim() ||
+            !form.password ||
+            (form.unit === 'franchise' && !form.franchiseId)
+          }
         >
           Cadastrar
         </Button>

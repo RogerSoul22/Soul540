@@ -6,6 +6,7 @@ import PermissionsPasswordModal from './PermissionsPasswordModal';
 type Props = {
   showCreate: boolean;
   form: UserForm;
+  franchises: { id: string; name: string }[];
   changePasswordTarget: AppUser | null;
   newPassword: string;
   changePasswordSaving: boolean;
@@ -23,6 +24,7 @@ type Props = {
 export default function PermissionsModals({
   showCreate,
   form,
+  franchises,
   changePasswordTarget,
   newPassword,
   changePasswordSaving,
@@ -39,7 +41,13 @@ export default function PermissionsModals({
   return (
     <>
       {showCreate && (
-        <PermissionsCreateModal form={form} onClose={onCloseCreate} onCreate={onCreate} onFormChange={onFormChange} />
+        <PermissionsCreateModal
+          form={form}
+          franchises={franchises}
+          onClose={onCloseCreate}
+          onCreate={onCreate}
+          onFormChange={onFormChange}
+        />
       )}
       {changePasswordTarget && (
         <PermissionsPasswordModal

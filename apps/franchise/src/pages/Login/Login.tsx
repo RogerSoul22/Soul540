@@ -1,6 +1,8 @@
 import { UnitLoginScreen, type UnitLoginFeature } from '../../../../../packages/screens/src/index';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { franchiseTitle } from '../../franchise-pwa';
+import { getFranchiseSlug } from '../../franchise-path';
 import { ROUTES } from '../../routes';
 import styles from './styles/Login.module.scss';
 
@@ -50,7 +52,7 @@ export default function Login() {
       login={login}
       onSuccess={() => navigate(ROUTES.DASHBOARD)}
       styles={styles}
-      unitName="Campinas"
+      unitName={franchiseTitle(getFranchiseSlug())}
     />
   );
 }

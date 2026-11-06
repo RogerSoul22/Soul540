@@ -133,6 +133,7 @@ export default function PermissionDirectoryScreen({
           apiFetch={apiFetch}
           allKeys={allKeys}
           configUnit={config.unit}
+          configDisplayUnit={config.displayUnit}
           form={form}
           onClose={() => {
             setForm(emptyNewUserForm);

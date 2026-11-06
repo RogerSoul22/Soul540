@@ -10,6 +10,7 @@ interface ModalProps {
   apiFetch: ApiFetch;
   allKeys: string[];
   configUnit: string;
+  configDisplayUnit: string;
   form: NewUserForm;
   onClose: () => void;
   setForm: Dispatch<SetStateAction<NewUserForm>>;
@@ -78,7 +79,7 @@ export function CreateUserModal(props: ModalProps) {
         label="Sistema"
         className={props.styles.input}
         disabled
-        value={props.configUnit === 'franchise' ? 'Campinas' : 'Fabrica'}
+        value={props.configDisplayUnit}
       />
       <footer className={props.styles.modalFooter}>
         <Button type="button" variant="ghost" className={props.styles.btnCancel} onClick={props.onClose}>
