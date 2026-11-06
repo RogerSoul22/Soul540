@@ -6,6 +6,6 @@ test('keeps direct franchise dev routes on the SPA fallback', () => {
   const config = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8');
 
   assert.match(config, /configureServer/);
-  assert.match(config, /franchise-assets/);
-  assert.match(config, /req\.url\s*=\s*["']\/franchise-assets\/["']/);
+  assert.match(config, /FRANCHISE_ASSETS_BASE.*\/franchise-assets\//);
+  assert.match(config, /req\.url\s*=\s*assetsBase/);
 });

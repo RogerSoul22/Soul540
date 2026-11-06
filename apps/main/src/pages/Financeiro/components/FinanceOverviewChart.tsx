@@ -9,7 +9,7 @@ function Gauge({ label, value, color }: { label: string; value: number; color: s
     <Card className={styles.gaugeCard}>
       <div className={styles.gaugeHeader}>
         <span>{label}</span>
-        <strong>{value.toFixed(1)}%</strong>
+        <strong>{value.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%</strong>
       </div>
       <div className={styles.gaugeTrack}>
         <span style={{ width: Math.min(100, Math.max(0, value)) + '%', background: color }} />

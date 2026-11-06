@@ -39,7 +39,9 @@ export default function FinanceiroOverviewSummary({ controller }: Props) {
         <div className={styles.summaryDivider} />
         <div className={styles.summaryItem}>
           <span className={styles.summaryItemLabel}>Margem</span>
-          <span className={`${styles.summaryItemValue} ${styles.amber}`}>{margin.toFixed(1)}%</span>
+          <span className={`${styles.summaryItemValue} ${styles.amber}`}>
+            {margin.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%
+          </span>
         </div>
       </div>
 

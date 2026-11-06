@@ -39,7 +39,10 @@ export default function FinanceOverviewSummary({ controller }: { controller: Fin
         <div className={styles.summaryDivider} />
         <Metric label="Resultado" value={formatBRL(profit)} tone={profit >= 0 ? styles.green : styles.red} />
         <div className={styles.summaryDivider} />
-        <Metric label="Margem" value={margin.toFixed(1) + '%'} />
+        <Metric
+          label="Margem"
+          value={margin.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%'}
+        />
         <div className={styles.summaryDivider} />
         <Metric label="Recebido" value={formatBRL(realizedIncome)} tone={styles.green} />
         <div className={styles.summaryDivider} />
