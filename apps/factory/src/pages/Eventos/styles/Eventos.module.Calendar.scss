@@ -108,7 +108,76 @@
 
   align-items: start;
 
-  @media (max-width: 700px) {
+  @include mobile {
     grid-template-columns: 1fr;
+  }
+}
+
+.sectionTabs {
+  display: none;
+
+  @include mobile {
+    display: flex;
+
+    align-items: center;
+
+    background: var(--surface-alt, rgba(0, 0, 0, 0.04));
+
+    border: 1px solid $border;
+
+    border-radius: $radius-sm;
+
+    padding: 3px;
+
+    gap: 2px;
+
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.sectionTab {
+  flex: 1;
+
+  padding: 7px 14px;
+
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-medium;
+
+  color: $text-muted;
+
+  background: none;
+
+  border: none;
+
+  border-radius: calc(#{$radius-sm} - 2px);
+
+  cursor: pointer;
+
+  text-align: center;
+
+  transition: all $transition-fast;
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.sectionTabActive {
+  background: $accent;
+
+  color: #fff;
+
+  font-weight: $font-weight-semibold;
+
+  &:hover {
+    background: $accent-hover;
+    color: #fff;
+  }
+}
+
+.sectionHiddenMobile {
+  @include mobile {
+    display: none;
   }
 }

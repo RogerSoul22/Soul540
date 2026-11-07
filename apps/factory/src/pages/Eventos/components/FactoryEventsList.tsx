@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Button,
   EmptyState,
@@ -9,6 +10,8 @@ import {
 import type { FactoryEventController } from '../hooks/use-factory-event-controller';
 import FactoryEventCard from './FactoryEventCard';
 import styles from '../styles/Eventos.module.scss';
+
+type EventsSection = 'orcamentos' | 'fechados';
 
 export default function FactoryEventsList({ controller }: { controller: FactoryEventController }) {
   const {
@@ -23,6 +26,7 @@ export default function FactoryEventsList({ controller }: { controller: FactoryE
     employeeMap,
     setViewingEvent,
   } = controller;
+  const [activeSection, setActiveSection] = useState<EventsSection>('orcamentos');
   return (
     <>
       <PageHeader
@@ -60,9 +64,28 @@ export default function FactoryEventsList({ controller }: { controller: FactoryE
       {filtered.fechados.length === 0 && filtered.orcamentos.length === 0 ? (
         <EmptyState className={styles.empty} title="Nenhum evento encontrado." />
       ) : (
-        <div className={styles.sections}>
+        <>
+          <div className={styles.sectionTabs}>
+            <Button
+              variant="chip"
+              className={`${styles.sectionTab} ${activeSection === 'orcamentos' ? styles.sectionTabActive : ''}`}
+              onClick={() => setActiveSection('orcamentos')}
+            >
+              Orçamentos
+            </Button>
+            <Button
+              variant="chip"
+              className={`${styles.sectionTab} ${activeSection === 'fechados' ? styles.sectionTabActive : ''}`}
+              onClick={() => setActiveSection('fechados')}
+            >
+              Eventos Fechados
+            </Button>
+          </div>
+          <div className={styles.sections}>
           {filtered.orcamentos.length > 0 && (
-            <div className={styles.section}>
+            <div
+              className={`${styles.section} ${activeSection !== 'orcamentos' ? styles.sectionHiddenMobile : ''}`}
+            >
               <Heading level={2} variant="section" className={styles.sectionTitle}>
                 Orçamentos
               </Heading>
@@ -74,7 +97,7 @@ export default function FactoryEventsList({ controller }: { controller: FactoryE
             </div>
           )}
           {monthGroupsFechados.length > 0 && (
-            <div className={styles.section}>
+            <div className={`${styles.section} ${activeSection !== 'fechados' ? styles.sectionHiddenMobile : ''}`}>
               <Heading level={2} variant="section" className={styles.sectionTitle}>
                 Eventos Fechados
               </Heading>
@@ -135,7 +158,8 @@ export default function FactoryEventsList({ controller }: { controller: FactoryE
               </div>
             </div>
           )}
-        </div>
+          </div>
+        </>
       )}
     </>
   );
