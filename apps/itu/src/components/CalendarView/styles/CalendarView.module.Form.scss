@@ -1,0 +1,110 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.dayTitleWeekday {
+  font-family: $font-display;
+
+  font-size: $font-size-2xl;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+
+  text-transform: capitalize;
+
+  letter-spacing: -0.3px;
+}
+
+.dayTitleDate {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+
+  font-weight: $font-weight-normal;
+}
+
+.todayChip {
+  font-size: 12px;
+
+  font-weight: $font-weight-bold;
+
+  background: rgba($accent, 0.15);
+
+  color: $accent;
+
+  border: 1px solid rgba($accent, 0.25);
+
+  padding: 2px 8px;
+
+  border-radius: $radius-full;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  align-self: center;
+}
+
+.dayNav {
+  display: flex;
+
+  gap: 2px;
+}
+
+// section
+.allDayRow {
+  display: flex;
+
+  align-items: stretch;
+
+  border-bottom: 1px solid $border;
+
+  min-height: 52px;
+}
+
+.allDayLabel {
+  width: 64px;
+
+  flex-shrink: 0;
+
+  padding: $spacing-sm $spacing-sm $spacing-sm $spacing-md;
+
+  font-size: 12px;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.6px;
+
+  border-right: 1px solid $border;
+
+  display: flex;
+
+  align-items: center;
+}
+
+.allDayEvents {
+  flex: 1;
+
+  padding: $spacing-sm $spacing-md;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-xs;
+}
+
+.allDayEmpty {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+
+  font-style: italic;
+
+  padding: $spacing-xs 0;
+}

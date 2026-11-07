@@ -1,0 +1,86 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.page {
+  padding: $spacing-2xl $spacing-xl;
+
+  animation: fadeIn 0.4s ease;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+.header {
+  margin-bottom: $spacing-2xl;
+
+  @include mobile {
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.dateLabel {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+
+  text-transform: capitalize;
+
+  letter-spacing: 0.4px;
+
+  margin-bottom: $spacing-xs;
+}
+
+.title {
+  font-family: $font-display;
+
+  font-size: $font-size-4xl;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+
+  letter-spacing: -0.5px;
+
+  line-height: 1.1;
+
+  font-style: italic;
+
+  @include mobile {
+    font-size: $font-size-3xl;
+  }
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+
+  margin-top: 8px;
+
+  strong {
+    color: #f87171;
+
+    font-weight: $font-weight-semibold;
+  }
+}
+
+// KPI Cards
+.kpiGrid {
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: $spacing-md;
+
+  margin-bottom: $spacing-2xl;
+
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}

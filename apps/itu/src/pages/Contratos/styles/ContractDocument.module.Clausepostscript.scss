@@ -1,0 +1,91 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// Highlighted payment box
+// ——— Date/location ———
+.docDate {
+  font-size: 13px;
+
+  text-align: center;
+
+  margin-bottom: 40px;
+}
+
+// ——— Signatures ———
+.sigGrid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 32px 48px;
+
+  margin-top: 32px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+.sigBlock {
+  text-align: center;
+}
+
+.sigLine {
+  border-top: 2px solid #1f2937;
+
+  padding-top: 10px;
+
+  margin-top: 64px;
+}
+
+.sigName {
+  font-size: 13px;
+
+  font-weight: 700;
+}
+
+.sigRole {
+  font-size: 11px;
+
+  color: #6b7280;
+
+  font-family: Arial, sans-serif;
+}
+
+.sigDoc {
+  font-size: 10px;
+
+  color: #9ca3af;
+
+  margin-top: 2px;
+
+  font-family: Arial, sans-serif;
+}
+
+// Witness
+.witnessGrid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 32px 48px;
+
+  margin-top: 32px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.witnessBlock {
+  text-align: center;
+}
+
+.witnessLine {
+  border-top: 1px solid #9ca3af;
+
+  padding-top: 8px;
+
+  margin-top: 48px;
+}

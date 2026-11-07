@@ -12,7 +12,11 @@ const checks = [
     selectors: ["html[data-theme='dark']", '.preview', '.previewTable'],
   },
   {
-    file: 'apps/franchise/src/pages/Financeiro/styles/Financeiro.module.scss',
+    file: 'apps/campinas/src/pages/Financeiro/styles/Financeiro.module.scss',
+    selectors: ["html[data-theme='dark']", '.page', '.modal'],
+  },
+  {
+    file: 'apps/itu/src/pages/Financeiro/styles/Financeiro.module.scss',
     selectors: ["html[data-theme='dark']", '.page', '.modal'],
   },
   {

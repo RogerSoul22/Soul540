@@ -1,0 +1,122 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.btnNewSchedule {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 6px;
+
+  padding: 7px 14px;
+
+  background: rgba(99, 179, 237, 0.12);
+
+  border: 1px solid rgba(99, 179, 237, 0.3);
+
+  border-radius: 8px;
+
+  color: #63b3ed;
+
+  font-size: 0.875rem;
+
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(99, 179, 237, 0.22);
+  }
+
+  @include mobile {
+    flex: 1;
+
+    font-size: 0.8125rem;
+  }
+}
+
+.btnNewEntry {
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 6px;
+
+  padding: 7px 14px;
+
+  background: rgba(251, 191, 36, 0.12);
+
+  border: 1px solid rgba(251, 191, 36, 0.3);
+
+  border-radius: 8px;
+
+  color: #fbbf24;
+
+  font-size: 0.875rem;
+
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(251, 191, 36, 0.22);
+  }
+
+  @include mobile {
+    flex: 1;
+
+    font-size: 0.8125rem;
+  }
+}
+
+.calendarMonth {
+  font-size: $font-size-lg;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+
+  text-transform: capitalize;
+}
+
+.calendarCount {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+}
+
+// Legend
+.legend {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-lg;
+
+  margin-bottom: $spacing-sm;
+
+  flex-wrap: wrap;
+}
+
+.legendItem {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+
+  font-weight: $font-weight-medium;
+}

@@ -1,0 +1,77 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.standardBadge {
+  font-size: 12px;
+
+  font-weight: $font-weight-bold;
+
+  color: $accent;
+
+  background: rgba($accent, 0.1);
+
+  border: 1px solid rgba($accent, 0.2);
+
+  border-radius: $radius-full;
+
+  padding: 2px 8px;
+
+  letter-spacing: 0.5px;
+
+  text-transform: uppercase;
+}
+
+.standardName {
+  font-size: $font-size-xl;
+
+  font-weight: $font-weight-bold;
+
+  color: $text-primary;
+
+  letter-spacing: -0.3px;
+
+  line-height: 1.2;
+}
+
+.standardTagline {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+
+  line-height: 1.5;
+
+  flex: 1;
+}
+
+.standardCategories {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 6px;
+}
+
+.standardTotal {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.standardCardFooter {
+  display: flex;
+
+  gap: 8px;
+
+  align-items: stretch;
+}

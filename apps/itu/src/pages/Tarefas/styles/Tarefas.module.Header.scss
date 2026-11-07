@@ -1,0 +1,121 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.page {
+  padding: $spacing-2xl $spacing-xl;
+
+  animation: fadeIn 0.4s ease;
+
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+.header {
+  @include flex-between;
+
+  margin-bottom: $spacing-xl;
+
+  flex-wrap: wrap;
+
+  gap: $spacing-md;
+}
+
+.title {
+  font-size: $font-size-3xl;
+
+  font-weight: $font-weight-bold;
+
+  color: $text-primary;
+
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+
+  margin-top: 6px;
+}
+
+.headerActions {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-md;
+}
+
+.viewToggle {
+  display: flex;
+
+  background: $bg-secondary;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  padding: 4px;
+}
+
+.viewBtn {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 6px 12px;
+
+  border: none;
+
+  border-radius: $radius-xs;
+
+  background: none;
+
+  color: $text-muted;
+
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+.viewBtnActive {
+  background: $accent;
+
+  color: #0a0f1e;
+}
+
+.stats {
+  display: flex;
+
+  gap: $spacing-xl;
+
+  margin-bottom: $spacing-xl;
+}
+
+.stat {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+}
+
+.statVal {
+  font-size: $font-size-2xl;
+
+  font-weight: $font-weight-bold;
+
+  color: $text-primary;
+}

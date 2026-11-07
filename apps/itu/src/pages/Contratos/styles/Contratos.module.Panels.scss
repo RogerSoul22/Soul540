@@ -1,0 +1,31 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.modalBody {
+  padding: $spacing-xl;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-md;
+}
+
+.modalFooter {
+  @include flex-between;
+
+  padding: $spacing-md $spacing-xl;
+
+  border-top: 1px solid $border;
+}
+
+// Preview
+.previewSection {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-sm;
+}
+

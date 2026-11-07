@@ -10,7 +10,7 @@ RUN corepack enable && corepack prepare pnpm@11.2.2 --activate && pnpm install -
     elif [ "$PORTAL" = "factory" ]; then \
       pnpm --filter @soul540/portal-factory build && cp -R apps/factory/dist /tmp/portal-dist && cp infra/docker/nginx-portal.conf /tmp/nginx.conf; \
     else \
-      pnpm --filter @soul540/portal-franchise build && cp -R apps/franchise/dist /tmp/portal-dist && cp infra/docker/nginx-portal.conf /tmp/nginx.conf; \
+      pnpm --filter @soul540/portal-campinas build && cp -R apps/campinas/dist /tmp/portal-dist && cp infra/docker/nginx-portal.conf /tmp/nginx.conf; \
     fi
 
 FROM nginx:alpine

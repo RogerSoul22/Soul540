@@ -1,0 +1,102 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.input,
+.textarea {
+  background: $bg-input;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  padding: 10px 12px;
+
+  font-size: $font-size-sm;
+
+  color: $text-primary;
+
+  transition: border-color $transition-fast;
+
+  font-family: inherit;
+
+  &::placeholder {
+    color: $text-muted;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $border-accent;
+  }
+}
+
+.textarea {
+  resize: vertical;
+}
+
+// Checkbox list (employee selection)
+.checkList {
+  background: $bg-input;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  max-height: 160px;
+
+  overflow-y: auto;
+
+  padding: 6px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 1px;
+
+  &:focus-within {
+    border-color: $border-accent;
+  }
+}
+
+.checkItem {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-sm;
+
+  padding: 6px 8px;
+
+  border-radius: $radius-xs;
+
+  cursor: pointer;
+
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  input[type='checkbox'] {
+    accent-color: $accent;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+}
+
+.checkLabel {
+  font-size: $font-size-sm;
+
+  color: $text-primary;
+
+  cursor: pointer;
+
+  span {
+    font-size: $font-size-xs;
+    color: $text-muted;
+    margin-left: 4px;
+  }
+}
+
+// Inline checkbox row (outOfCity, etc.)

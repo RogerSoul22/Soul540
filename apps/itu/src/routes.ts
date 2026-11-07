@@ -1,0 +1,17 @@
+export const ROUTES = {
+  LOGIN: '/login',
+  DASHBOARD: '/',
+  FUNCIONARIOS: '/funcionarios',
+  CONTRATANTES: '/contratantes',
+  EVENTOS: '/eventos',
+  ESTOQUE_INSUMOS: '/estoque-insumos',
+  ESTOQUE_UTENSILIOS: '/estoque-utensilios',
+  CARDAPIOS: '/cardapios',
+  CONTRATOS: '/contratos',
+  PERMISSOES: '/permissoes',
+  FINANCEIRO: '/financeiro',
+  TAREFAS: '/tarefas',
+  CHECKLIST_ENVIO: '/checklist-envio',
+  USUARIO: '/minha-conta',
+  AUDITORIA: '/auditoria',
+} as const;

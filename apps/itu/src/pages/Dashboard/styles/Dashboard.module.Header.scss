@@ -1,0 +1,60 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.kpiValue {
+  font-family: $font-display;
+
+  font-size: 2.6rem;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+
+  letter-spacing: -1.5px;
+
+  line-height: 1;
+
+  @include mobile {
+    font-size: $font-size-2xl;
+  }
+}
+
+// Calendar
+.calendarSection {
+  margin-bottom: $spacing-md;
+}
+
+.calendarHeader {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: $spacing-sm;
+
+  margin-bottom: $spacing-md;
+}
+
+.calendarHeaderLeft {
+  display: flex;
+
+  align-items: baseline;
+
+  gap: $spacing-sm;
+}
+
+.calendarHeaderRight {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-sm;
+
+  @include mobile {
+    flex-wrap: wrap;
+
+    width: 100%;
+  }
+}

@@ -1,0 +1,107 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.btnRemoveItem {
+  @include flex-center;
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  flex-shrink: 0;
+  &:hover {
+    color: #f87171;
+  }
+}
+
+.btnAddItem {
+  margin-top: $spacing-sm;
+  padding: 5px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed $border;
+  border-radius: $radius-xs;
+  color: $text-muted;
+  font-size: $font-size-xs;
+  cursor: pointer;
+  width: 100%;
+  &:hover {
+    color: $text-primary;
+    border-color: $border-accent;
+  }
+}
+
+// Custom Preview
+.previewHeader {
+  font-size: $font-size-sm;
+  color: $text-muted;
+  text-align: center;
+  font-style: italic;
+}
+
+.previewTitle {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  text-align: center;
+}
+
+.previewEvent {
+  font-size: $font-size-sm;
+  color: $accent;
+  text-align: center;
+}
+
+.previewItem {
+  @include flex-between;
+  padding: $spacing-sm 0;
+  gap: $spacing-md;
+}
+
+.previewFooter {
+  font-size: $font-size-xs;
+  color: $text-muted;
+  text-align: center;
+  font-style: italic;
+  padding-top: $spacing-md;
+  border-top: 1px solid $border;
+}
+
+// section
+.menuOverlay {
+  background: #0c0c0c;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  border-radius: $radius-lg;
+
+  width: 100%;
+
+  max-width: 640px;
+
+  max-height: 92vh;
+
+  overflow-y: auto;
+
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8);
+
+  position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+  }
+}

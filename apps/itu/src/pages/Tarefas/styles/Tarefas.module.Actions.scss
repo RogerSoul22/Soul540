@@ -1,0 +1,133 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.historyItemLeft {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-sm;
+
+  min-width: 0;
+
+  flex: 1;
+}
+
+.historyItemInfo {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 2px;
+
+  min-width: 0;
+}
+
+.historyItemTitle {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  color: $text-secondary;
+
+  @include text-ellipsis;
+}
+
+.historyItemMeta {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+}
+
+.historyItemActions {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-sm;
+
+  flex-shrink: 0;
+}
+
+.historyReopenBtn {
+  padding: 4px 10px;
+
+  background: none;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-xs;
+
+  color: $text-muted;
+
+  font-size: $font-size-xs;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  &:hover {
+    border-color: $accent;
+    color: $accent;
+    background: rgba($accent, 0.06);
+  }
+}
+
+.taskArchiveBtn {
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  padding: 3px 8px;
+
+  background: rgba(74, 222, 128, 0.08);
+
+  border: 1px solid rgba(74, 222, 128, 0.25);
+
+  border-radius: $radius-xs;
+
+  color: #4ade80;
+
+  font-size: 12px;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba(74, 222, 128, 0.16);
+    border-color: rgba(74, 222, 128, 0.5);
+  }
+}
+
+// List view
+.listView {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.listItem {
+  @include flex-between;
+
+  padding: $spacing-md;
+
+  background: $bg-card;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  gap: $spacing-md;
+
+  &:hover {
+    border-color: $border-accent;
+  }
+}

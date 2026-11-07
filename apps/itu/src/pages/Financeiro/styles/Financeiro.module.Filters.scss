@@ -1,0 +1,107 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.sectionTitle {
+  @include section-title;
+
+  margin-bottom: $spacing-lg;
+}
+
+.chartContainer {
+  margin: 0 (0 - $spacing-sm);
+}
+
+// Gauges Grid
+.gaugesGrid {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: $spacing-md;
+
+  margin-bottom: $spacing-xl;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gaugeCard {
+  @include card;
+
+  padding: $spacing-xl $spacing-lg;
+
+  @include flex-center;
+}
+
+// Filter Row
+.filterRow {
+  display: flex;
+
+  gap: $spacing-sm;
+
+  margin-bottom: $spacing-lg;
+
+  flex-wrap: wrap;
+
+  align-items: center;
+}
+
+.filterGroup {
+  display: flex;
+
+  gap: 2px;
+
+  background: $bg-card;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  padding: 3px;
+}
+
+.filterBtn {
+  padding: 6px 14px;
+
+  border-radius: $radius-xs;
+
+  border: none;
+
+  background: none;
+
+  color: $text-muted;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  transition: all $transition-base;
+
+  white-space: nowrap;
+
+  &:hover {
+    color: $text-primary;
+
+    background: rgba(255, 255, 255, 0.03);
+  }
+}
+
+.filterBtnActive {
+  background: $accent;
+
+  color: $bg-primary;
+
+  box-shadow: 0 1px 4px rgba($accent, 0.3);
+
+  &:hover {
+    background: $accent-hover;
+
+    color: $bg-primary;
+  }
+}
+
+// Category chips

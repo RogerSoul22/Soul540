@@ -11,7 +11,8 @@ const runtimeConfigurationFiles = [
   'vite.config.ts',
   'apps/main/vite.config.ts',
   'apps/factory/vite.config.ts',
-  'apps/franchise/vite.config.ts',
+  'apps/campinas/vite.config.ts',
+  'apps/itu/vite.config.ts',
   'apps/api/tsconfig.json',
   'apps/api/src/app.ts',
 ];

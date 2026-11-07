@@ -1,0 +1,121 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.agendamentosPill {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 2px;
+
+  padding: 6px $spacing-md;
+
+  background: rgba(255, 255, 255, 0.03);
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  min-width: 110px;
+}
+
+.agendamentosPillLabel {
+  font-size: 12px;
+
+  font-weight: $font-weight-medium;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+}
+
+.agendamentosPillValue {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-bold;
+
+  color: $text-primary;
+}
+
+.agendamentosEmpty {
+  text-align: center;
+
+  padding: $spacing-xl;
+
+  color: $text-muted;
+
+  font-size: $font-size-sm;
+}
+
+.agendamentosList {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.agendamentoRow {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: $spacing-md;
+
+  padding: 10px $spacing-md;
+
+  border-radius: $radius-xs;
+
+  transition: background $transition-fast;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.025);
+  }
+
+  & + & {
+    border-top: 1px solid $border-faint;
+  }
+}
+
+.agendamentoInfo {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 2px;
+
+  min-width: 0;
+
+  flex: 1;
+}
+
+.agendamentoName {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  color: $text-primary;
+
+  @include text-ellipsis;
+}
+
+.agendamentoDate {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+}
+
+.agendamentoRight {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-md;
+
+  flex-shrink: 0;
+}

@@ -1,0 +1,82 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+// section
+.btnWhatsapp {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  padding: 9px $spacing-lg;
+
+  background: rgba(37, 211, 102, 0.08);
+
+  border: 1px solid rgba(37, 211, 102, 0.25);
+  border-radius: $radius-sm;
+
+  color: #25d366;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+  text-decoration: none;
+  transition: all $transition-base;
+
+  &:hover {
+    background: rgba(37, 211, 102, 0.15);
+    border-color: rgba(37, 211, 102, 0.4);
+  }
+}
+
+.btnSave {
+  flex: 1;
+
+  padding: 9px $spacing-md;
+
+  border-radius: $radius-sm;
+
+  border: none;
+
+  background: $accent;
+
+  color: $bg-primary;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  cursor: pointer;
+
+  transition: all $transition-base;
+
+  &:hover {
+    background: $accent-hover;
+  }
+}
+
+.btnCancel {
+  padding: 9px $spacing-lg;
+
+  border-radius: $radius-sm;
+
+  border: 1px solid $border;
+
+  background: none;
+
+  color: $text-muted;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-medium;
+
+  cursor: pointer;
+
+  transition: all $transition-base;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+
+    color: $text-primary;
+  }
+}

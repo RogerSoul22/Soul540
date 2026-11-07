@@ -26,7 +26,7 @@ describe('Docker deployment structure', () => {
     assert.match(dockerfile, /portal-dist/);
     assert.doesNotMatch(dockerfile, /COPY\s+--from=build\s+\/app\/dist\s/);
     assert.match(dockerfile, /apps\/main\/dist/);
-    assert.match(dockerfile, /apps\/franchise\/dist/);
+    assert.match(dockerfile, /apps\/campinas\/dist/);
     assert.match(dockerfile, /apps\/factory\/dist/);
   });
 
@@ -59,7 +59,7 @@ describe('Docker deployment structure', () => {
       '@soul540/screens',
       '@soul540/ui',
     ];
-    for (const app of ['main', 'factory', 'franchise']) {
+    for (const app of ['main', 'factory', 'campinas', 'itu']) {
       const dependencies = readPackage(app).dependencies || {};
       for (const packageName of internalPackages)
         assert.equal(dependencies[packageName], 'workspace:*', `${app} -> ${packageName}`);

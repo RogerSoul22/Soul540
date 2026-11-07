@@ -14,23 +14,27 @@ function read(...segments: string[]) {
 const portals = [
   { app: 'main', id: "id: '/'", scope: "scope: '/'" },
   { app: 'factory', id: "id: '/fabrica/'", scope: "scope: '/fabrica/'" },
-  // A franquia monta id e escopo a partir do slug do build (padrão campinas; o container da Itu usa itu).
-  { app: 'franchise', id: 'id: `/${franchiseSlug}/`', scope: 'scope: `/${franchiseSlug}/`' },
+  // Cada franquia tem app próprio e monta id e escopo a partir do slug fixo do app.
+  { app: 'campinas', id: 'id: `/${franchiseSlug}/`', scope: 'scope: `/${franchiseSlug}/`' },
+  { app: 'itu', id: 'id: `/${franchiseSlug}/`', scope: 'scope: `/${franchiseSlug}/`' },
 ];
 
 test('each portal is an independent PWA with its own id, scope and registration', () => {
   for (const { app, id, scope } of portals) {
     const config = read('apps', app, 'vite.config.ts');
     assert.match(config, /soulPwa\(/, `${app}: plugin`);
-    if (app === 'franchise') assert.match(config, /VITE_FRANCHISE_SLUG \|\| 'campinas'/, `${app}: slug padrão`);
+    if (app === 'campinas' || app === 'itu') assert.ok(config.includes(`franchiseSlug = '${app}'`), `${app}: slug`);
     assert.ok(config.includes(id), `${app}: id`);
     assert.ok(config.includes(scope), `${app}: scope`);
     // A franquia registra pelo próprio módulo, que também define o manifesto de cada slug.
     const registration =
-      app === 'franchise' ? read('apps', app, 'src', 'franchise-pwa.ts') : read('apps', app, 'src', 'main.tsx');
+      app === 'campinas' || app === 'itu'
+        ? read('apps', app, 'src', 'franchise-pwa.ts')
+        : read('apps', app, 'src', 'main.tsx');
     assert.match(registration, /registerServiceWorker\(/, `${app}: registro`);
   }
-  const ids = portals.map(({ id }) => id);
+  // As franquias usam o mesmo modelo de id, mas cada app tem um slug fixo diferente (verificado acima).
+  const ids = portals.map(({ app, id }) => (app === 'campinas' || app === 'itu' ? `${app}:${id}` : id));
   assert.equal(new Set(ids).size, ids.length);
 });
 
@@ -65,11 +69,13 @@ test('the franchise service worker may control /campinas even though it is serve
 });
 
 test('every franchise path gets its own installable identity from the slug', () => {
-  const setup = read('apps', 'franchise', 'src', 'franchise-pwa.ts');
-  assert.match(setup, /applyDynamicManifest\(/);
-  assert.match(setup, /id: scope/);
-  assert.match(setup, /slug === \(import\.meta\.env\.VITE_FRANCHISE_SLUG \|\| 'campinas'\)/);
-  assert.match(read('apps', 'franchise', 'src', 'main.tsx'), /setupFranchisePwa\(\)/);
+  for (const app of ['campinas', 'itu']) {
+    const setup = read('apps', app, 'src', 'franchise-pwa.ts');
+    assert.match(setup, /applyDynamicManifest\(/);
+    assert.match(setup, /id: scope/);
+    assert.ok(setup.includes(`slug === '${app}'`), `${app}: manifesto estático`);
+    assert.match(read('apps', app, 'src', 'main.tsx'), /setupFranchisePwa\(\)/);
+  }
 
   const dynamic = read('packages', 'pwa', 'src', 'apply-dynamic-manifest.ts');
   assert.match(dynamic, /window\.location/);
@@ -96,7 +102,7 @@ test('every portal shows the offline status banner and the api client keeps the 
 });
 
 test('on phones every portal uses the bottom navigation bar (like dVolt) instead of the side bar', () => {
-  for (const app of ['main', 'franchise', 'factory']) {
+  for (const app of ['main', 'campinas', 'itu', 'factory']) {
     assert.match(read('apps', app, 'src', 'components', 'Sidebar', 'Sidebar.tsx'), /<MobileNav/, `${app}: MobileNav`);
   }
   const nav = read('packages', 'ui', 'src', 'components', 'mobile-nav', 'MobileNav.tsx');

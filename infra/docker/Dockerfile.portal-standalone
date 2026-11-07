@@ -1,18 +1,15 @@
-# Portal isolado para deploy independente (Coolify). PORTAL = main | factory | franchise
-# Franquia: VITE_FRANCHISE_SLUG (padrão campinas) e FRANCHISE_ASSETS_BASE (padrão /franchise-assets/),
-# ex.: itu + /itu-assets/ para um container só da Itu.
+# Portal isolado para deploy independente (Coolify). PORTAL = main | factory | campinas | itu
 FROM node:22-alpine AS build
 WORKDIR /app
 
 ARG PORTAL
-ARG VITE_FRANCHISE_SLUG=campinas
-ARG FRANCHISE_ASSETS_BASE=/franchise-assets/
 COPY . .
 
 RUN corepack enable && corepack prepare pnpm@11.2.2 --activate && pnpm install --frozen-lockfile && \
     if [ "$PORTAL" = "main" ]; then pnpm --filter @soul540/portal-main build && cp -R apps/main/dist /tmp/portal-dist; \
     elif [ "$PORTAL" = "factory" ]; then pnpm --filter @soul540/portal-factory build && cp -R apps/factory/dist /tmp/portal-dist; \
-    elif [ "$PORTAL" = "franchise" ]; then pnpm --filter @soul540/portal-franchise build && cp -R apps/franchise/dist /tmp/portal-dist; \
+    elif [ "$PORTAL" = "campinas" ]; then pnpm --filter @soul540/portal-campinas build && cp -R apps/campinas/dist /tmp/portal-dist; \
+    elif [ "$PORTAL" = "itu" ]; then pnpm --filter @soul540/portal-itu build && cp -R apps/itu/dist /tmp/portal-dist; \
     else echo "PORTAL invalido: $PORTAL" && exit 1; fi
 
 FROM nginx:alpine

@@ -1,0 +1,103 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.monthExpense {
+  border-top: 3px solid #f87171;
+}
+
+.monthProfit {
+  border-top: 3px solid #4ade80;
+}
+
+.monthLoss {
+  border-top: 3px solid #f87171;
+}
+
+.monthSummaryLabel {
+  display: block;
+
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-medium;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  margin-bottom: 6px;
+}
+
+.monthSummaryValue {
+  font-size: $font-size-xl;
+
+  font-weight: $font-weight-bold;
+
+  color: $text-primary;
+}
+
+.monthSummaryOperator {
+  font-size: $font-size-2xl;
+
+  font-weight: $font-weight-bold;
+
+  color: $text-muted;
+
+  @include mobile {
+    display: none;
+  }
+}
+
+// Horizontal bars grid
+.barsGrid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: $spacing-md;
+
+  @include tablet {
+    grid-template-columns: 1fr;
+  }
+}
+
+.barCard {
+  @include card;
+
+  padding: $spacing-lg;
+}
+
+// Search Input
+.searchInput {
+  flex: 1;
+
+  min-width: 200px;
+
+  padding: 9px $spacing-md;
+
+  background: $bg-card;
+
+  border: 1px solid $border;
+
+  border-radius: $radius-sm;
+
+  color: $text-primary;
+
+  font-size: $font-size-sm;
+
+  transition: all $transition-base;
+
+  &::placeholder {
+    color: $text-muted;
+  }
+
+  &:focus {
+    outline: none;
+
+    border-color: $accent;
+
+    box-shadow: 0 0 0 3px rgba($accent, 0.08);
+  }
+}

@@ -8,9 +8,10 @@ function source(path: string): string {
 
 test('keeps a visible recovery state when the frontend bundle fails before React mounts', () => {
   const mainIndex = source('../index.html');
-  const franchiseIndex = source('../../franchise/index.html');
+  const campinasIndex = source('../../campinas/index.html');
+  const ituIndex = source('../../itu/index.html');
 
-  for (const index of [mainIndex, franchiseIndex]) {
+  for (const index of [mainIndex, campinasIndex, ituIndex]) {
     assert.match(index, /id="boot-status"/);
     assert.match(index, /unhandledrejection/);
     assert.match(index, /location\.reload\(\)/);

@@ -21,7 +21,8 @@
   "references": [
     { "path": "./apps/api" },
     { "path": "./apps/factory" },
-    { "path": "./apps/franchise" },
+    { "path": "./apps/campinas" },
+    { "path": "./apps/itu" },
     { "path": "./apps/main" }
   ]
 }

@@ -38,6 +38,11 @@ export default defineConfig({
         rewrite: () => '/franchise-assets/',
       },
       '/franchise-assets': 'http://localhost:5174',
+      '/itu': {
+        target: 'http://localhost:5176',
+        rewrite: () => '/itu-assets/',
+      },
+      '/itu-assets': 'http://localhost:5176',
       '/fabrica': 'http://localhost:5175',
     },
   },

@@ -1,0 +1,67 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.kpiCard {
+  @include card;
+
+  padding: $spacing-lg;
+
+  position: relative;
+
+  overflow: hidden;
+
+  &::before {
+    content: '';
+
+    position: absolute;
+
+    top: 0;
+
+    left: 0;
+
+    right: 0;
+
+    height: 2px;
+
+    opacity: 1;
+  }
+
+  &::after {
+    content: '';
+
+    position: absolute;
+
+    top: 0;
+
+    left: 0;
+
+    right: 0;
+
+    height: 70px;
+
+    opacity: 0.3;
+
+    pointer-events: none;
+
+    transition: opacity $transition-smooth;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+
+    &::after {
+      opacity: 0.55;
+    }
+  }
+}
+
+.kpiLabel {
+  font-size: 13px;
+
+  color: $text-muted;
+
+  font-weight: $font-weight-medium;
+
+  letter-spacing: 0.3px;
+}

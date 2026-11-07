@@ -1,0 +1,51 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.adminToggleLabel {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-primary;
+
+  small {
+    font-weight: $font-weight-normal;
+
+    color: $text-muted;
+
+    font-size: $font-size-xs;
+  }
+}
+
+.crossUnitBanner {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 10px 14px;
+
+  background: rgba(129, 140, 248, 0.08);
+
+  border: 1px solid rgba(129, 140, 248, 0.25);
+
+  border-radius: $radius-sm;
+
+  font-size: $font-size-xs;
+
+  color: #a5b4fc;
+
+  margin-bottom: $spacing-md;
+
+  line-height: 1.5;
+
+  strong {
+    color: #c7d2fe;
+  }
+
+  svg {
+    flex-shrink: 0;
+    opacity: 0.8;
+  }
+}

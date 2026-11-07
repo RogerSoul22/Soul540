@@ -1,0 +1,90 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.xmlCatSelect {
+  background: $bg-input;
+  border: 1px solid $border;
+  border-radius: $radius-xs;
+
+  padding: 4px 8px;
+  font-size: $font-size-xs;
+  color: $text-primary;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:focus {
+    outline: none;
+    border-color: $accent;
+  }
+}
+
+.xmlTotal {
+  font-size: $font-size-sm;
+  color: $text-muted;
+  margin-top: 8px;
+  strong {
+    color: $text-primary;
+  }
+}
+
+.btnCancel {
+  padding: 10px $spacing-md;
+  background: none;
+  border: none;
+  color: $text-muted;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+/* Visual refresh inspired by modern financial workspaces. */
+.page {
+  min-height: 100%;
+  padding: 28px 32px 48px;
+  background: #f5f7fb;
+  color: #182235;
+}
+
+.header {
+  align-items: flex-end;
+  margin-bottom: 22px;
+}
+
+.headerLeft .title {
+  color: #10213d;
+  font-size: 30px;
+  letter-spacing: -0.3px;
+}
+
+.headerLeft .subtitle,
+.pageMonthLabel,
+.filterLabel,
+.summaryItemLabel,
+.monthSummaryLabel {
+  color: #64748b;
+}
+
+.headerActions {
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.scopeToggle,
+.tabs,
+.filterGroup,
+.monthSelector {
+  background: #fff;
+  border: 1px solid #dbe3ef;
+  box-shadow: 0 2px 8px rgba(24, 34, 53, 0.04);
+}
+
+.scopeBtn,
+.tab,
+.filterBtn,
+.monthBtn {
+  color: #64748b;
+}

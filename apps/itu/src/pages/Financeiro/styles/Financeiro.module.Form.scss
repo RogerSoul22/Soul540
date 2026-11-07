@@ -1,0 +1,39 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+// Month selector
+// Monthly Summary Bar (Revenue - Expenses = Profit)
+.monthSummary {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-md;
+
+  margin-bottom: $spacing-xl;
+
+  flex-wrap: wrap;
+
+  justify-content: center;
+
+  @include mobile {
+    flex-direction: column;
+  }
+}
+
+.monthSummaryItem {
+  @include card;
+
+  padding: $spacing-md $spacing-xl;
+
+  text-align: center;
+
+  min-width: 160px;
+
+  flex: 1;
+}
+
+.monthRevenue {
+  border-top: 3px solid #4ade80;
+}

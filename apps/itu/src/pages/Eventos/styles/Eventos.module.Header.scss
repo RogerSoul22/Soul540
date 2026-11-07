@@ -1,0 +1,129 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+// Sections
+.sections {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: $spacing-2xl;
+
+  align-items: start;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.section {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: $spacing-lg;
+
+  min-width: 0;
+}
+
+.sectionHeader {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: $spacing-md;
+
+  width: 100%;
+
+  background: none;
+
+  border: none;
+
+  padding: 0;
+
+  cursor: pointer;
+
+  margin-bottom: $spacing-sm;
+
+  &:hover .sectionChevron {
+    color: $text-primary;
+  }
+}
+
+.sectionHeaderLeft {
+  display: flex;
+
+  align-items: baseline;
+
+  gap: $spacing-sm;
+}
+
+.sectionHeaderRight {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-sm;
+
+  flex-shrink: 0;
+}
+
+.sectionCount {
+  font-size: $font-size-xs;
+
+  color: $text-muted;
+
+  font-weight: $font-weight-normal;
+}
+
+.sectionTotal {
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-semibold;
+}
+
+.sectionChevron {
+  color: $text-muted;
+
+  transition:
+    transform $transition-fast,
+    color $transition-fast;
+}
+
+.sectionChevronCollapsed {
+  transform: rotate(-90deg);
+}
+
+.sectionEmpty {
+  font-size: $font-size-sm;
+
+  color: $text-muted;
+
+  padding: $spacing-lg 0;
+}
+
+.sectionTitle {
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  color: $text-muted;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.6px;
+
+  margin: 0;
+}
+
+// Status toggle no form
+.statusToggle {
+  display: flex;
+
+  gap: $spacing-sm;
+
+  margin-bottom: $spacing-md;
+}

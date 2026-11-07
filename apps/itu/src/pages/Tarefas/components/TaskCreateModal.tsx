@@ -1,0 +1,95 @@
+import { Button, Input, Label, Modal, Select, Textarea } from '../../../../../../packages/pentagono/src/index';
+import type { TaskPriority } from '../../../../../../shared/contracts/types';
+import type { TaskFormData } from '../types/task-types';
+import styles from '../styles/Tarefas.module.scss';
+
+type Props = {
+  form: TaskFormData;
+  events: Array<{ id: string; name: string }>;
+  onChange: <Key extends keyof TaskFormData>(key: Key, value: TaskFormData[Key]) => void;
+  onCreate: () => void;
+  onClose: () => void;
+};
+
+export default function TaskCreateModal({ form, events, onChange, onCreate, onClose }: Props) {
+  return (
+    <Modal title="Nova Tarefa" onClose={onClose} closeOnOverlay maxWidth={500} flush>
+      <div className={styles.modalBody}>
+        <Label className={styles.formGroup}>
+          <span className={styles.label}>Título *</span>
+          <Input
+            className={styles.input}
+            value={form.title}
+            onChange={(event) => onChange('title', event.target.value)}
+          />
+        </Label>
+        <Label className={styles.formGroup}>
+          <span className={styles.label}>Descrição</span>
+          <Textarea
+            className={styles.textarea}
+            rows={2}
+            value={form.description}
+            onChange={(event) => onChange('description', event.target.value)}
+          />
+        </Label>
+        <div className={styles.formGrid2}>
+          <Label className={styles.formGroup}>
+            <span className={styles.label}>Prioridade</span>
+            <Select
+              className={styles.input}
+              value={form.priority}
+              onChange={(event) => onChange('priority', event.target.value as TaskPriority)}
+            >
+              <option value="low">Baixa</option>
+              <option value="medium">Média</option>
+              <option value="high">Alta</option>
+              <option value="urgent">Urgente</option>
+            </Select>
+          </Label>
+          <Label className={styles.formGroup}>
+            <span className={styles.label}>Responsável</span>
+            <Input
+              className={styles.input}
+              value={form.assignee}
+              onChange={(event) => onChange('assignee', event.target.value)}
+            />
+          </Label>
+        </div>
+        <div className={styles.formGrid2}>
+          <Label className={styles.formGroup}>
+            <span className={styles.label}>Prazo</span>
+            <Input
+              className={styles.input}
+              type="date"
+              value={form.dueDate}
+              onChange={(event) => onChange('dueDate', event.target.value)}
+            />
+          </Label>
+          <Label className={styles.formGroup}>
+            <span className={styles.label}>Evento</span>
+            <Select
+              className={styles.input}
+              value={form.eventId}
+              onChange={(event) => onChange('eventId', event.target.value)}
+            >
+              <option value="">Nenhum</option>
+              {events.map((event) => (
+                <option key={event.id} value={event.id}>
+                  {event.name}
+                </option>
+              ))}
+            </Select>
+          </Label>
+        </div>
+      </div>
+      <div className={styles.modalFooter}>
+        <Button variant="ghost" onClick={onClose}>
+          Cancelar
+        </Button>
+        <Button variant="primary" onClick={onCreate} disabled={!form.title.trim()}>
+          Criar Tarefa
+        </Button>
+      </div>
+    </Modal>
+  );
+}

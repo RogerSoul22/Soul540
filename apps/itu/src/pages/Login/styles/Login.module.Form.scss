@@ -1,0 +1,129 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.container {
+  display: flex;
+
+  min-height: 100vh;
+}
+
+// Left panel — Branding
+.branding {
+  flex: 0 0 46%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: $bg-secondary;
+
+  padding: $spacing-3xl;
+
+  position: relative;
+
+  overflow: hidden;
+
+  &::before {
+    content: '';
+
+    position: absolute;
+
+    top: -20%;
+
+    right: -15%;
+
+    width: 520px;
+
+    height: 520px;
+
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.07) 0%, transparent 65%);
+
+    border-radius: 50%;
+
+    animation: drift 18s ease-in-out infinite;
+  }
+
+  &::after {
+    content: '';
+
+    position: absolute;
+
+    bottom: -25%;
+
+    left: -10%;
+
+    width: 420px;
+
+    height: 420px;
+
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.04) 0%, transparent 65%);
+
+    border-radius: 50%;
+
+    animation: drift 24s ease-in-out infinite reverse;
+  }
+
+  @include mobile {
+    display: none;
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate(20px, -28px) scale(1.04);
+  }
+}
+
+.brandingContent {
+  position: relative;
+
+  z-index: 1;
+
+  max-width: 380px;
+}
+
+.brandingLogo {
+  width: 140px;
+
+  height: 140px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+
+  border: 3px solid rgba($accent, 0.4);
+
+  box-shadow:
+    0 0 40px rgba($accent, 0.2),
+    0 8px 32px rgba(0, 0, 0, 0.3);
+
+  margin-bottom: $spacing-xl;
+
+  display: block;
+}
+
+.brandingTitle {
+  font-family: $font-display;
+
+  font-size: 2.9rem;
+
+  font-weight: $font-weight-semibold;
+
+  font-style: italic;
+
+  color: $text-primary;
+
+  margin-bottom: $spacing-md;
+
+  line-height: 1.05;
+
+  letter-spacing: -0.5px;
+}

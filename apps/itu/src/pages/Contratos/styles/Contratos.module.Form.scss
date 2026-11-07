@@ -1,0 +1,72 @@
+@use '../../../styles/variables' as *;
+
+@use '../../../styles/mixins' as *;
+
+.formSectionLabel {
+  font-size: $font-size-xs;
+
+  font-weight: $font-weight-semibold;
+
+  color: $accent;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.6px;
+
+  padding-bottom: $spacing-xs;
+
+  border-bottom: 1px solid $border;
+
+  margin-top: $spacing-sm;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.empty {
+  text-align: center;
+
+  padding: $spacing-3xl;
+
+  color: $text-muted;
+
+  font-size: $font-size-sm;
+}
+
+// Buttons
+.btnPrimary {
+  display: flex;
+
+  align-items: center;
+
+  gap: $spacing-sm;
+
+  padding: 10px $spacing-md;
+
+  background: $accent;
+
+  color: #0a0f1e;
+
+  font-size: $font-size-sm;
+
+  font-weight: $font-weight-semibold;
+
+  border: none;
+
+  border-radius: $radius-sm;
+
+  cursor: pointer;
+
+  transition: background $transition-fast;
+
+  &:hover {
+    background: $accent-hover;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+

@@ -45,7 +45,7 @@ services:
     build:
       context: ../..
       dockerfile: infra/docker/Dockerfile.portal
-      args: { PORTAL: franchise }
+      args: { PORTAL: campinas }
     ports: ['8082:80']
     depends_on:
       api:

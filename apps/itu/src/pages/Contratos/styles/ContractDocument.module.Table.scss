@@ -1,0 +1,113 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.docCompanyMeta {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  gap: 4px 16px;
+
+  margin-top: 4px;
+
+  font-size: 11px;
+
+  color: #6b7280;
+
+  font-family: Arial, sans-serif;
+}
+
+.docRef {
+  font-size: 10px;
+
+  color: #9ca3af;
+
+  text-align: right;
+
+  margin-bottom: 16px;
+
+  font-family: Arial, sans-serif;
+}
+
+.docTitle {
+  font-size: 15px;
+
+  font-weight: 700;
+
+  text-align: center;
+
+  color: #111827;
+
+  margin-bottom: 28px;
+
+  letter-spacing: 1.5px;
+}
+
+// ——— Clauses ———
+.clause {
+  margin-bottom: 24px;
+}
+
+.clauseTitle {
+  font-size: 12px;
+
+  font-weight: 700;
+
+  color: #111827;
+
+  margin-bottom: 10px;
+
+  letter-spacing: 0.3px;
+
+  font-family: Arial, sans-serif;
+}
+
+.clauseBox {
+  background: #f9fafb;
+
+  border-radius: 6px;
+
+  padding: 14px 16px;
+
+  font-size: 13px;
+}
+
+.clauseGrid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 8px 16px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.clauseField {
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+.clauseFieldLabel {
+  font-weight: 600;
+
+  color: #4b5563;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 12px;
+}
+
+.clauseText {
+  font-size: 13px;
+
+  line-height: 1.75;
+
+  text-align: justify;
+}

@@ -34,7 +34,12 @@ import { normalizeApiError } from './infrastructure/http/errors';
 import { createRateLimit } from './infrastructure/middleware/rate-limit';
 
 const app = express();
-const defaultCorsOrigins = ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'];
+const defaultCorsOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:5175',
+  'http://localhost:5176',
+];
 const corsOrigins = new Set(
   (process.env.CORS_ORIGINS || defaultCorsOrigins.join(','))
     .split(',')
@@ -90,13 +95,19 @@ app.use('/api/audit-log', auditLogRoutes);
 app.use('/api/production-recipes', productionRecipesRoutes);
 app.use('/api/production-orders', productionOrdersRoutes);
 
-const franchiseDist = path.join(process.cwd(), 'apps/franchise/dist');
+const franchiseDist = path.join(process.cwd(), 'apps/campinas/dist');
 app.use('/campinas', express.static(franchiseDist));
 app.get(['/campinas', '/campinas/*'], (_req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.sendFile(path.join(franchiseDist, 'index.html'));
 });
 app.use('/franchise-assets', express.static(franchiseDist));
+const ituDist = path.join(process.cwd(), 'apps/itu/dist');
+app.use('/itu-assets', express.static(ituDist));
+app.get(['/itu', '/itu/*'], (_req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendFile(path.join(ituDist, 'index.html'));
+});
 app.get(['/franquias/:slug', '/franquias/:slug/*'], (_req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.sendFile(path.join(franchiseDist, 'index.html'));

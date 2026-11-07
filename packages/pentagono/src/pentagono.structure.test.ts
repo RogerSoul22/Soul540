@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const packageRoot = fileURLToPath(new URL('..', import.meta.url));
 const workspaceRoot = join(packageRoot, '..', '..');
-const portals = ['main', 'franchise', 'factory'];
+const portals = ['main', 'campinas', 'itu', 'factory'];
 
 function read(...segments: string[]): string {
   return readFileSync(join(packageRoot, ...segments), 'utf8');

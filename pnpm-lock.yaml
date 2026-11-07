@@ -147,6 +147,24 @@ importers:
         specifier: workspace:*
         version: link:../../packages/domain
 
+  apps/campinas:
+    dependencies:
+      '@soul540/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@soul540/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@soul540/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
+      '@soul540/screens':
+        specifier: workspace:*
+        version: link:../../packages/screens
+      '@soul540/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+
   apps/factory:
     dependencies:
       '@soul540/api-client':
@@ -165,7 +183,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
 
-  apps/franchise:
+  apps/itu:
     dependencies:
       '@soul540/api-client':
         specifier: workspace:*
