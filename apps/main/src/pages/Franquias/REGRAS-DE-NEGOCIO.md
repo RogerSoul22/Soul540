@@ -18,19 +18,18 @@ A visualização e as ações dependem da permissão da página e das permissõe
 ## Regras da página
 
 1. Cadastro deve possuir nome, responsável, cidade, estado e unidade.
-2. A franquia inicia em implantação e só deve ficar ativa após os requisitos definidos pelo negócio.
+2. A troca de status (implantação → ativa, suspensão, congelamento, encerramento, reativação) é decisão manual do administrador da matriz. O sistema não impõe critério, checklist ou automação para essa troca — é julgamento do negócio, feito tela a tela.
 3. Usuário de uma franquia não pode administrar outra franquia.
-4. Encerramento ou suspensão não deve apagar histórico de eventos, financeiro ou usuários.
-5. Taxa mensal deve ter regra própria de cobrança e não deve ser confundida com receita de evento.
+4. Encerramento ou suspensão não deve apagar histórico de eventos, financeiro ou usuários (hoje é soft: muda `status` e marca `deletedAt`).
+5. O que acontece com o acesso de usuários de uma franquia logo após ela ser suspensa/encerrada também é decisão manual do administrador (ex.: desativar usuários um a um), não um efeito automático do sistema.
+6. Taxa mensal (`monthlyFee`) é só um valor de referência cadastrado. Cobrança, lembrete e controle de inadimplência são **decisão explícita de não automatizar**: isso é feito manualmente, fora do sistema. Não deve ser confundida com receita de evento.
 
 ## Efeitos e integrações
 
 - Define o tenant usado por usuários e dados operacionais.
-- Pode alimentar cobrança, indicadores consolidados e permissões.
-- Pode restringir login e operações da unidade.
+- Pode alimentar indicadores consolidados e permissões.
+- Status `suspensa`/`encerrada` restringe login e acesso ao portal da unidade; os demais status (`ativa`, `em_implantacao`, `congelada`) não restringem nada.
 
 ## Pendências de negócio
 
-- Definir estados de implantação/ativa/suspensa/congelada/encerrada.
-- Definir cobrança, inadimplência e reativação.
-- Definir transferência de unidade e dados.
+- Definir transferência de titularidade/unidade e dados entre franqueados.
