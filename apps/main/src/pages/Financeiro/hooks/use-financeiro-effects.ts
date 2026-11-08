@@ -7,6 +7,7 @@ type FinanceiroEffectsState = Pick<
   | 'searchParams'
   | 'setSearchParams'
   | 'dataScope'
+  | 'setFranchises'
   | 'setFranchiseFinances'
   | 'setFranchiseEvents'
   | 'setFactoryFinances'
@@ -25,6 +26,7 @@ export function useFinanceiroEffects(state: FinanceiroEffectsState) {
     searchParams,
     setSearchParams,
     dataScope,
+    setFranchises,
     setFranchiseFinances,
     setFranchiseEvents,
     setFactoryFinances,
@@ -37,6 +39,12 @@ export function useFinanceiroEffects(state: FinanceiroEffectsState) {
     eventComboRef,
     setShowEventDropdown,
   } = state;
+  useEffect(() => {
+    apiFetch('/api/franchises', { credentials: 'include' })
+      .then((r) => r.json())
+      .then((d) => Array.isArray(d) && setFranchises(d))
+      .catch(() => {});
+  }, []);
   useEffect(() => {
     if (searchParams.get('action') === 'new') {
       const type = searchParams.get('type') as FinanceType | null;

@@ -21,6 +21,7 @@ type FinanceDerivedFiltersInput = {
   factoryEvents: PizzaEvent[];
   directEvents: PizzaEvent[];
   dataScope: FinanceScope;
+  franchiseFilter: string;
   eventSearch: string;
   formType: FinanceType;
 };
@@ -37,22 +38,38 @@ export function useFinanceDerivedFilters({
   factoryEvents,
   directEvents,
   dataScope,
+  franchiseFilter,
   eventSearch,
   formType,
 }: FinanceDerivedFiltersInput) {
+  const scopedFranchiseFinances = useMemo(
+    () =>
+      franchiseFilter === 'all'
+        ? franchiseFinances
+        : franchiseFinances.filter((entry) => entry.franchiseId === franchiseFilter),
+    [franchiseFinances, franchiseFilter],
+  );
+  const scopedFranchiseEvents = useMemo(
+    () =>
+      franchiseFilter === 'all'
+        ? franchiseEvents
+        : franchiseEvents.filter((event) => event.franchiseId === franchiseFilter),
+    [franchiseEvents, franchiseFilter],
+  );
+
   const activeFinances = useMemo(() => {
-    if (dataScope === 'franchise') return franchiseFinances;
+    if (dataScope === 'franchise') return scopedFranchiseFinances;
     if (dataScope === 'factory') return factoryFinances;
-    if (dataScope === 'combined') return [...finances, ...franchiseFinances, ...factoryFinances];
+    if (dataScope === 'combined') return [...finances, ...scopedFranchiseFinances, ...factoryFinances];
     return finances;
-  }, [finances, franchiseFinances, factoryFinances, dataScope]);
+  }, [finances, scopedFranchiseFinances, factoryFinances, dataScope]);
 
   const activeEvents = useMemo(() => {
-    if (dataScope === 'franchise') return franchiseEvents;
+    if (dataScope === 'franchise') return scopedFranchiseEvents;
     if (dataScope === 'factory') return factoryEvents;
-    if (dataScope === 'combined') return [...events, ...franchiseEvents, ...factoryEvents];
+    if (dataScope === 'combined') return [...events, ...scopedFranchiseEvents, ...factoryEvents];
     return events.length > 0 ? events : directEvents;
-  }, [events, franchiseEvents, factoryEvents, dataScope, directEvents]);
+  }, [events, scopedFranchiseEvents, factoryEvents, dataScope, directEvents]);
 
   const filteredEventsForCombo = useMemo(() => {
     const eventsById = new Map<string, PizzaEvent>();

@@ -29,6 +29,8 @@ export function useFinanceiroState() {
   const [activeTab, setActiveTab] = useState<TabType>('geral');
   const [costFilter, setCostFilter] = useState<CostFilter>('all');
   const [dataScope, setDataScope] = useState<DataScope>('main');
+  const [franchiseFilter, setFranchiseFilter] = useState<string>('all');
+  const [franchises, setFranchises] = useState<{ id: string; name: string }[]>([]);
   const [franchiseFinances, setFranchiseFinances] = useState<typeof finances>([]);
   const [franchiseEvents, setFranchiseEvents] = useState<typeof events>([]);
   const [factoryFinances, setFactoryFinances] = useState<typeof finances>([]);
@@ -93,6 +95,10 @@ export function useFinanceiroState() {
     setCostFilter,
     dataScope,
     setDataScope,
+    franchiseFilter,
+    setFranchiseFilter,
+    franchises,
+    setFranchises,
     franchiseFinances,
     franchiseEvents,
     factoryFinances,

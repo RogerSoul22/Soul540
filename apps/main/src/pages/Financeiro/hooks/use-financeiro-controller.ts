@@ -24,6 +24,7 @@ export function useFinanceiroController() {
     factoryEvents: state.factoryEvents,
     directEvents: state.directEvents,
     dataScope: state.dataScope,
+    franchiseFilter: state.franchiseFilter,
     eventSearch: state.eventSearch,
     formType: state.formType,
   });
@@ -71,6 +72,7 @@ export function useFinanceiroController() {
     forms.resetForm();
     settlement.closeSettlement();
     state.setDataScope(scope);
+    state.setFranchiseFilter('all');
   };
 
   const handleCreateCategory = async () => {

@@ -33,6 +33,7 @@ export interface FinanceSettlement {
 export interface FinanceEntry {
   id: string;
   eventId: string;
+  franchiseId?: string;
   type: FinanceType;
   category: string;
   classificationStatus?: 'classified' | 'unclassified';
