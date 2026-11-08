@@ -176,7 +176,7 @@
   }
 }
 
-.sectionHiddenMobile {
+.section.sectionHiddenMobile {
   @include mobile {
     display: none;
   }
