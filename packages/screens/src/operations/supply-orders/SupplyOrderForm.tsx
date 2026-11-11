@@ -42,12 +42,11 @@ export default function SupplyOrderForm({ catalog, saving, onSubmit }: Props) {
             label="Insumo da Fábrica"
             value={selected}
             onChange={(event) => setSelected(event.target.value)}
-            required
           >
             <option value="">Selecione um insumo</option>
             {catalog.map((item) => (
               <option key={item.id} value={item.id}>
-                {item.name} ({item.measureUnit}) — disponível: {item.availableQuantity}
+                {item.name} ({item.measureUnit}) — saldo na Fábrica: {item.availableQuantity}
               </option>
             ))}
           </Select>
