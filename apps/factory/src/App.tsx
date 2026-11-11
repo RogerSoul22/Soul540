@@ -45,10 +45,11 @@ function PrivateRoute() {
   return authenticated ? <Outlet /> : <Navigate to={ROUTES.LOGIN} replace />;
 }
 
-function PermissionRoute({ routeKey }: { routeKey: string }) {
+function PermissionRoute({ routeKey }: { routeKey: string | string[] }) {
   const { user, loading } = useAuth();
   if (loading) return <AppLoading />;
-  if (user?.isAdmin || user?.permissions?.includes(routeKey)) return <Outlet />;
+  const routeKeys = Array.isArray(routeKey) ? routeKey : [routeKey];
+  if (user?.isAdmin || routeKeys.some((key) => user?.permissions?.includes(key))) return <Outlet />;
   return <Navigate to={ROUTES.USUARIO} replace />;
 }
 
@@ -83,12 +84,12 @@ export default function App() {
                       <Route element={<PermissionRoute routeKey="eventos" />}>
                         <Route path={ROUTES.EVENTOS} element={<Eventos />} />
                       </Route>
-                      <Route element={<PermissionRoute routeKey="estoque-insumos" />}>
+                      <Route element={<PermissionRoute routeKey={['estoque-insumos', 'pedidos-insumos']} />}>
                         <Route path={ROUTES.ESTOQUE_INSUMOS} element={<EstoqueInsumos />} />
                       </Route>
                       <Route
                         path={ROUTES.PEDIDOS_INSUMOS}
-                        element={<Navigate to={ROUTES.TAREFAS} replace />}
+                        element={<Navigate to={`${ROUTES.ESTOQUE_INSUMOS}?tab=pedidos`} replace />}
                       />
                       <Route element={<PermissionRoute routeKey="estoque-utensilios" />}>
                         <Route path={ROUTES.ESTOQUE_UTENSILIOS} element={<EstoqueUtensilios />} />

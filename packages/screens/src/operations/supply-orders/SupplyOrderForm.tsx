@@ -14,15 +14,29 @@ export default function SupplyOrderForm({ catalog, saving, onSubmit }: Props) {
   const [quantity, setQuantity] = useState('1');
   const [note, setNote] = useState('');
   const [items, setItems] = useState<CreateSupplyOrderInput['items']>([]);
+  const selectedSupply = catalog.find((item) => item.id === selected);
+  const selectedQuantity = Number(quantity);
+  const canIncludeSelected =
+    !!selectedSupply &&
+    selectedSupply.availableQuantity > 0 &&
+    Number.isFinite(selectedQuantity) &&
+    selectedQuantity > 0 &&
+    !items.some((item) => item.factorySupplyId === selected);
+  const orderItems: CreateSupplyOrderInput['items'] = canIncludeSelected
+    ? [...items, { factorySupplyId: selected, quantity: selectedQuantity }]
+    : items;
+
   async function submit(event: React.FormEvent) {
     event.preventDefault();
-    await onSubmit({ items, note: note.trim() || undefined });
+    await onSubmit({ items: orderItems, note: note.trim() || undefined });
     setItems([]);
+    setSelected('');
+    setQuantity('1');
     setNote('');
   }
   function addItem() {
-    if (!selected || Number(quantity) <= 0 || items.some((item) => item.factorySupplyId === selected)) return;
-    setItems([...items, { factorySupplyId: selected, quantity: Number(quantity) }]);
+    if (!canIncludeSelected || !selectedSupply) return;
+    setItems([...items, { factorySupplyId: selectedSupply.id, quantity: selectedQuantity }]);
     setSelected('');
     setQuantity('1');
   }
@@ -35,7 +49,9 @@ export default function SupplyOrderForm({ catalog, saving, onSubmit }: Props) {
             <h2>Novo pedido de insumos</h2>
             <p>Escolha os itens e as quantidades que sua unidade precisa.</p>
           </div>
-          <span className={styles.itemCount}>{items.length} {items.length === 1 ? 'item' : 'itens'}</span>
+          <span className={styles.itemCount}>
+            {orderItems.length} {orderItems.length === 1 ? 'item' : 'itens'}
+          </span>
         </div>
         <div className={styles.formGrid}>
           <Select
@@ -45,8 +61,9 @@ export default function SupplyOrderForm({ catalog, saving, onSubmit }: Props) {
           >
             <option value="">Selecione um insumo</option>
             {catalog.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name} ({item.measureUnit}) — saldo na Fábrica: {item.availableQuantity}
+              <option key={item.id} value={item.id} disabled={item.availableQuantity <= 0}>
+                {item.name} ({item.measureUnit}) —{' '}
+                {item.availableQuantity > 0 ? `saldo na Fábrica: ${item.availableQuantity}` : 'sem estoque'}
               </option>
             ))}
           </Select>
@@ -99,7 +116,7 @@ export default function SupplyOrderForm({ catalog, saving, onSubmit }: Props) {
         />
         <div className={styles.formFooter}>
           <span>Você poderá acompanhar o status do pedido nesta página.</span>
-          <Button type="submit" disabled={!items.length || saving} loading={saving}>
+          <Button type="submit" disabled={!orderItems.length || saving} loading={saving}>
             Enviar pedido
           </Button>
         </div>

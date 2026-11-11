@@ -3,7 +3,7 @@ import { getTenantUnit } from '../../infrastructure/middleware/tenant';
 import { supplyModels } from '../operations/supply-model';
 import { SupplyOrderError } from './supply-orders.errors';
 import { SupplyOrderModel } from './supply-orders.model';
-import { getSupplyOrderListFilter } from './supply-orders.scope';
+import { getFactorySupplyOrderFilter, getSupplyOrderListFilter } from './supply-orders.scope';
 
 export async function listSupplyOrders(req: any) {
   const scope = getFranchiseScope(req);
@@ -15,15 +15,12 @@ export async function getSupplyOrderCatalog(req: any) {
   if (!['main', 'franchise'].includes(getTenantUnit(req))) {
     throw new SupplyOrderError('Somente as unidades podem solicitar insumos.', 403);
   }
-  const supplies = await supplyModels.Factory.find({
-    deletedAt: { $exists: false },
-    status: { $ne: 'vencido' },
-  }).sort({ name: 1 });
+  const supplies = await supplyModels.Factory.find(getFactorySupplyOrderFilter()).sort({ name: 1 });
   return supplies.map((supply: any) => ({
     id: String(supply._id),
     name: supply.name,
     measureUnit: supply.measureUnit,
-    availableQuantity: supply.quantity,
+    availableQuantity: Number(supply.quantity) || 0,
   }));
 }
 
@@ -51,7 +48,7 @@ export function requireSupplyOrder(req: any, id: string, session?: any) {
 }
 
 export function requireFactorySupply(id: string, session?: any) {
-  const query = supplyModels.Factory.findOne({ _id: id, deletedAt: { $exists: false } });
+  const query = supplyModels.Factory.findOne(getFactorySupplyOrderFilter({ _id: id }));
   return session ? query.session(session) : query;
 }
 

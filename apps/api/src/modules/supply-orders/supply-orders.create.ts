@@ -4,23 +4,24 @@ import { FranchiseModel } from '../identity/franchise-policy';
 import { supplyModels } from '../operations/supply-model';
 import { logAudit } from '../../infrastructure/audit-log';
 import type { CreateSupplyOrderInput } from '@soul540/contracts';
-import { validateSupplyOrderItems } from '@soul540/domain';
+import { validateSupplyAvailability, validateSupplyOrderItems } from '@soul540/domain';
 import { SupplyOrderError } from './supply-orders.errors';
 import { SupplyOrderModel } from './supply-orders.model';
 import { assertFranchiseScope } from './supply-orders.read';
+import { getFactorySupplyOrderFilter } from './supply-orders.scope';
 
 export async function createSupplyOrder(req: any, input: CreateSupplyOrderInput) {
   const scope = assertFranchiseScope(req);
   const validation = validateSupplyOrderItems(input.items || []);
   if (validation) throw new SupplyOrderError(validation, 400);
-  const factorySupplies = await supplyModels.Factory.find({
-    _id: { $in: input.items.map((item) => item.factorySupplyId) },
-    deletedAt: { $exists: false },
-    status: { $ne: 'vencido' },
-  });
+  const factorySupplies = await supplyModels.Factory.find(
+    getFactorySupplyOrderFilter({ _id: { $in: input.items.map((item) => item.factorySupplyId) } }),
+  );
   if (factorySupplies.length !== input.items.length) {
     throw new SupplyOrderError('Um ou mais insumos não estão disponíveis no catálogo da Fábrica.', 422);
   }
+  const stockValidation = validateSupplyAvailability(factorySupplies);
+  if (stockValidation) throw new SupplyOrderError(stockValidation, 422);
   const franchiseName = await resolveRequestingUnit(scope);
   const supplyById = new Map(factorySupplies.map((supply: any) => [String(supply._id), supply]));
   const now = new Date().toISOString();

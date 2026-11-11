@@ -1,6 +1,27 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { canAccessSupplyOrder, canRunSupplyOrderCommand, getSupplyOrderListFilter } from './supply-orders.scope';
+import {
+  canAccessSupplyOrder,
+  canAccessSupplyOrders,
+  canRunSupplyOrderCommand,
+  getFactorySupplyOrderFilter,
+  getSupplyOrderListFilter,
+} from './supply-orders.scope';
+
+test('factory task permissions include supply orders while franchise permission remains scoped', () => {
+  assert.equal(canAccessSupplyOrders('factory', { permissions: ['tarefas'] }, 'read'), true);
+  assert.equal(canAccessSupplyOrders('factory', { permissions: ['tarefas'] }, 'write'), true);
+  assert.equal(canAccessSupplyOrders('franchise', { permissions: ['tarefas'] }, 'read'), false);
+  assert.equal(canAccessSupplyOrders('franchise', { permissions: ['pedidos-insumos'] }, 'read'), true);
+});
+
+test('factory supply order catalog includes positive stock regardless of status', () => {
+  assert.deepEqual(getFactorySupplyOrderFilter(), { deletedAt: { $exists: false } });
+  assert.deepEqual(getFactorySupplyOrderFilter({ _id: { $in: ['supply-1'] } }), {
+    _id: { $in: ['supply-1'] },
+    deletedAt: { $exists: false },
+  });
+});
 
 test('franchise queries are restricted to its unit and franchise ID', () => {
   assert.deepEqual(getSupplyOrderListFilter({ unit: 'franchise', franchiseId: 'franchise-1' }), {

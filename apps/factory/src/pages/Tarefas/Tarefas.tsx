@@ -1,5 +1,7 @@
 import { ROUTES } from '../../routes';
 import { Button, ConfirmModal, Modal, PageHeader, SkeletonContent } from '../../../../../packages/pentagono/src/index';
+import { useSupplyOrders } from '../../../../../packages/screens/src';
+import { apiFetch } from '../../lib/api';
 import styles from './styles/Tarefas.module.scss';
 import NewProductionOrderForm from './components/NewProductionOrderForm';
 import ProductionOrderFilters from './components/ProductionOrderFilters';
@@ -10,6 +12,7 @@ import { getOrderKey } from './support/task-formatters';
 
 export default function Tarefas() {
   const controller = useProductionOrdersController();
+  const supplyOrders = useSupplyOrders(apiFetch, 'factory');
   const {
     recipe,
     loading,
@@ -70,11 +73,25 @@ export default function Tarefas() {
         onModeChange={handleOrderSearchModeChange}
         onClear={handleClearOrderFilters}
       />
-      {loading ? (
+      {!!supplyOrders.error && (
+        <div role="alert">
+          {supplyOrders.error}{' '}
+          <Button variant="secondary" size="sm" onClick={() => void supplyOrders.refresh()}>
+            Tentar novamente
+          </Button>
+        </div>
+      )}
+      {loading || supplyOrders.loading ? (
         <SkeletonContent variant="cards" label="Carregando pedidos..." />
       ) : (
         <ProductionOrderKanban
           pedidosByStatus={pedidosByStatus}
+          supplyOrders={supplyOrders.orders}
+          supplyOrderSaving={supplyOrders.saving}
+          onSupplyPrepare={(id) => runSupplyOrder(() => supplyOrders.prepare(id))}
+          onSupplyDispatch={(id, items) => runSupplyOrder(() => supplyOrders.dispatch(id, { items }))}
+          onSupplyReceive={(id, items) => runSupplyOrder(() => supplyOrders.receive(id, { items }))}
+          onSupplyCancel={(id) => runSupplyOrder(() => supplyOrders.cancel(id))}
           draggedId={controller.draggedId}
           dragOverCol={controller.dragOverCol}
           setDraggedId={controller.setDraggedId}
@@ -128,4 +145,12 @@ export default function Tarefas() {
       )}
     </div>
   );
+}
+
+async function runSupplyOrder(action: () => Promise<unknown>) {
+  try {
+    await action();
+  } catch {
+    // The supply-orders hook exposes request failures in its error state.
+  }
 }

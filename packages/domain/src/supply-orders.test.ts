@@ -4,6 +4,7 @@ import {
   transitionSupplyOrder,
   validateDispatchQuantities,
   validateReceiptQuantities,
+  validateSupplyAvailability,
   validateSupplyOrderItems,
 } from './supply-orders';
 
@@ -64,4 +65,12 @@ test('requires a nonempty list of unique positive finite quantities', () => {
     'Informe uma quantidade válida.',
   );
   assert.equal(validateSupplyOrderItems([{ factorySupplyId: 'supply-1', quantity: 1.5 }]), null);
+});
+
+test('rejects supply orders when any factory supply has no stock', () => {
+  assert.equal(validateSupplyAvailability([{ quantity: 3 }, { quantity: 1 }]), null);
+  assert.equal(
+    validateSupplyAvailability([{ quantity: 3 }, { quantity: 0 }]),
+    'Não é possível pedir insumos sem estoque na Fábrica.',
+  );
 });

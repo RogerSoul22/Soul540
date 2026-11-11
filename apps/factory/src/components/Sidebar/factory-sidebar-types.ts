@@ -5,7 +5,8 @@ export type SidebarNavigationItem = {
   icon: ReactNode;
   label: string;
   path: string;
-  permKey: string;
+  permKey?: string;
+  permKeys?: string[];
 };
 
 export type SidebarNavigationGroup = {

@@ -33,6 +33,12 @@ export function validateSupplyOrderItems(items: SupplyOrderItemInput[]): string 
   return null;
 }
 
+export function validateSupplyAvailability(supplies: Array<{ quantity: number }>): string | null {
+  return supplies.some((supply) => !(supply.quantity > 0))
+    ? 'Não é possível pedir insumos sem estoque na Fábrica.'
+    : null;
+}
+
 export function validateDispatchQuantities(
   dispatch: Array<{ factorySupplyId: string; quantityToDispatch: number }>,
   requested: Array<{ factorySupplyId: string; quantityRequested: number }>,

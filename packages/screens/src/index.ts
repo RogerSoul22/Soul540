@@ -17,6 +17,8 @@ export { default as UnitLoginScreen } from './auth/UnitLoginScreen';
 export type { UnitLoginFeature, UnitLoginStyles } from './auth/UnitLoginScreen';
 export { default as AuditLogScreen } from './audit/AuditLogScreen';
 export { default as SupplyOrdersScreen } from './operations/supply-orders/SupplyOrdersScreen';
+export { default as SupplyOrderCard } from './operations/supply-orders/SupplyOrderCard';
+export { useSupplyOrders } from './operations/supply-orders/use-supply-orders';
 export { taskColumns, taskPriorityLabels, taskStatusLabels } from './tasks/kanban-vocabulary';
 export type { KanbanTaskPriority, KanbanTaskStatus } from './tasks/kanban-vocabulary';
 export { emptyContractForm, filterContracts, toContractForm } from './contracts/contract-form';

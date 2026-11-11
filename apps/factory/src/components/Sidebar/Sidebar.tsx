@@ -21,6 +21,15 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const { user, logout } = useAuth();
   const isAdmin = user?.isAdmin ?? false;
   const permissions = user?.permissions ?? [];
+  const canAccessItem = (item: (typeof factorySidebarGroups)[number]['items'][number]) => {
+    if (item.permKey === '__admin__') return isAdmin;
+    if (isAdmin) return true;
+    return (
+      item.permKey === 'dashboard' ||
+      (!!item.permKey && permissions.includes(item.permKey)) ||
+      !!item.permKeys?.some((permission) => permissions.includes(permission))
+    );
+  };
 
   const handleLogout = () => {
     logout();
@@ -30,11 +39,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   // Mesmos itens da barra lateral, para o menu do celular (barra fixa embaixo + "Mais").
   const mobileItems = factorySidebarGroups
     .flatMap((group) => group.items)
-    .filter((item) => {
-      if (item.permKey === '__admin__') return isAdmin;
-      if (isAdmin) return true;
-      return item.permKey === 'dashboard' || permissions.includes(item.permKey);
-    });
+    .filter(canAccessItem);
 
   return (
     <>
@@ -66,11 +71,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
         </div>
         <nav className={styles.nav}>
           {factorySidebarGroups.map((group) => {
-            const visibleItems = group.items.filter((item) => {
-              if (item.permKey === '__admin__') return isAdmin;
-              if (isAdmin) return true;
-              return item.permKey === 'dashboard' || permissions.includes(item.permKey);
-            });
+            const visibleItems = group.items.filter(canAccessItem);
             if (visibleItems.length === 0) return null;
             return (
               <div key={group.label} className={styles.navGroup}>

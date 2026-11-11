@@ -33,7 +33,7 @@ export const factoryOperationsGroups: SidebarNavigationGroup[] = [
     items: [
       {
         path: ROUTES.ESTOQUE_INSUMOS,
-        permKey: 'estoque-insumos',
+        permKeys: ['estoque-insumos', 'pedidos-insumos'],
         label: 'Est. Insumos',
         icon: (
           <svg

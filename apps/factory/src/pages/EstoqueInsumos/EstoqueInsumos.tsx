@@ -1,4 +1,6 @@
+import { useSearchParams } from 'react-router-dom';
 import { useSuppliesController } from './hooks/use-supplies-controller';
+import { SupplyOrdersScreen } from '../../../../../packages/screens/src';
 import {
   Button,
   Card,
@@ -9,15 +11,18 @@ import {
   PageHeader,
   SkeletonValue,
 } from '../../../../../packages/pentagono/src/index';
+import { useAuth } from '../../contexts/AuthContext';
+import { apiFetch } from '../../lib/api';
 import SupplyCatalog from './components/SupplyCatalog';
 import SupplyFormModal from './components/SupplyFormModal';
 import SupplyDetailsModal from './components/SupplyDetailsModal';
 import SupplyXmlModal from './components/SupplyXmlModal';
 import SupplyCategoryModal from './components/SupplyCategoryModal';
 import SupplyInfoModal from './components/SupplyInfoModal';
+import InsumosTabs from './components/InsumosTabs';
 import styles from './styles/EstoqueInsumos.module.scss';
 
-export default function EstoqueInsumos() {
+function StockInventoryTab() {
   const controller = useSuppliesController();
   const {
     loading,
@@ -108,5 +113,35 @@ export default function EstoqueInsumos() {
         />
       )}
     </div>
+  );
+}
+
+export default function EstoqueInsumos() {
+  const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const permissions = user?.permissions ?? [];
+  const canViewStock = user?.isAdmin || permissions.includes('estoque-insumos');
+  const canViewOrders = user?.isAdmin || permissions.includes('pedidos-insumos');
+  const ordersRequested = searchParams.get('tab') === 'pedidos';
+  const activeTab = ordersRequested && canViewOrders ? 'orders' : canViewStock ? 'stock' : 'orders';
+  const selectTab = (tab: 'stock' | 'orders') => {
+    setSearchParams(tab === 'orders' ? { tab: 'pedidos' } : {});
+  };
+
+  return (
+    <>
+      {canViewStock && canViewOrders && <InsumosTabs activeTab={activeTab} onChange={selectTab} />}
+      <div
+        id="insumos-panel"
+        role="tabpanel"
+        aria-labelledby={canViewStock && canViewOrders ? `insumos-${activeTab}-tab` : undefined}
+      >
+        {activeTab === 'orders' ? (
+          <SupplyOrdersScreen apiFetch={apiFetch} mode="factory" />
+        ) : (
+          <StockInventoryTab />
+        )}
+      </div>
+    </>
   );
 }

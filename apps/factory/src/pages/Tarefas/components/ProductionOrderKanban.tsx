@@ -1,11 +1,26 @@
-import { Button, EmptyState } from '../../../../../../packages/pentagono/src/index';
+import { EmptyState } from '../../../../../../packages/pentagono/src/index';
 import styles from '../styles/Tarefas.module.scss';
 import ProductionOrderCard from './ProductionOrderCard';
-import { ALL_STATUSES, formatQty, formatR$, getOrderKey } from '../support/task-formatters';
+import { ALL_STATUSES, getOrderKey } from '../support/task-formatters';
 import type { Pedido, PedidoStatus } from '../types/task-types';
+import { SupplyOrderCard } from '../../../../../../packages/screens/src';
+import type { SupplyOrderSummary } from '@soul540/contracts';
+import FinalizedOrders from './FinalizedOrders';
 
 type Props = {
   pedidosByStatus: Record<PedidoStatus, Pedido[]>;
+  supplyOrders: SupplyOrderSummary[];
+  supplyOrderSaving: boolean;
+  onSupplyPrepare: (id: string) => Promise<void>;
+  onSupplyDispatch: (
+    id: string,
+    items: Array<{ factorySupplyId: string; quantityToDispatch: number }>,
+  ) => Promise<void>;
+  onSupplyReceive: (
+    id: string,
+    items: Array<{ factorySupplyId: string; quantityReceived: number; franchiseSupplyId?: string }>,
+  ) => Promise<void>;
+  onSupplyCancel: (id: string) => Promise<void>;
   draggedId: string | null;
   dragOverCol: PedidoStatus | null;
   setDraggedId: (id: string | null) => void;
@@ -14,26 +29,14 @@ type Props = {
   onDelete: (id: string) => void;
 };
 
-function DeleteIcon() {
-  return (
-    <svg
-      width="12"
-      height="12"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
-  );
-}
-
 export default function ProductionOrderKanban({
   pedidosByStatus,
+  supplyOrders,
+  supplyOrderSaving,
+  onSupplyPrepare,
+  onSupplyDispatch,
+  onSupplyReceive,
+  onSupplyCancel,
   draggedId,
   dragOverCol,
   setDraggedId,
@@ -44,11 +47,16 @@ export default function ProductionOrderKanban({
   return (
     <>
       <div className={styles.kanban}>
-        {ALL_STATUSES.slice(0, 2).map((column) => (
+        {ALL_STATUSES.slice(0, 2).map((column) => {
+          const columnOrders = pedidosByStatus[column.id];
+          const columnSupplyOrders = supplyOrders.filter((order) =>
+            column.id === 'a_preparar' ? order.status === 'submitted' : order.status === 'preparing',
+          );
+          return (
           <div key={column.id} className={styles.column}>
             <div className={styles.columnHeader}>
               <span className={styles.columnTitle}>{column.label}</span>
-              <span className={styles.columnCount}>{pedidosByStatus[column.id].length}</span>
+              <span className={styles.columnCount}>{columnOrders.length + columnSupplyOrders.length}</span>
             </div>
             <div
               className={`${styles.columnBody} ${dragOverCol === column.id ? styles.columnBodyOver : ''}`}
@@ -67,7 +75,7 @@ export default function ProductionOrderKanban({
                 setDragOverCol(null);
               }}
             >
-              {!pedidosByStatus[column.id].length ? (
+              {!columnOrders.length && !columnSupplyOrders.length ? (
                 <EmptyState
                   variant="compact"
                   className={styles.colEmpty}
@@ -75,65 +83,47 @@ export default function ProductionOrderKanban({
                   description="Arraste um card para esta coluna."
                 />
               ) : (
-                pedidosByStatus[column.id].map((pedido) => (
-                  <ProductionOrderCard
-                    key={getOrderKey(pedido)}
-                    pedido={pedido}
-                    draggedId={draggedId}
-                    onDelete={onDelete}
-                    onMove={onMove}
-                    onDragStart={setDraggedId}
-                    onDragEnd={() => {
-                      setDraggedId(null);
-                      setDragOverCol(null);
-                    }}
-                  />
-                ))
+                <>
+                  {columnOrders.map((pedido) => (
+                    <ProductionOrderCard
+                      key={getOrderKey(pedido)}
+                      pedido={pedido}
+                      draggedId={draggedId}
+                      onDelete={onDelete}
+                      onMove={onMove}
+                      onDragStart={setDraggedId}
+                      onDragEnd={() => {
+                        setDraggedId(null);
+                        setDragOverCol(null);
+                      }}
+                    />
+                  ))}
+                  {!!columnSupplyOrders.length && (
+                    <div className={styles.supplyOrderGroup}>
+                      <h3>Solicitações de insumos</h3>
+                      {columnSupplyOrders.map((order) => (
+                        <SupplyOrderCard
+                          key={order.id}
+                          order={order}
+                          mode="factory"
+                          localSupplies={[]}
+                          saving={supplyOrderSaving}
+                          onPrepare={onSupplyPrepare}
+                          onDispatch={onSupplyDispatch}
+                          onReceive={onSupplyReceive}
+                          onCancel={onSupplyCancel}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
       <FinalizedOrders pedidos={pedidosByStatus.entregue} onDelete={onDelete} />
     </>
-  );
-}
-
-const summary = (pedido: Pedido) =>
-  pedido.itens.map((item) => `${item.nome} ${formatQty(item.quantidade)} ${item.measure}`).join(', ');
-
-function FinalizedOrders({ pedidos, onDelete }: { pedidos: Pedido[]; onDelete: (id: string) => void }) {
-  if (!pedidos.length) return null;
-  return (
-    <div className={styles.finalizedSection}>
-      <div className={styles.finalizedHeader}>
-        <span className={styles.blockTitle}>Pedidos Finalizados</span>
-        <span className={styles.columnCount}>{pedidos.length}</span>
-      </div>
-      <div className={styles.finalizedList}>
-        {pedidos.map((pedido) => (
-          <div key={getOrderKey(pedido)} className={styles.finalizedItem}>
-            <div className={styles.finalizedHead}>
-              {pedido.orderNumber !== undefined && <span className={styles.orderBadge}>#{pedido.orderNumber}</span>}
-              <span className={styles.finalizedFilial}>{pedido.filial}</span>
-              <span className={styles.finalizedCost}>R$ {formatR$(pedido.totalCost)}</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className={styles.finalizedDelete}
-                onClick={() => onDelete(getOrderKey(pedido))}
-                title="Excluir pedido"
-                aria-label={`Excluir pedido ${pedido.orderNumber ?? pedido.filial}`}
-              >
-                <DeleteIcon />
-              </Button>
-            </div>
-            <p className={styles.finalizedItens} title={summary(pedido)}>
-              {summary(pedido)}
-            </p>
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }
