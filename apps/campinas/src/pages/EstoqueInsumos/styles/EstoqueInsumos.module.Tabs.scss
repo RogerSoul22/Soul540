@@ -1,0 +1,40 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.tabBarWrapper {
+  padding: $spacing-2xl $spacing-xl 0;
+  @include mobile {
+    padding: $spacing-md $spacing-md 0;
+  }
+}
+
+.tabBar {
+  display: flex;
+  gap: $spacing-xs;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  padding: $spacing-sm $spacing-md;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  transition:
+    color $transition-fast,
+    border-color $transition-fast;
+
+  &:hover {
+    color: var(--text-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $accent;
+    outline-offset: -2px;
+  }
+}
+
+.tabActive {
+  border-bottom-color: $accent;
+  color: var(--text-primary);
+}

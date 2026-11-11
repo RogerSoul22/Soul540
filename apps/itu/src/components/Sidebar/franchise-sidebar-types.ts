@@ -6,6 +6,7 @@ export type SidebarNavigationItem = {
   label: string;
   path: string;
   permKey: string;
+  permKeys?: string[];
 };
 
 export type SidebarNavigationGroup = {

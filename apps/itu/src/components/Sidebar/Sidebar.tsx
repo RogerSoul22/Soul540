@@ -33,9 +33,9 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
     .filter((item) => {
       if (item.permKey === '__admin__') return isAdmin;
       if (isAdmin) return true;
-      return item.permKey === 'dashboard' || permissions.includes(item.permKey);
-    })
-    .map((item) => (item.path === ROUTES.PEDIDOS_INSUMOS ? { ...item, label: 'Pedidos' } : item));
+      const requiredPermissions = item.permKeys ?? [item.permKey];
+      return item.permKey === 'dashboard' || requiredPermissions.some((key) => permissions.includes(key));
+    });
 
   return (
     <>
@@ -70,7 +70,8 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
             const visibleItems = group.items.filter((item) => {
               if (item.permKey === '__admin__') return isAdmin;
               if (isAdmin) return true;
-              return item.permKey === 'dashboard' || permissions.includes(item.permKey);
+              const requiredPermissions = item.permKeys ?? [item.permKey];
+              return item.permKey === 'dashboard' || requiredPermissions.some((key) => permissions.includes(key));
             });
             if (visibleItems.length === 0) return null;
             return (
@@ -124,7 +125,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </aside>
       <MobileNav
         items={mobileItems}
-        primaryPaths={[ROUTES.DASHBOARD, ROUTES.EVENTOS, ROUTES.FINANCEIRO, ROUTES.PEDIDOS_INSUMOS]}
+        primaryPaths={[ROUTES.DASHBOARD, ROUTES.EVENTOS, ROUTES.FINANCEIRO, ROUTES.ESTOQUE_INSUMOS]}
         activePath={location.pathname}
         userName={user?.name}
         onSelect={(item) => navigate(item.path)}

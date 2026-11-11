@@ -34,7 +34,8 @@ export const franchiseOperationsGroups: SidebarNavigationGroup[] = [
       {
         path: ROUTES.ESTOQUE_INSUMOS,
         permKey: 'estoque-insumos',
-        label: 'Est. Insumos',
+        permKeys: ['estoque-insumos', 'pedidos-insumos'],
+        label: 'Insumos',
         icon: (
           <svg
             width="17"
@@ -54,17 +55,6 @@ export const franchiseOperationsGroups: SidebarNavigationGroup[] = [
             />
             <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
             <line x1="12" y1="22.08" x2="12" y2="12" />
-          </svg>
-        ),
-      },
-      {
-        path: ROUTES.PEDIDOS_INSUMOS,
-        permKey: 'pedidos-insumos',
-        label: 'Pedidos de insumos',
-        icon: (
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M4 4h16v16H4z" />
-            <path d="M8 8h8M8 12h8M8 16h5" />
           </svg>
         ),
       },

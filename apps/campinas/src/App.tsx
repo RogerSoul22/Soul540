@@ -16,7 +16,6 @@ const Funcionarios = lazy(() => import('./pages/Funcionarios/Funcionarios'));
 const Contratantes = lazy(() => import('./pages/Contratantes/Contratantes'));
 const Eventos = lazy(() => import('./pages/Eventos/Eventos'));
 const EstoqueInsumos = lazy(() => import('./pages/EstoqueInsumos/EstoqueInsumos'));
-const PedidosInsumos = lazy(() => import('./pages/PedidosInsumos/PedidosInsumos'));
 const EstoqueUtensilios = lazy(() => import('./pages/EstoqueUtensilios/EstoqueUtensilios'));
 const Financeiro = lazy(() => import('./pages/Financeiro/Financeiro'));
 const Tarefas = lazy(() => import('./pages/Tarefas/Tarefas'));
@@ -48,10 +47,11 @@ function PrivateRoute() {
   return authenticated ? <Outlet /> : <Navigate to={ROUTES.LOGIN} replace />;
 }
 
-function PermissionRoute({ routeKey }: { routeKey: string }) {
+function PermissionRoute({ routeKey }: { routeKey: string | string[] }) {
   const { isAdmin, permissions, loading } = useAuth();
   if (loading) return <AppLoading />;
-  if (isAdmin || permissions.includes(routeKey)) return <Outlet />;
+  const requiredKeys = Array.isArray(routeKey) ? routeKey : [routeKey];
+  if (isAdmin || requiredKeys.some((key) => permissions.includes(key))) return <Outlet />;
   return <Navigate to={ROUTES.DASHBOARD} replace />;
 }
 
@@ -102,11 +102,12 @@ export default function App() {
                         <Route element={<PermissionRoute routeKey="financeiro" />}>
                           <Route path={ROUTES.FINANCEIRO} element={<Financeiro />} />
                         </Route>
-                        <Route element={<PermissionRoute routeKey="estoque-insumos" />}>
+                        <Route element={<PermissionRoute routeKey={['estoque-insumos', 'pedidos-insumos']} />}>
                           <Route path={ROUTES.ESTOQUE_INSUMOS} element={<EstoqueInsumos />} />
-                        </Route>
-                        <Route element={<PermissionRoute routeKey="pedidos-insumos" />}>
-                          <Route path={ROUTES.PEDIDOS_INSUMOS} element={<PedidosInsumos />} />
+                          <Route
+                            path={ROUTES.PEDIDOS_INSUMOS}
+                            element={<Navigate to={`${ROUTES.ESTOQUE_INSUMOS}?tab=pedidos`} replace />}
+                          />
                         </Route>
                         <Route element={<PermissionRoute routeKey="estoque-utensilios" />}>
                           <Route path={ROUTES.ESTOQUE_UTENSILIOS} element={<EstoqueUtensilios />} />
