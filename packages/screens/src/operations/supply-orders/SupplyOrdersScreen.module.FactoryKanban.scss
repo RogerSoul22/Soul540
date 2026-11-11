@@ -1,0 +1,45 @@
+.kanbanOrderCard {
+  padding: 14px;
+  border-radius: 8px;
+}
+
+.kanbanOrderCard .orderHeader {
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 10px;
+}
+
+.kanbanOrderCard .orderTitle {
+  gap: 3px;
+}
+
+.kanbanOrderCard .orderTitle strong {
+  font-size: 14px;
+}
+
+.kanbanOrderCard .orderLines {
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.kanbanOrderCard .orderLine {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  padding: 9px 10px;
+  border-radius: 7px;
+}
+
+.kanbanOrderCard .quantitySummary {
+  gap: 8px;
+}
+
+.kanbanOrderCard .orderActions {
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.kanbanOrderCard .orderActions > button {
+  min-height: 36px;
+  padding: 7px 10px;
+  font-size: 12px;
+}

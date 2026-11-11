@@ -106,6 +106,7 @@ export default function ProductionOrderKanban({
                           key={order.id}
                           order={order}
                           mode="factory"
+                          appearance="kanban"
                           localSupplies={[]}
                           saving={supplyOrderSaving}
                           onPrepare={onSupplyPrepare}

@@ -10,6 +10,7 @@ import styles from './SupplyOrdersScreen.module.scss';
 type Props = {
   order: SupplyOrderSummary;
   mode: SupplyOrderMode;
+  appearance?: 'default' | 'kanban';
   localSupplies: FranchiseSupplyOption[];
   saving: boolean;
   onPrepare(id: string): Promise<void>;
@@ -21,7 +22,8 @@ type Props = {
   onCancel(id: string): Promise<void>;
 };
 export default function SupplyOrderCard(props: Props) {
-  const { order, mode, localSupplies, saving, onPrepare, onDispatch, onReceive, onCancel } = props;
+  const { order, mode, appearance = 'default', localSupplies, saving, onPrepare, onDispatch, onReceive, onCancel } =
+    props;
   const actions = getSupplyOrderActions(mode, order.status);
   const [quantities, setQuantities] = useState<Record<string, string>>(() =>
     Object.fromEntries(
@@ -41,7 +43,7 @@ export default function SupplyOrderCard(props: Props) {
           ? 'gray'
           : 'blue';
   return (
-    <Card className={styles.orderCard}>
+    <Card className={`${styles.orderCard} ${appearance === 'kanban' ? styles.kanbanOrderCard : ''}`}>
       <header className={styles.orderHeader}>
         <div className={styles.orderTitle}>
           <strong>{order.franchiseName}</strong>
