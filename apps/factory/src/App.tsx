@@ -15,6 +15,7 @@ const Funcionarios = lazy(() => import('./pages/Funcionarios/Funcionarios'));
 const Contratantes = lazy(() => import('./pages/Contratantes/Contratantes'));
 const Eventos = lazy(() => import('./pages/Eventos/Eventos'));
 const EstoqueInsumos = lazy(() => import('./pages/EstoqueInsumos/EstoqueInsumos'));
+const PedidosInsumos = lazy(() => import('./pages/PedidosInsumos/PedidosInsumos'));
 const EstoqueUtensilios = lazy(() => import('./pages/EstoqueUtensilios/EstoqueUtensilios'));
 const Permissoes = lazy(() => import('./pages/Permissoes/Permissoes'));
 const Financeiro = lazy(() => import('./pages/Financeiro/Financeiro'));
@@ -85,6 +86,9 @@ export default function App() {
                       </Route>
                       <Route element={<PermissionRoute routeKey="estoque-insumos" />}>
                         <Route path={ROUTES.ESTOQUE_INSUMOS} element={<EstoqueInsumos />} />
+                      </Route>
+                      <Route element={<PermissionRoute routeKey="pedidos-insumos" />}>
+                        <Route path={ROUTES.PEDIDOS_INSUMOS} element={<PedidosInsumos />} />
                       </Route>
                       <Route element={<PermissionRoute routeKey="estoque-utensilios" />}>
                         <Route path={ROUTES.ESTOQUE_UTENSILIOS} element={<EstoqueUtensilios />} />

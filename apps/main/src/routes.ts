@@ -14,6 +14,7 @@ export const ROUTES = {
   FRANQUIAS: '/franquias',
   CARDAPIOS: '/cardapios',
   ESTOQUE_INSUMOS: '/estoque-insumos',
+  PEDIDOS_INSUMOS: '/pedidos-insumos',
   ESTOQUE_UTENSILIOS: '/estoque-utensilios',
   CHAT: '/chat',
   PERMISSOES: '/permissoes',

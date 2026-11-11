@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@soul540/api-client": "file:../api-client",
+    "@soul540/contracts": "workspace:*",
     "@soul540/ui": "file:../ui",
     "html2pdf.js": "^0.14.0"
   },

@@ -6,6 +6,7 @@ export { default as contractorCategoryRoutes } from './contractor-categories.rou
 export { default as dashboardRoutes } from './dashboard.routes';
 export { default as utensilRoutes } from './utensils.routes';
 export { default as supplyRoutes } from './supplies.routes';
+export { default as supplyOrderRoutes } from '../supply-orders/supply-orders.routes';
 export { default as utensilCategoryRoutes } from './utensil-categories.routes';
 export { default as supplyCategoryRoutes } from './supply-categories.routes';
 export { default as contractRoutes } from './contracts.routes';

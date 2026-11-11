@@ -21,6 +21,7 @@ async function seed() {
     'franquias',
     'cardapios',
     'estoque-insumos',
+    'pedidos-insumos',
     'estoque-utensilios',
     'chat',
     'usuario',

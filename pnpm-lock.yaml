@@ -243,6 +243,9 @@ importers:
       '@soul540/api-client':
         specifier: file:../api-client
         version: link:../api-client
+      '@soul540/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@soul540/ui':
         specifier: file:../ui
         version: link:../ui

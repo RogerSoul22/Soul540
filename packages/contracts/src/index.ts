@@ -4,3 +4,4 @@ export * from './invoices';
 export * from './pagination';
 export * from './tasks';
 export * from './users';
+export * from './supply-orders';

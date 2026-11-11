@@ -16,6 +16,7 @@ export { default as ChecklistDeliveryScreen } from './checklists/ChecklistDelive
 export { default as UnitLoginScreen } from './auth/UnitLoginScreen';
 export type { UnitLoginFeature, UnitLoginStyles } from './auth/UnitLoginScreen';
 export { default as AuditLogScreen } from './audit/AuditLogScreen';
+export { default as SupplyOrdersScreen } from './operations/supply-orders/SupplyOrdersScreen';
 export { taskColumns, taskPriorityLabels, taskStatusLabels } from './tasks/kanban-vocabulary';
 export type { KanbanTaskPriority, KanbanTaskStatus } from './tasks/kanban-vocabulary';
 export { emptyContractForm, filterContracts, toContractForm } from './contracts/contract-form';

@@ -20,6 +20,7 @@ import {
   menuRoutes,
   supplyCategoryRoutes,
   supplyRoutes,
+  supplyOrderRoutes,
   taskHistoryRoutes,
   taskRoutes,
   utensilCategoryRoutes,
@@ -81,6 +82,7 @@ app.use('/api/finance-categories', financeCategoryRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/utensils', utensilRoutes);
 app.use('/api/supplies', supplyRoutes);
+app.use('/api/supply-orders', supplyOrderRoutes);
 app.use('/api/utensil-categories', utensilCategoryRoutes);
 app.use('/api/supply-categories', supplyCategoryRoutes);
 app.use('/api/users', userRoutes);

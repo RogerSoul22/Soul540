@@ -46,6 +46,7 @@ export const ALL_PAGES = [
     items: [
       { key: 'cardapios', label: 'Cardápios' },
       { key: 'estoque-insumos', label: 'Est. Insumos' },
+      { key: 'pedidos-insumos', label: 'Pedidos de insumos' },
       { key: 'estoque-utensilios', label: 'Est. Utensílios' },
     ],
   },

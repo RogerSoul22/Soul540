@@ -292,6 +292,17 @@ O sistema possui cadastros de insumos e utensílios com quantidade, unidade, cus
 
 **Status:** pendente. O código atual é predominantemente cadastro, sem livro de movimentos completo.
 
+### Pedidos de abastecimento entre unidades e Fábrica
+
+- Matriz e franquias podem solicitar itens ativos do estoque da Fábrica; a unidade e a franquia solicitante são determinadas pela sessão autenticada.
+- A Fábrica ajusta quantidades na separação. No despacho, o estoque da Fábrica é baixado em transação e não pode ficar negativo.
+- A unidade solicitante confirma a quantidade recebida. Só essa quantidade entra no estoque local; o pedido conserva quantidades solicitadas, despachadas, recebidas e seu histórico.
+- Diferença entre despacho e recebimento fica marcada no pedido. A confirmação não pode ser repetida para movimentar estoque novamente.
+- No primeiro recebimento, a unidade pode vincular um item local de mesmo nome e unidade ou deixar o sistema criar o item local vinculado. Não há associação automática por nome.
+- Pedidos podem ser cancelados antes do despacho. Depois do despacho, seguem para confirmação de recebimento e não geram lançamentos financeiros.
+
+Essas regras cobrem o fluxo de pedidos e não substituem um livro geral de movimentos para entradas e ajustes manuais de estoque.
+
 ## 12. Contratantes, contratos e cardápios
 
 ### Contratantes

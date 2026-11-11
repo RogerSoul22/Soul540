@@ -5,6 +5,7 @@ export const ROUTES = {
   CONTRATANTES: '/contratantes',
   EVENTOS: '/eventos',
   ESTOQUE_INSUMOS: '/estoque-insumos',
+  PEDIDOS_INSUMOS: '/pedidos-insumos',
   ESTOQUE_UTENSILIOS: '/estoque-utensilios',
   CARDAPIOS: '/cardapios',
   CONTRATOS: '/contratos',

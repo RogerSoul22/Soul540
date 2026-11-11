@@ -6,3 +6,4 @@ export * from './text-ordering';
 export * from './nfe-emission-date';
 export * from './event-whatsapp';
 export * from './event-modalities';
+export * from './supply-orders';

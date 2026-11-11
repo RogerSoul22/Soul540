@@ -33,6 +33,7 @@ const config: PermissionDirectoryConfig = {
       group: 'Operações',
       items: [
         { key: 'estoque-insumos', label: 'Est. Insumos' },
+        { key: 'pedidos-insumos', label: 'Pedidos de insumos' },
         { key: 'estoque-utensilios', label: 'Est. Utensílios' },
       ],
     },

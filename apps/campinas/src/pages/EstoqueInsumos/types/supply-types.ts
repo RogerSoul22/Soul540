@@ -12,6 +12,7 @@ export type Supply = {
   expirationDate?: string;
   status: SupplyStatus;
   createdAt?: string;
+  factorySupplyId?: string;
 };
 
 export type SupplyForm = {

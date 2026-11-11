@@ -58,6 +58,17 @@ export const factoryOperationsGroups: SidebarNavigationGroup[] = [
         ),
       },
       {
+        path: ROUTES.PEDIDOS_INSUMOS,
+        permKey: 'pedidos-insumos',
+        label: 'Pedidos de insumos',
+        icon: (
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M4 4h16v16H4z" />
+            <path d="M8 8h8M8 12h8M8 16h5" />
+          </svg>
+        ),
+      },
+      {
         path: ROUTES.ESTOQUE_UTENSILIOS,
         permKey: 'estoque-utensilios',
         label: 'Est. Utensílios',
