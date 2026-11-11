@@ -6,6 +6,7 @@ import styles from './SupplyOrdersScreen.module.scss';
 type Props = {
   order: SupplyOrderSummary;
   actions: SupplyOrderViewAction[];
+  appearance?: 'default' | 'kanban';
   quantities: Record<string, string>;
   links: Record<string, string>;
   saving: boolean;
@@ -18,9 +19,20 @@ type Props = {
   onCancel(id: string): Promise<void>;
 };
 export default function SupplyOrderActions(props: Props) {
-  const { order, actions, quantities, links, saving, onPrepare, onDispatch, onReceive, onCancel } = props;
+  const {
+    order,
+    actions,
+    appearance = 'default',
+    quantities,
+    links,
+    saving,
+    onPrepare,
+    onDispatch,
+    onReceive,
+    onCancel,
+  } = props;
   return (
-    <footer className={styles.orderActions}>
+    <footer className={`${styles.orderActions} ${appearance === 'kanban' ? styles.kanbanOrderActions : ''}`}>
       {actions.includes('cancel') && (
         <Button variant="secondary" disabled={saving} onClick={() => void onCancel(order.id)}>
           Cancelar pedido

@@ -55,8 +55,10 @@ export default function SupplyOrderCard(props: Props) {
           : 'blue';
   const content = (
     <>
-      <header className={styles.orderHeader}>
-        <div className={styles.orderTitle}>
+      <header
+        className={`${styles.orderHeader} ${appearance === 'kanban' ? styles.kanbanOrderHeader : ''}`}
+      >
+        <div className={`${styles.orderTitle} ${appearance === 'kanban' ? styles.kanbanOrderTitle : ''}`}>
           <strong>{order.franchiseName}</strong>
           <time dateTime={order.createdAt}>
             Pedido em {new Date(order.createdAt).toLocaleString('pt-BR', { dateStyle: 'medium', timeStyle: 'short' })}
@@ -64,11 +66,12 @@ export default function SupplyOrderCard(props: Props) {
         </div>
         <Badge variant={badge}>{getSupplyOrderStatusLabel(order.status)}</Badge>
       </header>
-      <div className={styles.orderLines}>
+      <div className={`${styles.orderLines} ${appearance === 'kanban' ? styles.kanbanOrderLines : ''}`}>
         {order.items.map((item) => (
           <SupplyOrderLine
             key={item.factorySupplyId}
             item={item}
+            appearance={appearance}
             actions={actions}
             localSupplies={localSupplies}
             quantity={quantities[item.factorySupplyId] ?? ''}
@@ -102,6 +105,7 @@ export default function SupplyOrderCard(props: Props) {
         <SupplyOrderActions
           order={order}
           actions={actions}
+          appearance={appearance}
           quantities={quantities}
           links={links}
           saving={saving}

@@ -7,6 +7,7 @@ import styles from './SupplyOrdersScreen.module.scss';
 type Props = {
   item: Line;
   actions: SupplyOrderViewAction[];
+  appearance?: 'default' | 'kanban';
   localSupplies: FranchiseSupplyOption[];
   quantity: string;
   linkedSupplyId: string;
@@ -16,6 +17,7 @@ type Props = {
 export default function SupplyOrderLine({
   item,
   actions,
+  appearance = 'default',
   localSupplies,
   quantity,
   linkedSupplyId,
@@ -29,7 +31,7 @@ export default function SupplyOrderLine({
       (!supply.factorySupplyId || supply.factorySupplyId === item.factorySupplyId),
   );
   return (
-    <div className={styles.orderLine}>
+    <div className={`${styles.orderLine} ${appearance === 'kanban' ? styles.kanbanOrderLine : ''}`}>
       <div className={styles.supplyName}>
         <strong>{item.factorySupplyName}</strong>
         <span>{item.measureUnit}</span>

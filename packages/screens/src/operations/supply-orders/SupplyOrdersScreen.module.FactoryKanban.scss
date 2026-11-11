@@ -1,24 +1,24 @@
-.kanbanOrderCard .orderHeader {
+.kanbanOrderHeader {
   align-items: flex-start;
   gap: 16px;
   padding-bottom: 12px;
   border-bottom: 0;
 }
 
-.kanbanOrderCard .orderTitle {
+.kanbanOrderTitle {
   gap: 5px;
 }
 
-.kanbanOrderCard .orderTitle strong {
+.kanbanOrderTitle strong {
   font-size: 15px;
 }
 
-.kanbanOrderCard .orderLines {
+.kanbanOrderLines {
   gap: 4px;
   margin: 0;
 }
 
-.kanbanOrderCard .orderLine {
+.kanbanOrderLine {
   grid-template-columns: minmax(0, 1fr) auto minmax(90px, 0.65fr);
   gap: 10px;
   padding: 8px 0;
@@ -27,38 +27,38 @@
   background: transparent;
 }
 
-.kanbanOrderCard .supplyName {
+.kanbanOrderLine .supplyName {
   min-width: 0;
   gap: 5px;
 }
 
-.kanbanOrderCard .supplyName strong {
+.kanbanOrderLine .supplyName strong {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.kanbanOrderCard .quantitySummary {
+.kanbanOrderLine .quantitySummary {
   gap: 6px;
 }
 
-.kanbanOrderCard .orderLineInputs {
+.kanbanOrderLine .orderLineInputs {
   min-width: 0;
 }
 
-.kanbanOrderCard .quantityInput {
+.kanbanOrderLine .quantityInput {
   min-height: 34px;
   padding: 6px 8px;
 }
 
-.kanbanOrderCard .orderActions {
+.kanbanOrderActions {
   gap: 6px;
   margin-top: 8px;
   padding-top: 8px;
   border-top: 1px solid var(--border);
 }
 
-.kanbanOrderCard .orderActions > button {
+.kanbanOrderActions > button {
   min-height: 36px;
   padding: 7px 10px;
   font-size: 12px;
