@@ -119,11 +119,7 @@ export default function SupplyOrderCard(props: Props) {
   );
   if (appearance !== 'kanban') return <Card className={styles.orderCard}>{content}</Card>;
   if (kanbanCardClassName) {
-    return <div className={`${styles.kanbanOrderCard} ${kanbanCardClassName}`}>{content}</div>;
+    return <div className={kanbanCardClassName}>{content}</div>;
   }
-  return (
-    <Card className={styles.orderCard}>
-      <div className={styles.kanbanOrderCard}>{content}</div>
-    </Card>
-  );
+  return <Card className={styles.orderCard}>{content}</Card>;
 }
