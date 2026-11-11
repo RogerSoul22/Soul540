@@ -29,6 +29,8 @@
 
 :root,
 html[data-theme='dark'] {
+  font-size: 17px;
+
   --bg-primary: #0a0f1e;
 
   --bg-secondary: #111827;
@@ -94,6 +96,5 @@ body {
 
   -webkit-font-smoothing: antialiased;
 }
-
 
 

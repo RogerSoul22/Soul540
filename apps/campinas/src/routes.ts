@@ -9,7 +9,6 @@ export const ROUTES = {
   ESTOQUE_UTENSILIOS: '/estoque-utensilios',
   CARDAPIOS: '/cardapios',
   CONTRATOS: '/contratos',
-  PERMISSOES: '/permissoes',
   FINANCEIRO: '/financeiro',
   TAREFAS: '/tarefas',
   CHECKLIST_ENVIO: '/checklist-envio',

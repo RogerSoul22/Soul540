@@ -5,13 +5,22 @@ import { resourceLabels } from './audit-types';
 type Props = {
   styles: AuditLogStyles;
   unitLabels: Record<string, string>;
+  showUnitFilter: boolean;
   resource: string;
   unit: string;
   onResourceChange: (value: string) => void;
   onUnitChange: (value: string) => void;
 };
 
-export default function AuditLogFilters({ styles, unitLabels, resource, unit, onResourceChange, onUnitChange }: Props) {
+export default function AuditLogFilters({
+  styles,
+  unitLabels,
+  showUnitFilter,
+  resource,
+  unit,
+  onResourceChange,
+  onUnitChange,
+}: Props) {
   return (
     <div className={styles.filters}>
       <Select className={styles.select} value={resource} onChange={(event) => onResourceChange(event.target.value)}>
@@ -22,7 +31,7 @@ export default function AuditLogFilters({ styles, unitLabels, resource, unit, on
           </option>
         ))}
       </Select>
-      {Object.keys(unitLabels).length > 1 && (
+      {showUnitFilter && Object.keys(unitLabels).length > 1 && (
         <Select className={styles.select} value={unit} onChange={(event) => onUnitChange(event.target.value)}>
           <option value="">Todos os sistemas</option>
           {Object.entries(unitLabels).map(([key, label]) => (

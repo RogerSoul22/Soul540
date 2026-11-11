@@ -22,3 +22,16 @@ test('global administrator on the factory portal only sees factory records, igno
     userUnit: 'factory',
   });
 });
+
+test('franchise administrator is restricted to their audit records and cannot request another system', () => {
+  const franchiseId = '507f1f77bcf86cd799439011';
+  const req = {
+    user: { isAdmin: true, unit: 'main' },
+    headers: { 'x-system': 'franchise', 'x-franchise-id': franchiseId },
+  };
+  assert.deepEqual(getAuditLogFilter(req, { resource: 'events', userUnit: 'main', franchiseId: 'other' }), {
+    resource: 'events',
+    userUnit: 'franchise',
+    franchiseId,
+  });
+});

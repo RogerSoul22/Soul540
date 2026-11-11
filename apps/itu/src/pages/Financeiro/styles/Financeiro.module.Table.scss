@@ -5,7 +5,7 @@
 .tabActive {
   background: $accent;
 
-  color: $bg-primary;
+  color: #fff;
 
   font-weight: $font-weight-semibold;
 
@@ -14,7 +14,7 @@
   &:hover {
     background: $accent-hover;
 
-    color: $bg-primary;
+    color: #fff;
   }
 }
 

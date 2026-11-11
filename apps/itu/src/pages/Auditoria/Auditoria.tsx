@@ -11,10 +11,10 @@ export default function Auditoria() {
       apiFetch={apiFetch}
       csvPrefix={`auditoria-${slug}`}
       styles={styles}
+      showUnitFilter={false}
+      showSystemColumn={false}
       unitLabels={{
-        main: 'Principal',
         franchise: franchiseTitle(slug),
-        factory: 'Fábrica',
       }}
     />
   );

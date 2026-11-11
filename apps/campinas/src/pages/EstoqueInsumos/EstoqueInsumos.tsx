@@ -60,13 +60,16 @@ export default function EstoqueInsumos() {
             {controller.supplies.length}
           </SkeletonValue>
         </Card>
-        <div className={styles.kpiCard + ' ' + (lowStockCount ? styles.red : styles.green)}>
+        <Card
+          className={`${styles.kpiCard} ${lowStockCount ? styles.red : styles.green}`}
+          variant="stat"
+        >
           <span className={styles.kpiLabel}>Atenção</span>
           <SkeletonValue as="strong" loading={loading} label="Carregando alertas..." className={styles.kpiValue}>
             {lowStockCount}
           </SkeletonValue>
           <small>{lowStockCount ? 'abaixo do mínimo' : 'tudo em ordem'}</small>
-        </div>
+        </Card>
         <Card className={styles.kpiCard} variant="stat">
           <span className={styles.kpiLabel}>Valor em estoque</span>
           <SkeletonValue as="strong" loading={loading} label="Carregando valor..." className={styles.kpiValue}>

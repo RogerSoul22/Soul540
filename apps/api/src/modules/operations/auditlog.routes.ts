@@ -2,13 +2,20 @@ import { Router } from 'express';
 import { AuditLog } from '../../infrastructure/audit-log';
 import { getFranchiseFilter } from '../../infrastructure/franchise-scope';
 import { requireAdmin } from '../../infrastructure/middleware/auth';
-import { getFranchiseScope } from '../../infrastructure/franchise-context';
+import { getFranchiseScope, requireFranchiseId } from '../../infrastructure/franchise-context';
 
 const router = Router();
 router.use(requireAdmin);
 
 export function getAuditLogFilter(req: any, filter: Record<string, unknown>) {
   const scopedFilter = getFranchiseFilter(req, filter);
+  if (getFranchiseScope(req).unit === 'franchise') {
+    return {
+      ...scopedFilter,
+      userUnit: 'franchise',
+      franchiseId: requireFranchiseId(req),
+    };
+  }
   // O portal da fábrica só enxerga registros da fábrica, mesmo para o administrador global.
   if (getFranchiseScope(req).unit === 'factory') {
     return { ...scopedFilter, userUnit: 'factory' };

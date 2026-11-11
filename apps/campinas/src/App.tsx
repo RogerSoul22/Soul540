@@ -18,7 +18,6 @@ const Eventos = lazy(() => import('./pages/Eventos/Eventos'));
 const EstoqueInsumos = lazy(() => import('./pages/EstoqueInsumos/EstoqueInsumos'));
 const PedidosInsumos = lazy(() => import('./pages/PedidosInsumos/PedidosInsumos'));
 const EstoqueUtensilios = lazy(() => import('./pages/EstoqueUtensilios/EstoqueUtensilios'));
-const Permissoes = lazy(() => import('./pages/Permissoes/Permissoes'));
 const Financeiro = lazy(() => import('./pages/Financeiro/Financeiro'));
 const Tarefas = lazy(() => import('./pages/Tarefas/Tarefas'));
 const ChecklistEnvio = lazy(() => import('./pages/ChecklistEnvio/ChecklistEnvio'));
@@ -115,8 +114,8 @@ export default function App() {
                         <Route element={<PermissionRoute routeKey="usuario" />}>
                           <Route path={ROUTES.USUARIO} element={<MinhaConta />} />
                         </Route>
+                        <Route path="/permissoes" element={<Navigate to={ROUTES.DASHBOARD} replace />} />
                         <Route element={<PermissionRoute routeKey="__admin__" />}>
-                          <Route path={ROUTES.PERMISSOES} element={<Permissoes />} />
                           <Route path={ROUTES.AUDITORIA} element={<Auditoria />} />
                         </Route>
                       </Route>

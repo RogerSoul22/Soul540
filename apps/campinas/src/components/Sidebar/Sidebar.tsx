@@ -34,7 +34,8 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       if (item.permKey === '__admin__') return isAdmin;
       if (isAdmin) return true;
       return item.permKey === 'dashboard' || permissions.includes(item.permKey);
-    });
+    })
+    .map((item) => (item.path === ROUTES.PEDIDOS_INSUMOS ? { ...item, label: 'Pedidos' } : item));
 
   return (
     <>
@@ -123,7 +124,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </aside>
       <MobileNav
         items={mobileItems}
-        primaryPaths={[ROUTES.DASHBOARD, ROUTES.EVENTOS, ROUTES.FINANCEIRO]}
+        primaryPaths={[ROUTES.DASHBOARD, ROUTES.EVENTOS, ROUTES.FINANCEIRO, ROUTES.PEDIDOS_INSUMOS]}
         activePath={location.pathname}
         userName={user?.name}
         onSelect={(item) => navigate(item.path)}

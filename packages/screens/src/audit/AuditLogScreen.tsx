@@ -11,8 +11,17 @@ interface AuditLogScreenProps {
   csvPrefix: string;
   styles: AuditLogStyles;
   unitLabels: Record<string, string>;
+  showUnitFilter?: boolean;
+  showSystemColumn?: boolean;
 }
-export default function AuditLogScreen({ apiFetch, csvPrefix, styles, unitLabels }: AuditLogScreenProps) {
+export default function AuditLogScreen({
+  apiFetch,
+  csvPrefix,
+  styles,
+  unitLabels,
+  showUnitFilter = true,
+  showSystemColumn = true,
+}: AuditLogScreenProps) {
   const [items, setItems] = useState<AuditEntry[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -40,12 +49,19 @@ export default function AuditLogScreen({ apiFetch, csvPrefix, styles, unitLabels
   function exportCsv() {
     const escape = (value: string) => `"${value.replace(/"/g, '""')}"`;
     const rows = [
-      ['Data/Hora', 'Usuário', 'Sistema', 'Ação', 'Recurso', 'Descrição'].map(escape).join(';'),
+      [
+        'Data/Hora',
+        'Usuário',
+        ...(showSystemColumn ? ['Sistema'] : []),
+        'Ação',
+        'Recurso',
+        'Descrição',
+      ].map(escape).join(';'),
       ...items.map((entry) =>
         [
           formatDate(entry.timestamp),
           entry.userName,
-          unitLabels[entry.userUnit] || entry.userUnit,
+          ...(showSystemColumn ? [unitLabels[entry.userUnit] || entry.userUnit] : []),
           actionLabels[entry.action],
           resourceLabels[entry.resource] || entry.resource,
           entry.description,
@@ -86,6 +102,7 @@ export default function AuditLogScreen({ apiFetch, csvPrefix, styles, unitLabels
       <AuditLogFilters
         styles={styles}
         unitLabels={unitLabels}
+        showUnitFilter={showUnitFilter}
         resource={resource}
         unit={unit}
         onResourceChange={(value) => {
@@ -97,7 +114,14 @@ export default function AuditLogScreen({ apiFetch, csvPrefix, styles, unitLabels
           setPage(1);
         }}
       />
-      <AuditLogTable items={items} loading={loading} styles={styles} unitLabels={unitLabels} formatDate={formatDate} />
+      <AuditLogTable
+        items={items}
+        loading={loading}
+        styles={styles}
+        unitLabels={unitLabels}
+        formatDate={formatDate}
+        showSystemColumn={showSystemColumn}
+      />
       {totalPages > 1 && (
         <div className={styles.pagination}>
           <Button

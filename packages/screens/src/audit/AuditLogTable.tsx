@@ -17,9 +17,17 @@ type Props = {
   styles: AuditLogStyles;
   unitLabels: Record<string, string>;
   formatDate: (value: string) => string;
+  showSystemColumn: boolean;
 };
 
-export default function AuditLogTable({ items, loading, styles, unitLabels, formatDate }: Props) {
+export default function AuditLogTable({
+  items,
+  loading,
+  styles,
+  unitLabels,
+  formatDate,
+  showSystemColumn,
+}: Props) {
   return (
     <div className={styles.tableWrap}>
       {loading ? (
@@ -32,7 +40,7 @@ export default function AuditLogTable({ items, loading, styles, unitLabels, form
             <TableRow>
               <TableHeadCell>Data/Hora</TableHeadCell>
               <TableHeadCell>Usuário</TableHeadCell>
-              <TableHeadCell>Sistema</TableHeadCell>
+              {showSystemColumn && <TableHeadCell>Sistema</TableHeadCell>}
               <TableHeadCell>Ação</TableHeadCell>
               <TableHeadCell>Recurso</TableHeadCell>
               <TableHeadCell>Descrição</TableHeadCell>
@@ -43,7 +51,7 @@ export default function AuditLogTable({ items, loading, styles, unitLabels, form
               <TableRow key={entry.id}>
                 <TableCell className={styles.mono}>{formatDate(entry.timestamp)}</TableCell>
                 <TableCell>{entry.userName}</TableCell>
-                <TableCell>{unitLabels[entry.userUnit] || entry.userUnit}</TableCell>
+                {showSystemColumn && <TableCell>{unitLabels[entry.userUnit] || entry.userUnit}</TableCell>}
                 <TableCell>
                   <span
                     className={styles.badge}
