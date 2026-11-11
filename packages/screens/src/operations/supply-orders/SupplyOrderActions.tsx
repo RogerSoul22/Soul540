@@ -7,6 +7,7 @@ type Props = {
   order: SupplyOrderSummary;
   actions: SupplyOrderViewAction[];
   appearance?: 'default' | 'kanban';
+  className?: string;
   quantities: Record<string, string>;
   links: Record<string, string>;
   saving: boolean;
@@ -23,6 +24,7 @@ export default function SupplyOrderActions(props: Props) {
     order,
     actions,
     appearance = 'default',
+    className,
     quantities,
     links,
     saving,
@@ -32,7 +34,11 @@ export default function SupplyOrderActions(props: Props) {
     onCancel,
   } = props;
   return (
-    <footer className={`${styles.orderActions} ${appearance === 'kanban' ? styles.kanbanOrderActions : ''}`}>
+    <footer
+      className={
+        className ?? `${styles.orderActions} ${appearance === 'kanban' ? styles.kanbanOrderActions : ''}`
+      }
+    >
       {actions.includes('cancel') && (
         <Button variant="secondary" disabled={saving} onClick={() => void onCancel(order.id)}>
           Cancelar pedido

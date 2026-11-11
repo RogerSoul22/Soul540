@@ -113,6 +113,16 @@ export default function ProductionOrderKanban({
                       order={order}
                       mode="factory"
                       appearance="kanban"
+                      kanbanClasses={{
+                        taskTop: styles.taskTop,
+                        taskTitle: styles.taskTitle,
+                        taskMeta: styles.taskMeta,
+                        taskDesc: styles.taskDesc,
+                        taskRecipe: styles.taskRecipe,
+                        taskRecipeTitle: styles.taskRecipeTitle,
+                        taskRecipeList: styles.taskRecipeList,
+                        taskMoveRow: styles.taskMoveRow,
+                      }}
                       kanbanCardClassName={`${styles.taskCard} ${
                         draggedId === `${SUPPLY_ORDER_DRAG_PREFIX}${order.id}` ? styles.taskCardDragging : ''
                       }`}

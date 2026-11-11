@@ -5,6 +5,7 @@ import { getSupplyOrderActions, getSupplyOrderStatusLabel, type SupplyOrderMode 
 import type { FranchiseSupplyOption } from './use-supply-orders';
 import SupplyOrderLine from './SupplyOrderLine';
 import SupplyOrderActions from './SupplyOrderActions';
+import SupplyOrderKanbanContent, { type SupplyOrderKanbanClasses } from './SupplyOrderKanbanContent';
 import styles from './SupplyOrdersScreen.module.scss';
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
   mode: SupplyOrderMode;
   appearance?: 'default' | 'kanban';
   kanbanCardClassName?: string;
+  kanbanClasses?: SupplyOrderKanbanClasses;
   draggable?: boolean;
   onDragStart?(event: DragEvent<HTMLDivElement>): void;
   onDragEnd?(): void;
@@ -31,6 +33,7 @@ export default function SupplyOrderCard(props: Props) {
     mode,
     appearance = 'default',
     kanbanCardClassName,
+    kanbanClasses,
     draggable = false,
     onDragStart,
     onDragEnd,
@@ -132,9 +135,25 @@ export default function SupplyOrderCard(props: Props) {
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
       >
-        {content}
+        {kanbanClasses ? (
+          <SupplyOrderKanbanContent
+            order={order}
+            actions={actions}
+            classes={kanbanClasses}
+            quantities={quantities}
+            links={links}
+            saving={saving}
+            onQuantity={(id, value) => setQuantities((current) => ({ ...current, [id]: value }))}
+            onPrepare={onPrepare}
+            onDispatch={onDispatch}
+            onReceive={onReceive}
+            onCancel={onCancel}
+          />
+        ) : (
+          content
+        )}
       </div>
     );
   }
-  return <Card className={styles.orderCard}>{content}</Card>;
+  return <Card className={styles.orderCard}>{kanbanClasses ? kanbanContent : content}</Card>;
 }

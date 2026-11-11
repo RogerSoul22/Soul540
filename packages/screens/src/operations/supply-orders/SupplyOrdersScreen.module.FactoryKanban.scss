@@ -63,3 +63,21 @@
   padding: 7px 10px;
   font-size: 12px;
 }
+
+.kanbanOrderItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.kanbanOrderItem .quantityInput {
+  width: 84px;
+  min-height: 28px;
+  padding: 4px 6px;
+}
+
+.kanbanOrderNote {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
