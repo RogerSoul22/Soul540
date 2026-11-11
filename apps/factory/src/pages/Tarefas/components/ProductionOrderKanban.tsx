@@ -121,6 +121,7 @@ export default function ProductionOrderKanban({
                         taskRecipe: styles.taskRecipe,
                         taskRecipeTitle: styles.taskRecipeTitle,
                         taskRecipeList: styles.taskRecipeList,
+                        taskRecipeFooter: styles.taskRecipeFooter,
                         taskMoveRow: styles.taskMoveRow,
                       }}
                       kanbanCardClassName={`${styles.taskCard} ${

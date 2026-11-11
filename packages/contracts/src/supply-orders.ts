@@ -10,6 +10,7 @@ export type SupplyOrderLine = {
   factorySupplyId: string;
   factorySupplyName: string;
   measureUnit: string;
+  costPerUnit: number;
   quantityRequested: number;
   quantityToDispatch: number;
   quantityReceived?: number;

@@ -5,6 +5,7 @@ const SupplyOrderItemSchema = new Schema(
     factorySupplyId: { type: String, required: true },
     factorySupplyName: { type: String, required: true },
     measureUnit: { type: String, required: true },
+    costPerUnit: { type: Number, min: 0, default: undefined },
     quantityRequested: { type: Number, required: true, min: 0 },
     quantityToDispatch: { type: Number, default: 0, min: 0 },
     quantityReceived: { type: Number, min: 0 },

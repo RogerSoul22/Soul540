@@ -8,7 +8,31 @@ import { getFactorySupplyOrderFilter, getSupplyOrderListFilter } from './supply-
 export async function listSupplyOrders(req: any) {
   const scope = getFranchiseScope(req);
   const filter = getSupplyOrderListFilter(scope);
-  return SupplyOrderModel.find(filter).sort({ createdAt: -1 });
+  const orders = await SupplyOrderModel.find(filter).sort({ createdAt: -1 });
+  const legacySupplyIds = [
+    ...new Set(
+      orders.flatMap((order: any) =>
+        order.items.filter((item: any) => item.costPerUnit == null).map((item: any) => item.factorySupplyId),
+      ),
+    ),
+  ];
+  const legacyCosts = legacySupplyIds.length
+    ? await supplyModels.Factory.find(getFactorySupplyOrderFilter({ _id: { $in: legacySupplyIds } })).select(
+        '_id costPerUnit',
+      )
+    : [];
+  const costBySupplyId = new Map(
+    legacyCosts.map((supply: any) => [String(supply._id), Number(supply.costPerUnit) || 0]),
+  );
+
+  return orders.map((order: any) => {
+    const result = order.toObject();
+    result.items = result.items.map((item: any) => ({
+      ...item,
+      costPerUnit: item.costPerUnit ?? costBySupplyId.get(item.factorySupplyId) ?? 0,
+    }));
+    return result;
+  });
 }
 
 export async function getSupplyOrderCatalog(req: any) {

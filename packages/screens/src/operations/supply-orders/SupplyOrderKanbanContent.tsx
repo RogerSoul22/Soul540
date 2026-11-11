@@ -12,6 +12,7 @@ export type SupplyOrderKanbanClasses = {
   taskRecipe: string;
   taskRecipeTitle: string;
   taskRecipeList: string;
+  taskRecipeFooter: string;
   taskMoveRow: string;
 };
 
@@ -45,6 +46,9 @@ export default function SupplyOrderKanbanContent({
   onReceive,
   onCancel,
 }: Props) {
+  const estimatedCost = order.items.reduce((total, item) => total + item.quantityRequested * item.costPerUnit, 0);
+  const formattedCost = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(estimatedCost);
+
   return (
     <>
       <div className={classes.taskTop}>
@@ -87,6 +91,7 @@ export default function SupplyOrderKanbanContent({
             </div>
           ))}
         </div>
+        <div className={classes.taskRecipeFooter}>Custo estimado: {formattedCost}</div>
         {order.note && <div className={styles.kanbanOrderNote}>{order.note}</div>}
         {order.history?.length > 1 && (
           <details className={styles.history}>

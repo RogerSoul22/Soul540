@@ -38,6 +38,7 @@ export async function createSupplyOrder(req: any, input: CreateSupplyOrderInput)
           factorySupplyId: item.factorySupplyId,
           factorySupplyName: supply.name,
           measureUnit: supply.measureUnit,
+          costPerUnit: Number(supply.costPerUnit) || 0,
           quantityRequested: item.quantity,
           quantityToDispatch: 0,
         };
