@@ -27,6 +27,7 @@ export default function Dashboard() {
         greeting={controller.greeting}
         urgentTaskCount={controller.urgentTaskCount}
         onInfo={() => setShowInfo(true)}
+        onNewEvent={() => navigate('/eventos?action=new')}
       />
       <div className={styles.calendarSection}>
         <div className={styles.calendarHeader}>
