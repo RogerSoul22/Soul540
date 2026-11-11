@@ -10,6 +10,7 @@ import {
 
 test('allows only the supply order lifecycle transitions', () => {
   assert.equal(transitionSupplyOrder('submitted', 'start_preparing'), 'preparing');
+  assert.equal(transitionSupplyOrder('preparing', 'return_to_submitted'), 'submitted');
   assert.equal(transitionSupplyOrder('preparing', 'dispatch'), 'dispatched');
   assert.equal(transitionSupplyOrder('dispatched', 'confirm_receipt'), 'received');
   assert.equal(transitionSupplyOrder('submitted', 'cancel'), 'cancelled');
@@ -38,6 +39,7 @@ test('receipt cannot exceed dispatched quantity and allows zero received', () =>
 
 test('rejects transitions from an incompatible state', () => {
   assert.equal(transitionSupplyOrder('submitted', 'dispatch'), null);
+  assert.equal(transitionSupplyOrder('dispatched', 'return_to_submitted'), null);
   assert.equal(transitionSupplyOrder('dispatched', 'cancel'), null);
   assert.equal(transitionSupplyOrder('received', 'confirm_receipt'), null);
   assert.equal(transitionSupplyOrder('cancelled', 'start_preparing'), null);

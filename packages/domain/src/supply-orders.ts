@@ -1,10 +1,16 @@
 import type { SupplyOrderStatus } from '@soul540/contracts';
 
-export type SupplyOrderCommand = 'start_preparing' | 'dispatch' | 'confirm_receipt' | 'cancel';
+export type SupplyOrderCommand =
+  | 'start_preparing'
+  | 'return_to_submitted'
+  | 'dispatch'
+  | 'confirm_receipt'
+  | 'cancel';
 export type SupplyOrderItemInput = { factorySupplyId: string; quantity: number };
 
 const transitions: Record<SupplyOrderCommand, Partial<Record<SupplyOrderStatus, SupplyOrderStatus>>> = {
   start_preparing: { submitted: 'preparing' },
+  return_to_submitted: { preparing: 'submitted' },
   dispatch: { preparing: 'dispatched' },
   confirm_receipt: { dispatched: 'received' },
   cancel: { submitted: 'cancelled', preparing: 'cancelled' },

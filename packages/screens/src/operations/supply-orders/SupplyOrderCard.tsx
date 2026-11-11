@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type DragEvent } from 'react';
 import type { SupplyOrderSummary } from '@soul540/contracts';
 import { Badge, Card } from '../../../../pentagono/src';
 import { getSupplyOrderActions, getSupplyOrderStatusLabel, type SupplyOrderMode } from './supply-order-view';
@@ -12,6 +12,9 @@ type Props = {
   mode: SupplyOrderMode;
   appearance?: 'default' | 'kanban';
   kanbanCardClassName?: string;
+  draggable?: boolean;
+  onDragStart?(event: DragEvent<HTMLDivElement>): void;
+  onDragEnd?(): void;
   localSupplies: FranchiseSupplyOption[];
   saving: boolean;
   onPrepare(id: string): Promise<void>;
@@ -28,6 +31,9 @@ export default function SupplyOrderCard(props: Props) {
     mode,
     appearance = 'default',
     kanbanCardClassName,
+    draggable = false,
+    onDragStart,
+    onDragEnd,
     localSupplies,
     saving,
     onPrepare,
@@ -119,7 +125,16 @@ export default function SupplyOrderCard(props: Props) {
   );
   if (appearance !== 'kanban') return <Card className={styles.orderCard}>{content}</Card>;
   if (kanbanCardClassName) {
-    return <div className={kanbanCardClassName}>{content}</div>;
+    return (
+      <div
+        className={kanbanCardClassName}
+        draggable={draggable}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+      >
+        {content}
+      </div>
+    );
   }
   return <Card className={styles.orderCard}>{content}</Card>;
 }

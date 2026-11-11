@@ -3,7 +3,12 @@ import { hasPermission, type PermissionMode } from '../../infrastructure/middlew
 
 export type SupplyOrderScope = { unit: 'main' | 'franchise' | 'factory'; franchiseId?: string };
 export type SupplyOrderOwner = { unit: 'main' | 'franchise'; franchiseId?: string };
-export type SupplyOrderAction = 'start_preparing' | 'dispatch' | 'confirm_receipt' | 'cancel';
+export type SupplyOrderAction =
+  | 'start_preparing'
+  | 'return_to_submitted'
+  | 'dispatch'
+  | 'confirm_receipt'
+  | 'cancel';
 
 export function canAccessSupplyOrders(
   unit: string,
@@ -40,7 +45,8 @@ export function canRunSupplyOrderCommand(
   order: SupplyOrderOwner & { status: SupplyOrderStatus },
   command: SupplyOrderAction,
 ): boolean {
-  if (command === 'start_preparing' || command === 'dispatch') return scope.unit === 'factory';
+  if (command === 'start_preparing' || command === 'return_to_submitted' || command === 'dispatch')
+    return scope.unit === 'factory';
   if (command === 'confirm_receipt') return scope.unit !== 'factory' && canAccessSupplyOrder(scope, order);
   if (command === 'cancel')
     return order.status === 'submitted' || order.status === 'preparing'

@@ -89,6 +89,14 @@ export default function Tarefas() {
           supplyOrders={supplyOrders.orders}
           supplyOrderSaving={supplyOrders.saving}
           onSupplyPrepare={(id) => runSupplyOrder(() => supplyOrders.prepare(id))}
+          onSupplyMove={(id, status) => {
+            const order = supplyOrders.orders.find((candidate) => candidate.id === id);
+            const targetStatus = status === 'a_preparar' ? 'submitted' : 'preparing';
+            if (!order || order.status === targetStatus) return;
+            void runSupplyOrder(() =>
+              targetStatus === 'submitted' ? supplyOrders.returnToSubmitted(id) : supplyOrders.prepare(id),
+            );
+          }}
           onSupplyDispatch={(id, items) => runSupplyOrder(() => supplyOrders.dispatch(id, { items }))}
           onSupplyReceive={(id, items) => runSupplyOrder(() => supplyOrders.receive(id, { items }))}
           onSupplyCancel={(id) => runSupplyOrder(() => supplyOrders.cancel(id))}

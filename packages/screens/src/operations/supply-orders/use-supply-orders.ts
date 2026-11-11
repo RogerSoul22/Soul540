@@ -100,6 +100,7 @@ export function useSupplyOrders(apiFetch: ApiFetch, mode: 'franchise' | 'factory
     refresh,
     create: (input: CreateSupplyOrderInput) => mutate('/api/supply-orders', 'POST', input),
     prepare: (id: string) => mutate(`/api/supply-orders/${id}/preparing`, 'POST', {}),
+    returnToSubmitted: (id: string) => mutate(`/api/supply-orders/${id}/submitted`, 'POST', {}),
     dispatch: (id: string, input: DispatchSupplyOrderInput) =>
       mutate(`/api/supply-orders/${id}/dispatch`, 'POST', input),
     receive: (id: string, input: ConfirmSupplyOrderReceiptInput) =>

@@ -17,6 +17,15 @@ export async function startSupplyOrderPreparation(req: any, id: string) {
   return updateStatus(req, order, nextStatus, 'start_preparing');
 }
 
+export async function returnSupplyOrderToSubmitted(req: any, id: string) {
+  if (getTenantUnit(req) !== 'factory') throw new SupplyOrderError('Somente a Fábrica pode alterar esta etapa.', 403);
+  const order = await requireSupplyOrder(req, id);
+  if (!order) throw new SupplyOrderError('Pedido de insumos não encontrado.', 404);
+  const nextStatus = transitionSupplyOrder(order.status, 'return_to_submitted');
+  if (!nextStatus) throw new SupplyOrderError('Este pedido não pode voltar para a etapa anterior.', 409);
+  return updateStatus(req, order, nextStatus, 'return_to_submitted');
+}
+
 export async function cancelSupplyOrder(req: any, id: string, note?: string) {
   const order = await requireSupplyOrder(req, id);
   if (!order) throw new SupplyOrderError('Pedido de insumos não encontrado.', 404);

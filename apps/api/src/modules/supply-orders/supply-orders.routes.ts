@@ -11,7 +11,11 @@ import {
   listSupplyOrders,
   requireSupplyOrder,
 } from './supply-orders.read';
-import { cancelSupplyOrder, startSupplyOrderPreparation } from './supply-orders.transitions';
+import {
+  cancelSupplyOrder,
+  returnSupplyOrderToSubmitted,
+  startSupplyOrderPreparation,
+} from './supply-orders.transitions';
 import { canAccessSupplyOrders } from './supply-orders.scope';
 
 const router = Router();
@@ -51,6 +55,14 @@ router.post(
   handle(async (req, res) => {
     assertOrderId(req.params.id);
     res.json(await startSupplyOrderPreparation(req, req.params.id));
+  }),
+);
+router.post(
+  '/:id/submitted',
+  requireSupplyOrderPermission('write'),
+  handle(async (req, res) => {
+    assertOrderId(req.params.id);
+    res.json(await returnSupplyOrderToSubmitted(req, req.params.id));
   }),
 );
 router.post(

@@ -7,11 +7,14 @@ import { SupplyOrderCard } from '../../../../../../packages/screens/src';
 import type { SupplyOrderSummary } from '@soul540/contracts';
 import FinalizedOrders from './FinalizedOrders';
 
+const SUPPLY_ORDER_DRAG_PREFIX = 'supply-order:';
+
 type Props = {
   pedidosByStatus: Record<PedidoStatus, Pedido[]>;
   supplyOrders: SupplyOrderSummary[];
   supplyOrderSaving: boolean;
   onSupplyPrepare: (id: string) => Promise<void>;
+  onSupplyMove: (id: string, status: PedidoStatus) => void;
   onSupplyDispatch: (
     id: string,
     items: Array<{ factorySupplyId: string; quantityToDispatch: number }>,
@@ -34,6 +37,7 @@ export default function ProductionOrderKanban({
   supplyOrders,
   supplyOrderSaving,
   onSupplyPrepare,
+  onSupplyMove,
   onSupplyDispatch,
   onSupplyReceive,
   onSupplyCancel,
@@ -70,7 +74,12 @@ export default function ProductionOrderKanban({
               }}
               onDrop={(event) => {
                 event.preventDefault();
-                if (draggedId) onMove(draggedId, column.id);
+                const transferId = event.dataTransfer.getData('text/plain');
+                const supplyOrderId = (transferId || draggedId || '').startsWith(SUPPLY_ORDER_DRAG_PREFIX)
+                  ? (transferId || draggedId || '').slice(SUPPLY_ORDER_DRAG_PREFIX.length)
+                  : '';
+                if (supplyOrderId) onSupplyMove(supplyOrderId, column.id);
+                else if (draggedId) onMove(draggedId, column.id);
                 setDraggedId(null);
                 setDragOverCol(null);
               }}
@@ -104,7 +113,20 @@ export default function ProductionOrderKanban({
                       order={order}
                       mode="factory"
                       appearance="kanban"
-                      kanbanCardClassName={styles.taskCard}
+                      kanbanCardClassName={`${styles.taskCard} ${
+                        draggedId === `${SUPPLY_ORDER_DRAG_PREFIX}${order.id}` ? styles.taskCardDragging : ''
+                      }`}
+                      draggable
+                      onDragStart={(event) => {
+                        const dragId = `${SUPPLY_ORDER_DRAG_PREFIX}${order.id}`;
+                        event.dataTransfer.effectAllowed = 'move';
+                        event.dataTransfer.setData('text/plain', dragId);
+                        setDraggedId(dragId);
+                      }}
+                      onDragEnd={() => {
+                        setDraggedId(null);
+                        setDragOverCol(null);
+                      }}
                       localSupplies={[]}
                       saving={supplyOrderSaving}
                       onPrepare={onSupplyPrepare}
