@@ -1,6 +1,36 @@
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
+.form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $spacing-md;
+  padding: $spacing-lg;
+}
+
+.formRow {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $spacing-md;
+}
+
+.formRow:last-of-type {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form > .label:last-child {
+  grid-column: 1 / -1;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: 0 $spacing-lg $spacing-lg;
+}
+
 .modalBody {
   padding: $spacing-xl;
   display: flex;
@@ -16,14 +46,40 @@
 
 .viewGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: $spacing-md;
+  padding: $spacing-lg;
+
   @include mobile {
     grid-template-columns: 1fr;
+    padding: $spacing-md;
+  }
+}
+
+.viewItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  gap: 6px;
+  padding: $spacing-md;
+  background: $bg-primary;
+  border: 1px solid $border;
+  border-radius: $radius-sm;
+
+  > span:last-child {
+    display: block;
+    max-width: 100%;
+    color: $text-primary;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
   }
 }
 
 .viewLabel {
+  display: block;
   font-size: 13px;
   font-weight: $font-weight-semibold;
   color: $text-muted;
@@ -32,8 +88,13 @@
 }
 
 .viewValue {
-  font-size: $font-size-sm;
+  display: block;
+  max-width: 100%;
   color: $text-primary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .formGrid2 {
@@ -61,6 +122,10 @@
 }
 
 .label {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 6px;
   font-size: $font-size-xs;
   font-weight: $font-weight-medium;
   color: $text-secondary;
@@ -69,6 +134,8 @@
 }
 
 .input {
+  width: 100%;
+  min-width: 0;
   background: $bg-input;
   border: 1px solid $border;
   border-radius: $radius-sm;
@@ -83,6 +150,26 @@
   &:focus {
     outline: none;
     border-color: $border-accent;
+  }
+}
+
+@include mobile {
+  .form {
+    grid-template-columns: 1fr;
+    padding: $spacing-md;
+  }
+
+  .formRow,
+  .formRow:last-of-type {
+    grid-template-columns: 1fr;
+  }
+
+  .form > .label:last-child {
+    grid-column: auto;
+  }
+
+  .formActions {
+    padding: 0 $spacing-md $spacing-md;
   }
 }
 

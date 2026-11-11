@@ -10,39 +10,39 @@ export default function SupplyDetailsModal({ controller }: { controller: Supplie
   return (
     <Modal title={viewingItem.name} onClose={() => setViewingItem(null)} closeOnOverlay maxWidth={520} flush>
       <div className={styles.viewGrid}>
-        <div>
+        <div className={styles.viewItem}>
           <span className={styles.viewLabel}>Status</span>
           <Badge variant={status.color}>{status.label}</Badge>
         </div>
-        <div>
+        <div className={styles.viewItem}>
           <span className={styles.viewLabel}>Categoria</span>
           <span className={styles.viewValue}>{viewingItem.category || '—'}</span>
         </div>
-        <div>
+        <div className={styles.viewItem}>
           <span className={styles.viewLabel}>Quantidade</span>
           <span className={styles.viewValue}>
             {viewingItem.quantity} {viewingItem.measureUnit}
           </span>
         </div>
-        <div>
+        <div className={styles.viewItem}>
           <span className={styles.viewLabel}>Mínimo</span>
           <span className={styles.viewValue}>
             {viewingItem.minStock} {viewingItem.measureUnit}
           </span>
         </div>
-        <div>
+        <div className={styles.viewItem}>
           <span className={styles.viewLabel}>Custo unitário</span>
           <span className={styles.viewValue}>R$ {viewingItem.costPerUnit.toFixed(2)}</span>
         </div>
-        <div>
+        <div className={styles.viewItem}>
           <span className={styles.viewLabel}>Valor total</span>
           <span className={styles.viewValue}>R$ {(viewingItem.quantity * viewingItem.costPerUnit).toFixed(2)}</span>
         </div>
-        <div>
+        <div className={styles.viewItem}>
           <span className={styles.viewLabel}>Fornecedor</span>
           <span className={styles.viewValue}>{viewingItem.supplier || '—'}</span>
         </div>
-        <div>
+        <div className={styles.viewItem}>
           <span className={styles.viewLabel}>Validade</span>
           <span className={styles.viewValue}>
             {viewingItem.expirationDate ? new Date(viewingItem.expirationDate).toLocaleDateString('pt-BR') : '—'}
