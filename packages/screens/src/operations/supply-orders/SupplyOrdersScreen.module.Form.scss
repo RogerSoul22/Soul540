@@ -1,0 +1,188 @@
+.formCard {
+  padding: clamp(18px, 2.4vw, 28px);
+}
+
+.form {
+  display: grid;
+  gap: 20px;
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.formHeader h2 {
+  margin: 4px 0;
+  color: var(--text-primary);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.formHeader p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.itemCount {
+  flex: 0 0 auto;
+  padding: 6px 11px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(130px, 0.8fr) auto;
+  align-items: end;
+  gap: 12px;
+}
+
+.addButton {
+  min-height: 42px;
+  margin-bottom: 1px;
+}
+
+.itemList {
+  display: grid;
+  gap: 8px;
+  margin: -4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.itemRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+}
+
+.itemName {
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.itemQuantity {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.removeButton {
+  color: var(--text-secondary);
+}
+
+.noteField {
+  min-height: 84px;
+  resize: vertical;
+}
+
+.formFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.formFooter > span {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.formFooter button {
+  min-width: 180px;
+}
+
+.ordersHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 4px 0;
+}
+
+.ordersHeading h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 17px;
+}
+
+.ordersHeading > span {
+  flex: 0 0 auto;
+  padding: 6px 11px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 20px 16px;
+  }
+
+  .formGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(110px, 0.6fr);
+  }
+
+  .addButton {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    gap: 16px;
+    padding: 18px 12px;
+  }
+
+  .formCard {
+    padding: 16px;
+  }
+
+  .formHeader,
+  .formFooter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .addButton {
+    grid-column: auto;
+  }
+
+  .formFooter button {
+    width: 100%;
+  }
+
+  .itemRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .removeButton {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}

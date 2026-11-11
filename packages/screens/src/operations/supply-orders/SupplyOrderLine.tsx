@@ -2,6 +2,7 @@ import { Select } from '../../../../pentagono/src';
 import type { SupplyOrderLine as Line } from '@soul540/contracts';
 import type { FranchiseSupplyOption } from './use-supply-orders';
 import type { SupplyOrderViewAction } from './supply-order-view';
+import styles from './SupplyOrdersScreen.module.scss';
 
 type Props = {
   item: Line;
@@ -28,18 +29,20 @@ export default function SupplyOrderLine({
       (!supply.factorySupplyId || supply.factorySupplyId === item.factorySupplyId),
   );
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 8, alignItems: 'center' }}>
-      <span>
-        {item.factorySupplyName} ({item.measureUnit})
-      </span>
-      <span>
-        Solicitado: {item.quantityRequested}
-        {item.quantityToDispatch > 0 && ` · Enviado: ${item.quantityToDispatch}`}
-        {item.quantityReceived !== undefined && ` · Recebido: ${item.quantityReceived}`}
-      </span>
+    <div className={styles.orderLine}>
+      <div className={styles.supplyName}>
+        <strong>{item.factorySupplyName}</strong>
+        <span>{item.measureUnit}</span>
+      </div>
+      <div className={styles.quantitySummary}>
+        <span>Solicitado <strong>{item.quantityRequested}</strong></span>
+        {item.quantityToDispatch > 0 && <span>Enviado <strong>{item.quantityToDispatch}</strong></span>}
+        {item.quantityReceived !== undefined && <span>Recebido <strong>{item.quantityReceived}</strong></span>}
+      </div>
       {(actions.includes('dispatch') || actions.includes('confirm_receipt')) && (
-        <div style={{ display: 'grid', gap: 6 }}>
+        <div className={styles.orderLineInputs}>
           <input
+            className={styles.quantityInput}
             aria-label={`Quantidade: ${item.factorySupplyName}`}
             type="number"
             min="0"
@@ -51,6 +54,7 @@ export default function SupplyOrderLine({
           {actions.includes('confirm_receipt') && (
             <Select
               aria-label={`Estoque local: ${item.factorySupplyName}`}
+              className={styles.stockSelect}
               value={linkedSupplyId}
               onChange={(event) => onLink(event.target.value)}
             >

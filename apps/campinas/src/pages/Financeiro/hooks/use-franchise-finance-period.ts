@@ -15,7 +15,10 @@ function normalizeSearchText(value: string) {
   return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase();
 }
 
-type Props = Pick<FranchiseFinanceState, 'events' | 'finances' | 'financePeriod' | 'filterType' | 'search'> & {
+type Props = Pick<
+  FranchiseFinanceState,
+  'activeTab' | 'events' | 'finances' | 'financePeriod' | 'filterType' | 'search'
+> & {
   modalityFilter: FinanceModalityFilter;
   categoryLabels: Record<string, string>;
   categoryColors: Record<string, string>;
@@ -24,6 +27,7 @@ type Props = Pick<FranchiseFinanceState, 'events' | 'finances' | 'financePeriod'
 export function useFranchiseFinancePeriod({
   events,
   finances,
+  activeTab,
   financePeriod,
   filterType,
   modalityFilter,
@@ -31,21 +35,22 @@ export function useFranchiseFinancePeriod({
   categoryLabels,
   categoryColors,
 }: Props) {
+  const effectiveModalityFilter = activeTab === 'eventos-avulsos' ? 'evento_avulso' : modalityFilter;
   const periodFinances = useMemo(
     () =>
-      filterFinanceByModality(finances, modalityFilter).filter((finance) =>
+      filterFinanceByModality(finances, effectiveModalityFilter).filter((finance) =>
         matchesFinancePeriod(finance.date, financePeriod),
       ),
-    [finances, financePeriod, modalityFilter],
+    [effectiveModalityFilter, finances, financePeriod],
   );
   const periodEvents = useMemo(
     () =>
       events.filter(
         (event) =>
-          (modalityFilter === 'all' || normalizeEventModality(event.modality) === modalityFilter) &&
+          (effectiveModalityFilter === 'all' || normalizeEventModality(event.modality) === effectiveModalityFilter) &&
           matchesFinancePeriod(event.date, financePeriod),
       ),
-    [events, financePeriod, modalityFilter],
+    [effectiveModalityFilter, events, financePeriod],
   );
   const totalRevenue = useMemo(
     () =>

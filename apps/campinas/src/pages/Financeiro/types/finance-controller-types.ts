@@ -7,7 +7,7 @@ import type { FinanceModalityFilter } from '../support/finance-modalities';
 
 export type FinanceType = 'revenue' | 'cost';
 export type FinanceStatus = 'pending' | 'paid';
-export type TabType = 'geral' | 'despesas' | 'mensal' | 'lancamentos' | 'valores';
+export type TabType = 'geral' | 'despesas' | 'mensal' | 'lancamentos' | 'eventos-avulsos' | 'valores';
 export type FilterType = 'all' | 'revenue' | 'cost' | 'pending';
 export type CostFilter = 'all' | 'fixed' | 'variable';
 export type { FinanceModalityFilter };

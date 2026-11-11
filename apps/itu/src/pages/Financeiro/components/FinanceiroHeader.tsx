@@ -5,7 +5,7 @@ type Props = { controller: Controller };
 import { Button, InfoButton, Input, PageHeader } from '../../../../../../packages/pentagono/src/index';
 import FinancePeriodFilter from '../../../../../../shared/finance/components/FinancePeriodFilter';
 import styles from '../styles/Financeiro.module.scss';
-type TabType = 'geral' | 'despesas' | 'mensal' | 'lancamentos' | 'valores';
+type TabType = 'geral' | 'despesas' | 'mensal' | 'lancamentos' | 'eventos-avulsos' | 'valores';
 
 export default function FinanceiroHeader({ controller }: Props) {
   const {
@@ -77,6 +77,7 @@ export default function FinanceiroHeader({ controller }: Props) {
             ['despesas', 'Painel Despesas'],
             ['mensal', 'Painel do Período'],
             ['lancamentos', 'Lançamentos'],
+            ['eventos-avulsos', 'Eventos Avulsos'],
             ['valores', 'Financeiro dos Eventos'],
           ] as [TabType, string][]
         ).map(([key, label]) => (

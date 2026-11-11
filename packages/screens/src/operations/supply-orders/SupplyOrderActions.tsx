@@ -1,6 +1,7 @@
 import { Button } from '../../../../pentagono/src';
 import type { SupplyOrderSummary } from '@soul540/contracts';
 import type { SupplyOrderViewAction } from './supply-order-view';
+import styles from './SupplyOrdersScreen.module.scss';
 
 type Props = {
   order: SupplyOrderSummary;
@@ -19,7 +20,7 @@ type Props = {
 export default function SupplyOrderActions(props: Props) {
   const { order, actions, quantities, links, saving, onPrepare, onDispatch, onReceive, onCancel } = props;
   return (
-    <footer style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 12 }}>
+    <footer className={styles.orderActions}>
       {actions.includes('cancel') && (
         <Button variant="secondary" disabled={saving} onClick={() => void onCancel(order.id)}>
           Cancelar pedido

@@ -5,6 +5,7 @@ import { getSupplyOrderActions, getSupplyOrderStatusLabel, type SupplyOrderMode 
 import type { FranchiseSupplyOption } from './use-supply-orders';
 import SupplyOrderLine from './SupplyOrderLine';
 import SupplyOrderActions from './SupplyOrderActions';
+import styles from './SupplyOrdersScreen.module.scss';
 
 type Props = {
   order: SupplyOrderSummary;
@@ -40,15 +41,17 @@ export default function SupplyOrderCard(props: Props) {
           ? 'gray'
           : 'blue';
   return (
-    <Card>
-      <header style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-        <div>
+    <Card className={styles.orderCard}>
+      <header className={styles.orderHeader}>
+        <div className={styles.orderTitle}>
           <strong>{order.franchiseName}</strong>
-          <div>Pedido de {new Date(order.createdAt).toLocaleString('pt-BR')}</div>
+          <time dateTime={order.createdAt}>
+            Pedido em {new Date(order.createdAt).toLocaleString('pt-BR', { dateStyle: 'medium', timeStyle: 'short' })}
+          </time>
         </div>
         <Badge variant={badge}>{getSupplyOrderStatusLabel(order.status)}</Badge>
       </header>
-      <div style={{ display: 'grid', gap: 8, margin: '16px 0' }}>
+      <div className={styles.orderLines}>
         {order.items.map((item) => (
           <SupplyOrderLine
             key={item.factorySupplyId}
@@ -62,9 +65,14 @@ export default function SupplyOrderCard(props: Props) {
           />
         ))}
       </div>
-      {order.note && <p>Observação: {order.note}</p>}
+      {order.note && (
+        <p className={styles.orderNote}>
+          <strong>Observação</strong>
+          {order.note}
+        </p>
+      )}
       {order.history?.length > 1 && (
-        <details>
+        <details className={styles.history}>
           <summary>Histórico</summary>
           <ul>
             {order.history.map((entry, index) => (

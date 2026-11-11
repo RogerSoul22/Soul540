@@ -1,16 +1,11 @@
 import { Button, Input } from '../../../../../../packages/pentagono/src/index';
-import { franchiseTitle } from '../../../franchise-pwa';
-import { getFranchiseSlug } from '../../../franchise-path';
 import type { EventosController } from '../hooks/use-eventos-controller';
 import styles from '../styles/Eventos.module.scss';
 
 export default function EventosFilters({ controller }: { controller: EventosController }) {
-  const franchiseLabel = franchiseTitle(getFranchiseSlug());
   const {
     search,
     setSearch,
-    sourceFilter,
-    setSourceFilter,
     dateFilter,
     setDateFilter,
     dateFilterMode,
@@ -42,18 +37,6 @@ export default function EventosFilters({ controller }: { controller: EventosCont
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         />
-      </div>
-      <div className={styles.unitFilter}>
-        {(['all', 'main', 'franchise'] as const).map((filter) => (
-          <Button
-            variant="chip"
-            key={filter}
-            className={`${styles.unitFilterBtn} ${sourceFilter === filter ? styles.unitFilterBtnActive : ''}`}
-            onClick={() => setSourceFilter(filter)}
-          >
-            {filter === 'all' ? 'Todos' : filter === 'main' ? 'Sorocaba' : franchiseLabel}
-          </Button>
-        ))}
       </div>
       <div className={styles.unitFilter}>
         {(['all', 'feirinha', 'evento_avulso'] as const).map((filter) => (

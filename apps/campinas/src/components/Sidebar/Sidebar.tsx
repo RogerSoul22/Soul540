@@ -8,8 +8,6 @@ import { ROUTES } from '../../routes';
 import styles from './styles/Sidebar.module.scss';
 import { franchiseSidebarGroups } from './franchise-sidebar-navigation';
 
-// No servidor de desenvolvimento os arquivos públicos ficam sob o prefixo (base) do app.
-const externalHref = (path: string) => (import.meta.env.DEV ? `${LOGO_BASE}${path.replace(/^\//, '')}` : path);
 const LOGO_BASE = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
 const LOGO_SRC = `${LOGO_BASE}logo.png`;
 
@@ -84,11 +82,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
                       variant="nav"
                       key={item.path}
                       className={`${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
-                      onClick={() =>
-                        'external' in item && item.external
-                          ? (window.location.href = externalHref(item.path))
-                          : navigate(item.path)
-                      }
+                      onClick={() => navigate(item.path)}
                       title={collapsed ? item.label : undefined}
                     >
                       {isActive && <span className={styles.activeIndicator} />}
@@ -129,10 +123,10 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </aside>
       <MobileNav
         items={mobileItems}
-        primaryPaths={[ROUTES.DASHBOARD, ROUTES.EVENTOS, ROUTES.FINANCEIRO, '/portal.html']}
+        primaryPaths={[ROUTES.DASHBOARD, ROUTES.EVENTOS, ROUTES.FINANCEIRO]}
         activePath={location.pathname}
         userName={user?.name}
-        onSelect={(item) => (item.external ? (window.location.href = externalHref(item.path)) : navigate(item.path))}
+        onSelect={(item) => navigate(item.path)}
         onLogout={handleLogout}
       />
     </>

@@ -1,0 +1,57 @@
+.page {
+  display: grid;
+  gap: 22px;
+  width: min(100%, 1320px);
+  margin: 0 auto;
+  padding: clamp(20px, 3vw, 36px);
+  color: var(--text-primary);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.titleGroup {
+  display: grid;
+  gap: 5px;
+}
+
+.eyebrow,
+.stepLabel {
+  color: #b77900;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pageHeader h1 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: clamp(25px, 2.4vw, 32px);
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}
+
+.pageHeader p {
+  margin: 3px 0 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 20px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    gap: 16px;
+    padding: 18px 12px;
+  }
+}

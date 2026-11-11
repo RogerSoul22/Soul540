@@ -2,7 +2,7 @@ import type { useFinanceiroController } from '../hooks/use-financeiro-controller
 
 type Controller = ReturnType<typeof useFinanceiroController>;
 type Props = { controller: Controller };
-import { Badge, Button, Input } from '../../../../../../packages/pentagono/src/index';
+import { Badge, Button, Heading, Input } from '../../../../../../packages/pentagono/src/index';
 import { formatCurrencyPtBr as formatBRL } from '../../../../../../packages/domain/src/index';
 import styles from '../styles/Financeiro.module.scss';
 import FinanceiroEntriesTable from './FinanceiroEntriesTable';
@@ -21,9 +21,15 @@ export default function FinanceiroEntriesTab({ controller }: Props) {
     exportCSV,
     exportDRE,
   } = controller;
-  if (activeTab !== 'lancamentos') return null;
+  const isAvulsoTab = activeTab === 'eventos-avulsos';
+  if (activeTab !== 'lancamentos' && !isAvulsoTab) return null;
   return (
     <div className={styles.tabContent}>
+      {isAvulsoTab && (
+        <Heading level={3} variant="section" className={styles.sectionTitle}>
+          Lançamentos de Eventos Avulsos
+        </Heading>
+      )}
       <div className={styles.filterRow}>
         <div className={styles.filterGroup}>
           {(['all', 'revenue', 'cost', 'pending'] as FilterType[]).map((type) => (
@@ -40,21 +46,23 @@ export default function FinanceiroEntriesTab({ controller }: Props) {
             </Button>
           ))}
         </div>
-        <div className={styles.filterGroup}>
-          {(['all', 'feirinha', 'evento_avulso'] as const).map((modality) => (
-            <Button
-              variant="chip"
-              key={modality}
-              className={`${styles.filterBtn} ${modalityFilter === modality ? styles.filterBtnActive : ''}`}
-              onClick={() => {
-                setModalityFilter(modality);
-                setLancamentosPage(1);
-              }}
-            >
-              {modality === 'all' ? 'Todas modalidades' : modality === 'feirinha' ? 'Feirinhas' : 'Eventos'}
-            </Button>
-          ))}
-        </div>
+        {!isAvulsoTab && (
+          <div className={styles.filterGroup}>
+            {(['all', 'feirinha', 'evento_avulso'] as const).map((modality) => (
+              <Button
+                variant="chip"
+                key={modality}
+                className={`${styles.filterBtn} ${modalityFilter === modality ? styles.filterBtnActive : ''}`}
+                onClick={() => {
+                  setModalityFilter(modality);
+                  setLancamentosPage(1);
+                }}
+              >
+                {modality === 'all' ? 'Todas modalidades' : modality === 'feirinha' ? 'Feirinhas' : 'Eventos'}
+              </Button>
+            ))}
+          </div>
+        )}
         <Input
           variant="search"
           type="text"

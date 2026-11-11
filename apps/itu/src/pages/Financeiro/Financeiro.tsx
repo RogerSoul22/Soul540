@@ -27,7 +27,9 @@ export default function Financeiro() {
       {!dataLoading && activeTab === 'despesas' && <FinanceiroExpensesTab controller={controller} />}
       {!dataLoading && activeTab === 'mensal' && <FinanceiroMonthlyTab controller={controller} />}
       {!dataLoading && activeTab === 'valores' && <FinanceiroValuesTab controller={controller} />}
-      {!dataLoading && <FinanceiroEntriesTab controller={controller} />}
+      {!dataLoading && (activeTab === 'lancamentos' || activeTab === 'eventos-avulsos') && (
+        <FinanceiroEntriesTab controller={controller} />
+      )}
       <FinanceEventDetailsModal controller={controller} />
       <FinanceFormModal controller={controller} />
       <FinanceSupportModals controller={controller} />

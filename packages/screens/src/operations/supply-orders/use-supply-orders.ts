@@ -67,10 +67,12 @@ export function useSupplyOrders(apiFetch: ApiFetch, mode: 'franchise' | 'factory
       setSaving(true);
       setError('');
       try {
-        const response = await apiFetch(path, {
-          method,
-          ...(body && { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }),
-        });
+        const request: RequestInit = { method };
+        if (body) {
+          request.headers = { 'Content-Type': 'application/json' };
+          request.body = JSON.stringify(body);
+        }
+        const response = await apiFetch(path, request);
         if (!response.ok) {
           const result = await response.json().catch(() => null);
           throw new Error(result?.error || 'Não foi possível salvar o pedido.');

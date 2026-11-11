@@ -5,17 +5,11 @@ import type { EventGroups } from '../support/event-listing';
 
 export function useEventFilters(events: PizzaEvent[]) {
   const [search, setSearch] = useState('');
-  const [sourceFilter, setSourceFilter] = useState<'all' | 'main' | 'franchise'>('all');
   const [dateFilter, setDateFilter] = useState('');
   const [dateFilterMode, setDateFilterMode] = useState<'date' | 'month'>('date');
   const [modalityFilter, setModalityFilter] = useState<'all' | 'feirinha' | 'evento_avulso'>('all');
   const filtered = useMemo<EventGroups>(() => {
     const matching = events
-      .filter(
-        (event) =>
-          sourceFilter === 'all' ||
-          (sourceFilter === 'main' ? !event.source || event.source === 'main' : event.source === 'franchise'),
-      )
       .filter(
         (event) =>
           !search ||
@@ -34,12 +28,10 @@ export function useEventFilters(events: PizzaEvent[]) {
       finalizados: regularEvents.filter((event) => event.status === 'completed'),
       cancelados: regularEvents.filter((event) => event.status === 'cancelled'),
     };
-  }, [events, search, sourceFilter, dateFilter, modalityFilter]);
+  }, [events, search, dateFilter, modalityFilter]);
   return {
     search,
     setSearch,
-    sourceFilter,
-    setSourceFilter,
     dateFilter,
     setDateFilter,
     dateFilterMode,

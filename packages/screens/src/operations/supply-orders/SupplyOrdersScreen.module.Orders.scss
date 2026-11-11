@@ -1,0 +1,189 @@
+.orderCard {
+  padding: clamp(18px, 2.4vw, 28px);
+}
+
+.ordersSection {
+  display: grid;
+  gap: 12px;
+}
+
+.orderHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.orderHeader {
+  align-items: flex-start;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.orderTitle {
+  display: grid;
+  gap: 5px;
+}
+
+.orderTitle strong {
+  color: var(--text-primary);
+  font-size: 15px;
+}
+
+.orderTitle time {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.orderLines {
+  display: grid;
+  gap: 9px;
+  margin: 16px 0;
+}
+
+.orderLine {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) minmax(180px, 1fr) minmax(180px, 0.9fr);
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+}
+
+.supplyName {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.supplyName strong {
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.supplyName span {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.quantitySummary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.quantitySummary span {
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.quantitySummary strong {
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.orderLineInputs {
+  display: grid;
+  gap: 7px;
+}
+
+.quantityInput,
+.stockSelect {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  font: inherit;
+}
+
+.quantityInput:focus,
+.stockSelect:focus {
+  border-color: #e5a000;
+  outline: 3px solid rgba(229, 160, 0, 0.16);
+}
+
+.orderNote {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 12px 14px;
+  border-left: 3px solid #e5a000;
+  border-radius: 0 8px 8px 0;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  font-size: 13px;
+}
+
+.orderNote strong {
+  color: var(--text-primary);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.history {
+  margin-top: 14px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.history summary {
+  width: fit-content;
+  cursor: pointer;
+  font-weight: 650;
+}
+
+.history ul {
+  display: grid;
+  gap: 7px;
+  padding-left: 18px;
+}
+
+.orderActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+@media (max-width: 760px) {
+  .orderLine {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .orderLineInputs {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .orderCard {
+    padding: 16px;
+  }
+
+  .orderHeader {
+    align-items: flex-start;
+  }
+
+  .orderLine {
+    grid-template-columns: 1fr;
+  }
+
+  .orderLineInputs {
+    grid-column: auto;
+  }
+
+  .orderActions {
+    justify-content: stretch;
+  }
+
+  .orderActions > button {
+    flex: 1 1 100%;
+  }
+}
