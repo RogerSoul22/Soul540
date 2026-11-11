@@ -11,6 +11,7 @@ type Props = {
   order: SupplyOrderSummary;
   mode: SupplyOrderMode;
   appearance?: 'default' | 'kanban';
+  kanbanCardClassName?: string;
   localSupplies: FranchiseSupplyOption[];
   saving: boolean;
   onPrepare(id: string): Promise<void>;
@@ -22,8 +23,18 @@ type Props = {
   onCancel(id: string): Promise<void>;
 };
 export default function SupplyOrderCard(props: Props) {
-  const { order, mode, appearance = 'default', localSupplies, saving, onPrepare, onDispatch, onReceive, onCancel } =
-    props;
+  const {
+    order,
+    mode,
+    appearance = 'default',
+    kanbanCardClassName,
+    localSupplies,
+    saving,
+    onPrepare,
+    onDispatch,
+    onReceive,
+    onCancel,
+  } = props;
   const actions = getSupplyOrderActions(mode, order.status);
   const [quantities, setQuantities] = useState<Record<string, string>>(() =>
     Object.fromEntries(
@@ -42,8 +53,8 @@ export default function SupplyOrderCard(props: Props) {
         : order.status === 'cancelled'
           ? 'gray'
           : 'blue';
-  return (
-    <Card className={`${styles.orderCard} ${appearance === 'kanban' ? styles.kanbanOrderCard : ''}`}>
+  const content = (
+    <>
       <header className={styles.orderHeader}>
         <div className={styles.orderTitle}>
           <strong>{order.franchiseName}</strong>
@@ -100,6 +111,11 @@ export default function SupplyOrderCard(props: Props) {
           onCancel={onCancel}
         />
       )}
-    </Card>
+    </>
+  );
+  return appearance === 'kanban' ? (
+    <div className={`${styles.kanbanOrderCard} ${kanbanCardClassName ?? ''}`}>{content}</div>
+  ) : (
+    <Card className={styles.orderCard}>{content}</Card>
   );
 }

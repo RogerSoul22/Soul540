@@ -1,27 +1,8 @@
-.kanbanOrderCard {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg-card);
-  box-shadow: none;
-  transition:
-    border-color 0.15s ease,
-    opacity 0.15s ease,
-    box-shadow 0.15s ease;
-}
-
-.kanbanOrderCard:hover {
-  border-color: rgba(245, 158, 11, 0.2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
 .kanbanOrderCard .orderHeader {
   align-items: flex-start;
   gap: 16px;
   padding-bottom: 12px;
+  border-bottom: 0;
 }
 
 .kanbanOrderCard .orderTitle {

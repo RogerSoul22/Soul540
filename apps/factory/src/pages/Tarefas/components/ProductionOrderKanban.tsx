@@ -80,7 +80,7 @@ export default function ProductionOrderKanban({
                   variant="compact"
                   className={styles.colEmpty}
                   title="Nenhum pedido"
-                  description="Arraste um card para esta coluna."
+                  description="Os pedidos desta etapa aparecerão aqui."
                 />
               ) : (
                 <>
@@ -98,25 +98,21 @@ export default function ProductionOrderKanban({
                       }}
                     />
                   ))}
-                  {!!columnSupplyOrders.length && (
-                    <div className={styles.supplyOrderGroup}>
-                      <h3>Solicitações de insumos</h3>
-                      {columnSupplyOrders.map((order) => (
-                        <SupplyOrderCard
-                          key={order.id}
-                          order={order}
-                          mode="factory"
-                          appearance="kanban"
-                          localSupplies={[]}
-                          saving={supplyOrderSaving}
-                          onPrepare={onSupplyPrepare}
-                          onDispatch={onSupplyDispatch}
-                          onReceive={onSupplyReceive}
-                          onCancel={onSupplyCancel}
-                        />
-                      ))}
-                    </div>
-                  )}
+                  {columnSupplyOrders.map((order) => (
+                    <SupplyOrderCard
+                      key={order.id}
+                      order={order}
+                      mode="factory"
+                      appearance="kanban"
+                      kanbanCardClassName={styles.taskCard}
+                      localSupplies={[]}
+                      saving={supplyOrderSaving}
+                      onPrepare={onSupplyPrepare}
+                      onDispatch={onSupplyDispatch}
+                      onReceive={onSupplyReceive}
+                      onCancel={onSupplyCancel}
+                    />
+                  ))}
                 </>
               )}
             </div>
