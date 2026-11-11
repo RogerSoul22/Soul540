@@ -23,14 +23,34 @@
 }
 
 .kanbanOrderCard .orderLine {
-  grid-template-columns: minmax(0, 1fr);
-  gap: 6px;
-  padding: 9px 10px;
+  grid-template-columns: minmax(0, 1fr) auto minmax(90px, 0.65fr);
+  gap: 10px;
+  padding: 8px 10px;
   border-radius: 7px;
 }
 
+.kanbanOrderCard .supplyName {
+  min-width: 0;
+  gap: 5px;
+}
+
+.kanbanOrderCard .supplyName strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .kanbanOrderCard .quantitySummary {
-  gap: 8px;
+  gap: 6px;
+}
+
+.kanbanOrderCard .orderLineInputs {
+  min-width: 0;
+}
+
+.kanbanOrderCard .quantityInput {
+  min-height: 34px;
+  padding: 6px 8px;
 }
 
 .kanbanOrderCard .orderActions {
