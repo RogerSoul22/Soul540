@@ -70,6 +70,7 @@ export default function SupplyOrdersScreen({ apiFetch, mode }: Props) {
               key={order.id}
               order={order}
               mode={mode}
+              appearance={mode === 'factory' ? 'kanban' : 'default'}
               localSupplies={state.localSupplies}
               saving={state.saving}
               onPrepare={(id) => run(() => state.prepare(id))}
