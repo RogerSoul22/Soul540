@@ -15,6 +15,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
 const Funcionarios = lazy(() => import('./pages/Funcionarios/Funcionarios'));
 const Contratantes = lazy(() => import('./pages/Contratantes/Contratantes'));
 const Eventos = lazy(() => import('./pages/Eventos/Eventos'));
+const EventosStatus = lazy(() => import('./pages/Eventos/EventosStatus'));
 const EstoqueInsumos = lazy(() => import('./pages/EstoqueInsumos/EstoqueInsumos'));
 const EstoqueUtensilios = lazy(() => import('./pages/EstoqueUtensilios/EstoqueUtensilios'));
 const Financeiro = lazy(() => import('./pages/Financeiro/Financeiro'));
@@ -83,6 +84,7 @@ export default function App() {
                         <Route path={ROUTES.DASHBOARD} element={<Dashboard />} />
                         <Route element={<PermissionRoute routeKey="eventos" />}>
                           <Route path={ROUTES.EVENTOS} element={<Eventos />} />
+                          <Route path={ROUTES.EVENTOS_STATUS} element={<EventosStatus />} />
                         </Route>
                         <Route element={<PermissionRoute routeKey="tarefas" />}>
                           <Route path={ROUTES.TAREFAS} element={<Tarefas />} />

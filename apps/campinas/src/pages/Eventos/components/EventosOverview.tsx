@@ -1,5 +1,6 @@
 import { format, isValid, parseISO, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useNavigate } from 'react-router-dom';
 import {
   Badge,
   Card,
@@ -14,20 +15,8 @@ import type { PizzaEvent } from '../../../types/Event';
 import EventCardActions from './EventCardActions';
 import { eventValue } from '../support/event-listing';
 import { getModalityLabel } from '../support/event-modalities';
+import { EVENT_STATUS_PAGES, eventStatusPath } from '../support/event-status';
 import styles from '../styles/Eventos.module.scss';
-
-const statusCards = [
-  { key: 'orcamentos', label: 'Orçamentos', accent: '#3b82f6', statuses: ['planning'], upcoming: true },
-  {
-    key: 'confirmados',
-    label: 'Fechados',
-    accent: '#f59e0b',
-    statuses: ['confirmed', 'in_progress'],
-    upcoming: true,
-  },
-  { key: 'finalizados', label: 'Finalizados', accent: '#22c55e', statuses: ['completed'], upcoming: false },
-  { key: 'cancelados', label: 'Cancelados', accent: '#6b7280', statuses: ['cancelled'], upcoming: false },
-] as const;
 
 const statusBadge: Record<string, 'blue' | 'amber' | 'green' | 'gray'> = {
   planning: 'blue',
@@ -62,6 +51,7 @@ type Props = {
 };
 
 export default function EventosOverview({ events, loading, onView, onEdit, onDelete, onFinalize }: Props) {
+  const navigate = useNavigate();
   const regularEvents = events.filter((event) => !event.isRecurringTemplate);
   const upcoming = regularEvents
     .filter((event) => ['planning', 'confirmed', 'in_progress'].includes(event.status))
@@ -70,14 +60,14 @@ export default function EventosOverview({ events, loading, onView, onEdit, onDel
       return isValid(date) && date >= startOfDay(new Date());
     })
     .sort((left, right) => parseISO(left.date).getTime() - parseISO(right.date).getTime());
-  const statusGroups = statusCards.map((card) => {
-    const matches = regularEvents.filter((event) => (card.statuses as readonly string[]).includes(event.status));
-    const next = card.upcoming
+  const statusGroups = EVENT_STATUS_PAGES.map((page) => {
+    const matches = regularEvents.filter((event) => page.statuses.includes(event.status));
+    const next = page.upcoming
       ? matches
           .filter((event) => parseISO(event.date) >= startOfDay(new Date()))
           .sort((left, right) => parseISO(left.date).getTime() - parseISO(right.date).getTime())[0]
       : undefined;
-    return { ...card, events: matches, total: matches.reduce((sum, event) => sum + eventValue(event), 0), next };
+    return { ...page, events: matches, total: matches.reduce((sum, event) => sum + eventValue(event), 0), next };
   });
 
   return (
@@ -85,10 +75,20 @@ export default function EventosOverview({ events, loading, onView, onEdit, onDel
       <section className={styles.statusGrid} aria-label="Eventos por status">
         {statusGroups.map((group) => (
           <Card
-            key={group.key}
+            key={group.slug}
+            interactive
+            role="link"
+            tabIndex={0}
             aria-label={`${group.label}: ${group.events.length} eventos`}
             className={styles.statusCard}
             style={{ ['--status-accent' as string]: group.accent }}
+            onClick={() => navigate(eventStatusPath(group.slug))}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                navigate(eventStatusPath(group.slug));
+              }
+            }}
           >
             <Heading level={2} variant="section" className={styles.statusLabel}>
               {group.label}

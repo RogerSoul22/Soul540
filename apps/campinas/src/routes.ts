@@ -4,6 +4,7 @@ export const ROUTES = {
   FUNCIONARIOS: '/funcionarios',
   CONTRATANTES: '/contratantes',
   EVENTOS: '/eventos',
+  EVENTOS_STATUS: '/eventos/:status',
   ESTOQUE_INSUMOS: '/estoque-insumos',
   PEDIDOS_INSUMOS: '/pedidos-insumos',
   ESTOQUE_UTENSILIOS: '/estoque-utensilios',
