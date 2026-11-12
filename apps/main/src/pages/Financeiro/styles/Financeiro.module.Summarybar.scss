@@ -25,10 +25,11 @@
     width: 100%;
   }
   .scopeToggle {
-    overflow-x: auto;
+    overflow: visible;
+    flex-wrap: wrap;
   }
   .scopeBtn {
-    flex: 1 0 auto;
+    flex: 1 1 auto;
   }
 }
 

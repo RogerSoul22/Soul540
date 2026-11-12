@@ -8,6 +8,7 @@ const factoryTitle = 'Exibir apenas dados da fábrica';
 const combinedTitle = 'Exibir dados consolidados: principal, franquias e fábrica';
 const ofxTitle = 'Importar extrato bancário OFX';
 const newFinanceLabel = 'Novo Lançamento';
+const readOnlyTitle = 'Selecione Sorocaba para criar ou importar lançamentos.';
 
 export default function FinanceiroHeader({ controller }: { controller: FinanceiroController }) {
   const {
@@ -39,7 +40,7 @@ export default function FinanceiroHeader({ controller }: { controller: Financeir
           </>
         }
         actions={
-          <>
+          <div className={styles.headerActions}>
             {controller.canAccessConsolidatedData && (
               <div className={styles.scopeToggle}>
                 <Button
@@ -74,59 +75,51 @@ export default function FinanceiroHeader({ controller }: { controller: Financeir
               </div>
             )}
 
-            {controller.canEditEntries && (
-              <>
-                <Input ref={xmlInputRef} type="file" accept=".xml" hidden onChange={handleXmlFile} />
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className={styles.btnXml}
-                  onClick={() => xmlInputRef.current?.click()}
-                >
-                  Importar XML
-                </Button>
+            <Input ref={xmlInputRef} type="file" accept=".xml" hidden onChange={handleXmlFile} />
+            <Button
+              variant="secondary"
+              size="sm"
+              className={styles.btnXml}
+              disabled={!controller.canEditEntries}
+              onClick={() => xmlInputRef.current?.click()}
+              title={controller.canEditEntries ? undefined : readOnlyTitle}
+            >
+              Importar XML
+            </Button>
 
-                <Input
-                  ref={ofxInputRef}
-                  type="file"
-                  accept=".ofx,application/x-ofx"
-                  hidden
-                  onChange={handleOfxFile}
-                />
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className={styles.btnXml}
-                  onClick={() => ofxInputRef.current?.click()}
-                  title={ofxTitle}
-                >
-                  Importar OFX
-                </Button>
+            <Input
+              ref={ofxInputRef}
+              type="file"
+              accept=".ofx,application/x-ofx"
+              hidden
+              onChange={handleOfxFile}
+            />
+            <Button
+              variant="secondary"
+              size="sm"
+              className={styles.btnXml}
+              disabled={!controller.canEditEntries}
+              onClick={() => ofxInputRef.current?.click()}
+              title={controller.canEditEntries ? ofxTitle : readOnlyTitle}
+            >
+              Importar OFX
+            </Button>
 
-                <Button
-                  onClick={() => {
-                    resetForm();
-                    setShowForm(true);
-                  }}
-                >
-                  {newFinanceLabel}
-                </Button>
-              </>
-            )}
-          </>
+            <Button
+              disabled={!controller.canEditEntries}
+              onClick={() => {
+                resetForm();
+                setShowForm(true);
+              }}
+              title={controller.canEditEntries ? undefined : readOnlyTitle}
+            >
+              {newFinanceLabel}
+            </Button>
+          </div>
         }
       />
       {showFranchisePicker && (
         <div className={styles.scopeToggle}>
-          <Button
-            variant="chip"
-            active={dataScope === 'main'}
-            className={`${styles.scopeBtn} ${dataScope === 'main' ? styles.scopeBtnActive : ''}`}
-            onClick={() => setDataScope('main')}
-            title="Exibir somente os dados de Sorocaba"
-          >
-            Sorocaba
-          </Button>
           <Button
             variant="chip"
             active={dataScope === 'franchise' && franchiseFilter === 'all'}
@@ -140,6 +133,15 @@ export default function FinanceiroHeader({ controller }: { controller: Financeir
             title="Exibir todas as franquias juntas"
           >
             Todas as franquias
+          </Button>
+          <Button
+            variant="chip"
+            active={dataScope === 'main'}
+            className={`${styles.scopeBtn} ${dataScope === 'main' ? styles.scopeBtnActive : ''}`}
+            onClick={() => setDataScope('main')}
+            title="Exibir somente os dados de Sorocaba"
+          >
+            Sorocaba
           </Button>
           {franchises.map((franchise) => (
             <Button

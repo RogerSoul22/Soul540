@@ -54,10 +54,17 @@
   align-items: center;
 
   gap: $spacing-sm;
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .scopeToggle {
   display: flex;
+
+  flex-wrap: wrap;
+
+  max-width: 100%;
 
   gap: 2px;
 
