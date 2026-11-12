@@ -2,16 +2,21 @@ import {
   eachDayOfInterval,
   endOfMonth,
   endOfWeek,
+  format,
   isSameDay,
   startOfDay,
   startOfMonth,
   startOfWeek,
   parseISO,
 } from 'date-fns';
-import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { buildEventWhatsAppUrl as buildSharedEventWhatsAppUrl } from '../../../../../packages/domain/src/index';
+import {
+  buildEventWhatsAppUrl as buildSharedEventWhatsAppUrl,
+  canConfirmWeeklyOccurrence,
+} from '../../../../../packages/domain/src/index';
 import type { PizzaEvent } from '../../types/Event';
+
+export type CalendarEvent = PizzaEvent & { isProjectedOccurrence?: boolean };
 
 export const EVENT_COLOR = {
   bg: 'rgba(245,158,11,0.14)',
@@ -55,13 +60,47 @@ export function getCalendarDays(month: Date) {
   });
 }
 
-export function getEventsForDay(events: PizzaEvent[], day: Date) {
+export function getEventsForDay(events: PizzaEvent[], day: Date): CalendarEvent[] {
   const currentDay = startOfDay(day);
-  return events.filter((event) => {
+  const date = format(currentDay, 'yyyy-MM-dd');
+  const existingOccurrences = new Set(
+    events.filter((event) => event.recurrenceId).map((event) => `${event.recurrenceId}:${event.date}`),
+  );
+  const renderedOccurrences = new Set<string>();
+  const dayEvents: CalendarEvent[] = [];
+
+  for (const event of events) {
+    if (event.isRecurringTemplate) {
+      const occurrenceKey = `${event.id}:${date}`;
+      if (
+        event.status !== 'cancelled' &&
+        !existingOccurrences.has(occurrenceKey) &&
+        canConfirmWeeklyOccurrence(event, date)
+      ) {
+        dayEvents.push({
+          ...event,
+          id: `${event.id}::${date}`,
+          date,
+          endDate: undefined,
+          isRecurringTemplate: false,
+          isProjectedOccurrence: true,
+        });
+      }
+      continue;
+    }
+
+    if (event.recurrenceId) {
+      const occurrenceKey = `${event.recurrenceId}:${event.date}`;
+      if (renderedOccurrences.has(occurrenceKey)) continue;
+      renderedOccurrences.add(occurrenceKey);
+    }
+
     const start = startOfDay(parseISO(event.date));
     const end = event.endDate ? startOfDay(parseISO(event.endDate)) : start;
-    return currentDay >= start && currentDay <= end;
-  });
+    if (currentDay >= start && currentDay <= end) dayEvents.push(event);
+  }
+
+  return dayEvents;
 }
 
 export function isEventStart(event: PizzaEvent, day: Date) {

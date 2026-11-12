@@ -3,13 +3,14 @@ import { format, isToday } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import type { MouseEvent } from 'react';
 import type { PizzaEvent } from '../../types/Event';
+import type { CalendarEvent } from './calendar-utils';
 import styles from './styles/CalendarView.module.scss';
 import { IconChevronLeft, IconChevronRight } from './CalendarIcons';
 import { getEventColor, HOURS } from './calendar-utils';
 
 type Props = {
   selectedDay: Date;
-  dayEvents: PizzaEvent[];
+  dayEvents: CalendarEvent[];
   onBack: () => void;
   onPrevious: () => void;
   onNext: () => void;
@@ -50,17 +51,25 @@ export default function CalendarDayView({ selectedDay, dayEvents, onBack, onPrev
               return (
                 <div
                   key={event.id}
-                  className={styles.allDayEvent}
+                  className={[
+                    styles.allDayEvent,
+                    event.isProjectedOccurrence ? styles.allDayEventProjected : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
                   style={{
                     background: color.bg,
                     borderColor: color.solid,
                     color: color.text,
                   }}
-                  onClick={(mouseEvent) => onOpenEvent(event, mouseEvent)}
+                  onClick={event.isProjectedOccurrence ? undefined : (mouseEvent) => onOpenEvent(event, mouseEvent)}
                 >
                   <div className={styles.allDayEventBar} style={{ background: color.solid }} />
                   <div className={styles.allDayEventContent}>
-                    <p className={styles.allDayEventName}>{event.name}</p>
+                    <p className={styles.allDayEventName}>
+                      {event.name}
+                      {event.isProjectedOccurrence ? ' · Programação semanal' : ''}
+                    </p>
                     <p className={styles.allDayEventMeta}>
                       {event.location} · {event.guestCount} convidados · R$ {event.budget.toLocaleString('pt-BR', {
   minimumFractionDigits: 2,

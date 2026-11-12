@@ -1,6 +1,7 @@
 import { format, isSameDay, isSameMonth, isToday, parseISO } from 'date-fns';
 import type { MouseEvent } from 'react';
 import type { PizzaEvent } from '../../types/Event';
+import type { CalendarEvent } from './calendar-utils';
 import styles from './styles/CalendarView.module.scss';
 import { getEventColor, isEventStart } from './calendar-utils';
 
@@ -8,7 +9,7 @@ type Props = {
   day: Date;
   currentMonth: Date;
   selectedDay: Date;
-  events: PizzaEvent[];
+  events: CalendarEvent[];
   onOpenDay: (day: Date) => void;
   onOpenEvent: (event: PizzaEvent, eventMouse: MouseEvent) => void;
 };
@@ -46,7 +47,13 @@ export default function CalendarMonthDayCell({
           return (
             <div
               key={event.id}
-              className={[styles.pill, event.notes?.trim() ? styles.pillNotes : ''].filter(Boolean).join(' ')}
+              className={[
+                styles.pill,
+                event.notes?.trim() ? styles.pillNotes : '',
+                event.isProjectedOccurrence ? styles.pillProjected : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
               style={{
                 background: color.bg,
                 color: color.text,
@@ -55,8 +62,8 @@ export default function CalendarMonthDayCell({
                 ...(multi && !start ? { marginLeft: -6, paddingLeft: 4 } : {}),
                 ...(multi && !end ? { marginRight: -6, paddingRight: 4 } : {}),
               }}
-              title={event.name}
-              onClick={(mouseEvent) => onOpenEvent(event, mouseEvent)}
+              title={event.isProjectedOccurrence ? `${event.name} · Programação semanal` : event.name}
+              onClick={event.isProjectedOccurrence ? undefined : (mouseEvent) => onOpenEvent(event, mouseEvent)}
             >
               {start ? event.name : '\u00A0'}
             </div>
