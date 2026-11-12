@@ -15,7 +15,7 @@ test('factory task permissions include supply orders while franchise permission 
   assert.equal(canAccessSupplyOrders('franchise', { permissions: ['pedidos-insumos'] }, 'read'), true);
 });
 
-test('factory supply order catalog includes positive stock regardless of status', () => {
+test('factory supply lookup excludes deleted records', () => {
   assert.deepEqual(getFactorySupplyOrderFilter(), { deletedAt: { $exists: false } });
   assert.deepEqual(getFactorySupplyOrderFilter({ _id: { $in: ['supply-1'] } }), {
     _id: { $in: ['supply-1'] },

@@ -75,3 +75,10 @@ A API terÃ¡ rotas autenticadas para listar catÃ¡logo e pedidos, criar pedido
 ## AprovaÃ§Ã£o
 
 O usuÃ¡rio aprovou este fluxo em 2026-11-11. O plano de implementaÃ§Ã£o estÃ¡ em `docs/superpowers/plans/2026-11-11-pedidos-insumos-franquia-fabrica.md`.
+
+## Ajuste de catÃ¡logo e estoque (2026-11-12)
+
+- O catÃ¡logo disponÃ­vel para os pedidos vem da seÃ§Ã£o **Insumos** da receita de produÃ§Ã£o da FÃ¡brica (`ProductionRecipe.insumos`), nÃ£o dos registros do Estoque de Insumos.
+- A criaÃ§Ã£o do pedido nÃ£o exige saldo disponÃ­vel no estoque da FÃ¡brica.
+- Despachar o pedido registra quantidades e histÃ³rico, mas nÃ£o baixa automaticamente o estoque da FÃ¡brica.
+- Ao confirmar o recebimento, somente as quantidades recebidas continuam sendo adicionadas ao estoque da franquia.

@@ -1,29 +1,27 @@
 import { getFranchiseScope } from '../../infrastructure/franchise-context';
 import { getTenantUnit } from '../../infrastructure/middleware/tenant';
 import { FranchiseModel } from '../identity/franchise-policy';
-import { supplyModels } from '../operations/supply-model';
+import { ProductionRecipeModel } from '../production/production-recipes.model';
 import { logAudit } from '../../infrastructure/audit-log';
 import type { CreateSupplyOrderInput } from '@soul540/contracts';
-import { validateSupplyAvailability, validateSupplyOrderItems } from '@soul540/domain';
+import { validateSupplyOrderItems } from '@soul540/domain';
 import { SupplyOrderError } from './supply-orders.errors';
 import { SupplyOrderModel } from './supply-orders.model';
 import { assertFranchiseScope } from './supply-orders.read';
-import { getFactorySupplyOrderFilter } from './supply-orders.scope';
 
 export async function createSupplyOrder(req: any, input: CreateSupplyOrderInput) {
   const scope = assertFranchiseScope(req);
   const validation = validateSupplyOrderItems(input.items || []);
   if (validation) throw new SupplyOrderError(validation, 400);
-  const factorySupplies = await supplyModels.Factory.find(
-    getFactorySupplyOrderFilter({ _id: { $in: input.items.map((item) => item.factorySupplyId) } }),
+  const recipe = await ProductionRecipeModel.findOne({ unit: 'factory' }).lean();
+  const recipeSupplies = (recipe?.insumos || []).filter(
+    (supply: any) => supply.id && supply.name?.trim() && input.items.some((item) => item.factorySupplyId === supply.id),
   );
-  if (factorySupplies.length !== input.items.length) {
-    throw new SupplyOrderError('Um ou mais insumos não estão disponíveis no catálogo da Fábrica.', 422);
+  if (recipeSupplies.length !== input.items.length) {
+    throw new SupplyOrderError('Um ou mais insumos não estão disponíveis na lista da Fábrica.', 422);
   }
-  const stockValidation = validateSupplyAvailability(factorySupplies);
-  if (stockValidation) throw new SupplyOrderError(stockValidation, 422);
   const franchiseName = await resolveRequestingUnit(scope);
-  const supplyById = new Map(factorySupplies.map((supply: any) => [String(supply._id), supply]));
+  const supplyById = new Map(recipeSupplies.map((supply: any) => [supply.id, supply]));
   const now = new Date().toISOString();
   const actor = actorSnapshot(req);
   const [order] = await SupplyOrderModel.create([
@@ -37,8 +35,8 @@ export async function createSupplyOrder(req: any, input: CreateSupplyOrderInput)
         return {
           factorySupplyId: item.factorySupplyId,
           factorySupplyName: supply.name,
-          measureUnit: supply.measureUnit,
-          costPerUnit: Number(supply.costPerUnit) || 0,
+          measureUnit: supply.measure,
+          costPerUnit: Number(supply.cost) || 0,
           quantityRequested: item.quantity,
           quantityToDispatch: 0,
         };

@@ -30,9 +30,10 @@ export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showInfo, setShowInfo] = useState(false);
-  const [unitFilter, setUnitFilter] = useState<UnitFilter>('all');
+  const [unitFilter, setUnitFilter] = useState<UnitFilter>('main');
   const [calendarMonth, setCalendarMonth] = useState(new Date());
   const [employees, setEmployees] = useState<Parameters<typeof buildEmployeeSchedule>[1]>([]);
+  const [ituFranchiseId, setItuFranchiseId] = useState<string | null>(null);
 
   useEffect(() => {
     apiFetch('/api/employees', { headers: { 'X-System': 'main' } })
@@ -41,15 +42,29 @@ export default function Dashboard() {
       .catch(() => {});
   }, []);
 
+  useEffect(() => {
+    apiFetch('/api/franchises/slug/itu', { headers: { 'X-System': 'main' } })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Falha ao carregar franquia Itu (${response.status}).`);
+        return response.json();
+      })
+      .then((franchise: { id?: string; _id?: string }) => {
+        const id = franchise.id || franchise._id;
+        if (typeof id === 'string') setItuFranchiseId(id);
+      })
+      .catch((error) => console.error('Falha ao carregar a franquia Itu:', error));
+  }, []);
+
   const urgentTasks = useMemo(
     () => tasks.filter((task) => task.priority === 'urgent' && task.status !== 'done'),
     [tasks],
   );
   const filteredEvents = useMemo(() => {
     if (unitFilter === 'main') return events.filter((event) => !event.source || event.source === 'main');
-    if (unitFilter === 'franchise') return events.filter((event) => event.source === 'franchise');
+    if (unitFilter === 'franchise')
+      return events.filter((event) => event.source === 'franchise' && event.franchiseId === ituFranchiseId);
     return events;
-  }, [events, unitFilter]);
+  }, [events, ituFranchiseId, unitFilter]);
   const monthEventCount = useMemo(
     () =>
       filteredEvents.filter((event) => {

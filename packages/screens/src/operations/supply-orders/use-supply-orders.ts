@@ -6,7 +6,7 @@ import type {
   SupplyOrderSummary,
 } from '@soul540/contracts';
 
-export type FactorySupplyOption = { id: string; name: string; measureUnit: string; availableQuantity: number };
+export type SupplyCatalogOption = { id: string; name: string; measureUnit: string };
 export type FranchiseSupplyOption = {
   id: string;
   name: string;
@@ -18,7 +18,7 @@ type ApiFetch = (path: string, init?: RequestInit) => Promise<Response>;
 
 export function useSupplyOrders(apiFetch: ApiFetch, mode: 'franchise' | 'factory') {
   const [orders, setOrders] = useState<SupplyOrderSummary[]>([]);
-  const [catalog, setCatalog] = useState<FactorySupplyOption[]>([]);
+  const [catalog, setCatalog] = useState<SupplyCatalogOption[]>([]);
   const [localSupplies, setLocalSupplies] = useState<FranchiseSupplyOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -41,7 +41,7 @@ export function useSupplyOrders(apiFetch: ApiFetch, mode: 'franchise' | 'factory
       );
       if (catalogResponse)
         setCatalog(
-          (await catalogResponse.json()).map((item: FactorySupplyOption & { _id?: string }) => ({
+          (await catalogResponse.json()).map((item: SupplyCatalogOption & { _id?: string }) => ({
             ...item,
             id: item.id || item._id,
           })),

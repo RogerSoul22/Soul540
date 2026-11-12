@@ -1,8 +1,10 @@
 import { getFranchiseScope } from '../../infrastructure/franchise-context';
 import { getTenantUnit } from '../../infrastructure/middleware/tenant';
 import { supplyModels } from '../operations/supply-model';
+import { ProductionRecipeModel } from '../production/production-recipes.model';
 import { SupplyOrderError } from './supply-orders.errors';
 import { SupplyOrderModel } from './supply-orders.model';
+import { mapRecipeSuppliesToCatalog } from './supply-orders.catalog';
 import { getFactorySupplyOrderFilter, getSupplyOrderListFilter } from './supply-orders.scope';
 
 export async function listSupplyOrders(req: any) {
@@ -39,13 +41,8 @@ export async function getSupplyOrderCatalog(req: any) {
   if (!['main', 'franchise'].includes(getTenantUnit(req))) {
     throw new SupplyOrderError('Somente as unidades podem solicitar insumos.', 403);
   }
-  const supplies = await supplyModels.Factory.find(getFactorySupplyOrderFilter()).sort({ name: 1 });
-  return supplies.map((supply: any) => ({
-    id: String(supply._id),
-    name: supply.name,
-    measureUnit: supply.measureUnit,
-    availableQuantity: Number(supply.quantity) || 0,
-  }));
+  const recipe = await ProductionRecipeModel.findOne({ unit: 'factory' }).lean();
+  return mapRecipeSuppliesToCatalog(recipe?.insumos || []);
 }
 
 export async function getLocalSupplyOptions(req: any) {
@@ -68,11 +65,6 @@ export async function getLocalSupplyOptions(req: any) {
 export function requireSupplyOrder(req: any, id: string, session?: any) {
   const scope = getFranchiseScope(req);
   const query = SupplyOrderModel.findOne({ _id: id, ...getSupplyOrderListFilter(scope) });
-  return session ? query.session(session) : query;
-}
-
-export function requireFactorySupply(id: string, session?: any) {
-  const query = supplyModels.Factory.findOne(getFactorySupplyOrderFilter({ _id: id }));
   return session ? query.session(session) : query;
 }
 

@@ -26,7 +26,7 @@ export default function FinanceiroHeader({ controller }: { controller: Financeir
   } = controller;
 
   const showFranchisePicker =
-    controller.canAccessConsolidatedData && (dataScope === 'franchise' || dataScope === 'combined');
+    controller.canAccessConsolidatedData && (dataScope === 'main' || dataScope === 'franchise');
 
   return (
     <>
@@ -44,19 +44,21 @@ export default function FinanceiroHeader({ controller }: { controller: Financeir
               <div className={styles.scopeToggle}>
                 <Button
                   variant="chip"
-                  active={dataScope === 'main'}
-                  className={`${styles.scopeBtn} ${dataScope === 'main' ? styles.scopeBtnActive : ''}`}
-                  onClick={() => setDataScope('main')}
-                  title="Exibir apenas dados do sistema principal"
+                  active={dataScope === 'combined'}
+                  className={`${styles.scopeBtn} ${dataScope === 'combined' ? styles.scopeBtnActive : ''}`}
+                  onClick={() => setDataScope('combined')}
+                  title={combinedTitle}
                 >
-                  Sorocaba
+                  Consolidado
                 </Button>
                 <Button
                   variant="chip"
-                  active={dataScope === 'franchise'}
-                  className={`${styles.scopeBtn} ${dataScope === 'franchise' ? styles.scopeBtnActive : ''}`}
+                  active={dataScope === 'franchise' || dataScope === 'main'}
+                  className={`${styles.scopeBtn} ${
+                    dataScope === 'franchise' || dataScope === 'main' ? styles.scopeBtnActive : ''
+                  }`}
                   onClick={() => setDataScope('franchise')}
-                  title="Exibir dados de todas as franquias"
+                  title="Exibir Sorocaba e as franquias"
                 >
                   Franquias
                 </Button>
@@ -68,15 +70,6 @@ export default function FinanceiroHeader({ controller }: { controller: Financeir
                   title={factoryTitle}
                 >
                   Fábrica
-                </Button>
-                <Button
-                  variant="chip"
-                  active={dataScope === 'combined'}
-                  className={`${styles.scopeBtn} ${dataScope === 'combined' ? styles.scopeBtnActive : ''}`}
-                  onClick={() => setDataScope('combined')}
-                  title={combinedTitle}
-                >
-                  Consolidado
                 </Button>
               </div>
             )}
@@ -123,13 +116,27 @@ export default function FinanceiroHeader({ controller }: { controller: Financeir
           </>
         }
       />
-      {showFranchisePicker && franchises.length > 0 && (
+      {showFranchisePicker && (
         <div className={styles.scopeToggle}>
           <Button
             variant="chip"
-            active={franchiseFilter === 'all'}
-            className={`${styles.scopeBtn} ${franchiseFilter === 'all' ? styles.scopeBtnActive : ''}`}
-            onClick={() => setFranchiseFilter('all')}
+            active={dataScope === 'main'}
+            className={`${styles.scopeBtn} ${dataScope === 'main' ? styles.scopeBtnActive : ''}`}
+            onClick={() => setDataScope('main')}
+            title="Exibir somente os dados de Sorocaba"
+          >
+            Sorocaba
+          </Button>
+          <Button
+            variant="chip"
+            active={dataScope === 'franchise' && franchiseFilter === 'all'}
+            className={`${styles.scopeBtn} ${
+              dataScope === 'franchise' && franchiseFilter === 'all' ? styles.scopeBtnActive : ''
+            }`}
+            onClick={() => {
+              if (dataScope !== 'franchise') setDataScope('franchise');
+              setFranchiseFilter('all');
+            }}
             title="Exibir todas as franquias juntas"
           >
             Todas as franquias
@@ -138,9 +145,14 @@ export default function FinanceiroHeader({ controller }: { controller: Financeir
             <Button
               key={franchise.id}
               variant="chip"
-              active={franchiseFilter === franchise.id}
-              className={`${styles.scopeBtn} ${franchiseFilter === franchise.id ? styles.scopeBtnActive : ''}`}
-              onClick={() => setFranchiseFilter(franchise.id)}
+              active={dataScope === 'franchise' && franchiseFilter === franchise.id}
+              className={`${styles.scopeBtn} ${
+                dataScope === 'franchise' && franchiseFilter === franchise.id ? styles.scopeBtnActive : ''
+              }`}
+              onClick={() => {
+                if (dataScope !== 'franchise') setDataScope('franchise');
+                setFranchiseFilter(franchise.id);
+              }}
               title={`Exibir somente dados da franquia ${franchise.name}`}
             >
               {franchise.name}

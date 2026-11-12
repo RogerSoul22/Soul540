@@ -59,7 +59,7 @@ export default function DashboardCalendarHeader({
                 className={styles.unitFilterBtn + (unitFilter === filter ? ' ' + styles.unitFilterBtnActive : '')}
                 onClick={() => onUnitFilterChange(filter)}
               >
-                {filter === 'all' ? 'Todos' : filter === 'main' ? 'Sorocaba' : 'Campinas'}
+                {filter === 'all' ? 'Todos' : filter === 'main' ? 'Sorocaba' : 'Itu'}
               </Button>
             ))}
           </div>

@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import type { CreateSupplyOrderInput } from '@soul540/contracts';
 import { Button, Card, Input, Select, Textarea } from '../../../../pentagono/src';
-import type { FactorySupplyOption } from './use-supply-orders';
+import type { SupplyCatalogOption } from './use-supply-orders';
 import styles from './SupplyOrdersScreen.module.scss';
 
 type Props = {
-  catalog: FactorySupplyOption[];
+  catalog: SupplyCatalogOption[];
   saving: boolean;
   onSubmit(input: CreateSupplyOrderInput): Promise<void>;
 };
@@ -18,7 +18,6 @@ export default function SupplyOrderForm({ catalog, saving, onSubmit }: Props) {
   const selectedQuantity = Number(quantity);
   const canIncludeSelected =
     !!selectedSupply &&
-    selectedSupply.availableQuantity > 0 &&
     Number.isFinite(selectedQuantity) &&
     selectedQuantity > 0 &&
     !items.some((item) => item.factorySupplyId === selected);
@@ -55,15 +54,14 @@ export default function SupplyOrderForm({ catalog, saving, onSubmit }: Props) {
         </div>
         <div className={styles.formGrid}>
           <Select
-            label="Insumo da Fábrica"
+            label="Insumo"
             value={selected}
             onChange={(event) => setSelected(event.target.value)}
           >
             <option value="">Selecione um insumo</option>
             {catalog.map((item) => (
-              <option key={item.id} value={item.id} disabled={item.availableQuantity <= 0}>
-                {item.name} ({item.measureUnit}) —{' '}
-                {item.availableQuantity > 0 ? `saldo na Fábrica: ${item.availableQuantity}` : 'sem estoque'}
+              <option key={item.id} value={item.id}>
+                {item.name} ({item.measureUnit})
               </option>
             ))}
           </Select>

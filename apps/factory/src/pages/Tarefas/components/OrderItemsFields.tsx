@@ -38,6 +38,7 @@ export default function OrderItemsFields({
       <div className={styles.formGrid2}>
         <Select
           className={styles.input}
+          searchable
           value={itemKey}
           onChange={(event) => setItemKey(event.target.value)}
           disabled={!allItems.length}

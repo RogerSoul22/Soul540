@@ -1,49 +1,7 @@
 import { Router } from 'express';
-import mongoose, { Schema } from 'mongoose';
 import { getTenantUnit } from '../../infrastructure/middleware/tenant';
 import { requirePermission } from '../../infrastructure/middleware/permissions';
-
-const IngredientSchema = new Schema(
-  {
-    id: { type: String },
-    name: { type: String, default: '' },
-    measure: { type: String, default: 'kg' },
-    quantity: { type: Number, default: 0 },
-    cost: { type: Number, default: 0 },
-  },
-  { _id: false },
-);
-
-const InsumoSchema = new Schema(
-  {
-    id: { type: String },
-    name: { type: String, default: '' },
-    measure: { type: String, default: 'un' },
-    cost: { type: Number, default: 0 },
-  },
-  { _id: false },
-);
-
-const PizzaSizeSchema = new Schema(
-  {
-    id: { type: String },
-    diameter: { type: Number, default: 25 },
-    gramsPerPizza: { type: Number, default: 180 },
-  },
-  { _id: false },
-);
-
-const RecipeSchema = new Schema(
-  {
-    unit: { type: String, required: true, unique: true },
-    ingredients: { type: [IngredientSchema], default: [] },
-    insumos: { type: [InsumoSchema], default: [] },
-    sizes: { type: [PizzaSizeSchema], default: [] },
-  },
-  { toJSON: { virtuals: true, versionKey: false } },
-);
-
-const RecipeModel = mongoose.models.ProductionRecipe || mongoose.model('ProductionRecipe', RecipeSchema);
+import { ProductionRecipeModel } from './production-recipes.model';
 
 const router = Router();
 router.use(requirePermission('tarefas', 'read'));
@@ -54,9 +12,9 @@ export function getProductionRecipeUnit(req: any): string {
 
 router.get('/', async (req, res) => {
   const unit = getProductionRecipeUnit(req);
-  let doc = await RecipeModel.findOne({ unit });
+  let doc = await ProductionRecipeModel.findOne({ unit });
   if (!doc) {
-    doc = await RecipeModel.create({
+    doc = await ProductionRecipeModel.create({
       unit,
       ingredients: [
         { id: '1', name: 'Farinha', measure: 'kg', quantity: 0.6, cost: 0 },
@@ -77,7 +35,7 @@ router.get('/', async (req, res) => {
 router.put('/', requirePermission('tarefas', 'write'), async (req, res) => {
   const unit = getProductionRecipeUnit(req);
   const { ingredients, insumos, sizes } = req.body;
-  const doc = await RecipeModel.findOneAndUpdate(
+  const doc = await ProductionRecipeModel.findOneAndUpdate(
     { unit },
     { ingredients, insumos: insumos || [], sizes: sizes || [] },
     { upsert: true, new: true },
