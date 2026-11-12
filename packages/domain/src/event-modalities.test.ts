@@ -26,6 +26,12 @@ test('limits open-ended weekly occurrences', () => {
   ]);
 });
 
+test('keeps a Thursday Feirinha on Thursdays, exactly seven days apart', () => {
+  const occurrences = getWeeklyOccurrenceDates('2026-11-12', '2026-12-03', '2026-11-12', 8);
+
+  assert.deepEqual(occurrences, ['2026-11-12', '2026-11-19', '2026-11-26', '2026-12-03']);
+});
+
 test('only confirms a weekly occurrence on the configured weekday and range', () => {
   const template = { modality: 'feirinha' as const, date: '2026-10-25', recurrenceEndDate: '2026-11-15' };
   assert.equal(canConfirmWeeklyOccurrence(template, '2026-11-01'), true);

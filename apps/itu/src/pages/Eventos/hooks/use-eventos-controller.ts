@@ -136,7 +136,7 @@ export function useEventosController() {
     });
     const created = await response.json();
     if (!response.ok) throw new Error(created?.error || 'Falha ao confirmar ocorrência');
-    setEvents((previous) => [...previous, created]);
+    setEvents((previous) => [...previous.filter((event) => event.id !== created.id), created]);
     notifySuccess('Ocorrência confirmada.');
   };
   return {

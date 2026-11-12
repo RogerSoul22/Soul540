@@ -15,6 +15,7 @@ const sectionDefinitions = [
 
 export default function EventosSections({ controller }: { controller: EventosController }) {
   const {
+    events: allEvents,
     filtered,
     collapsedSections,
     expandedMonths,
@@ -85,7 +86,12 @@ export default function EventosSections({ controller }: { controller: EventosCon
                 <p className={styles.sectionEmpty}>Nenhuma feirinha.</p>
               ) : (
                 events.map((event) => (
-                  <RecurringFeirinhaCard key={event.id} event={event} onConfirm={confirmRecurringOccurrence} />
+                  <RecurringFeirinhaCard
+                    key={event.id}
+                    event={event}
+                    existingOccurrences={allEvents.filter((occurrence) => occurrence.recurrenceId === event.id)}
+                    onConfirm={confirmRecurringOccurrence}
+                  />
                 ))
               )
             )}
