@@ -1,5 +1,5 @@
 import type { SupplyOrderSummary } from '@soul540/contracts';
-import type { SupplyOrderViewAction } from './supply-order-view';
+import type { SupplyOrderMode, SupplyOrderViewAction } from './supply-order-view';
 import { getSupplyOrderStatusLabel } from './supply-order-view';
 import SupplyOrderActions from './SupplyOrderActions';
 import styles from './SupplyOrdersScreen.module.scss';
@@ -18,6 +18,7 @@ export type SupplyOrderKanbanClasses = {
 
 type Props = {
   order: SupplyOrderSummary;
+  mode: SupplyOrderMode;
   actions: SupplyOrderViewAction[];
   classes: SupplyOrderKanbanClasses;
   quantities: Record<string, string>;
@@ -35,6 +36,7 @@ type Props = {
 
 export default function SupplyOrderKanbanContent({
   order,
+  mode,
   actions,
   classes,
   quantities,
@@ -111,6 +113,7 @@ export default function SupplyOrderKanbanContent({
       {!!actions.length && (
         <SupplyOrderActions
           order={order}
+          mode={mode}
           actions={actions}
           quantities={quantities}
           links={links}

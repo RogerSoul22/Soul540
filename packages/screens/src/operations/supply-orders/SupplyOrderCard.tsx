@@ -113,6 +113,7 @@ export default function SupplyOrderCard(props: Props) {
       {!!actions.length && (
         <SupplyOrderActions
           order={order}
+          mode={mode}
           actions={actions}
           appearance={appearance}
           quantities={quantities}
@@ -138,6 +139,7 @@ export default function SupplyOrderCard(props: Props) {
         {kanbanClasses ? (
           <SupplyOrderKanbanContent
             order={order}
+            mode={mode}
             actions={actions}
             classes={kanbanClasses}
             quantities={quantities}
