@@ -79,5 +79,6 @@ export const emptyEventForm: EventFormData = {
   estimatedPizzas: '',
   actualPizzas: '',
   modality: 'evento_avulso',
+  isRecurringTemplate: false,
   recurrenceEndDate: '',
 };

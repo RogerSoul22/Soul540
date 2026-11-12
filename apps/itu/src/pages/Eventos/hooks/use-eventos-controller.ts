@@ -12,7 +12,7 @@ import { useEventResources } from './use-event-resources';
 import { useEventViewState } from './use-event-view-state';
 import { useEventFormDraft } from './use-event-form-draft';
 import { apiFetch } from '../../../lib/api';
-import { notifyFeedback } from '../../../../../../packages/api-client/src/index';
+import { notifySuccess } from '../../../../../../packages/api-client/src/index';
 export function useEventosController() {
   const { events, setEvents, addEvent, updateEvent, deleteEvent } = useApp();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -84,6 +84,7 @@ export function useEventosController() {
       estimatedPizzas: event.estimatedPizzas ? String(event.estimatedPizzas) : '',
       actualPizzas: event.actualPizzas ? String(event.actualPizzas) : '',
       modality: event.modality === 'feirinha' ? 'feirinha' : 'evento_avulso',
+      isRecurringTemplate: event.isRecurringTemplate === true,
       recurrenceEndDate: event.recurrenceEndDate || '',
     });
     setEditingId(event.id);
@@ -136,7 +137,7 @@ export function useEventosController() {
     const created = await response.json();
     if (!response.ok) throw new Error(created?.error || 'Falha ao confirmar ocorrência');
     setEvents((previous) => [...previous, created]);
-    notifyFeedback('Ocorrência confirmada.');
+    notifySuccess('Ocorrência confirmada.');
   };
   return {
     events,

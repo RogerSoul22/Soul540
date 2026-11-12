@@ -115,7 +115,7 @@ router.put('/:id', requirePermission('eventos', 'write'), async (req, res) => {
   // (ver syncEventFinances), mesmo que já tenham baixa registrada — não exige decisão prévia.
   const updateData = isFromFactory(req)
     ? pickFactoryOperationalUpdate(req.body)
-    : injectFranchiseScope(req, normalizeEventUpdatePayload(req.body));
+    : injectFranchiseScope(req, normalizeEventUpdatePayload(req.body, found.doc));
   if (isFromFactory(req) && Object.keys(updateData).length === 0) {
     return res.status(403).json({ error: 'Factory can only update operational production fields' });
   }

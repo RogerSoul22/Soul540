@@ -122,7 +122,7 @@ export function useEventFormActions({
       estimatedPizzas: Number(form.estimatedPizzas) || undefined,
       actualPizzas: Number(form.actualPizzas) || undefined,
       modality: form.modality,
-      isRecurringTemplate: form.modality === 'feirinha',
+      isRecurringTemplate: form.modality === 'feirinha' && (!editingId || form.isRecurringTemplate),
       recurrenceEndDate: form.modality === 'feirinha' ? form.recurrenceEndDate || undefined : undefined,
     };
     try {

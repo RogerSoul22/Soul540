@@ -18,7 +18,10 @@ export function normalizeEventPayload(body: Record<string, unknown>) {
   };
 }
 
-export function normalizeEventUpdatePayload(body: Record<string, unknown>) {
+export function normalizeEventUpdatePayload(
+  body: Record<string, unknown>,
+  existingEvent?: { recurrenceId?: string },
+) {
   const update = { ...body };
   if (Object.prototype.hasOwnProperty.call(body, 'modality'))
     update.modality = body.modality === 'feirinha' ? 'feirinha' : 'evento_avulso';
@@ -26,6 +29,10 @@ export function normalizeEventUpdatePayload(body: Record<string, unknown>) {
     update.isRecurringTemplate = body.isRecurringTemplate === true && body.modality !== 'evento_avulso';
   if (Object.prototype.hasOwnProperty.call(body, 'recurrenceEndDate'))
     update.recurrenceEndDate = body.modality === 'evento_avulso' ? undefined : body.recurrenceEndDate || undefined;
+  if (existingEvent?.recurrenceId) {
+    update.isRecurringTemplate = false;
+    update.recurrenceId = existingEvent.recurrenceId;
+  }
   return update;
 }
 

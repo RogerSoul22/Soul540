@@ -44,5 +44,6 @@ export type EventFormData = {
   estimatedPizzas: string;
   actualPizzas: string;
   modality: EventModality;
+  isRecurringTemplate: boolean;
   recurrenceEndDate: string;
 };
