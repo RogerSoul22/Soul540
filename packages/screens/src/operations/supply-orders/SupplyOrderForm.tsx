@@ -55,6 +55,7 @@ export default function SupplyOrderForm({ catalog, saving, onSubmit }: Props) {
         <div className={styles.formGrid}>
           <Select
             label="Insumo"
+            searchable
             value={selected}
             onChange={(event) => setSelected(event.target.value)}
           >
