@@ -5,7 +5,7 @@ export function useEventViewState() {
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
   const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set());
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
-    new Set(['orcamentos', 'confirmados', 'finalizados', 'cancelados']),
+    new Set(['recurringTemplates', 'orcamentos', 'confirmados', 'finalizados', 'cancelados']),
   );
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [viewingEvent, setViewingEvent] = useState<PizzaEvent | null>(null);

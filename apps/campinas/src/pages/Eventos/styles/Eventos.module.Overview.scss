@@ -1,0 +1,119 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.upcoming {
+  margin: $spacing-md 0 $spacing-xl;
+}
+
+.overviewTitle {
+  margin-bottom: $spacing-md;
+  color: $text-primary;
+}
+
+.overviewEmpty {
+  color: $text-muted;
+}
+
+.upcomingList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.upcomingItem {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  background: $bg-card;
+  cursor: pointer;
+  transition: border-color $transition-fast, transform $transition-fast;
+
+  &:hover {
+    border-color: rgba($accent, 0.45);
+    transform: translateY(-1px);
+  }
+
+  @include mobile {
+    grid-template-columns: 56px minmax(0, 1fr);
+
+    .upcomingSide {
+      grid-column: 1 / -1;
+      align-items: stretch;
+    }
+  }
+}
+
+.upcomingDate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $spacing-sm 0;
+  border-radius: $radius-sm;
+  background: $bg-tertiary;
+  color: $text-primary;
+
+  strong {
+    font-size: $font-size-xl;
+    line-height: 1;
+  }
+
+  span {
+    color: $accent;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    text-transform: uppercase;
+  }
+
+  small {
+    color: $text-muted;
+    font-size: $font-size-xs;
+    text-transform: capitalize;
+  }
+}
+
+.upcomingMain {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.upcomingTitleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.upcomingEventTitle {
+  overflow: hidden;
+  color: $text-primary;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upcomingMeta {
+  margin: 0;
+  overflow: hidden;
+  color: $text-muted;
+  font-size: $font-size-sm;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upcomingSide {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: $spacing-sm;
+}
+
+.upcomingValue {
+  color: $text-primary;
+  font-size: $font-size-lg;
+  white-space: nowrap;
+}

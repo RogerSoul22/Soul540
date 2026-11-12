@@ -6,6 +6,7 @@ import { eventValue, groupByMonth } from '../support/event-listing';
 import styles from '../styles/Eventos.module.scss';
 
 const sectionDefinitions = [
+  { key: 'recurringTemplates', label: 'Feirinhas', accent: '#f59e0b' },
   { key: 'orcamentos', label: 'Orçamentos', accent: '#3b82f6' },
   { key: 'confirmados', label: 'Eventos Fechados', accent: '#f59e0b' },
   { key: 'finalizados', label: 'Finalizados', accent: '#22c55e' },
@@ -42,15 +43,12 @@ export default function EventosSections({ controller }: { controller: EventosCon
     );
   return (
     <div className={styles.sections}>
-      {filtered.recurringTemplates.map((event) => (
-        <RecurringFeirinhaCard key={event.id} event={event} onConfirm={confirmRecurringOccurrence} />
-      ))}
       {sectionDefinitions.map(({ key, label, accent }) => {
         const events = filtered[key];
         const isCollapsed = collapsedSections.has(key);
         const total = events.reduce((sum, event) => sum + eventValue(event), 0);
         return (
-          <div key={key} className={styles.section}>
+          <div key={key} id={`event-section-${key}`} className={styles.section}>
             <Button variant="outline" className={styles.sectionHeader} onClick={() => toggleSection(key)}>
               <div className={styles.sectionHeaderLeft}>
                 <Heading level={2} variant="section" className={styles.sectionTitle} style={{ color: accent }}>
@@ -82,7 +80,16 @@ export default function EventosSections({ controller }: { controller: EventosCon
                 </svg>
               </div>
             </Button>
-            {!isCollapsed &&
+            {!isCollapsed && key === 'recurringTemplates' && (
+              events.length === 0 ? (
+                <p className={styles.sectionEmpty}>Nenhuma feirinha.</p>
+              ) : (
+                events.map((event) => (
+                  <RecurringFeirinhaCard key={event.id} event={event} onConfirm={confirmRecurringOccurrence} />
+                ))
+              )
+            )}
+            {!isCollapsed && key !== 'recurringTemplates' &&
               (events.length === 0 ? (
                 <p className={styles.sectionEmpty}>Nenhum evento.</p>
               ) : (
