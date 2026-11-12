@@ -1,6 +1,13 @@
 import { format, isValid, parseISO, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Badge, Card, Heading } from '../../../../../../packages/pentagono/src/index';
+import {
+  Badge,
+  Card,
+  EmptyState,
+  Heading,
+  SkeletonContent,
+  SkeletonValue,
+} from '../../../../../../packages/pentagono/src/index';
 import { buildEventWhatsAppUrl } from '../../../../../../packages/domain/src/index';
 import { formatBRL } from '../../../../../../shared/common/currency';
 import type { PizzaEvent } from '../../../types/Event';
@@ -10,10 +17,16 @@ import { getModalityLabel } from '../support/event-modalities';
 import styles from '../styles/Eventos.module.scss';
 
 const statusCards = [
-  { key: 'orcamentos', label: 'Orçamentos', accent: '#3b82f6', statuses: ['planning'] },
-  { key: 'confirmados', label: 'Fechados', accent: '#f59e0b', statuses: ['confirmed', 'in_progress'] },
-  { key: 'finalizados', label: 'Finalizados', accent: '#22c55e', statuses: ['completed'] },
-  { key: 'cancelados', label: 'Cancelados', accent: '#6b7280', statuses: ['cancelled'] },
+  { key: 'orcamentos', label: 'Orçamentos', accent: '#3b82f6', statuses: ['planning'], upcoming: true },
+  {
+    key: 'confirmados',
+    label: 'Fechados',
+    accent: '#f59e0b',
+    statuses: ['confirmed', 'in_progress'],
+    upcoming: true,
+  },
+  { key: 'finalizados', label: 'Finalizados', accent: '#22c55e', statuses: ['completed'], upcoming: false },
+  { key: 'cancelados', label: 'Cancelados', accent: '#6b7280', statuses: ['cancelled'], upcoming: false },
 ] as const;
 
 const statusBadge: Record<string, 'blue' | 'amber' | 'green' | 'gray'> = {
@@ -41,14 +54,14 @@ function formatCompactBRL(value: number): string {
 
 type Props = {
   events: PizzaEvent[];
-  onSelectStatus(key: string): void;
+  loading: boolean;
   onView(event: PizzaEvent): void;
   onEdit(event: PizzaEvent): void;
   onDelete(id: string): void;
   onFinalize(id: string): void;
 };
 
-export default function EventosOverview({ events, onSelectStatus, onView, onEdit, onDelete, onFinalize }: Props) {
+export default function EventosOverview({ events, loading, onView, onEdit, onDelete, onFinalize }: Props) {
   const regularEvents = events.filter((event) => !event.isRecurringTemplate);
   const upcoming = regularEvents
     .filter((event) => ['planning', 'confirmed', 'in_progress'].includes(event.status))
@@ -59,9 +72,11 @@ export default function EventosOverview({ events, onSelectStatus, onView, onEdit
     .sort((left, right) => parseISO(left.date).getTime() - parseISO(right.date).getTime());
   const statusGroups = statusCards.map((card) => {
     const matches = regularEvents.filter((event) => (card.statuses as readonly string[]).includes(event.status));
-    const next = matches
-      .filter((event) => parseISO(event.date) >= startOfDay(new Date()))
-      .sort((left, right) => parseISO(left.date).getTime() - parseISO(right.date).getTime())[0];
+    const next = card.upcoming
+      ? matches
+          .filter((event) => parseISO(event.date) >= startOfDay(new Date()))
+          .sort((left, right) => parseISO(left.date).getTime() - parseISO(right.date).getTime())[0]
+      : undefined;
     return { ...card, events: matches, total: matches.reduce((sum, event) => sum + eventValue(event), 0), next };
   });
 
@@ -71,43 +86,44 @@ export default function EventosOverview({ events, onSelectStatus, onView, onEdit
         {statusGroups.map((group) => (
           <Card
             key={group.key}
-            interactive
-            role="link"
-            tabIndex={0}
             aria-label={`${group.label}: ${group.events.length} eventos`}
             className={styles.statusCard}
             style={{ ['--status-accent' as string]: group.accent }}
-            onClick={() => onSelectStatus(group.key)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                onSelectStatus(group.key);
-              }
-            }}
           >
             <Heading level={2} variant="section" className={styles.statusLabel}>
               {group.label}
             </Heading>
             <strong className={styles.statusCount}>
-              {group.events.length}
+              <SkeletonValue loading={loading} label={`Carregando ${group.label}`}>
+                {group.events.length}
+              </SkeletonValue>
               <small>{group.events.length === 1 ? 'evento' : 'eventos'}</small>
             </strong>
-            <span className={styles.statusTotal}>{formatCompactBRL(group.total)}</span>
-            <span className={styles.statusNext}>
-              {group.next
-                ? `Próximo: ${group.next.name} · ${format(parseISO(group.next.date), "dd 'de' MMM", { locale: ptBR })}`
-                : 'Ver lista'}
-              <span aria-hidden="true"> ›</span>
+            <span className={styles.statusTotal}>
+              <SkeletonValue loading={loading} label="Carregando valor">
+                {formatCompactBRL(group.total)}
+              </SkeletonValue>
             </span>
+            {group.next && (
+              <span className={styles.statusNext}>
+                Próximo: {group.next.name} · {format(parseISO(group.next.date), "dd 'de' MMM", { locale: ptBR })}
+              </span>
+            )}
           </Card>
         ))}
       </section>
-      <section className={styles.upcoming} aria-labelledby="franchise-upcoming-events">
-        <Heading id="franchise-upcoming-events" level={2} variant="section" className={styles.overviewTitle}>
+      <section className={styles.upcoming} aria-labelledby="eventos-proximos">
+        <Heading id="eventos-proximos" level={2} variant="section" className={styles.overviewTitle}>
           Próximos eventos
         </Heading>
-        {upcoming.length === 0 ? (
-          <p className={styles.overviewEmpty}>Nenhum evento a caminho.</p>
+        {loading ? (
+          <SkeletonContent variant="list" label="Carregando eventos..." />
+        ) : upcoming.length === 0 ? (
+          <EmptyState
+            variant="compact"
+            title="Nenhum evento a caminho."
+            description="Crie um evento para começar."
+          />
         ) : (
           <div className={styles.upcomingList}>
             {upcoming.map((event) => {

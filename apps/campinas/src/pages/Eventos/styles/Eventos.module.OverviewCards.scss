@@ -2,7 +2,7 @@
 
 .statusGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: $spacing-md;
   margin-bottom: $spacing-xl;
 }
@@ -15,7 +15,6 @@
   gap: 4px;
   padding: $spacing-lg;
   overflow: hidden;
-  cursor: pointer;
 
   &::before {
     position: absolute;
@@ -25,10 +24,6 @@
     content: '';
   }
 
-  &:focus-visible {
-    outline: 2px solid var(--status-accent);
-    outline-offset: 2px;
-  }
 }
 
 .statusLabel {

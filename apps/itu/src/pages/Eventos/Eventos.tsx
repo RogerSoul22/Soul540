@@ -1,12 +1,10 @@
-import { ConfirmModal, SkeletonContent } from '../../../../../packages/pentagono/src/index';
+import { ConfirmModal } from '../../../../../packages/pentagono/src/index';
 import { useApp } from '../../contexts/AppContext';
 import styles from './styles/Eventos.module.scss';
 import EventDetailsModal from './components/EventDetailsModal';
-import EventosFilters from './components/EventosFilters';
 import EventosHeader from './components/EventosHeader';
 import EventosInfoModal from './components/EventosInfoModal';
 import EventosOverview from './components/EventosOverview';
-import EventosSections from './components/EventosSections';
 import EventFormModal from './components/EventFormModal';
 import { useEventosController } from './hooks/use-eventos-controller';
 
@@ -15,31 +13,17 @@ export default function Eventos() {
   const { dataLoading } = useApp();
   const { deleteTargetId, events, confirmDelete, setDeleteTargetId } = controller;
   const deletedEvent = events.find((event) => event.id === deleteTargetId);
-  const selectStatusSection = (key: string) => {
-    if (controller.collapsedSections.has(key)) controller.toggleSection(key);
-    requestAnimationFrame(() =>
-      document.getElementById(`event-section-${key}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
-    );
-  };
   return (
     <div className={styles.page}>
       <EventosHeader controller={controller} />
-      <EventosFilters controller={controller} />
-      {dataLoading ? (
-        <SkeletonContent variant="list" label="Carregando eventos..." />
-      ) : (
-        <>
-          <EventosOverview
-            events={Object.values(controller.filtered).flat()}
-            onSelectStatus={selectStatusSection}
-            onView={controller.setViewingEvent}
-            onEdit={controller.openEdit}
-            onDelete={controller.setDeleteTargetId}
-            onFinalize={(id) => controller.updateEvent(id, { status: 'completed' })}
-          />
-          <EventosSections controller={controller} />
-        </>
-      )}
+      <EventosOverview
+        events={events}
+        loading={dataLoading}
+        onView={controller.setViewingEvent}
+        onEdit={controller.openEdit}
+        onDelete={controller.setDeleteTargetId}
+        onFinalize={(id) => controller.updateEvent(id, { status: 'completed' })}
+      />
       <EventFormModal controller={controller} />
       <EventDetailsModal controller={controller} />
       <EventosInfoModal controller={controller} />
